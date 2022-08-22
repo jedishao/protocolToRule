@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3337: Frame pointer support for memory load and store operations</title>
+<meta property="og:title" content="EIP-3337: Frame pointer support for memory load and store operations" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3337" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3337" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3337: Frame pointer support for memory load and store operations
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3337.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/arachnid">Nick Johnson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eips-3336-and-3337-improving-the-evms-memory-model/5482">https://ethereum-magicians.org/t/eips-3336-and-3337-improving-the-evms-memory-model/5482</a></td></tr>
+
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-03-06</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3336">3336</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#frame-pointer">Frame pointer</a></li>
+<li><a href="#setfp-opcode">SETFP opcode</a></li>
+<li><a href="#getfp-opcode">GETFP opcode</a></li>
+<li><a href="#mloadfp-opcode">MLOADFP opcode</a></li>
+<li><a href="#mstorefp-opcode">MSTOREFP opcode</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#cost-of-new-opcodes">Cost of new opcodes</a></li>
+<li><a href="#absence-of-mstore8fp">Absence of MSTORE8FP</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Introduces four new opcodes for loading data from and storing data to memory offset by a frame pointer.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP introduces four new opcodes, <code class="language-plaintext highlighter-rouge">MLOADFP</code>, <code class="language-plaintext highlighter-rouge">MSTOREFP</code>, <code class="language-plaintext highlighter-rouge">GETFP</code> and <code class="language-plaintext highlighter-rouge">SETFP</code> that allow for more efficient memory access offset by a user-controlled quantity called the “frame pointer”. This permits compilers to more efficiently offload ephemeral data such as local variables to memory instead of the EVM’s evaluation stack, which has a number of benefits, including the effective elimination of restrictions on the number of local variables in a function.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>In most commonly used VMs, ephemeral data such as local variables, function arguments, and return addresses is stored in a region of memory called the stack. In contrast to the EVM’s evaluation stack, this area of memory is randomly accessible, and thus can store an arbitrary amount of data, which can be referenced from anywhere they remain in scope. Although this model is possible in the current EVM design, it is made difficult by the linear model of memory (addressed in <a href="/EIPS/eip-3336">EIP-3336</a>) and by the lack of opcodes for relative memory access commonly found in other architectures. This EIP proposes new opcodes that permit this form of memory use, without imposing undue burden on EVM implementers or on runtime efficiency.</p>
+<p>In the current EVM model, a compiler wishing to use this pattern would have to store the frame pointer - which points to the start or end of the current memory stack frame - in memory, and load it each time they wish to reference it. For example, loading a value from memory offset by the frame pointer would require the following sequence of operations:</p>
+<table>
+<thead>
+<tr>
+<th>Opcode</th>
+<th>Gas used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">PUSHn x</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">PUSH1 0</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MLOAD</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">ADD</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MLOAD</code></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>This consumes a total of 15 gas, and takes up at least 7 bytes of bytecode each time it is referenced. In contrast, after this EIP, the equivalent sequence of operations is:</p>
+<table>
+<thead>
+<tr>
+<th>Opcode</th>
+<th>Gas used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">PUSH1 x</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MLOADFP</code></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>This consumes only 6 gas, and takes at least 3 bytes of bytecode. The effort required from the EVM implementation is equivalent, costing only one extra addition operation over a regular <code class="language-plaintext highlighter-rouge">MLOAD</code>. The alternative of storing values on the stack, which requires 3 gas and 1 byte of bytecode for a <code class="language-plaintext highlighter-rouge">DUPn</code> operation, but it is now at most twice as efficient rather than 5 times as efficient, making storing values in memory a viable alternative.</p>
+<p>Likewise, before this EIP a frame-pointer relative store requires the following sequence of operations:
+| Opcode | Gas used |
+|———–|———-|
+| <code class="language-plaintext highlighter-rouge">PUSHn x</code> | 3 |
+| <code class="language-plaintext highlighter-rouge">PUSH1 0</code> | 3 |
+| <code class="language-plaintext highlighter-rouge">MLOAD</code> | 3 |
+| <code class="language-plaintext highlighter-rouge">ADD</code> | 3 |
+| <code class="language-plaintext highlighter-rouge">MSTORE</code> | 3 |</p>
+<p>This consumes 15 gas and at least 7 bytes of bytecode. After this EIP, the equivalent sequence of operations is:</p>
+<table>
+<thead>
+<tr>
+<th>Opcode</th>
+<th>Gas used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">PUSHn x</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MSTOREFP</code></td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>Consuming only 6 gas and at least 3 bytes of bytecode, while once again only requiring EVM implementations to do one extra addition operation. The alternative of storing values on the stack requires 6 gas and 2 bytes of bytecode for the sequence <code class="language-plaintext highlighter-rouge">SWAPn POP</code>, making it no more efficient than memory storage.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></td>
+<td>TBD</td>
+</tr>
+</tbody>
+</table>
+<p>For blocks where <code class="language-plaintext highlighter-rouge">block.number &gt;= FORK_BLOCK</code>, the following changes apply.</p>
+<h3 id="frame-pointer">
+<a href="#frame-pointer" class="anchor-link"></a> Frame pointer
+</h3>
+<p>A new EVM internal state variable called the “frame pointer” is introduced. This is a signed integer that starts at 0.</p>
+<h3 id="setfp-opcode">
+<a href="#setfp-opcode" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">SETFP</code> opcode
+</h3>
+<p>A new opcode, <code class="language-plaintext highlighter-rouge">SETFP</code> is introduced with value <code class="language-plaintext highlighter-rouge">0x5c</code>. This opcode costs <code class="language-plaintext highlighter-rouge">G_low</code> (3 gas) and takes one argument from the stack. The argument is stored as the new value of the frame pointer.</p>
+<h3 id="getfp-opcode">
+<a href="#getfp-opcode" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">GETFP</code> opcode
+</h3>
+<p>A new opcode, <code class="language-plaintext highlighter-rouge">GETFP</code> is introduced with value <code class="language-plaintext highlighter-rouge">0x5d</code>. This opcode costs <code class="language-plaintext highlighter-rouge">G_low</code> (3 gas) and takes no arguments. It takes the current value of the frame pointer and pushes it to the stack.</p>
+<h3 id="mloadfp-opcode">
+<a href="#mloadfp-opcode" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">MLOADFP</code> opcode
+</h3>
+<p>A new opcode <code class="language-plaintext highlighter-rouge">MLOADFP</code> is introduced with value <code class="language-plaintext highlighter-rouge">0x5e</code>. This opcode acts in all ways identical to <code class="language-plaintext highlighter-rouge">MLOAD</code>, except that the value of the frame pointer is added to the address before loading data from memory. An attempt to load data from a negative address should be treated identically to an invalid opcode, consuming all gas and reverting the current execution context.</p>
+<h3 id="mstorefp-opcode">
+<a href="#mstorefp-opcode" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">MSTOREFP</code> opcode
+</h3>
+<p>A new opcode <code class="language-plaintext highlighter-rouge">MSTOREFP</code> is introduced with value <code class="language-plaintext highlighter-rouge">0x5f</code>. This opcode acts in all ways identical to <code class="language-plaintext highlighter-rouge">MSTORE</code>, except that the value of the frame pointer is added to the address before storing data to memory. An attempt to store data to a negative address should be treated identically to an invalid opcode, consuming all gas and reverting the current execution context.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="cost-of-new-opcodes">
+<a href="#cost-of-new-opcodes" class="anchor-link"></a> Cost of new opcodes
+</h3>
+<p>The cost of the new opcodes <code class="language-plaintext highlighter-rouge">MLOADFP</code> and <code class="language-plaintext highlighter-rouge">MSTOREFP</code> reflects the cost of <code class="language-plaintext highlighter-rouge">MLOAD</code> and <code class="language-plaintext highlighter-rouge">MSTORE</code>. They are generally equivalent in cost with the exception of an extra addition operation, which imposes negligible cost.</p>
+<p>The cost of the new opcodes <code class="language-plaintext highlighter-rouge">SETFP</code> and <code class="language-plaintext highlighter-rouge">GETFP</code> is based on other common low-cost opcodes such as <code class="language-plaintext highlighter-rouge">PUSH</code> and <code class="language-plaintext highlighter-rouge">POP</code>.</p>
+<h3 id="absence-of-mstore8fp">
+<a href="#absence-of-mstore8fp" class="anchor-link"></a> Absence of <code class="language-plaintext highlighter-rouge">MSTORE8FP</code>
+</h3>
+<p><code class="language-plaintext highlighter-rouge">MSTORE8FP</code> opcode was not included because it is expected that it would be used infrequently, and there is a desire to minimise the size of the instruction set and to conserve opcodes for future use.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP exclusively introduces new opcodes, and as a result should not impact any existing programs unless they operate under the assumption that these opcodes are undefined, which we believe will not be the case.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>DoS risks are mitigated by correct pricing of opcodes to reflect current execution costs. No other security considerations pertain to this EIP.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/arachnid">Nick Johnson</a>, "EIP-3337: Frame pointer support for memory load and store operations [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3337, March 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3337.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3337: Frame pointer support for memory load and store operations [DRAFT]",
+    "author": "Nick Johnson (@arachnid)",
+    "name": "EIP-3337: Frame pointer support for memory load and store operations [DRAFT]",
+    "dateCreated": "2021-03-06",
+    "datePublished": "2021-03-06",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eips-3336-and-3337-improving-the-evms-memory-model/5482",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

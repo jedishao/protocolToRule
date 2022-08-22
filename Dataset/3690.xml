@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3690: EOF - JUMPDEST Table</title>
+<meta property="og:title" content="EIP-3690: EOF - JUMPDEST Table" />
+<meta name="description" content="A special EOF section for storing the list of JUMPDESTs, which simplifies execution time analysis." />
+<meta property="og:description" content="A special EOF section for storing the list of JUMPDESTs, which simplifies execution time analysis." />
+<meta name="twitter:description" content="A special EOF section for storing the list of JUMPDESTs, which simplifies execution time analysis." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3690" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3690" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3690: EOF - JUMPDEST Table
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3690.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A special EOF section for storing the list of JUMPDESTs, which simplifies execution time analysis.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3690-eof-jumpdest-table/6806">https://ethereum-magicians.org/t/eip-3690-eof-jumpdest-table/6806</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-06-23</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3540">3540</a>,
+<a href="eip-3670">3670</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#eof-container-changes">EOF container changes</a></li>
+<li><a href="#validation-rules">Validation rules</a></li>
+<li><a href="#execution">Execution</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#jumpdests-section-is-bounded">Jumpdests section is bounded</a></li>
+<li><a href="#delta-encoding">Delta encoding</a></li>
+<li><a href="#leb128-for-offsets">LEB128 for offsets</a></li>
+<li><a href="#size-prefix-for-offsets">Size-prefix for offsets</a></li>
+<li><a href="#empty-table">Empty table</a></li>
+<li><a href="#why-jumpdests-before-code">Why jumpdests before code?</a></li>
+<li><a href="#code-chunking--merkleization">Code chunking / merkleization</a></li>
+<li><a href="#benchmarks--performance-analysis">Benchmarks / performance analysis</a></li>
+</ul>
+</li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduce a section in the EOF format (<a href="/EIPS/eip-3540">EIP-3540</a>) for storing the list of <code class="language-plaintext highlighter-rouge">JUMPDEST</code>s, validate the correctness of this list at the time of contract creation, and remove the need for <code class="language-plaintext highlighter-rouge">JUMPDEST</code>-analysis at execution time. In EOF contracts, the <code class="language-plaintext highlighter-rouge">JUMPDEST</code> instruction is not needed anymore and becomes invalid. Legacy contracts are entirely unaffected by this change.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently existing contracts require no validation of correctness, but every time they are executed, a list must be built containing all the valid jump-destinations. This is an overhead which can be avoided, albeit the effect of the overhead depends on the client implementation.</p>
+<p>With the structure provided by EIP-3540 it is easy to store and transmit a table of valid jump-destinations instead of using designated <code class="language-plaintext highlighter-rouge">JUMPDEST</code> (0x5b) opcodes in the code.</p>
+<p>The goal of this change is that we trade less complexity (and processing time) at execution time for more complexity at contract creation time. Through benchmarks we have identified that the mandatory execution preparation time is the same as before for extreme cases (i.e. deliberate edge cases), while it is ~10x faster for the average case.</p>
+<p>Finally, this change puts an implicit bound on “initcode analysis” which is now limited to jumpdests section loading of max size of 0xffff. The legacy code remains vulnerable.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>This feature is introduced on the very same block <a href="/EIPS/eip-3540">EIP-3540</a> is enabled, therefore every EOF1-compatible bytecode MUST have a JUMPDEST-table if it uses jumps.</p>
+<p><em>Remark:</em> We rely on the notation of <em>initcode</em>, <em>code</em> and <em>creation</em> as defined by <a href="/EIPS/eip-3540">EIP-3540</a>, and extend validation rules of <a href="/EIPS/eip-3670">EIP-3670</a>.</p>
+<h3 id="eof-container-changes">
+<a href="#eof-container-changes" class="anchor-link"></a> EOF container changes
+</h3>
+<ol>
+<li>A new EOF section called <code class="language-plaintext highlighter-rouge">jumpdests</code> (<code class="language-plaintext highlighter-rouge">section_kind = 3</code>) is introduced. It contains a sequence of <em>n</em> unsigned integers <em>jumploc<sub>i</sub></em>.</li>
+<li>
+<p>The <em>jumploc<sub>i</sub></em> values are encoded with <a href="https://en.wikipedia.org/wiki/LEB128#Unsigned_LEB128">unsigned LEB128</a>.</p>
+<table>
+<thead>
+<tr>
+<th>description</th>
+<th>encoding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>jumploc<sub>0</sub></td>
+<td>unsigned LEB128</td>
+</tr>
+<tr>
+<td>jumploc<sub>1</sub></td>
+<td>unsigned LEB128</td>
+</tr>
+<tr>
+<td>…</td>
+<td> </td>
+</tr>
+<tr>
+<td>jumploc<sub>n</sub></td>
+<td>unsigned LEB128</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>The jump destinations represent the set of valid code positions as arguments to jump instructions. They are delta-encoded therefore partial sum must be performed to retrieve the absolute offsets.
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">jumpdest</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">jumpdests_table</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">jumpdests_table</span><span class="p">[:</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div> </div>
+</li>
+</ol>
+<h3 id="validation-rules">
+<a href="#validation-rules" class="anchor-link"></a> Validation rules
+</h3>
+<blockquote>
+<p>This section extends contact creation validation rules (as defined in EIP-3540).</p>
+</blockquote>
+<ol>
+<li>The <code class="language-plaintext highlighter-rouge">jumpdests</code> section MUST be present if and only if the <code class="language-plaintext highlighter-rouge">code</code> section contains <code class="language-plaintext highlighter-rouge">JUMP</code> or <code class="language-plaintext highlighter-rouge">JUMPI</code> opcodes.</li>
+<li>If the <code class="language-plaintext highlighter-rouge">jumpdests</code> section is present it MUST directly precede the <code class="language-plaintext highlighter-rouge">code</code> section. In this case a valid EOF bytecode will have the form of <code class="language-plaintext highlighter-rouge">format, magic, version, [jumpdests_section_header], code_section_header, [data_section_header], 0, [jumpdests_section_contents], code_section_contents, [data_section_contents]</code>.</li>
+<li>The LEB128 encoding of a <code class="language-plaintext highlighter-rouge">jumploc</code> must be valid: the encoding must be complete and not read out of <code class="language-plaintext highlighter-rouge">jumpdests</code> section. As an additional constraint, the shortest possible encoding must be used.</li>
+<li>With an exception of the first entry, the value of <code class="language-plaintext highlighter-rouge">jumploc</code> MUST NOT be 0.</li>
+<li>Every <code class="language-plaintext highlighter-rouge">jumploc</code> MUST point to a valid opcode. They MUST NOT point into PUSH-data or outside of the code section.</li>
+<li>The <code class="language-plaintext highlighter-rouge">JUMPDEST</code> (0x5b) instruction becomes undefined (Note: According to rules of EIP-3670, deploying the code will fail if it contains <code class="language-plaintext highlighter-rouge">JUMPDEST</code>)</li>
+</ol>
+<h3 id="execution">
+<a href="#execution" class="anchor-link"></a> Execution
+</h3>
+<ol>
+<li>When executing <code class="language-plaintext highlighter-rouge">JUMP</code> or <code class="language-plaintext highlighter-rouge">JUMPI</code> instructions, the jump destination MUST be in the <code class="language-plaintext highlighter-rouge">jumpdests</code> table. Otherwise, the execution aborts with <em>bad jump destination</em>. In case of <code class="language-plaintext highlighter-rouge">JUMPI</code>, the check is done only when the jump is to be taken (no change to the previous behaviour).</li>
+</ol>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="jumpdests-section-is-bounded">
+<a href="#jumpdests-section-is-bounded" class="anchor-link"></a> Jumpdests section is bounded
+</h3>
+<p>The length of the <code class="language-plaintext highlighter-rouge">jumpdests</code> section is bounded by the EOF maximum section size value 0xffff. Moreover, for deployed code this additionally limited by the max bytecode size 0x6000. Then any valid <code class="language-plaintext highlighter-rouge">jumpdests</code> section may not be more larger than 0x3000.</p>
+<h3 id="delta-encoding">
+<a href="#delta-encoding" class="anchor-link"></a> Delta encoding
+</h3>
+<p>Delta-encoding is very efficient for this job. From a quick analysis of a small set of contracts <code class="language-plaintext highlighter-rouge">JUMPDEST</code> opcodes are relatively close to each other. In the delta-encoding the values almost never exceed 128. Combined with any form of variable-length quantity (VLQ) where values &lt; 128 occupy one byte, encoding of single jumpdest takes ~1 byte. We also remove <code class="language-plaintext highlighter-rouge">JUMPDEST</code> opcodes from the code section therefore the total bytecode length remains the same if extreme examples are ignored.</p>
+<p>By extreme examples we mean contracts having a distance between two subsequent JUMPDESTs larger than 128. Then the LEB128 encoding of such distance requires more than one byte and the total bytecode size will increase by the additional number of bytes used.</p>
+<h3 id="leb128-for-offsets">
+<a href="#leb128-for-offsets" class="anchor-link"></a> LEB128 for offsets
+</h3>
+<p>The LEB128 encoding is the most popular VLQ used in DWARF and WebAssembly.</p>
+<p>LEB128 allows encoding a fixed value with arbitrary number of bytes by having zero payloads for most significant bits of the value. To ensure there exists only single encoding of a given value, we additionally require the shortest possible LEB128 encoding to be used. This constraint is also required by WebAssembly.</p>
+<h3 id="size-prefix-for-offsets">
+<a href="#size-prefix-for-offsets" class="anchor-link"></a> Size-prefix for offsets
+</h3>
+<p>This is another option for encoding inspired by UTF-8. The benefit is that the number of following bytes is encoded in the first byte (the top two bits), so the expected length is known upfront.</p>
+<p>A simple decoder is the following:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="n">size_prefix</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;&gt;</span> <span class="mi">6</span>
+    <span class="k">if</span> <span class="n">size_prefix</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0x3f</span>
+    <span class="k">elif</span> <span class="n">size_prefix</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0x3f</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span> <span class="o">|</span> <span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">size_prefix</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0x3f</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">16</span> <span class="o">|</span> <span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">|</span> <span class="nb">input</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="c1"># Do not support case 3
+</span>    <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="empty-table">
+<a href="#empty-table" class="anchor-link"></a> Empty table
+</h3>
+<p>In case code does not use jumps, an empty JUMPDEST table is represented by omitting <code class="language-plaintext highlighter-rouge">jumpdests</code> section as opposed to a section that is always present, but allowed to be empty. This is consistent with the requirement of EIP-3540 for section size to be non-zero. Additionally, omitting the section saves 3 bytes of code storage.</p>
+<h3 id="why-jumpdests-before-code">
+<a href="#why-jumpdests-before-code" class="anchor-link"></a> Why jumpdests before code?
+</h3>
+<p>The contents of <code class="language-plaintext highlighter-rouge">jumpdests</code> section are always needed to start EVM execution. For chunked and/or merkleized bytecode it is more efficient to have <code class="language-plaintext highlighter-rouge">jumpdests</code> just after the EOF header so they can share the same first chunk(s).</p>
+<h3 id="code-chunking--merkleization">
+<a href="#code-chunking--merkleization" class="anchor-link"></a> Code chunking / merkleization
+</h3>
+<p>In code chunking the contract code is split into (fixed size) chunks. Due to the requirement of jumpdest-analysis, it must be known where the first instruction starts in a given chunk, in case the split happened within a PUSH-data. This is commonly accomplished with reserving the first byte of the chunk as the “first instruction offset” (FIO) field.</p>
+<p>With this EIP, code chunking does not need to have such a field. However, the jumpdest table must be provided instead (for all the chunks up until the last jump location used during execution).</p>
+<h3 id="benchmarks--performance-analysis">
+<a href="#benchmarks--performance-analysis" class="anchor-link"></a> Benchmarks / performance analysis
+</h3>
+<p>We compared the performance of <code class="language-plaintext highlighter-rouge">jumpdests</code> section loading to JUMPDEST analysis in evmone/Baseline interpreter. In both cases a bitset of valid jumpdest positions is built.</p>
+<p>We used the worst case for <code class="language-plaintext highlighter-rouge">jumpdests</code> section as the benchmark baseline. This is the case where every position in the code section is valid jumpdest. I.e. the bytecode has as many jumpdests as possible making the jumpdests section as large as possible. The encoded representation is <code class="language-plaintext highlighter-rouge">0x00, 0x01, 0x01, 0x01, ...</code>.</p>
+<p>This also happen to be the worst case for the JUMPDEST analysis.</p>
+<p>Further, we picked 5 popular contracts from the Ethereum mainnet.</p>
+<table>
+<thead>
+<tr>
+<th>case</th>
+<th>size</th>
+<th>num JUMPDESTs</th>
+<th>JUMPDEST analysis (cycles/byte)</th>
+<th>jumpdests load (cycles/byte)</th>
+<th>performance change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>worst</td>
+<td>65535</td>
+<td>65535</td>
+<td>9.11</td>
+<td>9.36</td>
+<td>2.75%</td>
+</tr>
+<tr>
+<td>RoninBridge</td>
+<td>1760</td>
+<td>71</td>
+<td>3.57</td>
+<td> </td>
+<td>-89.41%</td>
+</tr>
+<tr>
+<td>UniswapV2ERC20</td>
+<td>2319</td>
+<td>61</td>
+<td>2.10</td>
+<td> </td>
+<td>-88.28%</td>
+</tr>
+<tr>
+<td>DepositContract</td>
+<td>6358</td>
+<td>123</td>
+<td>1.86</td>
+<td> </td>
+<td>-90.24%</td>
+</tr>
+<tr>
+<td>TetherToken</td>
+<td>11075</td>
+<td>236</td>
+<td>1.91</td>
+<td> </td>
+<td>-89.58%</td>
+</tr>
+<tr>
+<td>UniswapV2Router02</td>
+<td>21943</td>
+<td>468</td>
+<td>2.26</td>
+<td> </td>
+<td>-91.17%</td>
+</tr>
+</tbody>
+</table>
+<p>For the worst case the performance difference between JUMPDEST analysis and jumpdests section loading is very small. The performance very slow compared to memory copy (0.15 cycles/byte).</p>
+<p>However, the maximum length for the worst cases is different. For JUMPDEST analysis this is 24576 (0x6000) for deployed contracts and only limited by EVM memory cost in case of <em>initcode</em> (can be over 1MB). For jumpdests sections, the limit is 12288 for deployed contracts (the deployed bytecode length limit must be split equally between jumpdests and code sections). For <em>initcode</em> case, the limit is 65535 because this is the maximum section size allowed by EOF.</p>
+<p>For “popular” contracts the gained efficiency is ~10x because the jumpdests section is relatively small compared to the code section and therefore there is much less bytes to loop over than in JUMPDEST analysis.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>We extend the <code class="language-plaintext highlighter-rouge">validate_code()</code> function of <a href="/EIPS/eip-3670">EIP-3670</a>:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># The same table as in EIP-3670
+</span><span class="n">valid_opcodes</span> <span class="o">=</span> <span class="p">...</span>
+
+<span class="c1"># Remove JUMPDEST from the list of valid opcodes
+</span><span class="n">valid_opcodes</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="mh">0x5b</span><span class="p">)</span>
+
+<span class="c1"># This helper decodes a single unsigned LEB128 encoded value
+# This will abort on truncated (short) input
+</span><span class="k">def</span> <span class="nf">leb128u_decode</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+  <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">shift</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="n">consumed_bytes</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+      <span class="c1"># Check for truncated input
+</span>      <span class="k">assert</span><span class="p">(</span><span class="n">consumed_bytes</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="p">))</span>
+      <span class="c1"># Only allow up to 4-byte long leb128 encodings
+</span>      <span class="k">assert</span><span class="p">(</span><span class="n">consumed_bytes</span> <span class="o">&lt;=</span> <span class="mi">3</span><span class="p">)</span>
+      <span class="n">input_byte</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="n">consumed_bytes</span><span class="p">]</span>
+      <span class="n">consumed_bytes</span> <span class="o">+=</span> <span class="mi">1</span>
+      <span class="n">ret</span> <span class="o">|=</span> <span class="p">(</span><span class="n">input_byte</span> <span class="o">&amp;</span> <span class="mh">0x7f</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">shift</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">input_byte</span> <span class="o">&amp;</span> <span class="mh">0x80</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+          <span class="c1"># Do not allow additional leading zero bits.
+</span>          <span class="k">assert</span><span class="p">(</span><span class="n">input_byte</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">consumed_bytes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+          <span class="k">break</span>
+      <span class="n">shift</span> <span class="o">+=</span> <span class="mi">7</span>
+  <span class="k">return</span> <span class="p">(</span><span class="n">ret</span><span class="p">,</span> <span class="n">consumed_bytes</span><span class="p">)</span>
+
+<span class="c1"># This helper parses the jumpdest table into a list of relative offsets
+# This will abort on truncated (short) input
+</span><span class="k">def</span> <span class="nf">parse_table</span><span class="p">(</span><span class="nb">input</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+  <span class="n">jumpdests</span> <span class="o">=</span> <span class="p">[]</span>
+  <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+      <span class="n">value</span><span class="p">,</span> <span class="n">consumed_bytes</span> <span class="o">=</span> <span class="n">leb128u_decode</span><span class="p">(</span><span class="nb">input</span><span class="p">[</span><span class="n">pos</span><span class="p">:])</span>
+      <span class="n">jumpdests</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+      <span class="n">pos</span> <span class="o">+=</span> <span class="n">consumed_bytes</span>
+  <span class="k">return</span> <span class="n">jumpdests</span>
+
+<span class="c1"># This helper translates the delta offsets into absolute ones
+# This will abort on invalid 0-value entries
+</span><span class="k">def</span> <span class="nf">process_jumpdests</span><span class="p">(</span><span class="n">delta</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="n">jumpdests</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">partial_sum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">first</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">delta</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">first</span><span class="p">:</span>
+            <span class="n">first</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">d</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">partial_sum</span> <span class="o">+=</span> <span class="n">d</span>
+        <span class="n">jumpdests</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">partial_sum</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">jumpdests</span>
+
+<span class="c1"># Fails with assertion on invalid code
+# Expects list of absolute jumpdest offsets
+</span><span class="k">def</span> <span class="nf">validate_code</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">jumpdests</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+        <span class="c1"># Ensure the opcode is valid
+</span>        <span class="n">opcode</span> <span class="o">=</span> <span class="n">code</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">assert</span><span class="p">(</span><span class="n">opcode</span> <span class="ow">in</span> <span class="n">valid_opcodes</span><span class="p">)</span>
+
+        <span class="c1"># Remove touched offset
+</span>        <span class="k">try</span><span class="p">:</span>
+            <span class="n">jumpdests</span><span class="p">.</span><span class="n">remove</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># Skip pushdata
+</span>        <span class="k">if</span> <span class="n">opcode</span> <span class="o">&gt;=</span> <span class="mh">0x60</span> <span class="ow">and</span> <span class="n">opcode</span> <span class="o">&lt;=</span> <span class="mh">0x7f</span><span class="p">:</span>
+            <span class="n">pos</span> <span class="o">+=</span> <span class="n">opcode</span> <span class="o">-</span> <span class="mh">0x60</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Ensure last PUSH doesn't go over code end
+</span>    <span class="k">assert</span><span class="p">(</span><span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">))</span>
+
+    <span class="c1"># The table is invalid if there are untouched locations
+</span>    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">jumpdests</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h4 id="valid-bytecodes">
+<a href="#valid-bytecodes" class="anchor-link"></a> Valid bytecodes
+</h4>
+<ul>
+<li>No jumpdests</li>
+<li>Every byte is a jumpdest</li>
+<li>Distant jumpdests (0x7f and 0x3f01 bytes apart)</li>
+<li>Max number of jumpdests
+<ul>
+<li>1-byte offset encoding: initcode of max size (64K) with jumpdest at each byte - table contains 65536 1-byte offsets, first one is 0x00, all others equal 0x01</li>
+<li>2-byte offset encoding: inicode of max size with jumpdests 0x80 (128) bytes apart - table contains 512 offsets, first one is 0x7f (127), all others equal 0x8001</li>
+<li>3-byte offset encoding: inicode of max size with jumpdests 0x4000 (16384) bytes apart - table contains 4 offsets: 0xFF7F (16383), 0x808001, 0x808001, 0x808001</li>
+</ul>
+</li>
+</ul>
+<h4 id="invalid-bytecodes">
+<a href="#invalid-bytecodes" class="anchor-link"></a> Invalid bytecodes
+</h4>
+<ul>
+<li>Empty jumpdest section</li>
+<li>Multiple jumpdest sections</li>
+<li>jumpdest section after the code section</li>
+<li>jumpdest section after the data section</li>
+<li>Final jumploc in the table is truncated (not a valid LEB128)</li>
+<li>LEB128 encoding with extra 0s (non-minimal encoding)</li>
+<li>Jumpdest location pointing to PUSH data</li>
+<li>Jumpdest location out of code section bounds
+<ul>
+<li>pointing into data section</li>
+<li>pointing into jumpdest section</li>
+<li>pointing outside container bounds</li>
+</ul>
+</li>
+<li>Duplicate jumpdest locations (0 deltas in table other than 1st offset)</li>
+<li>Code containing <code class="language-plaintext highlighter-rouge">JUMP</code> but no jumpdest table</li>
+<li>Code containing <code class="language-plaintext highlighter-rouge">JUMPI</code> but no jumpdest table</li>
+<li>Code containing jumpdest table but not <code class="language-plaintext highlighter-rouge">JUMP</code>/<code class="language-plaintext highlighter-rouge">JUMPI</code></li>
+<li>Code containing <code class="language-plaintext highlighter-rouge">JUMPDEST</code></li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change poses no risk to backwards compatibility, as it is introduced at the same time EIP-3540 is. The requirement of a JUMPDEST table does not cover legacy bytecode.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The authors are not aware of any security or DoS risks posed by this change.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, "EIP-3690: EOF - JUMPDEST Table [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3690, June 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3690.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3690: EOF - JUMPDEST Table [DRAFT]",
+    "author": "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0)",
+    "name": "EIP-3690: EOF - JUMPDEST Table [DRAFT]",
+    "dateCreated": "2021-06-23",
+    "datePublished": "2021-06-23",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3690-eof-jumpdest-table/6806",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

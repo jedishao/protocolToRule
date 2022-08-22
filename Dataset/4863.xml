@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4863: Beacon chain push withdrawals</title>
+<meta property="og:title" content="EIP-4863: Beacon chain push withdrawals" />
+<meta name="description" content="Support validator withdrawals from the beacon chain to the EVM via a new &quot;push-style&quot; transaction type." />
+<meta property="og:description" content="Support validator withdrawals from the beacon chain to the EVM via a new &quot;push-style&quot; transaction type." />
+<meta name="twitter:description" content="Support validator withdrawals from the beacon chain to the EVM via a new &quot;push-style&quot; transaction type." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4863" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4863" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4863: Beacon chain push withdrawals
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4863.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Support validator withdrawals from the beacon chain to the EVM via a new &quot;push-style&quot; transaction type.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/ralexstokes">Alex Stokes</a>, <a href="https://github.com/djrtwo">Danny Ryan</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4863-beacon-chain-push-withdrawals/8465">https://ethereum-magicians.org/t/eip-4863-beacon-chain-push-withdrawals/8465</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2022-02-28</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#new-transaction-type">New transaction type</a></li>
+<li><a href="#block-validity">Block validity</a></li>
+<li><a href="#transaction-processing">Transaction processing</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#push-vs-pull-approach">Push vs pull approach</a></li>
+<li><a href="#why-a-new-transaction-type">Why a new transaction type?</a></li>
+<li><a href="#why-no-gas-costs-for-new-transaction-type">Why no (gas) costs for new transaction type?</a></li>
+<li><a href="#why-only-balance-updates-no-general-evm-execution">Why only balance updates? No general EVM execution?</a></li>
+<li><a href="#why-new-block-validations">Why new block validations?</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduce a new <a href="/EIPS/eip-2718">EIP-2718 transaction type</a> to support validator withdrawals that are “pushed” from the beacon chain to the EVM.</p>
+<p>Add block validations to ensure the withdrawal transactions are sound with respect to withdrawal processing on the beacon chain.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>This EIP provides a way for validator withdrawals made on the beacon chain to enter into the EVM.
+The architecture is “push”-based, rather than “pull”-based, where withdrawals are required to be processed in the execution block as soon as they are dequeued from the beacon chain.</p>
+<p>This approach is more involved than “pull”-based alternatives (e.g. <a href="/EIPS/eip-4788">EIP-4788</a> + user-space withdrawal contract) with respect to the core protocol (by providing a new transaction type with special semantics) but does provide tighter integration of a critical feature into the protocol itself.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<table>
+<thead>
+<tr>
+<th>constants</th>
+<th>value</th>
+<th>units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code></td>
+<td>TBD</td>
+<td> </td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">WITHDRAWAL_TX_TYPE</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x3</code></td>
+<td>byte</td>
+</tr>
+</tbody>
+</table>
+<p>Beginning with the execution timestamp <code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code>, execution clients <strong>MUST</strong> introduce the following extensions to transaction processing and block validation:</p>
+<h3 id="new-transaction-type">
+<a href="#new-transaction-type" class="anchor-link"></a> New transaction type
+
+</h3>
+<p>Define a new <a href="/EIPS/eip-2718">EIP-2718</a> transaction type with <code class="language-plaintext highlighter-rouge">TransactionType</code> <code class="language-plaintext highlighter-rouge">WITHDRAWAL_TX_TYPE</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">TransactionPayload</code> is an RLP-encoded list <code class="language-plaintext highlighter-rouge">RLP([index, address, amount])</code> where the <code class="language-plaintext highlighter-rouge">index</code> is a 64-bit value uniquely labeling a specific withdrawal, the <code class="language-plaintext highlighter-rouge">address</code> refers to an execution layer account and the <code class="language-plaintext highlighter-rouge">amount</code> refers to an ether value given in units of wei.</p>
+<p>These values are provided by the consensus layer.</p>
+<h3 id="block-validity">
+<a href="#block-validity" class="anchor-link"></a> Block validity
+</h3>
+<p>If a block contains <em>any</em> transactions with <code class="language-plaintext highlighter-rouge">WITHDRAWAL_TX_TYPE</code> type, they <strong>MUST</strong> come after <strong>ALL</strong> other transactions in the block.</p>
+<p>If the execution client receives a block where this is not the case, it <strong>MUST</strong> consider the block invalid.</p>
+<h3 id="transaction-processing">
+<a href="#transaction-processing" class="anchor-link"></a> Transaction processing
+</h3>
+<p>When processing a transaction with <code class="language-plaintext highlighter-rouge">WITHDRAWAL_TX_TYPE</code> type, the implementation should increase the balance of the <code class="language-plaintext highlighter-rouge">address</code> specified by
+the <code class="language-plaintext highlighter-rouge">WithdrawalTransaction</code> by the <code class="language-plaintext highlighter-rouge">amount</code> of wei specified.</p>
+<p>This balance change is unconditional and <strong>MUST</strong> not fail.</p>
+<p>This transaction type has no associated gas costs.</p>
+<p>TODO: add logs?</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="push-vs-pull-approach">
+<a href="#push-vs-pull-approach" class="anchor-link"></a> Push vs pull approach
+</h3>
+<p>This push approach gives validators a small subsidy with respect to processing, in lieu of needing to buy gas via normal EVM processing that would be required for a pull-based approach.</p>
+<p>This style also happens automatically when the requisite conditions are met on the beacon chain which is nicer UX for validators.</p>
+<h3 id="why-a-new-transaction-type">
+<a href="#why-a-new-transaction-type" class="anchor-link"></a> Why a new transaction type?
+</h3>
+<p>This EIP suggests a new transaction type as it has special semantics different from other existing types of EVM transactions.</p>
+<p>An entirely new transaction type firewalls off generic EVM execution from this type of processing to simplify testing and security review of withdrawals.</p>
+<h3 id="why-no-gas-costs-for-new-transaction-type">
+<a href="#why-no-gas-costs-for-new-transaction-type" class="anchor-link"></a> Why no (gas) costs for new transaction type?
+</h3>
+<p>The maximum number of this transaction type that can reach the execution layer at a given time is bounded (enforced by the consensus layer) and this limit is kept small so that
+any execution layer operational costs are negligible in the context of the broader block execution.</p>
+<h3 id="why-only-balance-updates-no-general-evm-execution">
+<a href="#why-only-balance-updates-no-general-evm-execution" class="anchor-link"></a> Why only balance updates? No general EVM execution?
+</h3>
+<p>More general processing introduces the risk of failures, which complicates accounting on the beacon chain.</p>
+<p>This EIP suggests a route for withdrawals that provides most of the benefits for a minimum of the (complexity) cost.</p>
+<h3 id="why-new-block-validations">
+<a href="#why-new-block-validations" class="anchor-link"></a> Why new block validations?
+</h3>
+<p>The beacon chain must be able to efficiently validate that the withdrawal transactions in a given execution block are
+the ones expected based on its own internal scheduling logic to maintain the soundness of the withdrawal mechanism.</p>
+<p>By requiring all withdrawal transactions to be at the back of every block where they are applicable, the algorithm to
+check consistency becomes a straightforward linear walk from the start of the set until a known, bounded (small) number.</p>
+<p>Having a simple ordering scheme like this facilitates optimizations clients may do with respect to withdrawal processing, which
+would be hampered if withdrawal transactions could be placed in the block freely.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>No issues.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Consensus-layer validation of withdrawal transactions is critical to ensure that the proper amount of ETH is withdrawn back into the execution layer.
+This consensus-layer to execution-layer ETH transfer does not have a current analog in the EVM and thus deserves very high security scrutiny.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/ralexstokes">Alex Stokes</a>, <a href="https://github.com/djrtwo">Danny Ryan</a>, "EIP-4863: Beacon chain push withdrawals [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4863, February 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4863.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4863: Beacon chain push withdrawals [DRAFT]",
+    "author": "Alex Stokes (@ralexstokes), Danny Ryan (@djrtwo)",
+    "name": "EIP-4863: Beacon chain push withdrawals [DRAFT]",
+    "dateCreated": "2022-02-28",
+    "datePublished": "2022-02-28",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4863-beacon-chain-push-withdrawals/8465",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

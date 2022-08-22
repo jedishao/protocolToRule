@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2700: JavaScript Provider Event Emitter</title>
+<meta property="og:title" content="EIP-2700: JavaScript Provider Event Emitter" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2700" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2700" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-2700: JavaScript Provider Event Emitter
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2700.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/MicahZoltu">Micah Zoltu</a>, <a href="https://github.com/rekmarks">Erik Marks</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2701">https://github.com/ethereum/EIPs/issues/2701</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-06-05</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#rfc-2119">RFC-2119</a></li>
+<li><a href="#interface">Interface</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard mechanism for JavaScript Ethereum Providers to notify clients about chain state changes when both are able to interface with each other via a shared JavaScript object.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard provides the description of an object that is made available to JavaScript applications which they can use to receive notifications from an Ethereum Provider. This standard only describes the notification mechanism, it does not specify the payloads that are valid nor does it specify how the client or the provider will discover or agree on payload content.</p>
+<p>How/where this Ethereum Provider object is exposed is left to future standards.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>When working within a JavaScript runtime (such as NodeJS, Electron, Browser, etc.) it may be possible for the runtime or a runtime plugin to inject objects into the runtime. Someone authoring a runtime or a runtime plugin may choose to expose an Ethereum Provider to any JavaScript apps or scripts running within that runtime in order to provide notifications of blockchain state changes. In order to achieve maximum compatibility between the provider and the client, a standard is necessary for what the shape of that object is.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="rfc-2119">
+<a href="#rfc-2119" class="anchor-link"></a> RFC-2119
+</h3>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC-2119</a>.</p>
+<h3 id="interface">
+<a href="#interface" class="anchor-link"></a> Interface
+</h3>
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">EthereumProvider</span> <span class="p">{</span>
+	<span class="nx">on</span><span class="p">(</span><span class="nx">eventName</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">listener</span><span class="p">:</span> <span class="p">(...</span><span class="nx">params</span><span class="p">:</span> <span class="nx">unknown</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">):</span> <span class="k">void</span>
+	<span class="nx">removeListener</span><span class="p">(</span><span class="nx">eventName</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">listener</span><span class="p">:</span> <span class="p">(...</span><span class="nx">params</span><span class="p">:</span> <span class="nx">unknown</span><span class="p">[])</span> <span class="o">=&gt;</span> <span class="k">void</span><span class="p">):</span> <span class="k">void</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The specific events that can be listened to and the shape of their listener callback functions is left to be defined in separate standards.</p>
+<p>If <code class="language-plaintext highlighter-rouge">on</code> is called with an <code class="language-plaintext highlighter-rouge">eventName</code> that the provider is familiar with then the provider <strong>MUST</strong> call the provided <code class="language-plaintext highlighter-rouge">listener</code> when the named event occurs. If the same <code class="language-plaintext highlighter-rouge">listener</code> is added multiple times to the same event via <code class="language-plaintext highlighter-rouge">on</code>, the provider <strong>MAY</strong> choose to either callback the listener one time or one time per call to <code class="language-plaintext highlighter-rouge">on</code>.</p>
+<p>If <code class="language-plaintext highlighter-rouge">removeListener</code> is called with an <code class="language-plaintext highlighter-rouge">eventName</code> and <code class="language-plaintext highlighter-rouge">listener</code> that was previously added via <code class="language-plaintext highlighter-rouge">on</code> then the provider <strong>MUST</strong> decrease the number of times it calls the <code class="language-plaintext highlighter-rouge">listener</code> per event by one.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP is mostly a retrospective EIP meaning it codifies an already existing specification so there isn’t a lot of room for improving things such as by using a discriminated union object for listener parameters or having a tighter definition of <code class="language-plaintext highlighter-rouge">on</code>. The specific events are intentionally left out of this specification as that set will be an ever-evolving collection and having the first few listed here doesn’t add value to this specification (especially if, over time, the first few end up deprecated or unused).</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The relationship between Ethereum Provider and client is a trusted one, where it is assumed that the user implicitly trusts the Ethereum Provider which is how it managed to get injected into the client, or the client expressly pulled in a connection to it.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/MicahZoltu">Micah Zoltu</a>, <a href="https://github.com/rekmarks">Erik Marks</a>, "EIP-2700: JavaScript Provider Event Emitter," <em>Ethereum Improvement Proposals</em>, no. 2700, June 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2700.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2700: JavaScript Provider Event Emitter",
+    "author": "Micah Zoltu (@MicahZoltu), Erik Marks (@rekmarks)",
+    "name": "EIP-2700: JavaScript Provider Event Emitter",
+    "dateCreated": "2020-06-05",
+    "datePublished": "2020-06-05",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2701",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

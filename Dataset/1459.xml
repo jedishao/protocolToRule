@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1459: Node Discovery via DNS</title>
+<meta property="og:title" content="EIP-1459: Node Discovery via DNS" />
+<meta name="description" content="Scheme for authenticated updateable Ethereum node lists via DNS." />
+<meta property="og:description" content="Scheme for authenticated updateable Ethereum node lists via DNS." />
+<meta name="twitter:description" content="Scheme for authenticated updateable Ethereum node lists via DNS." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1459" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1459" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1459: Node Discovery via DNS
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1459.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Scheme for authenticated updateable Ethereum node lists via DNS.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/fjl">Felix Lange</a>, <a href="https://github.com/karalabe">Péter Szilágyi</a></td></tr>
+ <tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/devp2p/issues/50">https://github.com/ethereum/devp2p/issues/50</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Networking</td></tr>
+<tr><th>Created</th><td>2018-09-26</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-778">778</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#dns-record-structure">DNS Record Structure</a></li>
+<li><a href="#client-protocol">Client Protocol</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#why-dns">Why DNS?</a></li>
+<li><a href="#why-is-this-a-merkle-tree">Why is this a merkle tree?</a></li>
+<li><a href="#why-does-the-link-subtree-exist">Why does the link subtree exist?</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This document describes a scheme for authenticated, updateable Ethereum node
+lists retrievable via DNS.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Many Ethereum clients contain hard-coded bootstrap node lists. Updating those
+lists requires a software update. The current lists are small, giving the client
+little choice of initial entry point into the Ethereum network. We would like to
+maintain larger node lists containing hundreds of nodes, and update them
+regularly.</p>
+<p>The scheme described here is a replacement for client bootstrap node lists with
+equivalent security and many additional benefits. Large lists populated by
+traversing the node discovery DHT can serve as a fallback option for nodes which
+can’t join the DHT due to restrictive network policy. DNS-based node lists may
+also be useful to Ethereum peering providers because their customers can
+configure the client to use the provider’s list.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>A ‘node list’ is a list of ‘node records’ <a href="/EIPS/eip-778">as defined by EIP-778</a>
+of arbitrary length. Lists
+may refer to other lists using links. The entire list is signed using a
+secp256k1 private key. The corresponding public key must be known to the client
+in order to verify the list.</p>
+<p>To refer to a DNS node list, clients use a URL with ‘enrtree’ scheme. The URL
+contains the DNS name on which the list can be found as well as the public key
+that signed the list. The public key is contained in the username part of the
+URL and is the base32 encoding (RFC-4648) of the compressed 32-byte binary public key.</p>
+<p>Example:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enrtree://<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7b3a364e3d382a372c322123492a3d2b35313a2b4c2d2e3e29383829353c29332c213c48222233322e2d4c392d3f2a4e3d3f2b292f493b15141f1e08551e031a16">[email&#160;protected]</a>ple.org
+</code></pre></div></div>
+<p>This URL refers to a node list at the DNS name ‘nodes.example.org’ and is signed
+by the public key
+<code class="language-plaintext highlighter-rouge">0x049f88229042fef9200246f49f94d9b77c4e954721442714e85850cb6d9e5daf2d880ea0e53cb3ac1a75f9923c2726a4f941f7d326781baa6380754a360de5c2b6</code></p>
+<h3 id="dns-record-structure">
+<a href="#dns-record-structure" class="anchor-link"></a> DNS Record Structure
+</h3>
+<p>The nodes in a list are encoded as a merkle tree for distribution via the DNS
+protocol. Entries of the merkle tree are contained in DNS TXT records. The root
+of the tree is a TXT record with the following content:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>enrtree-root:v1 e=&lt;enr-root&gt; l=&lt;link-root&gt; seq=&lt;sequence-number&gt; sig=&lt;signature&gt;
+</code></pre></div></div>
+<p>where</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">enr-root</code> and <code class="language-plaintext highlighter-rouge">link-root</code> refer to the root hashes of subtrees containing
+nodes and links subtrees.</li>
+<li><code class="language-plaintext highlighter-rouge">sequence-number</code> is the tree’s update sequence number, a decimal integer.</li>
+<li><code class="language-plaintext highlighter-rouge">signature</code> is a 65-byte secp256k1 EC signature over the keccak256 hash of the
+record content, excluding the <code class="language-plaintext highlighter-rouge">sig=</code> part, encoded as URL-safe base64 (RFC-4648).</li>
+</ul>
+<p>Further TXT records on subdomains map hashes to one of three entry types. The
+subdomain name of any entry is the base32 encoding of the (abbreviated)
+keccak256 hash of its text content.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">enrtree-branch:&lt;h₁&gt;,&lt;h₂&gt;,...,&lt;hₙ&gt;</code> is an intermediate tree entry containing
+hashes of subtree entries.</li>
+<li><code class="language-plaintext highlighter-rouge">enrtree://&lt;key&gt;@&lt;fqdn&gt;</code> is a leaf pointing to a different list located at
+another fully qualified domain name. Note that this format matches the URL
+encoding. This type of entry may only appear in the subtree pointed to by
+<code class="language-plaintext highlighter-rouge">link-root</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">enr:&lt;node-record&gt;</code> is a leaf containing a node record. The node record is
+encoded as a URL-safe base64 string. Note that this type of entry matches the
+canonical ENR text encoding. It may only appear in the <code class="language-plaintext highlighter-rouge">enr-root</code> subtree.</li>
+</ul>
+<p>No particular ordering or structure is defined for the tree. Whenever the tree
+is updated, its sequence number should increase. The content of any TXT record
+should be small enough to fit into the 512 byte limit imposed on UDP DNS
+packets. This limits the number of hashes that can be placed into an
+<code class="language-plaintext highlighter-rouge">enrtree-branch</code> entry.</p>
+<p>Example in zone file format:</p>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>; name                        ttl     class type  content
+@                             60      IN    TXT   enrtree-root:v1 e=JWXYDBPXYWG6FX3GMDIBFA6CJ4 l=C7HRFPF3BLGF3YR4DY5KX3SMBE seq=1 sig=o908WmNp7LibOfPsr4btQwatZJ5URBr2ZAuxvK4UWHlsB9sUOTJQaGAlLPVAhM__XJesCHxLISo94z5Z2a463gA
+C7HRFPF3BLGF3YR4DY5KX3SMBE    86900   IN    TXT   enrtree://<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21606c146762706d76687b79137067716f6b607116777464736262736f667369767b6612787869687477166377657014676571737513614c4e53444f4e4544520f">[email&#160;protected]</a>example.org
+JWXYDBPXYWG6FX3GMDIBFA6CJ4    86900   IN    TXT   enrtree-branch:2XS2367YHAXJFGLZHVAWLQD4ZY,H4FHT4B454P6UXFD7JCYQ5PWDY,MHTDO6TMUBRIA2XWG5LUDACK24
+2XS2367YHAXJFGLZHVAWLQD4ZY    86900   IN    TXT   enr:-HW4QOFzoVLaFJnNhbgMoDXPnOvcdVuj7pDpqRvh6BRDO68aVi5ZcjB3vzQRZH2IcLBGHzo8uUN3snqmgTiE56CH3AMBgmlkgnY0iXNlY3AyNTZrMaECC2_24YYkYHEgdzxlSNKQEnHhuNAbNlMlWJxrJxbAFvA
+H4FHT4B454P6UXFD7JCYQ5PWDY    86900   IN    TXT   enr:-HW4QAggRauloj2SDLtIHN1XBkvhFZ1vtf1raYQp9TBW2RD5EEawDzbtSmlXUfnaHcvwOizhVYLtr7e6vw7NAf6mTuoCgmlkgnY0iXNlY3AyNTZrMaECjrXI8TLNXU0f8cthpAMxEshUyQlK-AM0PW2wfrnacNI
+MHTDO6TMUBRIA2XWG5LUDACK24    86900   IN    TXT   enr:-HW4QLAYqmrwllBEnzWWs7I5Ev2IAs7x_dZlbYdRdMUx5EyKHDXp7AV5CkuPGUPdvbv1_Ms1CPfhcGCvSElSosZmyoqAgmlkgnY0iXNlY3AyNTZrMaECriawHKWdDRk2xeZkrOXBQ0dfMFLHY4eENZwdufn1S1o
+</code></pre></div></div>
+<h3 id="client-protocol">
+<a href="#client-protocol" class="anchor-link"></a> Client Protocol
+</h3>
+<p>To find nodes at a given DNS name, say “mynodes.org”:</p>
+<ol>
+<li>Resolve the TXT record of the name and check whether it contains a valid
+“enrtree-root=v1” entry. Let’s say the <code class="language-plaintext highlighter-rouge">enr-root</code> hash contained in the entry
+is “CFZUWDU7JNQR4VTCZVOJZ5ROV4”.</li>
+<li>Verify the signature on the root against the known public key and check
+whether the sequence number is larger than or equal to any previous number
+seen for that name.</li>
+<li>Resolve the TXT record of the hash subdomain, e.g.
+“CFZUWDU7JNQR4VTCZVOJZ5ROV4.mynodes.org” and verify whether the content
+matches the hash.</li>
+<li>The next step depends on the entry type found:
+<ul>
+<li>for <code class="language-plaintext highlighter-rouge">enrtree-branch</code>: parse the list of hashes and continue resolving them (step 3).</li>
+<li>for <code class="language-plaintext highlighter-rouge">enr</code>: decode, verify the node record and import it to local node storage.</li>
+</ul>
+</li>
+</ol>
+<p>During traversal, the client must track hashes and domains which are already
+resolved to avoid going into an infinite loop. It’s in the client’s best
+interest to traverse the tree in random order.</p>
+<p>Client implementations should avoid downloading the entire tree at once during
+normal operation. It’s much better to request entries via DNS when-needed, i.e.
+at the time when the client is looking for peers.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="why-dns">
+<a href="#why-dns" class="anchor-link"></a> Why DNS?
+</h3>
+<p>We have chosen DNS as the distribution medium because it is always available,
+even under restrictive network conditions. The protocol provides low latency and
+answers to DNS queries can be cached by intermediate resolvers. No custom server
+software is needed. Node lists can be deployed to any DNS provider such as
+CloudFlare DNS, dnsimple, Amazon Route 53 using their respective client
+libraries.</p>
+<h3 id="why-is-this-a-merkle-tree">
+<a href="#why-is-this-a-merkle-tree" class="anchor-link"></a> Why is this a merkle tree?
+</h3>
+<p>Being a merkle tree, any node list can be authenticated by a single signature on
+the root. Hash subdomains protect the integrity of the list. At worst
+intermediate resolvers can block access to the list or disallow updates to it,
+but cannot corrupt its content. The sequence number prevents replacing the root
+with an older version.</p>
+<p>Synchronizing updates on the client side can be done incrementally, which
+matters for large lists. Individual entries of the tree are small enough to fit
+into a single UDP packet, ensuring compatibility with environments where only
+basic UDP DNS is available. The tree format also works well with caching
+resolvers: only the root of the tree needs a short TTL. Intermediate entries and
+leaves can be cached for days.</p>
+<h3 id="why-does-the-link-subtree-exist">
+<a href="#why-does-the-link-subtree-exist" class="anchor-link"></a> Why does the link subtree exist?
+</h3>
+<p>Links between lists enable federation and web-of-trust functionality. The
+operator of a large list can delegate maintenance to other list providers. If
+two node lists link to each other, users can use either list and get nodes from
+both.</p>
+<p>The link subtree is separate from the tree containing ENRs. This is done to
+enable client implementations to sync these trees independently. A client
+wanting to get as many nodes as possible will sync the link tree first and add
+all linked names to the sync horizon.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/fjl">Felix Lange</a>, <a href="https://github.com/karalabe">Péter Szilágyi</a>, "EIP-1459: Node Discovery via DNS [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1459, September 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1459.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1459: Node Discovery via DNS [DRAFT]",
+    "author": "Felix Lange (@fjl), Péter Szilágyi (@karalabe)",
+    "name": "EIP-1459: Node Discovery via DNS [DRAFT]",
+    "dateCreated": "2018-09-26",
+    "datePublished": "2018-09-26",
+
+    "discussionUrl": "https://github.com/ethereum/devp2p/issues/50",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

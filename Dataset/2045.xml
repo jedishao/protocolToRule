@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2045: Particle gas costs for EVM opcodes</title>
+<meta property="og:title" content="EIP-2045: Particle gas costs for EVM opcodes" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2045" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2045" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2045: Particle gas costs for EVM opcodes
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2045.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/cdetrio">Casey Detrio</a>, <a href="https://github.com/axic">Alex Beregszaszi</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2045-fractional-gas-costs/3311">https://ethereum-magicians.org/t/eip-2045-fractional-gas-costs/3311</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+ <tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2019-05-17</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#ewasm">Ewasm</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>According to recent benchmarks, EVM opcodes for computation (<code class="language-plaintext highlighter-rouge">ADD</code>, <code class="language-plaintext highlighter-rouge">SUB</code>, <code class="language-plaintext highlighter-rouge">MUL</code>, etc.) are generally overpriced relative to opcodes for storage I/O (<code class="language-plaintext highlighter-rouge">SLOAD</code>, <code class="language-plaintext highlighter-rouge">SSTORE</code>, etc.). Currently the minimum gas cost is 1 (i.e. one unit of gas), and most computational opcodes have a cost near to 1 (e.g. 3, 5, or 8), so the range in possible cost reduction is limited. A new minimum unit of gas, called a “particle”, which is a fraction of 1 gas, would expand the range of gas costs and thus enable reductions below the current minimum.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The transaction capacity of an Ethereum block is determined by the gas cost of transactions relative to the block gas limit. One way to boost the transaction capacity is to raise the block gas limit. Unfortunately, raising the block gas limit would also increase the rate of state growth, unless the costs of state-expanding storage opcodes (<code class="language-plaintext highlighter-rouge">SSTORE</code>, <code class="language-plaintext highlighter-rouge">CREATE</code>, etc.) are simultaneously increased to the same proportion. Increasing the cost of storage opcodes may have adverse side effects, such as shifting the economic assumptions around gas fees of deployed contracts, or possibly breaking invariants in current contract executions (as mentioned in <a href="/EIPS/eip-2035">EIP-2035</a><sup><a href="#eip2035">1</a></sup>, more research is needed on the potential effects of increasing the cost of storage opcodes).</p>
+<p>Another way to boost the transaction capacity of a block is to reduce the gas cost of transactions. Reducing the gas costs of computational opcodes while keeping the cost of storage opcodes the same, is effectively equivalent to raising the block gas limit and simultaneously increasing the cost of storage opcodes. However, reducing the cost of computational opcodes might avoid the adverse side effects of an increase in cost of storage opcodes (again, more research is needed on this topic).</p>
+<p>Currently, computational opcode costs are already too close to the minimum unit of 1 gas to achieve the large degree of cost reductions that recent benchmarks<sup><a href="#evmbenchmarks">2</a></sup> indicate would be needed to tune opcode gas costs to the performance of optimized EVM implementations. A smaller minimum unit called a “particle”, which is a fraction (or subdivision) of 1 gas, would enable large cost reductions.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>A new gas counter <code class="language-plaintext highlighter-rouge">particlesUsed</code> is added to the EVM, in addition to the existing gas counter <code class="language-plaintext highlighter-rouge">gasUsed</code>. The unit 1 gas is equal to 10000 particles (<code class="language-plaintext highlighter-rouge">PARTICLES_PER_GAS</code>). The <code class="language-plaintext highlighter-rouge">particlesUsed</code> counter is only increased for opcodes priced in particles (i.e. opcodes that cost less than 1 gas). If increasing <code class="language-plaintext highlighter-rouge">particlesUsed</code> results in an excess of 1 gas, then 1 gas is added to <code class="language-plaintext highlighter-rouge">gasUsed</code> (and deducted from <code class="language-plaintext highlighter-rouge">particlesUsed</code>).</p>
+<p>Where the current gas logic looks like this:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">vm_execute</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+    <span class="c1"># Initialize stack, memory, program counter, etc
+</span>    <span class="n">compustate</span> <span class="o">=</span> <span class="n">Compustate</span><span class="p">(</span><span class="n">gas</span><span class="o">=</span><span class="n">msg</span><span class="p">.</span><span class="n">gas</span><span class="p">)</span>
+    <span class="n">codelen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">compustate</span><span class="p">.</span><span class="n">pc</span> <span class="o">&lt;</span> <span class="n">codelen</span><span class="p">:</span>
+        <span class="n">opcode</span> <span class="o">=</span> <span class="n">code</span><span class="p">[</span><span class="n">compustate</span><span class="p">.</span><span class="n">pc</span><span class="p">]</span>
+        <span class="n">compustate</span><span class="p">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">compustate</span><span class="p">.</span><span class="n">gasUsed</span> <span class="o">+=</span> <span class="n">opcode</span><span class="p">.</span><span class="n">gas_fee</span>
+
+        <span class="c1"># out of gas error
+</span>        <span class="k">if</span> <span class="n">compustate</span><span class="p">.</span><span class="n">gasUsed</span> <span class="o">&gt;</span> <span class="n">compustate</span><span class="p">.</span><span class="n">gasLimit</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vm_exception</span><span class="p">(</span><span class="s">'OUT OF GAS'</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'STOP'</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">peaceful_exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'ADD'</span><span class="p">:</span>
+            <span class="n">stk</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">+</span> <span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'SUB'</span><span class="p">:</span>
+            <span class="n">stk</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">-</span> <span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'MUL'</span><span class="p">:</span>
+            <span class="n">stk</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">*</span> <span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="p">.....</span>
+</code></pre></div></div>
+<p>The new gas logic using particles might look like this:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PARTICLES_PER_GAS</span> <span class="o">=</span> <span class="mi">10000</span>
+
+<span class="k">def</span> <span class="nf">vm_execute</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+    <span class="c1"># Initialize stack, memory, program counter, etc
+</span>    <span class="n">compustate</span> <span class="o">=</span> <span class="n">Compustate</span><span class="p">(</span><span class="n">gas</span><span class="o">=</span><span class="n">msg</span><span class="p">.</span><span class="n">gas</span><span class="p">)</span>
+    <span class="n">codelen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="k">while</span> <span class="n">compustate</span><span class="p">.</span><span class="n">pc</span> <span class="o">&lt;</span> <span class="n">codelen</span><span class="p">:</span>
+        <span class="n">opcode</span> <span class="o">=</span> <span class="n">code</span><span class="p">[</span><span class="n">compustate</span><span class="p">.</span><span class="n">pc</span><span class="p">]</span>
+        <span class="n">compustate</span><span class="p">.</span><span class="n">pc</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">opcode</span><span class="p">.</span><span class="n">gas_fee</span><span class="p">:</span>
+            <span class="n">compustate</span><span class="p">.</span><span class="n">gasUsed</span> <span class="o">+=</span> <span class="n">opcode</span><span class="p">.</span><span class="n">gas_fee</span>
+        <span class="k">elif</span> <span class="n">opcode</span><span class="p">.</span><span class="n">particle_fee</span><span class="p">:</span>
+            <span class="n">compustate</span><span class="p">.</span><span class="n">particlesUsed</span> <span class="o">+=</span> <span class="n">opcode</span><span class="p">.</span><span class="n">particle_fee</span>
+            <span class="k">if</span> <span class="n">compustate</span><span class="p">.</span><span class="n">particlesUsed</span> <span class="o">&gt;=</span> <span class="n">PARTICLES_PER_GAS</span><span class="p">:</span>
+                <span class="c1"># particlesUsed will be between 1 and 2 gas (over 10000 but under 20000)
+</span>                <span class="n">compustate</span><span class="p">.</span><span class="n">gasUsed</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># remainder stays in particle counter
+</span>                <span class="n">compustate</span><span class="p">.</span><span class="n">particlesUsed</span> <span class="o">=</span> <span class="n">compustate</span><span class="p">.</span><span class="n">particlesUsed</span> <span class="o">%</span> <span class="n">PARTICLES_PER_GAS</span>
+
+        <span class="c1"># out of gas error
+</span>        <span class="k">if</span> <span class="n">compustate</span><span class="p">.</span><span class="n">gasUsed</span> <span class="o">&gt;</span> <span class="n">compustate</span><span class="p">.</span><span class="n">gasLimit</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">vm_exception</span><span class="p">(</span><span class="s">'OUT OF GAS'</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'STOP'</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">peaceful_exit</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'ADD'</span><span class="p">:</span>
+            <span class="n">stk</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">+</span> <span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'SUB'</span><span class="p">:</span>
+            <span class="n">stk</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">-</span> <span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="s">'MUL'</span><span class="p">:</span>
+            <span class="n">stk</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span> <span class="o">*</span> <span class="n">stk</span><span class="p">.</span><span class="n">pop</span><span class="p">())</span>
+
+<span class="p">.....</span>
+</code></pre></div></div>
+<p>The above pseudocode is written for clarity. A more performant implementation might instead keep a single <code class="language-plaintext highlighter-rouge">particlesUsed</code> counter by multiplying opcode gas costs by 10000 and the <code class="language-plaintext highlighter-rouge">gasLimit</code> by 10000, and convert particles back to gas with <code class="language-plaintext highlighter-rouge">ceil(particlesUsed / PARTICLES_PER_GAS)</code> at the end of execution. It may also be more performant to use a <code class="language-plaintext highlighter-rouge">PARTICLES_PER_GAS</code> ratio that is a power of 2 (such as 8192 or 16384) instead of 10000; the spec above is a draft and updates in response to feedback are expected.</p>
+<h4 id="opcode-cost-changes">
+<a href="#opcode-cost-changes" class="anchor-link"></a> Opcode cost changes
+</h4>
+<p>Many computational opcodes will undergo a cost reduction, with new costs suggested by benchmark analyses. For example, the cost of <code class="language-plaintext highlighter-rouge">DUP</code> and <code class="language-plaintext highlighter-rouge">SWAP</code> are reduced from 3 gas to 3000 particles (i.e. 0.3 gas). The cost of <code class="language-plaintext highlighter-rouge">ADD</code> and <code class="language-plaintext highlighter-rouge">SUB</code> are reduced from 3 gas to 6000 particles. The cost of <code class="language-plaintext highlighter-rouge">MUL</code> is reduced from 5 gas to 5000 particles (i.e. 0.5 gas).</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Adoption of fractional gas costs should only be an implementation detail inside the EVM, and not alter the current user experience around transaction gas limits and block gas limits. The concept of <code class="language-plaintext highlighter-rouge">particles</code> need not be exposed to Ethereum users nor most contract authors, but only to EVM implementers and contract developers concerned with optimized gas usage. Furthermore, only the EVM logic for charging gas per opcode executed should be affected by this change. All other contexts dealing with gas and gas limits, such as block headers and transaction formats, should be unaffected.</p>
+<h3 id="ewasm">
+<a href="#ewasm" class="anchor-link"></a> Ewasm
+</h3>
+<p>The term “particles” was first introduced for Ewasm<sup><a href="#particle">3</a></sup> to enable gas accounting for low cost wasm instructions, while remaining compatible with EVM gas costs. This EIP proposes introducing particles as a new minimum gas unit for EVM opcodes, and is not related to Ewasm.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change is not backwards compatible and requires a hard fork to be activated.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TODO</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>TODO</p>
+<h2 id="references">
+<a href="#references" class="anchor-link"></a> References
+</h2>
+<p><a name="eip2035">1</a>. <a href="/EIPS/eip-2035">EIP-2035</a>: Stateless Clients - Repricing SLOAD and SSTORE to pay for block proofs</p>
+<p><a name="evmbenchmarks">2</a>. https://github.com/ewasm/benchmarking</p>
+<p><a name="particle">3</a>. The term “particle” was inspired by a proposal for <a href="https://github.com/ewasm/design/blob/e77d8e3de42784f40a803a23f58ef06881142d9f/determining_wasm_gas_costs.md">Ewasm gas costs</a>.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/cdetrio">Casey Detrio</a>, <a href="https://github.com/axic">Alex Beregszaszi</a>, "EIP-2045: Particle gas costs for EVM opcodes [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2045, May 2019. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2045.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2045: Particle gas costs for EVM opcodes [DRAFT]",
+    "author": "Casey Detrio (@cdetrio), Alex Beregszaszi (@axic)",
+    "name": "EIP-2045: Particle gas costs for EVM opcodes [DRAFT]",
+    "dateCreated": "2019-05-17",
+    "datePublished": "2019-05-17",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2045-fractional-gas-costs/3311",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2019"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

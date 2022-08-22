@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1202: Voting Standard</title>
+<meta property="og:title" content="EIP-1202: Voting Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1202" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1202" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1202: Voting Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1202.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a>, <a href="https://github.com/evbots">Evan</a>, <a href="https://github.com/yingogobot">Yin Xu</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1202">https://github.com/ethereum/EIPs/issues/1202</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-07-08</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#benefits">Benefits</a></li>
+<li><a href="#use-cases">Use-cases:</a></li>
+</ul>
+</li>
+<li><a href="#specifications">Specifications</a>
+<ul>
+<li><a href="#draft-v2">Draft V2</a></li>
+<li><a href="#draft-v3">Draft V3</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backward-compatibility">Backward Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#work-directory">Work Directory</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Propose a standard interface for voting.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal creates a standard API for implementing voting within smart contract. This standard provides functionalities to voting as well as to view the vote result and set voting status.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Voting is one of the earliest example of EVM programming, and also a key to DAO/organizational governance process. We foresee many DAOs will ultimately need to leverage voting as one of the important part of their governance. By creating a voting standard for smart contract / token, we can have the following benefits</p>
+<h3 id="benefits">
+<a href="#benefits" class="anchor-link"></a> Benefits
+</h3>
+<ol>
+<li>Allow general UI and applications to be built on top of a standardized voting to allow more general user to participate, and encourage more DApp and DAO to think about their governance</li>
+<li>Allow delegate voting / smart contract voting, automatic voting</li>
+<li>Allow voting results to be recorded on-chain, in a standard way, and allow DAOs and DApps to honor the voting result programmatically.</li>
+<li>Allow the compatibility with token standard such as <a href="/EIPS/eip-20">ERC-20</a> or other new standards(<a href="/EIPS/eip-777">EIP-777</a>) and item standard such as <a href="/EIPS/eip-721">EIP-721</a></li>
+<li>Create massive potential for interoperability within Ethereum echo systems and other system.</li>
+<li>Allow setting voting deadline, allow determine on single or multiple options. Allow requiring voting orders. (trade-off is interface complexity, we might need <a href="/EIPS/eip-20">ERC-20</a> approach and later a <a href="/EIPS/eip-777">EIP-777</a> for advanced voting)</li>
+<li>Recording the voting with weights with token amount.</li>
+<li>Possibly allow trust-worthy privacy-safe voting and anonymous voting (with either voter address being un-associated with the vote they cast, given a list of randomized/obfuscated voting options).
+8</li>
+<li>Possibly allow result in reward by voting participation or voting result</li>
+</ol>
+<h3 id="use-cases">
+<a href="#use-cases" class="anchor-link"></a> Use-cases:
+</h3>
+<ol>
+<li>Determine on issuing new token, issuing more token or issuing sub-token</li>
+<li>Determine on creating new item under <a href="/EIPS/eip-721">EIP-721</a></li>
+<li>Determine on election on certain person or smart contract to be delegated leader for project or subproject</li>
+<li>Determine on auditing result ownership allowing migration of smart contract proxy address</li>
+</ol>
+<h2 id="specifications">
+<a href="#specifications" class="anchor-link"></a> Specifications
+</h2>
+<h3 id="draft-v2">
+<a href="#draft-v2" class="anchor-link"></a> Draft V2
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+
+<span class="c1">/// @title Core interface of ERC1202: A list of *REQUIRED* methods and events for
+///        a contract to be considered conforming to ERC1202.
+///
+/// @author Zainan Victor Zhou &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b9c3c3d7f9c3c3d797d0d4">[email&#160;protected]</a>&gt;
+///
+/// @dev Each ERC1202 contract is a cluster of issues being voted on, or done voted.
+///      Any contract of ERC1202 **MUST** implement ALL the following methods and events.
+///
+///      Each *issue* is identified with an `issueId`,
+///      For any given `issue`, each available option in that issue is
+///      identified with an `optionId`.
+</span><span class="k">interface</span> <span class="n">ERC1202Core</span> <span class="p">{</span>
+
+    <span class="c1">/// @dev Cast a vote for an issue with `issueId` for option with `optionId`
+</span>    <span class="c1">/// @param _issueId: the issue this vote is casting on.
+</span>    <span class="c1">/// @param _optionIds: an *ordered* array of the options being casted for the issue.
+</span>    <span class="c1">///   Whenever referring to the options as a whole, the order MUST be maintained.
+</span>    <span class="c1">/// @return a boolean if TRUE means the vote is casted successfully.
+</span>    <span class="k">function</span> <span class="n">vote</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_issueId</span><span class="p">,</span> <span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_optionIds</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Query the top ranked options of an issue given issueId and
+</span>    <span class="c1">///      a limit of max number of top options.
+</span>    <span class="c1">/// @param _issueId: the issue being queried for the top options.
+</span>    <span class="c1">/// @param _limit: the max number of top options the caller expect to return.
+</span>    <span class="c1">/// @return an ordered list of the top options for given issueId and limit,
+</span>    <span class="c1">///         where the first in array is the most favorite one, and the last in
+</span>    <span class="c1">///         array is the least favorite one among the list.
+</span>    <span class="c1">///         Specifically, WHEN limit = 0, returns the default length of winning
+</span>    <span class="c1">///         options in their ranking in an issue.
+</span>    <span class="k">function</span> <span class="n">topOptions</span><span class="p">(</span>
+        <span class="kt">uint</span> <span class="n">_issueId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_limit</span>
+        <span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="c1">/// @dev This event is emitted when a vote has been casted.
+</span>    <span class="c1">/// @param issueId the issue the vote is being cased on.
+</span>    <span class="c1">/// @param optionIds an ordered list of the options the vote is casting for.
+</span>    <span class="k">event</span> <span class="n">OnVote</span><span class="p">(</span><span class="kt">uint</span> <span class="k">indexed</span> <span class="n">issueId</span><span class="p">,</span> <span class="kt">uint</span><span class="p">[]</span> <span class="n">optionIds</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">voterAddr</span><span class="p">);</span>
+
+<span class="p">}</span>
+
+<span class="c1">/// @title Metadata interface for ERC1202: A list of *RECOMMENDED* methods and events for
+///        a contract to be considered conforming to ERC1202.
+///
+/// @author Zainan Victor Zhou &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9ee4e4f0dee4e4f0b0f7f3">[email&#160;protected]</a>&gt;
+</span><span class="k">interface</span> <span class="n">ERC1202Metadata</span> <span class="p">{</span>
+
+    <span class="c1">/// @notice A descriptive text for an issue in this contract.
+</span>    <span class="k">function</span> <span class="n">issueText</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">_text</span><span class="p">);</span>
+
+    <span class="c1">/// @notice A distinct Uniform Resource Identifier (URI) for a given issue.
+</span>    <span class="c1">/// @dev Throws if `_issueId` is not a valid issue;
+</span>    <span class="c1">///      URIs are defined in RFC 3986.
+</span>    <span class="k">function</span> <span class="n">issueURI</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_issueId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">_uri</span><span class="p">);</span>
+
+    <span class="c1">/// @notice A descriptive text for an option in an issue in this contract.
+</span>    <span class="k">function</span> <span class="n">optionText</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_issueId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_optionId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">_text</span><span class="p">);</span>
+
+    <span class="c1">/// @notice A distinct Uniform Resource Identifier (URI) for a given option in a given issue.
+</span>    <span class="c1">/// @dev Throws if `_issueId` is not a valid option-issue combination;
+</span>    <span class="c1">///      URIs are defined in RFC 3986.
+</span>    <span class="k">function</span> <span class="n">optionURI</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_issueId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_optionId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">_uri</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">/// @title Status interface for ERC1202: A list of *RECOMMENDED* methods and events for
+///        a contract to be considered conforming to ERC1202.
+///
+/// @author Zainan Victor Zhou &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a5050446a505044044347">[email&#160;protected]</a>&gt;
+</span><span class="k">interface</span> <span class="n">ERC1202Status</span> <span class="p">{</span>
+
+    <span class="c1">/// @dev This event is emitted when an issue has changed status.
+</span>    <span class="c1">/// @param issueId the issue about which a status change has happened.
+</span>    <span class="c1">/// @param isOpen the status
+</span>    <span class="k">event</span> <span class="n">OnStatusChange</span><span class="p">(</span><span class="kt">uint</span> <span class="k">indexed</span> <span class="n">issueId</span><span class="p">,</span> <span class="kt">bool</span> <span class="k">indexed</span> <span class="n">isOpen</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Sets the status of a issue, e.g. open for vote or closed for result.
+</span>    <span class="c1">/// @param _issueId the issue of Status being set.
+</span>    <span class="c1">/// @param _isOpen the status to set.
+</span>    <span class="c1">/// @return _success whether the setStatus option succeeded.
+</span>    <span class="k">function</span> <span class="n">setStatus</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_issueId</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_isOpen</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">_success</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Gets the status of a issue, e.g. open for vote or closed for result.
+</span>    <span class="c1">/// @param _issueId the issue of Status being get.
+</span>    <span class="c1">/// @return _isOpen the status of the issue.
+</span>    <span class="k">function</span> <span class="n">getStatus</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_issueId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">_isOpen</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Retrieves the ranked options voted by a given voter for a given issue.
+</span>    <span class="c1">/// @param _issueId the issue
+</span>    <span class="c1">/// @param _voter the aaddres of voter.
+</span>    <span class="c1">/// @return _optionIds the ranked options voted by voter.
+</span>    <span class="k">function</span> <span class="n">voteOf</span><span class="p">(</span><span class="kt">uint</span> <span class="n">_issueId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_voter</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_optionIds</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<h3 id="draft-v3">
+<a href="#draft-v3" class="anchor-link"></a> Draft V3
+</h3>
+<h4 id="single-option-proposal-yesnayabstain">
+<a href="#single-option-proposal-yesnayabstain" class="anchor-link"></a> Single Option Proposal: Yes/Nay/Abstain
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC1202Core</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">VoteCast</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">voter</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">uint8</span> <span class="n">support</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">weight</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="n">reason</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="n">extraParams</span>
+    <span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">castVote</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">uint8</span> <span class="n">support</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">weight</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="k">calldata</span> <span class="n">reasonUri</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">extraParams</span> <span class="c1">// TODO: under what circumstance the params will be used?
+</span>    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="nb">balance</span><span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">execute</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">extraParams</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="nb">balance</span><span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">votingPeriodFor</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">startBlock</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">endBlock</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="n">IERC1202XDelegate</span> <span class="p">{</span>
+    <span class="k">function</span> <span class="n">delegates</span><span class="p">(</span><span class="kt">address</span> <span class="n">account</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+    <span class="k">function</span> <span class="n">delegate</span><span class="p">(</span><span class="kt">address</span> <span class="n">delegatee</span><span class="p">,</span> <span class="kt">bytes</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">extraParams</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="n">IERC1202XProposal</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">ProposalCreated</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="n">proposalUri</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">proposer</span><span class="p">,</span>
+        <span class="kt">address</span><span class="p">[]</span> <span class="n">targets</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="n">values</span><span class="p">,</span>
+        <span class="kt">string</span><span class="p">[]</span> <span class="n">signatures</span><span class="p">,</span>
+        <span class="kt">bytes</span><span class="p">[]</span> <span class="n">calldatas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">startBlock</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">endBlock</span>
+    <span class="p">);</span>
+    <span class="k">event</span> <span class="n">ProposalExecuted</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">);</span>
+    <span class="c1">// TODO: add Proposal Cancel/Edit/Withdraw Event and Functions?
+</span>
+    <span class="c1">// TODO: decide whether we require generating ProposalId in the method or not?
+</span>    <span class="c1">// TODO: if require generating ProposalId internally, can it be incremental hash-generated?
+</span>    <span class="c1">// TODO: what if proposal need to demonstrate sufficient support? How to input quorum?
+</span>    <span class="k">function</span> <span class="n">proposeProposal</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="k">memory</span> <span class="n">proposalUri</span><span class="p">,</span>
+        <span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">targets</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">values</span><span class="p">,</span>
+        <span class="kt">bytes</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">calldatas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">startblock</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">endblock</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">extraParams</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">registeredProposalId</span><span class="p">);</span>
+
+    <span class="c1">// TODO: what's most proper way to update the voting period?
+</span>    <span class="c1">// TODO: do we want to include cancel or withdraw?
+</span>    <span class="c1">// TODO: what's the best way to include weight scheme?
+</span><span class="p">}</span>
+
+</code></pre></div></div>
+<h4 id="multi-option-proposal-board-elections-or-ranked-elections">
+<a href="#multi-option-proposal-board-elections-or-ranked-elections" class="anchor-link"></a> Multi-Option Proposal: Board Elections or Ranked Elections
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC1202Core</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">VoteCast</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">voter</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">uint8</span><span class="p">[]</span> <span class="n">optionIds</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="n">weights</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="n">reason</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="n">extraParams</span>
+    <span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">castVote</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">uint8</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">optionIds</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">weights</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="k">calldata</span> <span class="n">reasonUri</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">extraParams</span> <span class="c1">// TODO: under what circumstance the params will be used?
+</span>    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="nb">balance</span><span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">execute</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">extraParams</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="nb">balance</span><span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">votingPeriodFor</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">view</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">startBlock</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">endBlock</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="n">IERC1202XDelegate</span> <span class="p">{</span>
+    <span class="k">function</span> <span class="n">delegates</span><span class="p">(</span><span class="kt">address</span> <span class="n">account</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+    <span class="k">function</span> <span class="n">delegate</span><span class="p">(</span><span class="kt">address</span> <span class="n">delegatee</span><span class="p">,</span> <span class="kt">bytes</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">extraParams</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="n">IERC1202XProposal</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">ProposalCreated</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="n">proposalUri</span><span class="p">,</span>
+        <span class="kt">uint8</span><span class="p">[]</span> <span class="n">optionIds</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">proposer</span><span class="p">,</span>
+        <span class="kt">address</span><span class="p">[][]</span> <span class="n">targets</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[][]</span> <span class="n">values</span><span class="p">,</span>
+        <span class="kt">string</span><span class="p">[][]</span> <span class="n">signatures</span><span class="p">,</span>
+        <span class="kt">bytes</span><span class="p">[][]</span> <span class="n">calldatas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">startBlock</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">endBlock</span>
+    <span class="p">);</span>
+    <span class="k">event</span> <span class="n">ProposalExecuted</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">);</span>
+    <span class="c1">// TODO: add Proposal Cancel/Edit/Withdraw Event and Functions?
+</span>
+    <span class="c1">// TODO: decide whether we require generating ProposalId in the method or not?
+</span>    <span class="c1">// TODO: if require generating ProposalId internally, can it be incremental hash-generated?
+</span>    <span class="c1">// TODO: what if proposal need to demonstrate sufficient support? How to input quorum?
+</span>    <span class="k">function</span> <span class="n">proposeProposal</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="k">calldata</span> <span class="n">proposalUri</span><span class="p">,</span>
+        <span class="kt">uint8</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">optionIds</span><span class="p">,</span>
+        <span class="kt">address</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">targets</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">values</span><span class="p">,</span>
+        <span class="kt">bytes</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">calldatas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">startblock</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">endblock</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">extraParams</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">registeredProposalId</span><span class="p">);</span>
+
+    <span class="c1">// TODO: what's most proper way to update the voting period?
+</span>    <span class="c1">// TODO: do we want to include cancel or withdraw?
+</span>    <span class="c1">// TODO: what's the best way to include weight scheme?
+</span><span class="p">}</span>
+
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>We made the following design decisions and here are the rationales.</p>
+<ul>
+<li>
+<p><strong>Granularity and Anonymity:</strong>: We created a <code class="language-plaintext highlighter-rouge">view</code> function <code class="language-plaintext highlighter-rouge">ballotOf</code> primarily making it easier for people to check the vote from certain address. This has the following assumptions:</p>
+<ul>
+<li>
+<p>It’s possible to check someone’s vote directly given an address. If implementor don’t want to make it so easily, they can simply reject all calls to this function. We want to make sure that we support both anonymous voting an non-anonymous voting. However since all calls to a smart contract is logged in block history, there is really no secrecy unless done with cryptography tricks. I am not cryptography-savvy enough to comment on the possibility. Please see “Second Feedback Questions 2018” for related topic.</p>
+</li>
+<li>
+<p>It’s assumes for each individual address, they can only vote for one decision. They can distribute their available voting power into more granular level. If implementor wants allow this, they ask the user to create another wallet address and grant the new address certain power. For example, a token based voting where voting weight is determined by the amount of token held by a voter, a voter who wants to distribute its voting power in two different option(option set) can transfer some of the tokens to the new account and cast the votes from both accounts.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Weight</strong>: We assume there are <code class="language-plaintext highlighter-rouge">weight</code> of votes and can be checked by calling <code class="language-plaintext highlighter-rouge">weightOf(address addr)</code>, and the weight distribution is either internally determined or determined by constructor. However we have not been considering updating the weight distribution. Please comment on this design decision as we want to learn how likely an implementor would want to be able to update the voting weight distributions.</p>
+</li>
+</ul>
+<h2 id="backward-compatibility">
+<a href="#backward-compatibility" class="anchor-link"></a> Backward Compatibility
+</h2>
+<p>There is no backward compatibility issue we are aware of.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>EIP-1202 is a voting standard. We expect the voting standard to be used in connection with other contracts such as token distributions, conducting actions in consensus or on behalf of an entity, multi-signature wallets, etc.</p>
+<p>The major security consideration is to ensure only using the standard interface for performing downstream actions or receiving upstream input (vote casting). We expect future audit tool to be based on standard interfaces.</p>
+<p>It’s also important to note as discussed in this standard that for the sake of simplicity, EIP-1202 is kept in the very basic form. It can be extended to support many different implementation variations. Such variations might contain different assumptions of the behavior and interpretation of actions. One example would be: What does it mean if someone votes multiple times through <code class="language-plaintext highlighter-rouge">vote</code>?</p>
+<ul>
+<li>Would that mean the voter is increasing their weight, or</li>
+<li>vote multiple options in the meanwhile, or</li>
+<li>Does the latter vote override the previous vote?</li>
+</ul>
+<p>Because of the flexible nature of voting, we expect many subsequent standards need to be created as an extension of EIP-1202. We suggest any extension or implementations of this standard be thoroughly audited before included in large scale or high asset volume applications.</p>
+<p>The third consideration is non-triviality. Some voting applications assume <strong><em>anonymity</em></strong>, <strong><em>randomness</em></strong>, <strong><em>time-based deadline</em></strong>, <strong><em>ordering</em></strong>, etc, these requirements in Ethereum are known to be non-trivial to achieve. We suggest any applications or organizations rely on audited and time-proven shared libraries when these requirements need to be enforced in their applications.</p>
+<p>The fourth consideration is potential abuse. When voting is standardized and put on contract, it is possible to write another contract that rewards a voter to vote in a certain way. It creates potential issues of bribery and conflict of interest abuse that is previously hard to implement.</p>
+<h2 id="work-directory">
+<a href="#work-directory" class="anchor-link"></a> Work Directory
+</h2>
+<p>The drafting and revision of EIP-1202 is conducted at <a href="https://github.com/xinbenlv/eip-1202">GitHub/xinbenlv/eip-1202</a></p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a>, <a href="https://github.com/evbots">Evan</a>, <a href="https://github.com/yingogobot">Yin Xu</a>, "EIP-1202: Voting Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1202, July 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1202.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1202: Voting Standard [DRAFT]",
+    "author": "Zainan Victor Zhou (@xinbenlv), Evan (@evbots), Yin Xu (@yingogobot)",
+    "name": "EIP-1202: Voting Standard [DRAFT]",
+    "dateCreated": "2018-07-08",
+    "datePublished": "2018-07-08",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1202",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2535: Diamonds, Multi-Facet Proxy</title>
+<meta property="og:title" content="EIP-2535: Diamonds, Multi-Facet Proxy" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2535" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2535" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2535: Diamonds, Multi-Facet Proxy
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2535.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/mudgen">Nick Mudge</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2535">https://github.com/ethereum/EIPs/issues/2535</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2020-08-15</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-02-22</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#diamonds-support-transparency">Diamonds Support Transparency</a></li>
+</ul>
+</li>
+<li><a href="#what-is-a-diamond">What is a Diamond?</a></li>
+<li><a href="#how-a-diamond-works">How a Diamond Works</a></li>
+<li><a href="#upgrades-and-immutability">Upgrades and Immutability</a></li>
+<li><a href="#organizing-state-variables-in-diamonds">Organizing State Variables in Diamonds</a></li>
+<li><a href="#facets-state-variables-and-diamond-storage">Facets, State Variables and Diamond Storage</a></li>
+<li><a href="#appstorage">AppStorage</a></li>
+<li><a href="#diamonds-can-use-other-contract-storage-strategies">Diamonds Can Use Other Contract Storage Strategies</a></li>
+<li><a href="#facets-can-share-state-and-functionality">Facets Can Share State and Functionality</a></li>
+<li><a href="#facets-are-reusable-and-composable">Facets are Reusable and Composable</a></li>
+<li><a href="#diagrams">Diagrams</a>
+<ul>
+<li><a href="#diamond-structure">Diamond Structure</a></li>
+<li><a href="#diamond-storage">Diamond Storage</a></li>
+<li><a href="#deployed-facets-can-be-reused">Deployed Facets Can Be Reused</a></li>
+</ul>
+</li>
+<li><a href="#some-diamond-benefits">Some Diamond Benefits</a>
+<ul>
+<li><a href="#new-user-interface-software--libraries">New User-Interface Software &amp; Libraries</a></li>
+<li><a href="#upgradeable-diamond-vs-centralized-private-database">Upgradeable Diamond vs. Centralized Private Database</a></li>
+<li><a href="#different-kinds-of-diamonds">Different Kinds of Diamonds</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#terms">Terms</a></li>
+<li><a href="#general-summary">General Summary</a></li>
+<li><a href="#diamond-interface">Diamond Interface</a></li>
+<li><a href="#diamond-loupe">Diamond Loupe</a></li>
+<li><a href="#implementation-points">Implementation Points</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#using-function-selectors">Using Function Selectors</a></li>
+<li><a href="#gas-considerations">Gas Considerations</a></li>
+<li><a href="#diamond-storage-1">Diamond Storage</a></li>
+<li><a href="#versions-of-functions">Versions of Functions</a></li>
+<li><a href="#sharing-functions-between-facets">Sharing Functions Between Facets</a></li>
+<li><a href="#default-function">Default Function</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#ownership-and-authentication">Ownership and Authentication</a></li>
+<li><a href="#security-of-diamond-storage">Security of Diamond Storage</a></li>
+<li><a href="#function-selector-clash">Function Selector Clash</a></li>
+<li><a href="#transparency">Transparency</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#learning--references">Learning &amp; References</a>
+<ul>
+<li><a href="#diamond-articles">Diamond Articles</a></li>
+<li><a href="#diamond-storage-articles">Diamond Storage Articles</a></li>
+<li><a href="#diamond-user-interface">Diamond User Interface</a></li>
+<li><a href="#implementations">Implementations</a></li>
+<li><a href="#help">Help</a></li>
+</ul>
+</li>
+<li><a href="#inspiration--development">Inspiration &amp; Development</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<p><img align="right" src="../assets/eip-2535/diamond.svg" width="230" height="230" /></p>
+<h2 id="simple-summary">
+
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Standard for creating modular smart contract systems that can be extended after deployment.</p>
+<p>Enables people to write smart contracts with virtually no size limit.</p>
+<p>Diamonds can be upgraded without having to redeploy existing functionality. Parts of a diamond can be added/replaced/removed while leaving other parts alone.</p>
+<p>Standardizes contract interfaces and implementation details of diamonds, enabling software integration and interoperability.</p>
+<p>A diamond is a contract that implements the Specification in this standard.</p>
+<p>Diamond analogy helps conceptualize development.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There are a number of different reasons to use diamonds. Here are some of them:</p>
+<ol>
+<li><strong>A single address for unlimited contract functionality.</strong> Using a single address for contract functionality makes deployment, testing and integration with other smart contracts, software and user interfaces easier.</li>
+<li><strong>Your contract exceeds the 24KB maximum contract size.</strong> You may have related functionality that it makes sense to keep in a single contract, or at a single contract address. A diamond does not have a max contract size.</li>
+<li><strong>A diamond provides a way to organize contract code and data.</strong> You may want to build a contract system with a lot of functionality. A diamond provides a systematic way to isolate different functionality and connect them together and share data between them as needed in a gas-efficient way.</li>
+<li><strong>A diamond provides a way to upgrade functionality.</strong> Upgradeable diamonds can be upgraded to add/replace/remove functionality. Because diamonds have no max contract size, there is no limit to the amount of functionality that can be added to diamonds over time. Diamonds can be upgradeable or immutable. It is also possible to make an upgradeable diamond and then at a later time remove its upgrade capability.</li>
+</ol>
+<h3 id="diamonds-support-transparency">
+<a href="#diamonds-support-transparency" class="anchor-link"></a> Diamonds Support Transparency
+</h3>
+<p>To find out what functions a regular smart contract has it is only necessary to look at its verified source code.</p>
+<p>The verified source code of a diamond does not include what functions it has so a different mechanism is needed.</p>
+<p>A diamond has four standard functions called the loupe functions that are used to show what functions a diamond has.</p>
+<p>The loupe functions can be used for many things including:</p>
+<ol>
+<li>To show all functions used by a diamond.</li>
+<li>To query services like Etherscan or files to retrieve and show all source code used by a diamond.</li>
+<li>To query services like Etherscan or files to retrieve ABI information for a diamond.</li>
+<li>To test or verify that a transaction that adds/replaces/removes functions on a diamond succeeded.</li>
+<li>To find out what functions a diamond has before calling functions on it.</li>
+<li>To be used by tools and programming libraries to deploy and upgrade diamonds.</li>
+<li>To be used by user interfaces to show information about diamonds.</li>
+<li>To be used by user interfaces to enable users to call functions on diamonds.</li>
+</ol>
+<p>Diamonds support another form of transparency which is a historical record of all upgrades on a diamond. This is done with the DiamondCut event which is used to record all functions that are added, replaced or removed on a diamond.</p>
+<p>This standard is an improvement of <a href="https://eips.ethereum.org/EIPS/eip-1538">EIP-1538 Transparent Contract Standard</a>. The same motivations of that standard apply to this standard.</p>
+<p>See the <a href="https://eips.ethereum.org/EIPS/eip-2535#learning--references">Learning &amp; References section</a> for additional information and uses of diamonds.</p>
+<h2 id="what-is-a-diamond">
+<a href="#what-is-a-diamond" class="anchor-link"></a> What is a Diamond?
+</h2>
+<p>A diamond is a contract with external functions that are supplied by contracts called <strong>facets</strong>.</p>
+<p>Facets are separate, independent contracts that can share internal functions, libraries and state variables.</p>
+<h2 id="how-a-diamond-works">
+<a href="#how-a-diamond-works" class="anchor-link"></a> How a Diamond Works
+</h2>
+<p>A diamond stores within it a mapping of function selector to facet address, for example <code class="language-plaintext highlighter-rouge">selectorToFacet</code>.</p>
+<p>When an external function is called on a diamond its fallback function is executed. The fallback function finds in the <code class="language-plaintext highlighter-rouge">selectorToFacet</code> mapping which facet has the function that has been called and then executes that function from the facet using <code class="language-plaintext highlighter-rouge">delegatecall</code>.</p>
+<p>A diamond’s fallback function and <code class="language-plaintext highlighter-rouge">delegatecall</code> enable a diamond to execute a facet’s external function as its own external function. The <code class="language-plaintext highlighter-rouge">msg.sender</code> and <code class="language-plaintext highlighter-rouge">msg.value</code> values do not change and only the diamond’s contract storage is read and written to.</p>
+<p>Here is a simple example of a diamond’s fallback function:</p>
+<pre><code class="language-Solidity">// Find facet for function that is called and execute the
+// function if a facet is found and return any value.
+fallback() external payable {
+  // get facet from function selector
+  address facet = selectorTofacet[msg.sig];
+  require(facet != address(0));
+  // Execute external function from facet using delegatecall and return any value.
+  assembly {
+    // copy function selector and any arguments
+    calldatacopy(0, 0, calldatasize())
+    // execute function call using the facet
+    let result := delegatecall(gas(), facet, 0, calldatasize(), 0, 0)
+    // get any return value
+    returndatacopy(0, 0, returndatasize())
+    // return any return value or error back to the caller
+    switch result
+      case 0 {revert(0, returndatasize())}
+      default {return (0, returndatasize())}
+  }
+}
+</code></pre>
+<p>A diamond can use a <code class="language-plaintext highlighter-rouge">diamondCut</code> function to add/replace/remove any number of functions from any number of facets in a single transaction. <code class="language-plaintext highlighter-rouge">diamondCut</code> updates the mapping of function selector to facet address. Other such functions can be used.</p>
+<p>An event is emitted any time external functions are added, replaced or removed to report what changed.</p>
+<p>A diamond has four standard external functions that can be called to show what facets and functions it currently has.</p>
+<h2 id="upgrades-and-immutability">
+<a href="#upgrades-and-immutability" class="anchor-link"></a> Upgrades and Immutability
+</h2>
+<p>A diamond can be immutable from inception by not adding any external functions that can add/replace/remove functions. <a href="#different-kinds-of-diamonds">There are number of reasons to do this.</a></p>
+<p>A diamond that is mutable can be made immutable by removing such functions.</p>
+<p>A diamond can be upgraded if it has a diamondCut external function or other function(s) that can add/replace/remove functions.</p>
+<h2 id="organizing-state-variables-in-diamonds">
+<a href="#organizing-state-variables-in-diamonds" class="anchor-link"></a> Organizing State Variables in Diamonds
+</h2>
+<p>A state variable or storage layout organizational pattern is needed because Solidity’s builtin storage layout system doesn’t support proxy contracts or diamonds.</p>
+
+<p>Described below are Diamond Storage and AppStorage which are two state variable organizational patterns that have been successfully used in diamonds.</p>
+<p>Another successful pattern has been to write a storage contract that contains all state variables and is inherited by all facets.</p>
+<h2 id="facets-state-variables-and-diamond-storage">
+<a href="#facets-state-variables-and-diamond-storage" class="anchor-link"></a> Facets, State Variables and Diamond Storage
+</h2>
+<p>A facet defines external functions and can define or use internal functions, libraries, and state variables.</p>
+<p>A facet can declare state variables in structs. Each struct is given a specific position in contract storage. This technique is called <strong>Diamond Storage</strong>.</p>
+<p>Here is a simple example that shows Diamond Storage and its use in a facet:</p>
+<pre><code class="language-Solidity">// A contract that implements Diamond Storage.
+library LibA {
+
+  // This struct contains state variables we care about.
+  struct DiamondStorage {
+    address owner;
+    bytes32 dataA;
+  }
+
+  // Returns the struct from a specified position in contract storage
+  // ds is short for DiamondStorage
+  function diamondStorage() internal pure returns(DiamondStorage storage ds) {
+    // Specifies a random position in contract storage
+    // This can be done with a keccak256 hash of a unique string as is
+    // done here or other schemes can be used such as this: 
+    // bytes32 storagePosition = keccak256(abi.encodePacked(ERC1155.interfaceId, ERC1155.name, address(this)));
+    bytes32 storagePosition = keccak256("diamond.storage.LibA");
+    // Set the position of our struct in contract storage
+    assembly {ds.slot := storagePosition}
+  }
+}
+
+// Our facet uses the Diamond Storage defined above.
+contract FacetA {
+
+  function setDataA(bytes32 _dataA) external {
+    LibA.DiamondStorage storage ds = LibA.diamondStorage();
+    require(ds.owner == msg.sender, "Must be owner.");
+    ds.dataA = _dataA;
+  }
+
+  function getDataA() external view returns (bytes32) {
+    return LibA.diamondStorage().dataA;
+  }
+}
+</code></pre>
+<p>Any number of structs, each with a different storage position, can be used by a facet.</p>
+<p>By using Diamond Storage facets can declare their own state variables that do not conflict with the storage locations of state variables declared in other facets.</p>
+<p>By using Diamond Storage facets can be developed independently, without connection or concern for other facets.</p>
+<h2 id="appstorage">
+<a href="#appstorage" class="anchor-link"></a> AppStorage
+</h2>
+<p>A specialized version of Diamond Storage is AppStorage. This pattern is used to more conveniently and easily share state variables between facets.</p>
+<p>The AppStorage pattern is implemented by defining a struct called AppStorage that contains the state variables of your application. It can contain any number of state variables of any type, including arrays and mappings, and more can be added in upgrades.</p>
+<p>The AppStorage struct is defined or imported and declared as the first and only state variable directly (or via inheritance) in any facet that uses it. This means that AppStorage is always located at position 0 in contract storage.</p>
+<p>The AppStorage state variable is often named <code class="language-plaintext highlighter-rouge">s</code> to provide easy access to it and to distinguish state variables from function arguments, function names, and local variables.</p>
+<p>Here is a simple example of a contract that uses AppStorage:</p>
+<pre><code class="language-Solidity">import "./AppStorage.sol"
+
+contract StakingFacet {
+  AppStorage internal s;
+
+  function myFacetFunction(uint256 _nextVar) external {
+    s.total = s.firstVar + _nextVar;
+  }
+
+</code></pre>
+<p>The above example accesses the <code class="language-plaintext highlighter-rouge">s.firstVar</code> state variable and stores a computation in the <code class="language-plaintext highlighter-rouge">s.total</code> state variable.</p>
+<p>Read this article to learn more about AppStorage: <a href="https://dev.to/mudgen/appstorage-pattern-for-state-variables-in-solidity-3lki">AppStorage Pattern for State Variables in Solidity</a>.</p>
+<h2 id="diamonds-can-use-other-contract-storage-strategies">
+<a href="#diamonds-can-use-other-contract-storage-strategies" class="anchor-link"></a> Diamonds Can Use Other Contract Storage Strategies
+</h2>
+<p>Diamonds and facets don’t have to use Diamond Storage or AppStorage. They can use or mix with other contract storage strategies such as contract inheritance.</p>
+<p>Diamonds only need to implement the <a href="#specification">Specification section</a> of this standard.</p>
+<h2 id="facets-can-share-state-and-functionality">
+<a href="#facets-can-share-state-and-functionality" class="anchor-link"></a> Facets Can Share State and Functionality
+</h2>
+<p>Facets can share state variables by using the same structs at the same storage positions.</p>
+<p>Facets can share internal functions and libraries by inheriting the same contracts or using the same libraries.</p>
+<p>In these ways facets are separate, independent units but can share state and functionality.</p>
+<h2 id="facets-are-reusable-and-composable">
+<a href="#facets-are-reusable-and-composable" class="anchor-link"></a> Facets are Reusable and Composable
+</h2>
+<p>A deployed facet can be used by any number of diamonds.</p>
+<p>Different combinations of facets can be used with different diamonds.</p>
+<p>It is possible to create and deploy a set of facets that are reused by different diamonds over time.</p>
+<p>The ability to use the same deployed facets for many diamonds reduces deployment costs.</p>
+<p>A limitation is that two external functions with the same function signature can’t be added to a diamond at the same time because a diamond, or any contract, cannot have two external functions with the same function signature.</p>
+<h2 id="diagrams">
+<a href="#diagrams" class="anchor-link"></a> Diagrams
+</h2>
+<h3 id="diamond-structure">
+<a href="#diamond-structure" class="anchor-link"></a> Diamond Structure
+</h3>
+<p>This diagram shows the structure of a diamond:</p>
+<p><img src="../assets/eip-2535/DiamondDiagram.png" /></p>
+<h3 id="diamond-storage">
+<a href="#diamond-storage" class="anchor-link"></a> Diamond Storage
+</h3>
+<p>The diagram below shows facets with their own data and data shared between them.</p>
+<p>Notice that all data is stored in the diamond. But different facets have different access to data.</p>
+<p>In this diagram</p>
+<ul>
+<li>Only FacetA can access DataA</li>
+<li>Only FacetB can access DataB</li>
+<li>Only the diamond’s own code can access DataD.</li>
+<li>FacetA and FacetB share access to DataAB.</li>
+<li>The diamond’s own code, FacetA and FacetB share access to DataABD.</li>
+</ul>
+<p><img src="../assets/eip-2535/diamondstorage1.png" /></p>
+<h3 id="deployed-facets-can-be-reused">
+<a href="#deployed-facets-can-be-reused" class="anchor-link"></a> Deployed Facets Can Be Reused
+</h3>
+<p>A deployed facet can be used by any number of diamonds.</p>
+<p>The diagram below shows two diamonds using the same two facets.</p>
+<ul>
+<li>FacetA is used by Diamond1</li>
+<li>FacetA is used by Diamond2</li>
+<li>FacetB is used by Diamond1</li>
+<li>FacetB is used by Diamond2</li>
+</ul>
+<p><img src="../assets/eip-2535/facetreuse.png" /></p>
+<h2 id="some-diamond-benefits">
+<a href="#some-diamond-benefits" class="anchor-link"></a> Some Diamond Benefits
+</h2>
+<ol>
+<li>A stable contract address that provides needed functionality.</li>
+<li>A single address with the functionality of multiple contracts (facets) that are independent from each other but can share internal functions, libraries and state variables.</li>
+<li>A way to add, replace and remove multiple external functions atomically (in the same transaction).</li>
+<li>Fine-grained upgrades, so you can change just the parts of a diamond that need to be changed.</li>
+<li>Have greater control over when and what functions exist.</li>
+<li>Decentralized Autonomous Organizations (DAOs) and other governance systems can be used to upgrade diamonds.</li>
+<li>An event that shows what functions are added, replaced and removed.</li>
+<li>The ability to show all changes made to a diamond.</li>
+<li>Increase trust over time by showing all changes made to a diamond.</li>
+<li>A way to look at a diamond to see its current facets and functions.</li>
+<li>Have an immutable, trustless diamond.</li>
+<li>Solves the 24KB maximum contract size limitation. Diamonds can be any size.</li>
+<li>Separate functionality can be implemented in separate facets and used together in a diamond.</li>
+<li>Larger contracts have to reduce their size by removing error messages and other things. You can keep your error messages and the full functionality that you need by implementing a diamond.</li>
+<li>Enables zero, partial or full diamond immutability as desired, and when desired.</li>
+<li>The ability to develop and improve an application over time with an upgradeable diamond and then make it immutable and trustless if desired.</li>
+<li>Develop incrementally and let your diamond grow with your application.</li>
+<li>Upgrade diamonds to fix bugs, add functionality and implement new standards.</li>
+<li>Organize your code with a diamond and facets.</li>
+<li>Diamonds can be large (have many functions) but still be modular because they are compartmented with facets.</li>
+<li>Contract architectures that call multiple contracts in a single transaction can save gas by condensing those contracts into a single diamond and accessing state variables directly.</li>
+<li>Save gas by creating external functions for specific use cases, such as bulk transfers.</li>
+<li>Diamonds are designed for tooling and user-interface software.</li>
+</ol>
+<h3 id="new-user-interface-software--libraries">
+<a href="#new-user-interface-software--libraries" class="anchor-link"></a> New User-Interface Software &amp; Libraries
+</h3>
+<p>User-interface software can be written to show all documentation, functions and source code used by a diamond.</p>
+<p>Diamond events can be filtered from the Ethereum blockchain to show all changes to a diamond.</p>
+<p>Existing and new programming libraries and software can be used to deploy, show, upgrade and use diamonds.</p>
+<h3 id="upgradeable-diamond-vs-centralized-private-database">
+<a href="#upgradeable-diamond-vs-centralized-private-database" class="anchor-link"></a> Upgradeable Diamond vs. Centralized Private Database
+</h3>
+<p>Why have an upgradeable diamond instead of a centralized, private, mutable database?</p>
+<ol>
+<li>Decentralized Autonomous Organizations (DAOs) and other governance systems can be used to upgrade diamonds.</li>
+<li>Wide interaction and integration with the Ethereum ecosystem.</li>
+<li>With open storage data and verified source code it is possible to show a provable history of trustworthiness.</li>
+<li>With openness bad behavior can be spotted and reported when it happens.</li>
+<li>Independent security and domain experts can review the change history of contracts and vouch for their history of trustworthiness.</li>
+<li>It is possible for an upgradeable diamond to become immutable and trustless.</li>
+</ol>
+<h3 id="different-kinds-of-diamonds">
+<a href="#different-kinds-of-diamonds" class="anchor-link"></a> Different Kinds of Diamonds
+</h3>
+<p>Many designs of diamonds are possible. Here are a few kinds of diamonds and their uses.</p>
+<p><strong>Upgradeable Diamond</strong>
+An upgradeable diamond has the <code class="language-plaintext highlighter-rouge">diamondCut</code> function and/or possibly other functions to add/replace/remove functions. It is useful for iterative development or improving an application over time.</p>
+<p><strong>Finished Diamond</strong>
+A finished diamond was an upgradeable diamond and had a number of upgrades. Then its <code class="language-plaintext highlighter-rouge">diamondCut</code> function and/or other upgrade functions were removed and upgrades are no longer possible. It is no longer possible to add/replace/remove functions. It has become an immutable diamond.</p>
+<p><strong>Single Cut Diamond</strong>
+A single cut diamond adds all functions to itself in its constructor function, but it does not add the <code class="language-plaintext highlighter-rouge">diamondCut</code> function or any other function that can add/replace/remove functions. This means that a single cut diamond is fully created in its constructor and once created can never be upgraded. It has the same immutability and trustless guarantees as a regular vanilla contract. Why would someone do this? There may be a number of reasons. The two use cases below are good reasons.</p>
+<ol>
+<li>Your contract hits the max contract size limit. Make it into a single cut diamond. You still break your big contract into smaller facets, modularizing your code.</li>
+<li>You start with an upgradeable diamond in your development and testing and upgrade it to your heart’s delight. Reap the advantages of easy upgrading and a stable address as you work out new features, bugs and kinks. Release the upgradeable diamond on a test network with your application for beta testing and upgrade it when needed. This is iterative development. When it is solid then deploy it as a single cut diamond on the main network.</li>
+</ol>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<blockquote>
+<p><strong>Note:</strong>
+The solidity <code class="language-plaintext highlighter-rouge">delegatecall</code> opcode enables a contract to execute a function from another contract, but it is executed as if the function was from the calling contract. Essentially <code class="language-plaintext highlighter-rouge">delegatecall</code> enables a contract to “borrow” another contract’s function. Functions executed with <code class="language-plaintext highlighter-rouge">delegatecall</code> affect the contract storage of the calling contract, not the contract where the functions are defined.</p>
+</blockquote>
+<blockquote>
+<p><strong>Note:</strong> This specification specifies what needs to be implemented for a contract to be a diamond.</p>
+</blockquote>
+<h3 id="terms">
+<a href="#terms" class="anchor-link"></a> Terms
+</h3>
+<ol>
+<li>A <strong>diamond</strong> is a contract that uses functions from its facets to execute function calls. A diamond can have one or more facets.</li>
+<li>The word <strong>facet</strong> comes from the diamond industry. It is a side, or flat surface of a diamond. A diamond can have many facets. In this standard a facet is a contract with one or more functions that executes functionality of a diamond.</li>
+<li>A <strong>loupe</strong> is a magnifying glass that is used to look at diamonds. In this standard a loupe is a facet that provides functions to look at a diamond and its facets.</li>
+<li>An <strong>immutable function</strong> is a function that is defined directly in a diamond and so cannot be replaced or removed. Or it is a function that is defined in a facet that cannot be replaced or removed because all upgrade functions have been removed from a diamond.</li>
+</ol>
+<h3 id="general-summary">
+<a href="#general-summary" class="anchor-link"></a> General Summary
+</h3>
+<p>A diamond calls functions from its facets using <code class="language-plaintext highlighter-rouge">delegatecall</code>.</p>
+<p>In the diamond industry diamonds are created and shaped by being cut, creating facets. In this standard diamonds are cut by adding, replacing or removing facets and their functions.</p>
+<h4 id="the-diamondcut-function">
+<a href="#the-diamondcut-function" class="anchor-link"></a> The diamondCut Function
+</h4>
+<p>The standard <code class="language-plaintext highlighter-rouge">diamondCut</code> function specified below can be used to add/replace/remove any number of functions from/to a diamond in a single transaction.</p>
+<p>The standard <code class="language-plaintext highlighter-rouge">diamondCut</code> function below is specified for the purpose of interoperability. Diamond tools, software and user-interfaces should expect and use the standard <code class="language-plaintext highlighter-rouge">diamondCut</code> function. Diamonds that might work with diamond specific tooling to add/replace/remove functions should implement the standard <code class="language-plaintext highlighter-rouge">diamondCut</code> function.</p>
+<p>The <code class="language-plaintext highlighter-rouge">diamondCut</code> function is optional. It does not have to be implemented in a diamond. For example an immutable diamond wouldn’t have this function.</p>
+<p>You can implement your own custom functions that add or replace or remove functions. You can also implement your own non-standard versions of <code class="language-plaintext highlighter-rouge">diamondCut</code> that have different parameters.</p>
+<p>If you want to create your own custom function(s) for adding/replacing/removing functions you might also want to implement the standard <code class="language-plaintext highlighter-rouge">diamondCut</code> function for interoperability with tools.</p>
+<p><strong>In ALL cases any function or code that adds or replaces or removes one or more functions MUST emit the standard DiamondCut event specified below.</strong></p>
+<p>The <code class="language-plaintext highlighter-rouge">DiamondCut</code> event records all changes to a diamond.</p>
+<h3 id="diamond-interface">
+<a href="#diamond-interface" class="anchor-link"></a> Diamond Interface
+</h3>
+<pre><code class="language-Solidity">interface IDiamondCut {
+    enum FacetCutAction {Add, Replace, Remove}
+    // Add=0, Replace=1, Remove=2
+
+    struct FacetCut {
+        address facetAddress;
+        FacetCutAction action;
+        bytes4[] functionSelectors;
+    }
+
+    /// @notice Add/replace/remove any number of functions and optionally execute
+    ///         a function with delegatecall
+    /// @param _diamondCut Contains the facet addresses and function selectors
+    /// @param _init The address of the contract or facet to execute _calldata
+    /// @param _calldata A function call, including function selector and arguments
+    ///                  _calldata is executed with delegatecall on _init
+    function diamondCut(
+        FacetCut[] calldata _diamondCut,
+        address _init,
+        bytes calldata _calldata
+    ) external;
+
+    event DiamondCut(FacetCut[] _diamondCut, address _init, bytes _calldata);
+}
+</code></pre>
+<h4 id="addingreplacingremoving-functions">
+<a href="#addingreplacingremoving-functions" class="anchor-link"></a> Adding/Replacing/Removing Functions
+</h4>
+<p>A diamond contains within it a mapping of function selectors to facet addresses. Functions are added/replaced/removed by modifying this mapping.</p>
+<p>The <code class="language-plaintext highlighter-rouge">_diamondCut</code> argument is an array of FacetCut structs.</p>
+<p>Each FacetCut struct contains a facet address and array of function selectors that are updated in a diamond.</p>
+<p>To add new functions create a FacetCut struct with <code class="language-plaintext highlighter-rouge">facetAddress</code> set to the facet that has the new functions and <code class="language-plaintext highlighter-rouge">functionSelectors</code> set with the function selectors to add. Set the <code class="language-plaintext highlighter-rouge">action</code> enum to <code class="language-plaintext highlighter-rouge">Add</code>.</p>
+<p>To replace functions create a FacetCut struct with <code class="language-plaintext highlighter-rouge">facetAddress</code> set to the facet that has the replacement functions and <code class="language-plaintext highlighter-rouge">functionSelectors</code> set with the function selectors to replace. Set the <code class="language-plaintext highlighter-rouge">action</code> enum to <code class="language-plaintext highlighter-rouge">Replace</code>.</p>
+<p>To remove functions create a FacetCut struct with <code class="language-plaintext highlighter-rouge">facetAddress</code> set to <code class="language-plaintext highlighter-rouge">address(0)</code> and <code class="language-plaintext highlighter-rouge">functionSelectors</code> set with the function selectors to remove. Set the <code class="language-plaintext highlighter-rouge">action</code> enum to <code class="language-plaintext highlighter-rouge">Remove</code>.</p>
+<p>It is the design of the <code class="language-plaintext highlighter-rouge">diamondCut</code> function that cuts are explicit and intentional.</p>
+<p>The <code class="language-plaintext highlighter-rouge">diamondCut</code> function reverts when attempting to add a function that already exists.</p>
+<p>The <code class="language-plaintext highlighter-rouge">diamondCut</code> function reverts when attempting to replace a function with a facet it is already using.</p>
+<p>The <code class="language-plaintext highlighter-rouge">diamondCut</code> function reverts when attempting to remove a function that already does not exist.</p>
+<h4 id="executing-_calldata">
+<a href="#executing-_calldata" class="anchor-link"></a> Executing _calldata
+</h4>
+<p>After adding/replacing/removing functions the <code class="language-plaintext highlighter-rouge">_calldata</code> argument is executed with <code class="language-plaintext highlighter-rouge">delegatecall</code> on <code class="language-plaintext highlighter-rouge">_init</code>. This execution is done to initialize data or setup or remove anything needed or no longer needed after adding, replacing and/or removing functions.</p>
+<p>If the <code class="language-plaintext highlighter-rouge">_init</code> value is <code class="language-plaintext highlighter-rouge">address(0)</code> then <code class="language-plaintext highlighter-rouge">_calldata</code> execution is skipped. In this case <code class="language-plaintext highlighter-rouge">_calldata</code> can contain 0 bytes or custom information.</p>
+<p>If the <code class="language-plaintext highlighter-rouge">_init</code> value is not <code class="language-plaintext highlighter-rouge">address(0)</code> then <code class="language-plaintext highlighter-rouge">_calldata</code> must contain more than 0 bytes or the transaction reverts.</p>
+<h4 id="diamondcut-event">
+<a href="#diamondcut-event" class="anchor-link"></a> DiamondCut Event
+</h4>
+<p>The <code class="language-plaintext highlighter-rouge">_diamondCut</code>, <code class="language-plaintext highlighter-rouge">_init</code>, and <code class="language-plaintext highlighter-rouge">_calldata</code> arguments are passed directly to the <code class="language-plaintext highlighter-rouge">DiamondCut</code> event.</p>
+<p>Any time one or more functions are added, replaced or removed the <code class="language-plaintext highlighter-rouge">DiamondCut</code> event MUST be emitted to record changes.</p>
+<h3 id="diamond-loupe">
+<a href="#diamond-loupe" class="anchor-link"></a> Diamond Loupe
+</h3>
+<blockquote>
+<p>A loupe is a small magnifying glass used to look at diamonds.
+These functions look at diamonds.</p>
+</blockquote>
+<p>The function selectors used by a diamond are queried to get what functions the diamond has and what facets are used.</p>
+<p>A diamond loupe is a facet that implements this interface:</p>
+<pre><code class="language-Solidity">// A loupe is a small magnifying glass used to look at diamonds.
+// These functions look at diamonds
+interface IDiamondLoupe {
+    /// These functions are expected to be called frequently
+    /// by tools.
+
+    struct Facet {
+        address facetAddress;
+        bytes4[] functionSelectors;
+    }
+
+    /// @notice Gets all facet addresses and their four byte function selectors.
+    /// @return facets_ Facet
+    function facets() external view returns (Facet[] memory facets_);
+
+    /// @notice Gets all the function selectors supported by a specific facet.
+    /// @param _facet The facet address.
+    /// @return facetFunctionSelectors_
+    function facetFunctionSelectors(address _facet) external view returns (bytes4[] memory facetFunctionSelectors_);
+
+    /// @notice Get all the facet addresses used by a diamond.
+    /// @return facetAddresses_
+    function facetAddresses() external view returns (address[] memory facetAddresses_);
+
+    /// @notice Gets the facet that supports the given selector.
+    /// @dev If facet is not found return address(0).
+    /// @param _functionSelector The function selector.
+    /// @return facetAddress_ The facet address.
+    function facetAddress(bytes4 _functionSelector) external view returns (address facetAddress_);
+}
+</code></pre>
+<p>See a <a href="https://github.com/mudgen/Diamond">reference implementation</a> to see how this can be implemented.</p>
+<p>The loupe functions can be used in user-interface software. A user interface calls these functions to provide information about and visualize diamonds.</p>
+<p>The loupe functions can be used in deployment functionality, upgrade functionality, testing and other software.</p>
+<p>Some loupe implementations are not gas efficient and should not be called in on-chain transactions. Some loupe implementations may be gas efficient and can be called in on-chain transactions. Read the documentation of the loupe implementation you use.</p>
+<h3 id="implementation-points">
+<a href="#implementation-points" class="anchor-link"></a> Implementation Points
+</h3>
+<p>A diamond implements the following implementation points:</p>
+<ol>
+<li>A diamond contains a fallback function and zero or more immutable functions that are defined within it.</li>
+<li>A diamond associates function selectors with facets.</li>
+<li>When a function is called on a diamond it executes immediately if it is an “immutable function” defined directly in the diamond. Otherwise the diamond’s fallback function is executed. The fallback function finds the facet associated with the function and executes the function using <code class="language-plaintext highlighter-rouge">delegatecall</code>. If there is no facet for the function then optionally a default function may be executed. If there is no facet for the function and no default function and no other mechanism to handle it then execution reverts.</li>
+<li>Each time functions are added, replaced or removed a <code class="language-plaintext highlighter-rouge">DiamondCut</code> event is emitted to record it.</li>
+<li>A diamond implements the DiamondLoupe interface.</li>
+<li>All immutable functions must be emitted in the <code class="language-plaintext highlighter-rouge">DiamondCut</code> event as new functions added. And the loupe functions must return information about immutable functions if they exist. The facet address for an immutable function is the diamond’s address. Any attempt to delete or replace an immutable function must revert.</li>
+<li>Optionally a diamond implements ERC165. If a diamond has the <code class="language-plaintext highlighter-rouge">diamondCut</code> function then the interface ID used for it is <code class="language-plaintext highlighter-rouge">IDiamondCut.diamondCut.selector</code>. The interface ID used for the diamond loupe interface is <code class="language-plaintext highlighter-rouge">IDiamondLoupe.facets.selector ^ IDiamondLoupe.facetFunctionSelectors.selector ^ IDiamondLoupe.facetAddresses.selector ^ IDiamondLoupe.facetAddress.selector</code>.</li>
+</ol>
+<p>The diamond address is the address that users interact with. The diamond address does not change. Only facet addresses can change by using the <code class="language-plaintext highlighter-rouge">diamondCut</code> function, or other function.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Reference diamond implementations exist in the <a href="https://github.com/mudgen/Diamond">Diamond repository</a>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="using-function-selectors">
+<a href="#using-function-selectors" class="anchor-link"></a> Using Function Selectors
+</h3>
+<p>User interface software can be used to retrieve function selectors and face addresses from a diamond in order show what functions a diamond has.</p>
+<p>This standard is designed to make diamonds work well with user-interface software. Function selectors with the ABI of a contract provide enough information about functions to be useful for user-interface software.</p>
+<h3 id="gas-considerations">
+<a href="#gas-considerations" class="anchor-link"></a> Gas Considerations
+</h3>
+<p>Delegating function calls does have some gas overhead. This is mitigated in several ways:</p>
+<ol>
+<li>Because diamonds do not have a max size limitation it is possible to add gas optimizing functions for use cases. For example someone could use a diamond to implement the ERC721 standard and implement batch transfer functions from the <a href="https://github.com/ethereum/EIPs/issues/1412">ERC1412 standard</a> to reduce gas (and make batch transfers more convenient).</li>
+<li>Some contract architectures require calling many contracts in one transaction. Gas savings can be realized by condensing those contracts into a single diamond and accessing contract storage directly.</li>
+<li>Facets can be small, reducing gas costs. Because it costs more gas to call a function in a contract with many functions than a contract with few functions.</li>
+<li>The Solidity optimizer can be set to a high setting causing more bytecode to be generated but the facets will use less gas when executed.</li>
+</ol>
+<h3 id="diamond-storage-1">
+<a href="#diamond-storage-1" class="anchor-link"></a> Diamond Storage
+</h3>
+<p>Since Solidity 0.6.4 it is possible to create pointers to structs in arbitrary places in contract storage. This enables diamonds and their facets to create their own storage layouts that are separate from each other and do not conflict with each other, but can still be shared between them. See this blog post for more information: <a href="https://medium.com/1milliondevs/new-storage-layout-for-proxy-contracts-and-diamonds-98d01d0eadb">New Storage Layout For Proxy Contracts and Diamonds</a>. The reference implementations for EIP-2535 uses Diamond Storage.</p>
+<p>Diamond Storage is not the same thing as unstructured storage. Unstructured storage reads and writes specific values like unsigned integers and addresses at specified locations in contract storage. Diamond Storage uses structs at specified locations in contract storage for reading and writing. Structs can hold any number of state variables of any type.</p>
+<h3 id="versions-of-functions">
+<a href="#versions-of-functions" class="anchor-link"></a> Versions of Functions
+</h3>
+<p>Software or a user can verify what version of a function is called by getting the facet address of the function. This can be done by calling the <code class="language-plaintext highlighter-rouge">facetAddress</code> function from the DiamondLoupe interface. This function takes a function selector as an argument and returns the facet address where it is implemented.</p>
+<h3 id="sharing-functions-between-facets">
+<a href="#sharing-functions-between-facets" class="anchor-link"></a> Sharing Functions Between Facets
+</h3>
+<p>In some cases it might be necessary to call a function defined in a different facet.
+Here are some solutions to this:</p>
+<ol>
+<li>Copy internal function code in one facet to the other facet.</li>
+<li>Put common internal functions in a contract that is inherited by multiple facets.</li>
+<li>Put common internal functions in a Solidity library and use the library in facets.</li>
+<li>A type safe way to call an external function defined in another facet is to do this: MyOtherFacet(address(this)).myFunction(arg1, arg2)</li>
+<li>A more gas-efficient way to call an external function defined in another facet is to use <code class="language-plaintext highlighter-rouge">delegatecall</code>. Here is an example of doing that:
+<pre><code class="language-Solidity">DiamondStorage storage ds = diamondStorage();
+bytes4 functionSelector = bytes4(keccak256("myFunction(uint256)"));
+// get facet address of function
+address facet = ds.selectorToFacet[functionSelector];
+bytes memory myFunctionCall = abi.encodeWithSelector(functionSelector, 4);
+(bool success, uint result) = address(facet).delegatecall(myFunctionCall);
+require(success, "myFunction failed");
+</code></pre>
+</li>
+<li>Instead of calling an external function defined in another facet you can instead create an internal function version of the external function. Add the internal version of the function to the facet that needs to use it.</li>
+</ol>
+<h3 id="default-function">
+<a href="#default-function" class="anchor-link"></a> Default Function
+</h3>
+<p>Solidity provides the <code class="language-plaintext highlighter-rouge">fallback</code> function so that specific functionality can be executed when a function is called on a contract that does not exist in the contract. This same behavior can optionally be implemented in a diamond by implementing and using a default function, which is a function that is executed when a function is called on a diamond that does not exist in the diamond.</p>
+<p>A default function can be implemented a number of ways and this standard does not specify how it must be implemented.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="ownership-and-authentication">
+<a href="#ownership-and-authentication" class="anchor-link"></a> Ownership and Authentication
+</h3>
+<blockquote>
+<p><strong>Note:</strong> The design and implementation of diamond ownership/authentication is <strong>not</strong> part of this standard. The examples given in this standard and in the reference implementation are just <strong>examples</strong> of how it could be done.</p>
+</blockquote>
+<p>It is possible to create many different authentication or ownership schemes with EIP-2535. Authentication schemes can be very simple or complex, fine grained or coarse. EIP-2535 does not limit it in any way. For example ownership/authentication could be as simple as a single account address having the authority to add/replace/remove functions. Or a decentralized autonomous organization could have the authority to only add/replace/remove certain functions.</p>
+<p>Consensus functionality could be implemented such as an approval function that multiple different people call to approve changes before they are executed with the <code class="language-plaintext highlighter-rouge">diamondCut</code> function. These are just examples.</p>
+<p>The development of standards and implementations of ownership, control and authentication of diamonds is encouraged.</p>
+<h3 id="security-of-diamond-storage">
+<a href="#security-of-diamond-storage" class="anchor-link"></a> Security of Diamond Storage
+</h3>
+<p>If a person can add/replace functions then that person can alter storage willy-nilly. This is very powerful and very dangerous. However the capability can be used while eliminating or reducing the danger. The danger is eliminated or reduced by limiting <strong>who</strong> can add/replace/remove functions, limiting <strong>when</strong> functions can be added/replaced/removed and by <strong>transparency</strong>.</p>
+<p><strong>Who</strong>
+Here are some ways <strong>who</strong> can be limited:</p>
+<ol>
+<li>Only allow a trusted individual or organization to make diamond upgrades.</li>
+<li>Only allow a distributed autonomous organization to make diamond upgrades.</li>
+<li>Only allow multi-signature upgrades.</li>
+<li>Only allow the end user who owns his own diamond to make upgrades. This enables users to opt-in to upgrades.</li>
+<li>Don’t allow anybody to make upgrades by making a single cut diamond.</li>
+</ol>
+<p><strong>When</strong>
+Here are some ways <strong>when</strong> can be limited:</p>
+<ol>
+<li>Only allow upgrades during development and testing. Make a single cut diamond for main network release.</li>
+<li>Use an upgradeable diamond until it is certain that no new features are needed and then make it a finished diamond by removing the ability to add/replace/remove functions.</li>
+<li>Program into the <code class="language-plaintext highlighter-rouge">diamondCut</code> function certain periods of time that the diamond can be upgraded. For example the <code class="language-plaintext highlighter-rouge">diamondCut</code> function could be programmed so that a diamond could only be upgraded during a specific five hour period each year. Attention and transparency could be applied to that five hour period to ensure upgrades are done right.</li>
+</ol>
+<p><strong>Transparency</strong>
+Transparency provides certainty and proof that upgrades are done correctly and honestly.</p>
+<ol>
+<li>Publish and make available verified source code used by diamonds and facets.</li>
+<li>Provide documentation for diamonds, facets, upgrade plans, and results of upgrades.</li>
+<li>Provide tools and/or user interfaces that make your diamonds more visible and understandable.</li>
+</ol>
+<h3 id="function-selector-clash">
+<a href="#function-selector-clash" class="anchor-link"></a> Function Selector Clash
+</h3>
+<p>A function selector clash occurs when two different function signatures hash to the same four-byte hash. This has the unintended consequence of replacing an existing function in a diamond when the intention was to add a new function. This scenario is not possible with the <code class="language-plaintext highlighter-rouge">diamondCut</code> function because it prevents adding function selectors that already exist.</p>
+<h3 id="transparency">
+<a href="#transparency" class="anchor-link"></a> Transparency
+</h3>
+<p>Diamonds emit an event every time one or more functions are added, replaced or removed. All source code can be verified. This enables people and software to monitor changes to a contract. If any bad acting function is added to a diamond then it can be seen.</p>
+<p>Security and domain experts can review the history of change of a diamond to detect any history of foul play.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This standard makes upgradeable diamonds compatible with future standards and functionality because new functions can be added and existing functions can be replaced or removed.</p>
+<h2 id="learning--references">
+<a href="#learning--references" class="anchor-link"></a> Learning &amp; References
+</h2>
+<h3 id="diamond-articles">
+<a href="#diamond-articles" class="anchor-link"></a> Diamond Articles
+</h3>
+<p><a href="https://eip2535diamonds.substack.com/p/introduction-to-the-diamond-standard">Introduction to EIP-2535 Diamonds</a></p>
+<p><a href="https://github.com/mudgen/awesome-diamonds">Awesome Diamonds</a></p>
+<p><a href="https://dev.to/mudgen/how-to-share-functions-between-facets-of-a-diamond-1njb">How to Share Functions Between Facets of a Diamond</a></p>
+<p><a href="https://eip2535diamonds.substack.com/p/smart-contract-security-audits-for">Smart Contract Security Audits for EIP-2535 Diamonds Implementations</a></p>
+<p><a href="https://dev.to/mudgen/why-diamonds-need-a-standard-1i1h">Why Ethereum Diamonds Need A Standard</a></p>
+<p><a href="https://dev.to/mudgen/ethereum-s-maximum-contract-size-limit-is-solved-with-the-diamond-standard-2189">Ethereum’s Maximum Contract Size Limit is Solved with EIP-2535 Diamonds</a></p>
+<p><a href="https://dev.to/mudgen/understanding-diamonds-on-ethereum-1fb">Understanding Diamonds</a></p>
+<p><a href="https://dev.to/mudgen/why-diamonds-need-a-standard-1i1h">Why Ethereum Diamonds Need A Standard</a></p>
+<p><a href="https://dev.to/mudgen/why-loupe-functions-for-diamonds-1kc3">Diamond Loupe Functions?</a></p>
+<p><a href="https://dev.to/mudgen/ethereum-diamonds-for-on-chain-decentralized-governance-39op">Ethereum Diamonds for On-Chain Decentralized Governance</a></p>
+<h3 id="diamond-storage-articles">
+<a href="#diamond-storage-articles" class="anchor-link"></a> Diamond Storage Articles
+</h3>
+<p><a href="https://dev.to/mudgen/how-diamond-storage-works-90e">How Diamond Storage Works</a></p>
+<p><a href="https://dev.to/mudgen/appstorage-pattern-for-state-variables-in-solidity-3lki">AppStorage Pattern for State Variables in Solidity</a></p>
+<p><a href="https://medium.com/1milliondevs/new-storage-layout-for-proxy-contracts-and-diamonds-98d01d0eadb">New Storage Layout For Proxy Contracts and Diamonds</a></p>
+<p><a href="https://dev.to/mudgen/solidity-libraries-can-t-have-state-variables-oh-yes-they-can-3ke9">Solidity Libraries Can’t Have State Variables – Oh Yes They Can!</a></p>
+<p><a href="https://eip2535diamonds.substack.com/p/diamond-upgrades">Rules for Diamond Upgrades</a></p>
+<p><a href="https://eip2535diamonds.substack.com/p/example-of-a-diamond-upgrade">Example of Adding New State Variables in Diamond Upgrade</a></p>
+<p><a href="https://eip2535diamonds.substack.com/p/constructor-functions-dont-work-in">Constructor Functions Don’t Work in Facets</a></p>
+<h3 id="diamond-user-interface">
+<a href="#diamond-user-interface" class="anchor-link"></a> Diamond User Interface
+</h3>
+<p><a href="https://louper.dev/">Louper</a> A user interface for all diamonds.</p>
+<h3 id="implementations">
+<a href="#implementations" class="anchor-link"></a> Implementations
+</h3>
+<p><a href="https://github.com/mudgen/Diamond">Diamond reference implementations</a></p>
+<p><a href="https://github.com/aavegotchi/ghst-staking">GHST Staking</a></p>
+<p><a href="https://github.com/pie-dao/ExperiPie">pie-dao / ExperiPie</a></p>
+<p><a href="https://github.com/nayms/contracts">Nayms Contracts</a></p>
+<p><a href="https://github.com/aavegotchi/aavegotchi-contracts">Aavegotchi Diamond</a></p>
+<h3 id="help">
+<a href="#help" class="anchor-link"></a> Help
+</h3>
+<p><a href="https://discord.gg/kQewPw2">EIP-2535 Diamonds Discord</a></p>
+<h2 id="inspiration--development">
+<a href="#inspiration--development" class="anchor-link"></a> Inspiration &amp; Development
+</h2>
+<p>EIP-2535 is an improved design over <a href="/EIPS/eip-1538">EIP-1538</a> using ABIEncoderV2 and function selectors.</p>
+<p>EIP-2535 replaces EIP-1538.</p>
+<p>This standard was inspired by <a href="/EIPS/eip-1538">EIP-1538</a> and ZeppelinOS’s implementation of <a href="https://github.com/zeppelinos/labs/tree/master/upgradeability_with_vtable">Upgradeability with vtables</a>.</p>
+<p>This standard was also inspired by the design and implementation of the <a href="https://etherscan.io/address/0xc1eab49cf9d2e23e43bcf23b36b2be14fc2f8838#code">Mokens contract</a>.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/mudgen">Nick Mudge</a>, "EIP-2535: Diamonds, Multi-Facet Proxy [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2535, February 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2535.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2535: Diamonds, Multi-Facet Proxy [DRAFT]",
+    "author": "Nick Mudge (@mudgen)",
+    "name": "EIP-2535: Diamonds, Multi-Facet Proxy [DRAFT]",
+    "dateCreated": "2020-02-22",
+    "datePublished": "2020-02-22",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2535",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

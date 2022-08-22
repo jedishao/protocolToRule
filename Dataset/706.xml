@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-706: DEVp2p snappy compression</title>
+<meta property="og:title" content="EIP-706: DEVp2p snappy compression" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-706" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-706" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-706: DEVp2p snappy compression
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-706.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#2252475647506247564a475047574f0c4d5045">Péter Szilágyi</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Networking</td></tr>
+<tr><th>Created</th><td>2017-09-07</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#avoiding-dos-attacks">Avoiding DOS attacks</a></li>
+</ul>
+</li>
+<li><a href="#alternatives-discarded">Alternatives (discarded)</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#test-vectors">Test vectors</a>
+<ul>
+<li><a href="#go">Go</a></li>
+<li><a href="#python">Python</a></li>
+</ul>
+</li>
+<li><a href="#references">References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The base networking protocol (DEVp2p) used by Ethereum currently does not employ any form of compression. This results in a massive amount of bandwidth wasted in the entire network, making both initial sync as well as normal operation slower and laggier.</p>
+<p>This EIP proposes a tiny extension to the DEVp2p protocol to enable <a href="https://en.wikipedia.org/wiki/Snappy_(compression)">Snappy compression</a> on all message payloads after the initial handshake. After extensive benchmarks, results show that data traffic is decreased by 60-80% for initial sync. You can find exact numbers below.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Synchronizing the Ethereum main network (block 4,248,000) in Geth using fast sync currently consumes 1.01GB upload and 33.59GB download bandwidth. On the Rinkeby test network (block 852,000) it’s 55.89MB upload and 2.51GB download.</p>
+<p>However, most of this data (blocks, transactions) are heavily compressible. By enabling compression at the message payload level, we can reduce the previous numbers to 1.01GB upload / 13.46GB download on the main network, and 46.21MB upload / 463.65MB download on the test network.</p>
+<p>The motivation behind doing this at the DEVp2p level (opposed to eth for example) is that it would enable compression for all sub-protocols (eth, les, bzz) seamlessly, reducing any complexity those protocols might incur in trying to individually optimize for data traffic.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Bump the advertised DEVp2p version number from <code class="language-plaintext highlighter-rouge">4</code> to <code class="language-plaintext highlighter-rouge">5</code>. If during handshake, the remote side advertises support only for version <code class="language-plaintext highlighter-rouge">4</code>, run the exact same protocol as until now.</p>
+<p>If the remote side advertises a DEVp2p version <code class="language-plaintext highlighter-rouge">&gt;= 5</code>, inject a Snappy compression step right before encrypting the DEVp2p message during sending:</p>
+<ul>
+<li>A message consists of <code class="language-plaintext highlighter-rouge">{Code, Size, Payload}</code></li>
+<li>Compress the original payload with Snappy and store it in the same field.</li>
+<li>Update the message size to the length of the compressed payload.</li>
+<li>Encrypt and send the message as before, oblivious to compression.</li>
+</ul>
+<p>Similarly to message sending, when receiving a DEVp2p v5 message from a remote node, insert a Snappy decompression step right after the decrypting the DEVp2p message:</p>
+<ul>
+<li>A message consists of <code class="language-plaintext highlighter-rouge">{Code, Size, Payload}</code></li>
+<li>Decrypt the message payload as before, oblivious to compression.</li>
+<li>Decompress the payload with Snappy and store it in the same field.</li>
+<li>Update the message size to the length of the decompressed payload.</li>
+</ul>
+<p>Important caveats:</p>
+<ul>
+<li>The handshake message is <strong>never</strong> compressed, since it is needed to negotiate the common version.</li>
+<li>Snappy framing is <strong>not</strong> used, since the DEVp2p protocol already message oriented.</li>
+</ul>
+<p><em>Note: Snappy supports uncompressed binary literals (up to 4GB) too, leaving room for fine-tuned future optimisations for already compressed or encrypted data that would have no gain of compression (Snappy usually detects this case automatically).</em></p>
+<h3 id="avoiding-dos-attacks">
+<a href="#avoiding-dos-attacks" class="anchor-link"></a> Avoiding DOS attacks
+</h3>
+<p>Currently a DEVp2p message length is limited to 24 bits, amounting to a maximum size of 16MB. With the introduction of Snappy compression, care must be taken not to blindly decompress messages, since they may get significantly larger than 16MB.</p>
+<p>However, Snappy is capable of calculating the decompressed size of an input message without inflating it in memory (<em><a href="https://github.com/google/snappy/blob/master/format_description.txt#L20">the stream starts with the uncompressed length up to a maximum of <code class="language-plaintext highlighter-rouge">2^32 - 1</code> stored as a little-endian varint</a></em>). This can be used to discard any messages which decompress above some threshold. <strong>The proposal is to use the same limit (16MB) as the threshold for decompressed messages.</strong> This retains the same guarantees that the current DEVp2p protocol does, so there won’t be surprises in application level protocols.</p>
+<h2 id="alternatives-discarded">
+<a href="#alternatives-discarded" class="anchor-link"></a> Alternatives (discarded)
+</h2>
+<p><strong>Alternative solutions to data compression that have been brought up and discarded are:</strong></p>
+<p>Extend protocol <code class="language-plaintext highlighter-rouge">xyz</code> to support compressed messages versus doing it at DEVp2p level:</p>
+<ul>
+<li><strong>Pro</strong>: Can be better optimized when to compress and when not to.</li>
+<li><strong>Con</strong>: Mixes in transport layer encoding into application layer logic.</li>
+<li><strong>Con</strong>: Makes the individual message specs more convoluted with compression details.</li>
+<li><strong>Con</strong>: Requires cross client coordination on every single protocol, making the effor much harder and repeated (eth, les, shh, bzz).</li>
+</ul>
+<p>Introduce seamless variations of protocol such as <code class="language-plaintext highlighter-rouge">xyz</code> expanded with <code class="language-plaintext highlighter-rouge">xyz-compressed</code>:</p>
+<ul>
+<li><strong>Pro</strong>: Can be done (hacked in) without cross client coordination.</li>
+<li><strong>Con</strong>: Litters the network with client specific protocol announces.</li>
+<li><strong>Con</strong>: Needs to be specced in an EIP for cross interoperability anyway.</li>
+</ul>
+<p><strong>Other ideas that have been discussed and discarded:</strong></p>
+<p>Don’t explicitly limit the decompressed message size, only the compressed one:</p>
+<ul>
+<li><strong>Pro</strong>: Allows larger messages to traverse through DEVp2p.</li>
+<li><strong>Con</strong>: Upper layer protocols need to check and discard large messages.</li>
+<li><strong>Con</strong>: Needs lazy decompression to allow size limitations without DOS.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This proposal is fully backward compatible. Clients upgrading to the proposed DEVp2p protocol version <code class="language-plaintext highlighter-rouge">5</code> should still support skipping the compression step for connections that only advertise version <code class="language-plaintext highlighter-rouge">4</code> of the DEVp2p protocol.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>You can find a reference implementation of this EIP in https://github.com/ethereum/go-ethereum/pull/15106.</p>
+<h2 id="test-vectors">
+<a href="#test-vectors" class="anchor-link"></a> Test vectors
+</h2>
+<p>There is more than one valid encoding of any given input, and there is more than one good internal compression algorithm within Snappy when trading off throughput for output size. As such, different implementations might produce slight variations in the compressed form, but all should be cross compatible between each other.</p>
+<p>As an example, take hex encoded RLP of block #272621 from the Rinkeby test network: <a href="https://gist.githubusercontent.com/karalabe/72a1a6c4c1dbe6d4996879e415697f06/raw/195bf0c0050ee9805fcd5db4b5b650c58879a55f/block.rlp">block.rlp (~3MB)</a>.</p>
+<ul>
+<li>Encoding the raw RLP via <a href="https://github.com/golang/snappy">Go’s Snappy library</a> yields: <a href="https://gist.githubusercontent.com/karalabe/72a1a6c4c1dbe6d4996879e415697f06/raw/195bf0c0050ee9805fcd5db4b5b650c58879a55f/block.go.snappy">block.go.snappy (~70KB)</a>.</li>
+<li>Encoding the raw RLP via <a href="https://github.com/andrix/python-snappy">Python’s Snappy library</a> yields: <a href="https://gist.githubusercontent.com/karalabe/72a1a6c4c1dbe6d4996879e415697f06/raw/195bf0c0050ee9805fcd5db4b5b650c58879a55f/block.py.snappy">block.py.snappy (~70KB)</a>.</li>
+</ul>
+<p>You can verify that an encoded binary can be decoded into the proper plaintext using the following snippets:</p>
+<h3 id="go">
+<a href="#go" class="anchor-link"></a> Go
+</h3>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>go get https://github.com/golang/snappy
+</code></pre></div></div>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">package</span> <span class="n">main</span>
+
+<span class="k">import</span> <span class="p">(</span>
+	<span class="s">"bytes"</span>
+	<span class="s">"encoding/hex"</span>
+	<span class="s">"fmt"</span>
+	<span class="s">"io/ioutil"</span>
+	<span class="s">"log"</span>
+	<span class="s">"os"</span>
+
+	<span class="s">"github.com/golang/snappy"</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c">// Read and decode the decompressed file</span>
+	<span class="n">plainhex</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">ioutil</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">Args</span><span class="p">[</span><span class="m">1</span><span class="p">])</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">log</span><span class="o">.</span><span class="n">Fatalf</span><span class="p">(</span><span class="s">"Failed to read decompressed file %s: %v"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">Args</span><span class="p">[</span><span class="m">1</span><span class="p">],</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="n">plain</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">hex</span><span class="o">.</span><span class="n">DecodeString</span><span class="p">(</span><span class="kt">string</span><span class="p">(</span><span class="n">plainhex</span><span class="p">))</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">log</span><span class="o">.</span><span class="n">Fatalf</span><span class="p">(</span><span class="s">"Failed to decode decompressed file: %v"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c">// Read and decode the compressed file</span>
+	<span class="n">comphex</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">ioutil</span><span class="o">.</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">Args</span><span class="p">[</span><span class="m">2</span><span class="p">])</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">log</span><span class="o">.</span><span class="n">Fatalf</span><span class="p">(</span><span class="s">"Failed to read compressed file %s: %v"</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">Args</span><span class="p">[</span><span class="m">2</span><span class="p">],</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="n">comp</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">hex</span><span class="o">.</span><span class="n">DecodeString</span><span class="p">(</span><span class="kt">string</span><span class="p">(</span><span class="n">comphex</span><span class="p">))</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">log</span><span class="o">.</span><span class="n">Fatalf</span><span class="p">(</span><span class="s">"Failed to decode compressed file: %v"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c">// Make sure they match</span>
+	<span class="n">decomp</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">snappy</span><span class="o">.</span><span class="n">Decode</span><span class="p">(</span><span class="no">nil</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+		<span class="n">log</span><span class="o">.</span><span class="n">Fatalf</span><span class="p">(</span><span class="s">"Failed to decompress compressed file: %v"</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="o">!</span><span class="n">bytes</span><span class="o">.</span><span class="n">Equal</span><span class="p">(</span><span class="n">plain</span><span class="p">,</span> <span class="n">decomp</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Booo, decompressed file does not match provided plain text!"</span><span class="p">)</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"Yay, decompressed data matched provided plain text!"</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>go run main.go block.rlp block.go.snappy
+Yay, decompressed data matched provided plain text!
+
+<span class="nv">$ </span>go run main.go block.rlp block.py.snappy
+Yay, decompressed data matched provided plain text!
+</code></pre></div></div>
+<h3 id="python">
+<a href="#python" class="anchor-link"></a> Python
+</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>python-snappy
+</code></pre></div></div>
+<div class="language-py highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">snappy</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c1"># Read and decode the decompressed file
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+    <span class="n">plainhex</span> <span class="o">=</span> <span class="nb">file</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">plain</span> <span class="o">=</span> <span class="n">plainhex</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">"hex"</span><span class="p">)</span>
+
+<span class="c1"># Read and decode the compressed file
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+    <span class="n">comphex</span> <span class="o">=</span> <span class="nb">file</span><span class="p">.</span><span class="n">read</span><span class="p">()</span>
+
+<span class="n">comp</span> <span class="o">=</span> <span class="n">comphex</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">"hex"</span><span class="p">)</span>
+
+<span class="c1"># Make sure they match
+</span><span class="n">decomp</span> <span class="o">=</span> <span class="n">snappy</span><span class="p">.</span><span class="n">uncompress</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">plain</span> <span class="o">!=</span> <span class="n">decomp</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">"Booo, decompressed file does not match provided plain text!"</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">"Yay, decompressed data matched provided plain text!"</span>
+</code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python main.py block.rlp block.go.snappy
+Yay, decompressed data matched provided plain text!
+
+<span class="nv">$ </span>python main.py block.rlp block.py.snappy
+Yay, decompressed data matched provided plain text!
+</code></pre></div></div>
+<h2 id="references">
+<a href="#references" class="anchor-link"></a> References
+</h2>
+<ul>
+<li>Snappy website: https://google.github.io/snappy/</li>
+<li>Snappy specification: https://github.com/google/snappy/blob/master/format_description.txt</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#ccbca9b8a9be8ca9b8a4a9bea9b9a1e2a3beab">Péter Szilágyi</a>, "EIP-706: DEVp2p snappy compression," <em>Ethereum Improvement Proposals</em>, no. 706, September 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-706.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-706: DEVp2p snappy compression",
+    "author": "Péter Szilágyi <peter@ethereum.org>",
+    "name": "EIP-706: DEVp2p snappy compression",
+    "dateCreated": "2017-09-07",
+    "datePublished": "2017-09-07",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

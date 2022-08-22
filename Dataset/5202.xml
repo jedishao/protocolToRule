@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5202: Blueprint contract format</title>
+<meta property="og:title" content="EIP-5202: Blueprint contract format" />
+<meta name="description" content="Define a bytecode container format for indexing and utilizing blueprint contracts" />
+<meta property="og:description" content="Define a bytecode container format for indexing and utilizing blueprint contracts" />
+<meta name="twitter:description" content="Define a bytecode container format for indexing and utilizing blueprint contracts" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5202" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5202" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5202: Blueprint contract format
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5202.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Define a bytecode container format for indexing and utilizing blueprint contracts</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/charles-cooper">Charles Cooper</a>, <a href="https://github.com/skellet0r">Edward Amor</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-5202-standard-factory-contract-format/9851">https://ethereum-magicians.org/t/erc-5202-standard-factory-contract-format/9851</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-06-23</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-170">170</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Define a standard for “blueprint” contracts, or contracts which represent initcode that is stored on-chain.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>To decrease deployer contract size, a useful pattern is to store initcode on chain as a “blueprint” contract, and then use <code class="language-plaintext highlighter-rouge">EXTCODECOPY</code> to copy the initcode into memory, followed by a call to <code class="language-plaintext highlighter-rouge">CREATE</code> or <code class="language-plaintext highlighter-rouge">CREATE2</code>. However, this comes with the following problems:</p>
+<ul>
+<li>It is hard for external tools and indexers to detect if a contract is a “regular” runtime contract or a “blueprint” contract. Heuristically searching for patterns in bytecode to determine if it is initcode poses maintenance and correctness problems.</li>
+<li>Storing initcode byte-for-byte on-chain is a correctness and security problem. Since the EVM does not have a native way to distinguish between executable code and other types of code, unless the initcode explicitly implements ACL rules, <em>anybody</em> can call such a “blueprint” contract and execute the initcode directly as ordinary runtime code. This is particularly problematic if the initcode stored by the blueprint contract has side effects such as writing to storage or calling external contracts. If the initcode stored by the blueprint contract executes a <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> opcode, the blueprint contract could even be removed, preventing the correct operation of downstream deployer contracts that rely on the blueprint existing. For this reason, it would be good to prefix blueprint contracts with a special preamble to prevent execution.</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p>A blueprint contract MUST use the preamble <code class="language-plaintext highlighter-rouge">0xFE71&lt;version bits&gt;&lt;length encoding bits&gt;</code>. 6 bits are allocated to the version, and 2 bits to the length encoding. The first version begins at 0 (<code class="language-plaintext highlighter-rouge">0b000000</code>), and versions increment by 1. The value <code class="language-plaintext highlighter-rouge">0b11</code> for <code class="language-plaintext highlighter-rouge">&lt;length encoding bits&gt;</code> is reserved. In the case that the length bits are <code class="language-plaintext highlighter-rouge">0b11</code>, the third byte is considered a continuation byte (that is, the version requires multiple bytes to encode). The exact encoding of a multi-byte version is left to a future ERC.</p>
+<p>A blueprint contract MUST contain at least one byte of initcode.</p>
+<p>A blueprint contract MAY insert any bytes (data or code) between the version byte(s) and the initcode. If such variable length data is used, the preamble must be <code class="language-plaintext highlighter-rouge">0xFE71&lt;version bits&gt;&lt;length encoding bits&gt;&lt;length bytes&gt;&lt;data&gt;</code>. The <code class="language-plaintext highlighter-rouge">&lt;length encoding bits&gt;</code> represent a number between 0 and 2 (inclusive) describing how many bytes <code class="language-plaintext highlighter-rouge">&lt;length bytes&gt;</code> takes, and <code class="language-plaintext highlighter-rouge">&lt;length bytes&gt;</code> is the big-endian encoding of the number of bytes that <code class="language-plaintext highlighter-rouge">&lt;data&gt;</code> takes.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<ul>
+<li>
+<p>To save gas and storage space, the preamble should be as minimal as possible.</p>
+</li>
+<li>
+<p>It is considered “bad” behavior to try to CALL a blueprint contract directly, therefore the preamble starts with <code class="language-plaintext highlighter-rouge">INVALID (0xfe)</code> to end execution with an exceptional halting condition (rather than a “gentler” opcode like <code class="language-plaintext highlighter-rouge">STOP (0x00)</code>).</p>
+</li>
+<li>
+<p>To help distinguish a blueprint contract from other contracts that may start with <code class="language-plaintext highlighter-rouge">0xFE</code>, a “magic” byte is used. The value <code class="language-plaintext highlighter-rouge">0x71</code> was arbitrarily chosen by taking the last byte of the keccak256 hash of the bytestring “blueprint” (i.e.: <code class="language-plaintext highlighter-rouge">keccak256(b"blueprint")[-1]</code>).</p>
+</li>
+<li>
+<p>An empty initcode is disallowed by the spec to prevent what might be a common mistake.</p>
+</li>
+<li>
+<p>Users may want to include arbitrary data or code in their preamble. To allow indexers to ignore these bytes, a variable length encoding is proposed. To allow the length to be only zero or one bytes (in the presumably common case that <code class="language-plaintext highlighter-rouge">len(data bytes)</code> is smaller than 256), two bits of the third byte are reserved to specify how many bytes the encoded length takes.</p>
+</li>
+<li>
+<p>In case we need an upgrade path, version bits are included. While we do not expect to exhaust the version bits, in case we do, a continuation sequence is reserved. Since only two bytes are required for <code class="language-plaintext highlighter-rouge">&lt;length bytes&gt;</code> (as <a href="/EIPS/eip-170">EIP-170</a> restricts contract length to 24KB), a <code class="language-plaintext highlighter-rouge">&lt;length encoding bits&gt;</code> value of 3 would never be required to describe <code class="language-plaintext highlighter-rouge">&lt;length bytes&gt;</code>. For that reason, the special <code class="language-plaintext highlighter-rouge">&lt;length encoding bits&gt;</code> value of <code class="language-plaintext highlighter-rouge">0b11</code> is reserved as a continuation sequence marker.</p>
+</li>
+<li>
+<p>The length of the initcode itself is not included by default in the preamble because it takes space, and it can be trivially determined using <code class="language-plaintext highlighter-rouge">EXTCODESIZE</code>.</p>
+</li>
+<li>
+<p>The EOF (<a href="/EIPS/eip-3540">EIP-3540</a>) could provide another way of specifying blueprint contracts, by adding another section kind (3 - initcode). However, it is not yet in the EVM, and we would like to be able to standardize blueprint contracts today, without relying on EVM changes. If, at some future point, section kind 3 becomes part of the EOF spec, and the EOF becomes part of the EVM, this ERC will be considered to be obsolesced since the EOF validation spec provides much stronger guarantees than this ERC.</p>
+</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Needs discussion</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="k">def</span> <span class="nf">parse_blueprint_preamble</span><span class="p">(</span><span class="n">bytecode</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bytes</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">]:</span>
+    <span class="s">"""
+    Given bytecode as a sequence of bytes, parse the blueprint preamble and
+    deconstruct the bytecode into:
+        the ERC version, preamble data and initcode.
+    Raises an exception if the bytecode is not a valid blueprint contract
+    according to this ERC.
+    arguments:
+        bytecode: a `bytes` object representing the bytecode
+    returns:
+        (version,
+         None if &lt;length encoding bits&gt; is 0, otherwise the bytes of the data section,
+         the bytes of the initcode,
+        )
+    """</span>
+    <span class="k">if</span> <span class="n">bytecode</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="sa">b</span><span class="s">"</span><span class="se">\xFE\x71</span><span class="s">"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">"Not a blueprint!"</span><span class="p">)</span>
+
+    <span class="n">erc_version</span> <span class="o">=</span> <span class="p">(</span><span class="n">bytecode</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mb">0b11111100</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span>
+
+    <span class="n">n_length_bytes</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mb">0b11</span>
+    <span class="k">if</span> <span class="n">n_length_bytes</span> <span class="o">==</span> <span class="mb">0b11</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">"Reserved bits are set"</span><span class="p">)</span>
+
+    <span class="n">data_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">bytecode</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">3</span> <span class="o">+</span> <span class="n">n_length_bytes</span><span class="p">],</span> <span class="n">byteorder</span><span class="o">=</span><span class="s">"big"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_length_bytes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">preamble_data</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data_start</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">n_length_bytes</span>
+        <span class="n">preamble_data</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="n">data_start</span><span class="p">:</span><span class="n">data_start</span> <span class="o">+</span> <span class="n">data_length</span><span class="p">]</span>
+
+    <span class="n">initcode</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="mi">3</span> <span class="o">+</span> <span class="n">n_length_bytes</span> <span class="o">+</span> <span class="n">data_length</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">initcode</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nb">Exception</span><span class="p">(</span><span class="s">"Empty initcode!"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">erc_version</span><span class="p">,</span> <span class="n">preamble_data</span><span class="p">,</span> <span class="n">initcode</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>There could be contracts on-chain already which happen to start with the same prefix as proposed in this ERC. However, this is not considered a serious risk, because the way it is envisioned that indexers will use this is to verify source code by compiling it and prepending the preamble.</p>
+<p>As of 2022-07-08, no contracts deployed on the Ethereum mainnet have a bytecode starting with <code class="language-plaintext highlighter-rouge">0xFE71</code>.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/charles-cooper">Charles Cooper</a>, <a href="https://github.com/skellet0r">Edward Amor</a>, "EIP-5202: Blueprint contract format [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5202, June 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5202.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5202: Blueprint contract format [DRAFT]",
+    "author": "Charles Cooper (@charles-cooper), Edward Amor (@skellet0r)",
+    "name": "EIP-5202: Blueprint contract format [DRAFT]",
+    "dateCreated": "2022-06-23",
+    "datePublished": "2022-06-23",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-5202-standard-factory-contract-format/9851",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

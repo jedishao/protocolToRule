@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2926: Chunk-Based Code Merkleization</title>
+<meta property="og:title" content="EIP-2926: Chunk-Based Code Merkleization" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2926" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2926" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2926: Chunk-Based Code Merkleization
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2926.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/s1na">Sina Mahmoodi</a>, <a href="https://github.com/axic">Alex Beregszaszi</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2926-chunk-based-code-merkleization/4555">https://ethereum-magicians.org/t/eip-2926-chunk-based-code-merkleization/4555</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-08-25</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-161">161</a>,
+<a href="eip-170">170</a>,
+<a href="eip-2584">2584</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#constants-and-definitions">Constants and Definitions</a></li>
+<li><a href="#code-merkleization">Code merkleization</a></li>
+<li><a href="#updating-existing-code-transition-process">Updating existing code (transition process)</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#hexary-vs-binary-trie">Hexary vs binary trie</a></li>
+<li><a href="#chunk-size">Chunk size</a></li>
+<li><a href="#first-instruction-offset">First instruction offset</a></li>
+<li><a href="#gas-cost-of-code-accessing-opcodes">Gas cost of code-accessing opcodes</a></li>
+<li><a href="#different-chunking-logic">Different chunking logic</a></li>
+<li><a href="#rlp-and-ssz">RLP and SSZ</a></li>
+<li><a href="#metadata-fields">Metadata fields</a></li>
+<li><a href="#the-keys-in-the-code-trie-and-key_length">The keys in the code trie (and KEY_LENGTH)</a></li>
+<li><a href="#alternate-values-of-coderoot-for-eoas">Alternate values of codeRoot for EoAs</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Code merkleization, along with binarification of the trie and gas cost bump of state accessing opcodes, are considered as the main levers for decreasing block witness sizes in stateless or partial-stateless Eth1x roadmaps. Here we specify a fixed-sized chunk approach to code merkleization and outline how the transition of existing contracts to this model would look like.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Bytecode is currently the <a href="https://github.com/mandrigin/ethereum-mainnet-bin-tries-data">second contributor</a> to block witness size, after the proof hashes. Transitioning the trie from hexary to binary reduces the hash section of the witness by 3x, thereby making code the first contributor. By breaking contract code into chunks and committing to those chunks in a merkle tree, stateless clients would only need the chunks that were touched during a given transaction to execute it.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>This specification assumes that <a href="/EIPS/eip-2584">EIP-2584</a> is deployed, and the merkleization rules and gas costs are proposed accordingly. What follows is structured to have two sections:</p>
+<ol>
+<li>How a given contract code is split into chunks and then merkleized</li>
+<li>How to merkleize all existing contract codes during a hardfork</li>
+</ol>
+<h3 id="constants-and-definitions">
+<a href="#constants-and-definitions" class="anchor-link"></a> Constants and Definitions
+</h3>
+<h4 id="constants">
+<a href="#constants" class="anchor-link"></a> Constants
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">CHUNK_SIZE</code>: 32 (bytes)</li>
+<li><code class="language-plaintext highlighter-rouge">KEY_LENGTH</code>: 2 (bytes)</li>
+<li><code class="language-plaintext highlighter-rouge">MAX_CHUNK_COUNT</code>: <code class="language-plaintext highlighter-rouge">0xfffc</code></li>
+<li><code class="language-plaintext highlighter-rouge">VERSION_KEY</code>: <code class="language-plaintext highlighter-rouge">0xfffd</code></li>
+<li><code class="language-plaintext highlighter-rouge">CODELEN_KEY</code>: <code class="language-plaintext highlighter-rouge">0xfffe</code></li>
+<li><code class="language-plaintext highlighter-rouge">CODEHASH_KEY</code>: <code class="language-plaintext highlighter-rouge">0xffff</code></li>
+<li><code class="language-plaintext highlighter-rouge">VERSION</code>: 0</li>
+<li><code class="language-plaintext highlighter-rouge">EMPTY_CODE_ROOT</code>: <code class="language-plaintext highlighter-rouge">0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470</code> (==<code class="language-plaintext highlighter-rouge">keccak256('')</code>)</li>
+<li><code class="language-plaintext highlighter-rouge">HF_BLOCK_NUMBER</code>: to be defined</li>
+</ul>
+<h4 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">BE(x, N)</code>: casts <code class="language-plaintext highlighter-rouge">x</code> to an unsigned integer of <code class="language-plaintext highlighter-rouge">N</code> bytes and returns its big-endian representation</li>
+</ul>
+<h3 id="code-merkleization">
+<a href="#code-merkleization" class="anchor-link"></a> Code merkleization
+</h3>
+<p>For an account record <code class="language-plaintext highlighter-rouge">A</code> with code <code class="language-plaintext highlighter-rouge">C</code>, the field <code class="language-plaintext highlighter-rouge">A.codeHash</code> is replaced with <code class="language-plaintext highlighter-rouge">codeRoot</code>. <code class="language-plaintext highlighter-rouge">codeRoot</code> is <code class="language-plaintext highlighter-rouge">EMPTY_CODE_ROOT</code> if <code class="language-plaintext highlighter-rouge">C</code> is empty. Otherwise it contains the root of <code class="language-plaintext highlighter-rouge">codeTrie</code>, a <a href="https://hackmd.io/uCWOpSrUQaytBgcO0MVkTQ">binary trie</a> with the following leaves:</p>
+<ul>
+<li>Key: <code class="language-plaintext highlighter-rouge">VERSION_KEY</code>, value: <code class="language-plaintext highlighter-rouge">BE(VERSION, 1)</code></li>
+<li>Key: <code class="language-plaintext highlighter-rouge">CODELEN_KEY</code>, value: <code class="language-plaintext highlighter-rouge">BE(length(C), 4)</code></li>
+<li>Key: <code class="language-plaintext highlighter-rouge">CODEHASH_KEY</code>, value: <code class="language-plaintext highlighter-rouge">keccak256(C)</code></li>
+</ul>
+<p>In addition to the above, <code class="language-plaintext highlighter-rouge">codeTrie</code> commits to a list of code <code class="language-plaintext highlighter-rouge">chunks = [(FIO_0, code_0), ..., (FIO_n, code_n)]</code> which are derived from <code class="language-plaintext highlighter-rouge">C</code> in a way that:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">n &lt; MAX_CHUNK_COUNT</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">code_0 || ... || code_n == C</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">length(code_i) == CHUNK_SIZE</code> where <code class="language-plaintext highlighter-rouge">0 &lt;= i &lt; n</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">length(code_n) &lt;= CHUNK_SIZE</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">FIO_i</code> is the offset of the first instruction within the chunk. It should only be greater than zero if the last instruction in <code class="language-plaintext highlighter-rouge">code_i-1</code> is a multi-byte instruction (like <code class="language-plaintext highlighter-rouge">PUSHN</code>) crossing the chunk boundary. It is set to <code class="language-plaintext highlighter-rouge">CHUNK_SIZE</code> in the case where all bytes of a chunk are data.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">i</code>th element of <code class="language-plaintext highlighter-rouge">chunks</code> is stored in <code class="language-plaintext highlighter-rouge">codeTrie</code> with:</p>
+<ul>
+<li>Key: <code class="language-plaintext highlighter-rouge">BE(i, KEY_LENGTH)</code></li>
+<li>Value: <code class="language-plaintext highlighter-rouge">BE(FIO_i, 1) || code_i</code>, where <code class="language-plaintext highlighter-rouge">||</code> stands for byte-wise concatenation</li>
+</ul>
+<h4 id="contract-creation-gas-cost">
+<a href="#contract-creation-gas-cost" class="anchor-link"></a> Contract creation gas cost
+</h4>
+<p>As of now there is a charge of 200 gas per byte of the code stored in state by contract creation operations, be it initiated via <code class="language-plaintext highlighter-rouge">CREATE</code>, <code class="language-plaintext highlighter-rouge">CREATE2</code>, or an external transaction. This per byte cost is to be increased from <code class="language-plaintext highlighter-rouge">200</code> to <code class="language-plaintext highlighter-rouge">TBD</code> to account for the chunking and merkleization costs.</p>
+<h3 id="updating-existing-code-transition-process">
+<a href="#updating-existing-code-transition-process" class="anchor-link"></a> Updating existing code (transition process)
+</h3>
+<p>The transition process involves reading all contracts in the state and applying the above procedure to them. A benchmark showing how long this process will take is still pending, but intuitively it should take longer than the time between two blocks (in the order of hours). Hence we recommend clients to pre-process the changes before the EIP is activated.</p>
+<p>Code has the nice property that it is (mostly) static. Therefore clients can maintain a mapping of <code class="language-plaintext highlighter-rouge">[accountAddress -&gt; codeRoot]</code> which stores the results for the contracts they have already merkleized. During this pre-computation phase, whenever a new contract is created its <code class="language-plaintext highlighter-rouge">codeRoot</code> is computed, and added to the mapping. Whenever a contract self-destructs, its corresponding entry is removed.</p>
+<p>At block <code class="language-plaintext highlighter-rouge">HF_BLOCK_NUMBER</code> when the EIP gets activated, before executing any transaction the client must update the account record for all contracts with non-empty code in the state to replace the <code class="language-plaintext highlighter-rouge">codeHash</code> field with the pre-computed <code class="language-plaintext highlighter-rouge">codeRoot</code>. EoA accounts will keep their <code class="language-plaintext highlighter-rouge">codeHash</code> value as <code class="language-plaintext highlighter-rouge">codeRoot</code>. <em>Accounts with empty code will keep their <code class="language-plaintext highlighter-rouge">codeHash</code> value as <code class="language-plaintext highlighter-rouge">codeRoot</code>.</em></p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="hexary-vs-binary-trie">
+<a href="#hexary-vs-binary-trie" class="anchor-link"></a> Hexary vs binary trie
+</h3>
+<p>The Ethereum mainnet state is encoded as of now in a hexary Merkle Patricia Tree. As part of the Eth1x roadmap, a transition to a <a href="https://ethresear.ch/t/binary-trie-format/7621">binary trie</a> has been <a href="https://medium.com/@mandrigin/stateless-ethereum-binary-tries-experiment-b2c035497768">investigated</a> with the goal of reducing witness sizes. Because code chunks are also stored in the trie, this EIP would benefit from the witness size reduction offered by the binarification. Therefore we have decided to explicitly state <a href="/EIPS/eip-2584">EIP-2584</a> to be a requirement of this change. Note that if code merkleization is included in a hard-fork beforehand, then all code must be re-merkleized after the binary transition.</p>
+<h3 id="chunk-size">
+<a href="#chunk-size" class="anchor-link"></a> Chunk size
+</h3>
+<p>The current recommended chunk size of 32 bytes has been selected based on a few observations. Smaller chunks are more efficient (i.e. have higher <a href="https://ethresear.ch/t/some-quick-numbers-on-code-merkelization/7260/3">chunk utilization</a>), but incur a larger hash overhead (i.e. number of hashes as part of the proof) due to a higher trie depth. Larger chunks are less efficient, but incur less hash overhead. We plan to run a larger experiment comparing various chunk sizes to arrive at a final recommendation.</p>
+<h3 id="first-instruction-offset">
+<a href="#first-instruction-offset" class="anchor-link"></a> First instruction offset
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">firstInstructionOffset</code> fields allows safe jumpdest analysis when a client doesn’t have all the chunks, e.g. a stateless clients receiving block witnesses.</p>
+<p>Note: there could be an edge case when computing FIO for the chunks where the data bytes at the end of a bytecode (last chunk) resemble a multi-byte instruction. This case can be safely ignored.</p>
+<h3 id="gas-cost-of-code-accessing-opcodes">
+<a href="#gas-cost-of-code-accessing-opcodes" class="anchor-link"></a> Gas cost of code-accessing opcodes
+</h3>
+<p>How merkleized code is stored in the client database affects the performance of code-accessing opcodes, i.e: CALL, CALLCODE, DELEGATECALL, STATICCALL, EXTCODESIZE, EXTCODEHASH, and EXTCODECOPY. Storing the code trie with all intermediate nodes in the database implies multiple look-ups to fetch the code of the callee, which is more than the current one look-up (excluding the trie traversal to get the account) required. Note CODECOPY and CODESIZE are not affected since the code for the current contract has already been loaded to memory.</p>
+<p>The gas cost analysis in this section assumes a specific way of storing it. In this approach clients only merkleize code once during creation to compute <code class="language-plaintext highlighter-rouge">codeRoot</code>, but then discard the chunks. They instead store the full bytecode as well as the metadata fields in the database. We believe per-chunk metering for calls would be more easily solvable by witness metering in the stateless model.</p>
+<h3 id="different-chunking-logic">
+<a href="#different-chunking-logic" class="anchor-link"></a> Different chunking logic
+</h3>
+<p>We have considered an alternative option to package chunks, where each chunk is prepended with its <code class="language-plaintext highlighter-rouge">chunkLength</code> and would only contain complete opcodes (i.e. any multi-byte opcode not fitting the <code class="language-plaintext highlighter-rouge">CHUNK_SIZE</code> would be deferred to the next chunk).</p>
+<p>This approach has downsides compared to the one specified:
+1) Requires a larger <code class="language-plaintext highlighter-rouge">CHUNK_SIZE</code> – at least 33 bytes to accommodate the <code class="language-plaintext highlighter-rouge">PUSH32</code> instruction.
+2) It is more wasteful. For example, <code class="language-plaintext highlighter-rouge">DUP1 PUSH32 &lt;32-byte payload&gt;</code> would be encoded as two chunks, the first chunk contains only <code class="language-plaintext highlighter-rouge">DUP1</code>, and the second contains only the <code class="language-plaintext highlighter-rouge">PUSH32</code> instruction with its payload.
+3) Calculating the number of chunks is not trivial and would have to be stored explicitly in the metadata.</p>
+<p>Additionally we have reviewed many other options (basic block based, Solidity subroutines (requires determining the control flow), EIP-2315 subroutines). This EIP however only focuses on the chunk-based option.</p>
+<h3 id="rlp-and-ssz">
+<a href="#rlp-and-ssz" class="anchor-link"></a> RLP and SSZ
+</h3>
+<p>To remain consistent with the binary transition proposal we avoid using RLP for serializing the leaf values. We have furthermore considered SSZ for both serializing data and merkleization and remain open to adopting it, but decided to use the binary trie format for simplicity.</p>
+<h3 id="metadata-fields">
+<a href="#metadata-fields" class="anchor-link"></a> Metadata fields
+</h3>
+<p>The metadata fields <code class="language-plaintext highlighter-rouge">version</code>, <code class="language-plaintext highlighter-rouge">codeLen</code> and <code class="language-plaintext highlighter-rouge">codeHash</code> are added mostly to facilitate a cheaper implementation of <code class="language-plaintext highlighter-rouge">EXTCODESIZE</code> and <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code> in a stateless paradigm. The version field allows for differentiating between bytecode types (e.g. <a href="/EIPS/eip-615">EVM1.5/EIP-615</a>, <a href="/EIPS/eip-2315">EIP-2315</a>, etc.) or code merkleization schemes (or merkleization settings, such as larger <code class="language-plaintext highlighter-rouge">CHUNK_SIZE</code>) in future.</p>
+<p>Instead of encoding <code class="language-plaintext highlighter-rouge">codeHash</code> and <code class="language-plaintext highlighter-rouge">codeSize</code> in the metadata, they could be made part of the account. In our opinion, the metadata is a more concise option, because EoAs do not need these fields, resulting in either additional logic (to omit those fields in the accounts) or calculation (to include them in merkleizing the account).</p>
+<p>An alternative option to the version field would be to add an account-level field: either following <a href="/EIPS/eip-1702">EIP-1702</a>, or by adding an <code class="language-plaintext highlighter-rouge">accountKind</code> field (with potential options: <code class="language-plaintext highlighter-rouge">eoa</code>, <code class="language-plaintext highlighter-rouge">merkleized_evm_chunk32</code>, <code class="language-plaintext highlighter-rouge">merkleized_eip2315_chunk64</code>, etc.) as the first member of the account. One benefit this could provide is omitting <code class="language-plaintext highlighter-rouge">codeHash</code> for EoAs.</p>
+<h3 id="the-keys-in-the-code-trie-and-key_length">
+<a href="#the-keys-in-the-code-trie-and-key_length" class="anchor-link"></a> The keys in the code trie (and <code class="language-plaintext highlighter-rouge">KEY_LENGTH</code>)
+</h3>
+<p>As explained in the specification above, the keys in the code trie are indices of the <code class="language-plaintext highlighter-rouge">chunks</code> array. Having a key length of 2 bytes means the trie can address 65536 - 3 (minus metadata fields) chunks, which corresponds to ~2Mb code size. That allows for roughly ~85x increase in the code size limit in future without requiring a change in merkleization.</p>
+<h3 id="alternate-values-of-coderoot-for-eoas">
+<a href="#alternate-values-of-coderoot-for-eoas" class="anchor-link"></a> Alternate values of codeRoot for EoAs
+</h3>
+<p>This proposal changes the meaning of the fourth field (<code class="language-plaintext highlighter-rouge">codeHash</code>) of the account. Prior to this change, that field represents the Keccak-256 hash of the bytecode, which is logically hash of an empty input for EoAs.</p>
+<p>Since <code class="language-plaintext highlighter-rouge">codeHash</code> is replaced with <code class="language-plaintext highlighter-rouge">codeRoot</code>, the root hash of the code trie, the value would be different for EoAs under the new rules: the root of the <code class="language-plaintext highlighter-rouge">codeTrie(metadata=[codeHash=keccak256(''), codeSize=0])</code>. An alternative would be simply using the hash of an empty trie. Or to avoid introducing yet another constant (the result of the above), one could also consider using <code class="language-plaintext highlighter-rouge">codeRoot = 0</code> for EoAs.</p>
+<p>However, we wanted to maintain compatibility with <a href="/EIPS/eip-1052">EIP-1052</a> and decided to keep matters simple by using the hash of empty input (<code class="language-plaintext highlighter-rouge">c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470</code>) for EoAs.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>From the perspective of contracts, the design aims to be transparent, with the exception of changes in gas costs.</p>
+<p>Outside of the interface presented for contracts, this proposal introduces major changes to the way contract code is stored, and needs a substantial modification of the Ethereum state. Therefore it can only be introduced via a hard fork.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TBD</p>
+<p>Show the <code class="language-plaintext highlighter-rouge">codeRoot</code> for the following cases:</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">code=''</code></li>
+<li><code class="language-plaintext highlighter-rouge">code='PUSH1(0) DUP1 REVERT'</code></li>
+<li><code class="language-plaintext highlighter-rouge">code='PUSH32(-1)'</code> (data passing through a chunk boundary)</li>
+</ol>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>The implementation of the chunking and merkleization logic in Typescript can be found <a href="https://github.com/ewasm/biturbo/blob/merklize-mainnet-blocks/src/relayer/bytecode.ts#L172">here</a>, and in Python <a href="https://github.com/hugo-dc/code-chunks/">here</a>. Please note neither of these examples currently use a binary tree.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TBA</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/s1na">Sina Mahmoodi</a>, <a href="https://github.com/axic">Alex Beregszaszi</a>, "EIP-2926: Chunk-Based Code Merkleization [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2926, August 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2926.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2926: Chunk-Based Code Merkleization [DRAFT]",
+    "author": "Sina Mahmoodi (@s1na), Alex Beregszaszi (@axic)",
+    "name": "EIP-2926: Chunk-Based Code Merkleization [DRAFT]",
+    "dateCreated": "2020-08-25",
+    "datePublished": "2020-08-25",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2926-chunk-based-code-merkleization/4555",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

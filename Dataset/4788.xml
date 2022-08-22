@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4788: Beacon state root in the EVM</title>
+<meta property="og:title" content="EIP-4788: Beacon state root in the EVM" />
+<meta name="description" content="Expose beacon chain state roots in the EVM" />
+<meta property="og:description" content="Expose beacon chain state roots in the EVM" />
+<meta name="twitter:description" content="Expose beacon chain state roots in the EVM" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4788" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4788" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4788: Beacon state root in the EVM
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4788.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Expose beacon chain state roots in the EVM</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/ralexstokes">Alex Stokes</a>, <a href="https://github.com/djrtwo">Danny Ryan</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4788-beacon-state-root-in-evm/8281">https://ethereum-magicians.org/t/eip-4788-beacon-state-root-in-evm/8281</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2022-02-10</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#background">Background</a></li>
+<li><a href="#block-structure-and-validity">Block structure and validity</a></li>
+<li><a href="#evm-changes">EVM changes</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#general-strategy">General strategy</a></li>
+<li><a href="#fork-mechanics">Fork mechanics</a></li>
+<li><a href="#execution-layer-validations">Execution layer validations</a></li>
+<li><a href="#minimizing-client-code-change">Minimizing client code change</a></li>
+<li><a href="#gas-cost-of-opcode">Gas cost of opcode</a></li>
+<li><a href="#why-not-repurpose-blockhash">Why not repurpose BLOCKHASH?</a></li>
+<li><a href="#why-not-bound-history-of-state-roots">Why not bound history of state roots?</a></li>
+<li><a href="#beacon-state-root-instead-of-block-root">Beacon state root instead of block root</a></li>
+<li><a href="#block-number-in-lieu-of-slot">Block number in lieu of slot</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Commit to the state root of the beacon chain in the <code class="language-plaintext highlighter-rouge">ommers</code> field in the post-merge execution block. Reflect the changes in the <code class="language-plaintext highlighter-rouge">ommersHash</code> field of the execution block header.</p>
+<p>Store each beacon chain state root into a contract and add a new opcode that reads this contract.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Exposing the beacon chain state root allows for proofs about the beacon state to be verified inside the EVM. This functionality supports a wide variety of use cases in smart contracts involving validator status and finality produced by the consensus layer.</p>
+<p>In particular, this functionality is required for beacon chain validator withdrawals to the EVM.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<table>
+<thead>
+<tr>
+<th>constants</th>
+<th>value</th>
+<th>units</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code></td>
+<td>TBD</td>
+<td> </td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_EPOCH</code></td>
+<td>TBD</td>
+<td> </td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">HISTORY_STORAGE_ADDRESS</code></td>
+<td><code class="language-plaintext highlighter-rouge">0xfffffffffffffffffffffffffffffffffffffffd</code></td>
+<td> </td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">OPCODE_VALUE</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x48</code></td>
+<td> </td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">G_beacon_state_root</code></td>
+ <td>20</td>
+<td>gas</td>
+</tr>
+</tbody>
+</table>
+<h3 id="background">
+<a href="#background" class="anchor-link"></a> Background
+</h3>
+<p>The method of injecting the beacon state root in this EIP follows the general strategy of <a href="/EIPS/eip-4399">EIP-4399</a> to make a post-merge change to the EVM integrating information from the beacon chain. This EIP along with <a href="/EIPS/eip-3675">EIP-3675</a> should be taken as relevant background to understand the particular approach of this EIP.</p>
+<p>The method for exposing the state root data via opcode is inspired by <a href="/EIPS/eip-2935">EIP-2935</a>.</p>
+<h3 id="block-structure-and-validity">
+<a href="#block-structure-and-validity" class="anchor-link"></a> Block structure and validity
+</h3>
+<p>Beginning at the execution timestamp <code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code>, execution clients <strong>MUST</strong>:</p>
+<ol>
+<li>
+<p>set the value of the <code class="language-plaintext highlighter-rouge">ommers</code> field in the block to an RLP list with one element: the 32 byte <a href="https://github.com/ethereum/consensus-specs/blob/dev/ssz/simple-serialize.md#merkleization">hash tree root</a> of the <a href="https://github.com/ethereum/consensus-specs/blob/dev/specs/bellatrix/beacon-chain.md#beaconstate">beacon state</a> from the previous slot to this block.</p>
+</li>
+<li>
+<p>set the value of the <code class="language-plaintext highlighter-rouge">ommersHash</code> field in the block header to the Keccak256 hash of the <code class="language-plaintext highlighter-rouge">ommers</code> field.</p>
+</li>
+</ol>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">beaconStateRoot</span> <span class="o">=</span> <span class="o">&lt;</span><span class="mi">32</span> <span class="n">byte</span> <span class="n">value</span><span class="o">&gt;</span> <span class="c1"># provided by consensus client
+</span><span class="n">ommers</span> <span class="o">=</span> <span class="n">RLP</span><span class="p">([</span><span class="n">beaconStateRoot</span><span class="p">])</span>   <span class="c1"># in the block body
+</span><span class="n">ommersHash</span> <span class="o">=</span> <span class="n">Keccak256</span><span class="p">(</span><span class="n">ommers</span><span class="p">)</span>    <span class="c1"># in the block header
+</span></code></pre></div></div>
+<ol>
+<li>Add the block validation that the <code class="language-plaintext highlighter-rouge">ommersHash</code> does indeed match the expected commitment given the <code class="language-plaintext highlighter-rouge">ommers</code> value.</li>
+</ol>
+<h3 id="evm-changes">
+<a href="#evm-changes" class="anchor-link"></a> EVM changes
+</h3>
+<h4 id="block-processing">
+<a href="#block-processing" class="anchor-link"></a> Block processing
+</h4>
+<p>At the start of processing any execution block where <code class="language-plaintext highlighter-rouge">block.timestamp &gt;= FORK_TIMESTAMP</code> (i.e. before processing any transactions), write the beacon state root provided in the block into the storage of the smart contract at <code class="language-plaintext highlighter-rouge">HISTORY_STORAGE_ADDRESS</code>. This data is keyed by the block number.</p>
+<p>In pseudocode:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">beacon_state_root</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">ommers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sstore</span><span class="p">(</span><span class="n">HISTORY_STORAGE_ADDRESS</span><span class="p">,</span> <span class="n">block</span><span class="p">.</span><span class="n">number</span><span class="p">,</span> <span class="n">beacon_state_root</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="new-opcode">
+<a href="#new-opcode" class="anchor-link"></a> New opcode
+</h4>
+<p>Beginning at the execution timestamp <code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code>, introduce a new opcode <code class="language-plaintext highlighter-rouge">BEACON_STATE_ROOT</code> at <code class="language-plaintext highlighter-rouge">OPCODE_VALUE</code>. This opcode consumes one word from the stack encoding the block number for the root. The opcode has a gas cost of <code class="language-plaintext highlighter-rouge">G_beacon_state_root</code>.</p>
+<p>The result of executing this opcode leaves one word on the stack corresponding to a read of the history contract’s storage; in pseudocode:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">block_number</span> <span class="o">=</span> <span class="n">evm</span><span class="p">.</span><span class="n">stack</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span>
+<span class="n">sload</span><span class="p">(</span><span class="n">HISTORY_STORAGE_ADDRESS</span><span class="p">,</span> <span class="n">block_number</span><span class="p">)</span>
+</code></pre></div></div>
+<p>If there is no root stored at the requested block number, the opcode follows the existing EVM semantics of <code class="language-plaintext highlighter-rouge">sload</code> returning <code class="language-plaintext highlighter-rouge">0</code>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="general-strategy">
+<a href="#general-strategy" class="anchor-link"></a> General strategy
+</h3>
+<p>See the rationale for EIP-4399 for discussion about this general strategy of reusing execution block elements for beacon chain data.</p>
+<h3 id="fork-mechanics">
+<a href="#fork-mechanics" class="anchor-link"></a> Fork mechanics
+</h3>
+<p>This EIP requires the consensus layer and execution layer to execute a network upgrade in lockstep.
+To carry out this task, a <code class="language-plaintext highlighter-rouge">FORK_EPOCH</code> (of the beacon chain) will be chosen and then used to compute a timestamp <code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code>.
+This <code class="language-plaintext highlighter-rouge">FORK_TIMESTAMP</code> can be used in the execution layer to identify when the protocol change should be deployed.</p>
+<p>This technique works because the timestamps in post-merge execution blocks are aligned to beacon chain slots and thus serve as a proxy for the slot number.</p>
+<p>Another option for the fork definition would be to pick a beacon chain epoch and an execution payload block number.
+This design however is not reliable due to the presence of skipped slots on the beacon chain.</p>
+<h3 id="execution-layer-validations">
+<a href="#execution-layer-validations" class="anchor-link"></a> Execution layer validations
+</h3>
+<p>By including the beacon state root in the execution block in the deprecated <code class="language-plaintext highlighter-rouge">ommers</code> field, execution clients can still verify the chain in a self-contained way without relying on an available consensus client.
+This property is important during syncing (and likely other phases of execution node operation).</p>
+<h3 id="minimizing-client-code-change">
+<a href="#minimizing-client-code-change" class="anchor-link"></a> Minimizing client code change
+</h3>
+<p>By including the <code class="language-plaintext highlighter-rouge">ommersHash</code> validation, clients can use existing code with only minimal changes (supplying the actual state root) during block production and verification.
+Having the beacon state root value in the <code class="language-plaintext highlighter-rouge">ommers</code> field means that it is fairly straightforward to provide the value from the block data to the EVM execution context for client implementations as they stand today.</p>
+<h3 id="gas-cost-of-opcode">
+<a href="#gas-cost-of-opcode" class="anchor-link"></a> Gas cost of opcode
+</h3>
+<p>The suggested gas cost is just using the value for the <code class="language-plaintext highlighter-rouge">BLOCKHASH</code> opcode as <code class="language-plaintext highlighter-rouge">BEACON_STATE_ROOT</code> is an analogous operation.</p>
+<h3 id="why-not-repurpose-blockhash">
+<a href="#why-not-repurpose-blockhash" class="anchor-link"></a> Why not repurpose <code class="language-plaintext highlighter-rouge">BLOCKHASH</code>?
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">BLOCKHASH</code> opcode could be repurposed to provide a beacon state root instead of the current execution block hash.
+To minimize code change and simplify deployment to mainnet, this EIP suggests leaving <code class="language-plaintext highlighter-rouge">BLOCKHASH</code> alone and adding a new opcode with the desired semantics.</p>
+<h3 id="why-not-bound-history-of-state-roots">
+<a href="#why-not-bound-history-of-state-roots" class="anchor-link"></a> Why not bound history of state roots?
+</h3>
+<p>Marginal state growth; adding every single root results in an additional ~84MB of state growth per year compared to ~30 GB of state overall.</p>
+<p>TODO: say something about statelessness
+TODO: get latest numbers on state size, and compare against predicted growth</p>
+<h3 id="beacon-state-root-instead-of-block-root">
+<a href="#beacon-state-root-instead-of-block-root" class="anchor-link"></a> Beacon state root instead of block root
+</h3>
+<p>Each slot on the beacon chain containing a block has both a block root and a state root (reflecting the state after applying said block).
+The beacon block includes the state root so a proof about the state could also be authored against a block root at the cost of a few additional hashes.
+Given that most use cases want to prove data encapsulated in a given state, rather than a given block, this EIP suggests exposing state roots over block roots.</p>
+<h3 id="block-number-in-lieu-of-slot">
+<a href="#block-number-in-lieu-of-slot" class="anchor-link"></a> Block number in lieu of slot
+</h3>
+<p>The state roots are keyed by the <code class="language-plaintext highlighter-rouge">number</code> of the execution block.
+Another option is to key roots by the beacon chain slot they belong to.
+While at first pass this may seem more direct, the beacon chain can have “skipped” slots where a beacon proposer failed to produce a block that was included at a given slot.
+Handling roots of skipped slots would complicate the EVM mechanism so this EIP suggests to use the execution block number where each distinct block number is guaranteed to have a distinct root.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>No issues.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TODO</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>TODO</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TODO</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/ralexstokes">Alex Stokes</a>, <a href="https://github.com/djrtwo">Danny Ryan</a>, "EIP-4788: Beacon state root in the EVM [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4788, February 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4788.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4788: Beacon state root in the EVM [DRAFT]",
+    "author": "Alex Stokes (@ralexstokes), Danny Ryan (@djrtwo)",
+    "name": "EIP-4788: Beacon state root in the EVM [DRAFT]",
+    "dateCreated": "2022-02-10",
+    "datePublished": "2022-02-10",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4788-beacon-state-root-in-evm/8281",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

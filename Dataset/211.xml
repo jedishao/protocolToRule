@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-211: New opcodes: RETURNDATASIZE and RETURNDATACOPY</title>
+<meta property="og:title" content="EIP-211: New opcodes: RETURNDATASIZE and RETURNDATACOPY" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-211" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-211" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-211: New opcodes: RETURNDATASIZE and RETURNDATACOPY
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-211.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#91f2f9e3f8e2d1f4e5f9f4e3f4e4fcbffee3f6">Christian Reitwiessner</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2017-02-13</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A mechanism to allow returning arbitrary-length data inside the EVM has been requested for quite a while now. Existing proposals always had very intricate problems associated with charging gas. This proposal solves the same problem while at the same time, it has a very simple gas charging mechanism and requires minimal changes to the call opcodes. Its workings are very similar to the way calldata is handled already; after a call, return data is kept inside a virtual buffer from which the caller can copy it (or parts thereof) into memory. At the next call, the buffer is overwritten. This mechanism is 100% backwards compatible.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Please see summary.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>In some situations, it is vital for a function to be able to return data whose length cannot be anticipated before the call. In principle, this can be solved without alterations to the EVM, for example by splitting the call into two calls where the first is used to compute only the size. All of these mechanisms, though, are very expensive in at least some situations. A very useful example of such a worst-case situation is a generic forwarding contract; a contract that takes call data, potentially makes some checks and then forwards it as is to another contract. The return data should of course be transferred in a similar way to the original caller. Since the contract is generic and does not know about the contract it calls, there is no way to determine the size of the output without adapting the called contract accordingly or trying a logarithmic number of calls.</p>
+<p>Compiler implementors are advised to reserve a zero-length area for return data if the size of the return data is unknown before the call and then use <code class="language-plaintext highlighter-rouge">RETURNDATACOPY</code> in conjunction with <code class="language-plaintext highlighter-rouge">RETURNDATASIZE</code> to actually retrieve the data.</p>
+<p>Note that this proposal also makes the EIP that proposes to allow to return data in case of an intentional state reversion (<a href="/EIPS/eip-140">EIP-140</a>) much more useful. Since the size of the failure data might be larger than the regular return data (or even unknown), it is possible to retrieve the failure data after the CALL opcode has signalled a failure, even if the regular output area is not large enough to hold the data.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>If <code class="language-plaintext highlighter-rouge">block.number &gt;= BYZANTIUM_FORK_BLKNUM</code>, add two new opcodes and amend the semantics of any opcode that creates a new call frame (like <code class="language-plaintext highlighter-rouge">CALL</code>, <code class="language-plaintext highlighter-rouge">CREATE</code>, <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>, …) called call-like opcodes in the following. It is assumed that the EVM (to be more specific: an EVM call frame) has a new internal buffer of variable size, called the return data buffer. This buffer is created empty for each new call frame. Upon executing any call-like opcode, the buffer is cleared (its size is set to zero). After executing a call-like opcode, the complete return data (or failure data, see <a href="/EIPS/eip-140">EIP-140</a>) of the call is stored in the return data buffer (of the caller), and its size changed accordingly. As an exception, <code class="language-plaintext highlighter-rouge">CREATE</code> and <code class="language-plaintext highlighter-rouge">CREATE2</code> are considered to return the empty buffer in the success case and the failure data in the failure case. If the call-like opcode is executed but does not really instantiate a call frame (for example due to insufficient funds for a value transfer or if the called contract does not exist), the return data buffer is empty.</p>
+<p>As an optimization, it is possible to share the return data buffer across call frames because at most one will be non-empty at any time.</p>
+<p><code class="language-plaintext highlighter-rouge">RETURNDATASIZE</code>: <code class="language-plaintext highlighter-rouge">0x3d</code></p>
+<p>Pushes the size of the return data buffer onto the stack.
+Gas costs: 2 (same as <code class="language-plaintext highlighter-rouge">CALLDATASIZE</code>)</p>
+<p><code class="language-plaintext highlighter-rouge">RETURNDATACOPY</code>: <code class="language-plaintext highlighter-rouge">0x3e</code></p>
+<p>This opcode has similar semantics to <code class="language-plaintext highlighter-rouge">CALLDATACOPY</code>, but instead of copying data from the call data, it copies data from the return data buffer. Furthermore, accessing the return data buffer beyond its size results in a failure; i.e. if <code class="language-plaintext highlighter-rouge">start + length</code> overflows or results in a value larger than <code class="language-plaintext highlighter-rouge">RETURNDATASIZE</code>, the current call stops in an out-of-gas condition. In particular, reading 0 bytes from the end of the buffer will read 0 bytes; reading 0 bytes from one-byte out of the buffer causes an exception.</p>
+<p>Gas costs: <code class="language-plaintext highlighter-rouge">3 + 3 * ceil(amount / 32)</code> (same as <code class="language-plaintext highlighter-rouge">CALLDATACOPY</code>)</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Other solutions that would allow returning dynamic data were considered, but they all had to deduct the gas from the call opcode and thus were both complicated to implement and specify (<a href="https://github.com/ethereum/EIPs/issues/8">5/8</a>). Since this proposal is very similar to the way calldata is handled, it fits nicely into the concept. Furthermore, the eWASM architecture already handles return data in exactly the same way.</p>
+<p>Note that the EVM implementation needs to keep the return data until the next call or the return from the current call. Since this resource was already paid for as part of the memory of the callee, it should not be a problem. Implementations may either choose to keep the full memory of the callee alive until the next call or copy only the return data to a special memory area.</p>
+<p>Keeping the memory of the callee until the next call-like opcode does not increase the peak memory usage in the following sense; any memory allocation in the caller’s frame that happens after the return from the call can be moved before the call without a change in gas costs, but will add this allocation to the peak allocation.</p>
+<p>The number values of the opcodes were allocated in the same nibble block that also contains <code class="language-plaintext highlighter-rouge">CALLDATASIZE</code> and <code class="language-plaintext highlighter-rouge">CALLDATACOPY</code>.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This proposal introduces two new opcodes and stays fully backwards compatible apart from that.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#e98a819b809aa98c9d818c9b8c9c84c7869b8e">Christian Reitwiessner</a>, "EIP-211: New opcodes: RETURNDATASIZE and RETURNDATACOPY," <em>Ethereum Improvement Proposals</em>, no. 211, February 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-211.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-211: New opcodes: RETURNDATASIZE and RETURNDATACOPY",
+    "author": "Christian Reitwiessner <chris@ethereum.org>",
+    "name": "EIP-211: New opcodes: RETURNDATASIZE and RETURNDATACOPY",
+    "dateCreated": "2017-02-13",
+    "datePublished": "2017-02-13",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

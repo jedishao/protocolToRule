@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-7: DELEGATECALL</title>
+<meta property="og:title" content="EIP-7: DELEGATECALL" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-7" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-7" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-7: DELEGATECALL
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-7.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2015-11-15</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#hard-fork">Hard Fork</a></li>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#possible-arguments-against">Possible arguments against</a></li>
+</ul>
+</div>
+<h3 id="hard-fork">
+<a href="#hard-fork" class="anchor-link"></a> Hard Fork
+</h3>
+<p><a href="/EIPS/eip-606">Homestead</a></p>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<ul>
+<li>Activation:
+<ul>
+<li>Block &gt;= 1,150,000 on Mainnet</li>
+<li>Block &gt;= 494,000 on Morden</li>
+<li>Block &gt;= 0 on future testnets</li>
+</ul>
+</li>
+</ul>
+<h3 id="overview">
+<a href="#overview" class="anchor-link"></a> Overview
+</h3>
+<p>Add a new opcode, <code class="language-plaintext highlighter-rouge">DELEGATECALL</code> at <code class="language-plaintext highlighter-rouge">0xf4</code>, which is similar in idea to <code class="language-plaintext highlighter-rouge">CALLCODE</code>, except that it propagates the sender and value from the parent scope to the child scope, i.e. the call created has the same sender and value as the original call.</p>
+<h3 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h3>
+<p><code class="language-plaintext highlighter-rouge">DELEGATECALL</code>: <code class="language-plaintext highlighter-rouge">0xf4</code>, takes 6 operands:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">gas</code>: the amount of gas the code may use in order to execute;</li>
+<li><code class="language-plaintext highlighter-rouge">to</code>: the destination address whose code is to be executed;</li>
+<li><code class="language-plaintext highlighter-rouge">in_offset</code>: the offset into memory of the input;</li>
+<li><code class="language-plaintext highlighter-rouge">in_size</code>: the size of the input in bytes;</li>
+<li><code class="language-plaintext highlighter-rouge">out_offset</code>: the offset into memory of the output;</li>
+<li><code class="language-plaintext highlighter-rouge">out_size</code>: the size of the scratch pad for the output.</li>
+</ul>
+<h4 id="notes-on-gas">
+<a href="#notes-on-gas" class="anchor-link"></a> Notes on gas
+</h4>
+<ul>
+<li>The basic stipend is not given; <code class="language-plaintext highlighter-rouge">gas</code> is the total amount the callee receives.</li>
+<li>Like <code class="language-plaintext highlighter-rouge">CALLCODE</code>, account creation never happens, so the upfront gas cost is always <code class="language-plaintext highlighter-rouge">schedule.callGas</code> + <code class="language-plaintext highlighter-rouge">gas</code>.</li>
+<li>Unused gas is refunded as normal.</li>
+</ul>
+<h4 id="notes-on-sender">
+<a href="#notes-on-sender" class="anchor-link"></a> Notes on sender
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">CALLER</code> and <code class="language-plaintext highlighter-rouge">VALUE</code> behave exactly in the callee’s environment as they do in the caller’s environment.</li>
+</ul>
+<h4 id="other-notes">
+<a href="#other-notes" class="anchor-link"></a> Other notes
+</h4>
+<ul>
+<li>The depth limit of 1024 is still preserved as normal.</li>
+</ul>
+<h3 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h3>
+<p>Propagating the sender and value from the parent scope to the child scope makes it much easier for a contract to store another address as a mutable source of code and ‘‘pass through’’ calls to it, as the child code would execute in essentially the same environment (except for reduced gas and increased callstack depth) as the parent.</p>
+<p>Use case 1: split code to get around 3m gas barrier</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">~</span><span class="n">calldatacopy</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">())</span>
+<span class="k">if</span> <span class="o">~</span><span class="n">calldataload</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">253</span><span class="p">:</span>
+    <span class="o">~</span><span class="n">delegate_call</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">gas</span> <span class="o">-</span> <span class="mi">10000</span><span class="p">,</span> <span class="err">$</span><span class="n">ADDR1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">~</span><span class="k">return</span><span class="p">(</span><span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="k">elif</span> <span class="o">~</span><span class="n">calldataload</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">253</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="o">~</span><span class="n">delegate_call</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">gas</span> <span class="o">-</span> <span class="mi">10000</span><span class="p">,</span> <span class="err">$</span><span class="n">ADDR2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">~</span><span class="k">return</span><span class="p">(</span><span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="mi">10000</span><span class="p">)</span>
+<span class="p">...</span>
+</code></pre></div></div>
+<p>Use case 2: mutable address for storing the code of a contract:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="o">~</span><span class="n">calldataload</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="o">**</span><span class="mi">224</span> <span class="o">==</span> <span class="mh">0x12345678</span> <span class="ow">and</span> <span class="bp">self</span><span class="p">.</span><span class="n">owner</span> <span class="o">==</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">:</span>
+    <span class="bp">self</span><span class="p">.</span><span class="n">delegate</span> <span class="o">=</span> <span class="o">~</span><span class="n">calldataload</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="o">~</span><span class="n">delegate_call</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">gas</span> <span class="o">-</span> <span class="mi">10000</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">delegate</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="mi">10000</span><span class="p">)</span>
+    <span class="o">~</span><span class="k">return</span><span class="p">(</span><span class="o">~</span><span class="n">calldatasize</span><span class="p">(),</span> <span class="mi">10000</span><span class="p">)</span>
+</code></pre></div></div>
+<p>The child functions called by these methods can now freely reference <code class="language-plaintext highlighter-rouge">msg.sender</code> and <code class="language-plaintext highlighter-rouge">msg.value</code>.</p>
+<h3 id="possible-arguments-against">
+<a href="#possible-arguments-against" class="anchor-link"></a> Possible arguments against
+</h3>
+<ul>
+<li>You can replicate this functionality by just sticking the sender into the first twenty bytes of the call data. However, this would mean that code would need to be specially compiled for delegated contracts, and would not be usable in delegated and raw contexts at the same time.</li>
+</ul>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, "EIP-7: DELEGATECALL," <em>Ethereum Improvement Proposals</em>, no. 7, November 2015. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-7.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-7: DELEGATECALL",
+    "author": "Vitalik Buterin (@vbuterin)",
+    "name": "EIP-7: DELEGATECALL",
+    "dateCreated": "2015-11-15",
+    "datePublished": "2015-11-15",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2015"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

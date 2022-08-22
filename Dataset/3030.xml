@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3030: BLS Remote Signer HTTP API</title>
+<meta property="og:title" content="EIP-3030: BLS Remote Signer HTTP API" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3030" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3030" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3030: BLS Remote Signer HTTP API
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3030.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/hermanjunge">Herman Junge</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3030-bls-remote-signer-http-api-standard/4810">https://ethereum-magicians.org/t/eip-3030-bls-remote-signer-http-api-standard/4810</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-09-30</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#get-upcheck">GET /upcheck</a></li>
+<li><a href="#get-keys">GET /keys</a></li>
+<li><a href="#post-signidentifier">POST /sign/:identifier</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#unix-philosophy-simple-api">UNIX philosophy: Simple API</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a>
+<ul>
+<li><a href="#test-data">Test Data</a></li>
+<li><a href="#get-upcheck-1">GET /upcheck</a></li>
+<li><a href="#get-keys-1">GET /keys</a></li>
+<li><a href="#post-signidentifier-1">POST /sign/:identifier</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#threat-model">Threat model</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This EIP defines a HTTP API standard for a BLS remote signer, consumed by validator clients to sign block proposals and attestations in the context of Ethereum 2.0 (eth2).</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>A <a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/validator.md">validator</a> client contributes to the consensus of the Eth2 blockchain by signing proposals and attestations of blocks, using a BLS private key which must be available to this client at all times.</p>
+<p>The BLS remote signer API is designed to be consumed by validator clients, looking for a more secure avenue to store their BLS12-381 private key(s), enabling them to run in more permissive and scalable environments.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Eth2 utilizes <a href="https://github.com/cfrg/draft-irtf-cfrg-bls-signature/">BLS12-381</a> signatures.</p>
+<p>Consensus on the eth2 Blockchain is achieved via the proposal and attestation of blocks from validator clients, using a BLS private key (<em>signing</em> key) which must be available each time a message is signed: that is, at least once every epoch (6.4 minutes), during a small window of time within this epoch (a <em>slot</em>, i.e. 12 seconds), as each validator is expected to attest exactly once per epoch.</p>
+<p>The <a href="https://github.com/ethereum/eth2.0-specs">eth2 specification</a> does not explicitly provide a directive on where this BLS private key must/should be stored, leaving this implementation detail to the client teams, who assume that this cryptographic secret is stored on the same host as the validator client.</p>
+<p>This assumption is sufficient in the use case where the validator client is running in a physically secure network (i.e. nobody, but the operator, has a chance to log-in into the machine hosting the validator client), as such configuration would only allow <em>outbound</em> calls from the validator client. In this situation, only a physical security breach, or a Remote Code Execution (RCE) vulnerability can allow an attacker to either have arbitrary access to the storage or to the memory of the device.</p>
+<p>There are, however, use cases where it is required by the operator to run a validator client node in less constrained security environments, as the ones given by a cloud provider. Notwithstanding any security expectation, nothing prevents a rogue operator from gaining arbitrary access to the assets running inside a node.</p>
+<p>The situation is not better when the requirement is to execute the validators by leveraging a container orchestration solution (e.g. Kubernetes). The handling of secret keys across nodes can become a burden both from an operational as well as a security perspective.</p>
+<p>The proposed solution comprises running a specialized node with exclusive access to the secret keys, listening to a simple API (defined in the <a href="#specification">Specification</a> section), and returning the requested signatures. Operators working under this schema must utilize clients with the adequate feature supporting the consumption of this API.</p>
+<p>The focus of this specification is the supply of BLS signatures <em>on demand</em>. The aspects of authentication, key management (creation, update, and deletion), and transport encryption are discussed in the <a href="#rationale">Rationale</a> section of this document. Moreover, the <a href="#threat-model">Threat Model</a> section of this document provides a (non-exhaustive) list of threats and attack vectors, along with the suggested related mitigation strategy.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="get-upcheck">
+<a href="#get-upcheck" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">GET /upcheck</code>
+</h3>
+<p><em><strong>Responses</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Success</th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code</td>
+<td><code class="language-plaintext highlighter-rouge">200</code></td>
+</tr>
+<tr>
+<td>Content</td>
+<td><code class="language-plaintext highlighter-rouge">{"status": "OK"}</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="get-keys">
+<a href="#get-keys" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">GET /keys</code>
+</h3>
+<p>Returns the identifiers of the keys available to the signer.</p>
+<p><em><strong>Responses</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Success</th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code</td>
+<td><code class="language-plaintext highlighter-rouge">200</code></td>
+</tr>
+<tr>
+<td>Content</td>
+<td><code class="language-plaintext highlighter-rouge">{"keys": "[identifier]"}</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="post-signidentifier">
+<a href="#post-signidentifier" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">POST /sign/:identifier</code>
+</h3>
+<table>
+<thead>
+<tr>
+<th>URL Parameter</th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">:identifier</code></td>
+<td><code class="language-plaintext highlighter-rouge">public_key_hex_string_without_0x</code></td>
+</tr>
+</tbody>
+</table>
+<p><em><strong>Request</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>JSON Body</th>
+<th><br /></th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">bls_domain</code></td>
+<td><strong>Required</strong></td>
+<td>The BLS Signature domain.<br />As defined in the <a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#domain-types">specification</a>, in lowercase, omitting the <code class="language-plaintext highlighter-rouge">domain</code> prefix.<br />Supporting <code class="language-plaintext highlighter-rouge">beacon_proposer</code>, <code class="language-plaintext highlighter-rouge">beacon_attester</code>, and <code class="language-plaintext highlighter-rouge">randao</code>.</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">data</code></td>
+<td><strong>Required</strong></td>
+<td>The data to be signed.<br />As defined in the specifications for <a href="https://github.com/ethereum/eth2.0-APIs/blob/master/types/block.yaml">block</a>, <a href="https://github.com/ethereum/eth2.0-APIs/blob/master/types/attestation.yaml">attestation</a>, and <a href="https://github.com/ethereum/eth2.0-APIs/blob/master/types/misc.yaml">epoch</a>.</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">fork</code></td>
+<td><strong>Required</strong></td>
+<td>A <code class="language-plaintext highlighter-rouge">Fork</code> object containing previous and current versions.<br />As defined in the <a href="https://github.com/ethereum/eth2.0-APIs/blob/master/types/misc.yaml">specification</a></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">genesis_validators_root</code></td>
+<td><strong>Required</strong></td>
+<td>A <code class="language-plaintext highlighter-rouge">Hash256</code> for domain separation and chain versioning.</td>
+</tr>
+<tr>
+<td><br /></td>
+<td>Optional</td>
+<td>Any other field will be ignored by the signer</td>
+</tr>
+</tbody>
+</table>
+<p><em><strong>Responses</strong></em></p>
+<table>
+<thead>
+<tr>
+<th>Success</th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code</td>
+<td><code class="language-plaintext highlighter-rouge">200</code></td>
+</tr>
+<tr>
+<td>Content</td>
+<td><code class="language-plaintext highlighter-rouge">{"signature": "&lt;signature_hex_string&gt;"}</code></td>
+</tr>
+</tbody>
+</table>
+<p>Where signature is a <a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#bls-signatures">BLS signature</a> byte array encoded as a hexadecimal string.</p>
+<p><em>or</em></p>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code</td>
+<td><code class="language-plaintext highlighter-rouge">400</code></td>
+</tr>
+<tr>
+<td>Content</td>
+<td><code class="language-plaintext highlighter-rouge">{"error": "&lt;Bad Request Error Message&gt;"}</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>or</em></p>
+<table>
+<thead>
+<tr>
+<th>Error</th>
+<th><br /></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Code</td>
+<td><code class="language-plaintext highlighter-rouge">404</code></td>
+</tr>
+<tr>
+<td>Content</td>
+<td><code class="language-plaintext highlighter-rouge">{"error": "Key not found: &lt;identifier&gt;"}</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="unix-philosophy-simple-api">
+<a href="#unix-philosophy-simple-api" class="anchor-link"></a> UNIX philosophy: Simple API
+</h3>
+<p>This API specification contains only three methods: one for <strong>status</strong>, one for <strong>listing the available keys</strong>, and one to <strong>produce a signature</strong>. There are no methods for authentication, key management, nor transport encryption.</p>
+<p>The following subsections discuss aspects to be considered by the client implementers relative to these subjects.</p>
+<h4 id="implementation-of-additional-features">
+<a href="#implementation-of-additional-features" class="anchor-link"></a> Implementation of additional features
+</h4>
+<p>From an API pipeline view, we have two nodes: The validator client (1) that makes requests to the remote signer (2). A more sophisticated chain can be built by introducing elements between these two nodes. Either by setting up reverse proxy services, or by adding plugins to the remote signer implementation.</p>
+<h4 id="authentication">
+<a href="#authentication" class="anchor-link"></a> Authentication
+</h4>
+<p>Can be accomplished through the use of an HTTP Request Header. There are several ways to negotiate and issue a valid token to authenticate the communication between the validator client and the remote signer, each of them with potential drawbacks (e.g replay attacks, challenges in distributing the token to the validator client, etc.). In general, any method of authentication must be combined with transport encryption to be effective.</p>
+<p>The operator can also implement network Access Control Lists (ACLs) between the validator client’s network and the remote signer’s network, reducing the attack surface by requiring a potential attacker to be positioned in the same network as the validator client.</p>
+<h4 id="key-management">
+<a href="#key-management" class="anchor-link"></a> Key management
+</h4>
+<p>There are several ways to store secret keys, namely Hardware Security Modules (HSM), Secrets management applications (e.g. Hashicorp Vault), cloud storage with tight private network ACL rules, or even raw files in a directory. In general the remote signer implementers will abstract the storage medium from the HTTP API.</p>
+<p>It is in this perspective, that any procedure to create, update, or delete keys should be built separate from the client implementation.</p>
+<h4 id="transport-encryption">
+<a href="#transport-encryption" class="anchor-link"></a> Transport Encryption
+</h4>
+<p>If the operator is working with self-signed certificates, it is required that the client enhancement consuming the remote signer allows this option.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h3 id="test-data">
+<a href="#test-data" class="anchor-link"></a> Test Data
+</h3>
+<ul>
+<li>BLS Pair
+<ul>
+<li>Public key: <code class="language-plaintext highlighter-rouge">0xb7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a</code>.</li>
+<li>Secret key: <code class="language-plaintext highlighter-rouge">0x68081afeb7ad3e8d469f87010804c3e8d53ef77d393059a55132637206cc59ec</code>.</li>
+</ul>
+</li>
+<li>Signing root: <code class="language-plaintext highlighter-rouge">0xb6bb8f3765f93f4f1e7c7348479289c9261399a3c6906685e320071a1a13955c</code>.</li>
+<li>Expected signature: <code class="language-plaintext highlighter-rouge">0xb5d0c01cef3b028e2c5f357c2d4b886f8e374d09dd660cd7dd14680d4f956778808b4d3b2ab743e890fc1a77ae62c3c90d613561b23c6adaeb5b0e288832304fddc08c7415080be73e556e8862a1b4d0f6aa8084e34a901544d5bb6aeed3a612</code>.</li>
+</ul>
+<h3 id="get-upcheck-1">
+<a href="#get-upcheck-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">GET /upcheck</code>
+</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Success</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> localhost:9000/upcheck
+
+<span class="c">## Response</span>
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET /upcheck HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span>
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 200 OK
+&lt; content-type: application/json
+&lt; content-length: 15
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:25:08 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"status"</span>:<span class="s2">"OK"</span><span class="o">}</span>
+</code></pre></div></div>
+<h3 id="get-keys-1">
+<a href="#get-keys-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">GET /keys</code>
+</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Success</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> localhost:9000/keys
+
+<span class="c">## Response</span>
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET /publicKeys HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span>
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 200 OK
+&lt; content-type: application/json
+&lt; content-length: 116
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:25:36 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"keys"</span>:[<span class="s2">"b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a"</span><span class="o">]}</span>
+
+<span class="c"># Server Error</span>
+
+<span class="c">## Preparation</span>
+<span class="c">## `chmod` keys directory to the octal 311 (-wx--x--x).</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> localhost:9000/keys
+
+<span class="c">## Response</span>
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET /publicKeys HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span>
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 500 Internal Server Error
+&lt; content-length: 43
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:26:09 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"error"</span>:<span class="s2">"Storage error: PermissionDenied"</span><span class="o">}</span>
+</code></pre></div></div>
+<h3 id="post-signidentifier-1">
+<a href="#post-signidentifier-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">POST /sign/:identifier</code>
+</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Success</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> <span class="nt">-X</span> POST <span class="nt">-d</span> @payload.json <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> localhost:9000/sign/b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a
+
+<span class="c">## Response</span>
+Note: Unnecessary use of <span class="nt">-X</span> or <span class="nt">--request</span>, POST is already inferred.
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> POST /sign/b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> Content-Type: application/json
+<span class="o">&gt;</span> Content-Length: 84
+<span class="o">&gt;</span>
+<span class="k">*</span> upload completely sent off: 84 out of 84 bytes
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 200 OK
+&lt; content-type: application/json
+&lt; content-length: 210
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:16:02 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"signature"</span>:<span class="s2">"0xb5d0c01cef3b028e2c5f357c2d4b886f8e374d09dd660cd7dd14680d4f956778808b4d3b2ab743e890fc1a77ae62c3c90d613561b23c6adaeb5b0e288832304fddc08c7415080be73e556e8862a1b4d0f6aa8084e34a901544d5bb6aeed3a612"</span><span class="o">}</span>
+
+<span class="c"># Bad Request Error</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> <span class="nt">-X</span> POST <span class="nt">-d</span> <span class="s1">'foobar'</span> <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> localhost:9000/sign/b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a
+
+<span class="c">## Response</span>
+Note: Unnecessary use of <span class="nt">-X</span> or <span class="nt">--request</span>, POST is already inferred.
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> POST /sign/b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> Content-Type: application/json
+<span class="o">&gt;</span> Content-Length: 23
+<span class="o">&gt;</span>
+<span class="k">*</span> upload completely sent off: 23 out of 23 bytes
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 400 Bad Request
+&lt; content-length: 38
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:15:05 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"error"</span>:<span class="s2">"Unable to parse body message from JSON: Error(</span><span class="se">\"</span><span class="s2">expected ident</span><span class="se">\"</span><span class="s2">, line: 1, column: 2)"</span><span class="o">}</span>
+
+<span class="c"># No Keys Available</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> <span class="nt">-X</span> POST <span class="nt">-d</span> @payload.json <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> localhost:9000/sign/000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+<span class="c">## Response</span>
+Note: Unnecessary use of <span class="nt">-X</span> or <span class="nt">--request</span>, POST is already inferred.
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> POST /sign/000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> Content-Type: application/json
+<span class="o">&gt;</span> Content-Length: 84
+<span class="o">&gt;</span>
+<span class="k">*</span> upload completely sent off: 84 out of 84 bytes
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 404 Not Found
+&lt; content-length: 123
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:18:53 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"error"</span>:<span class="s2">"Key not found: 000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"</span><span class="o">}</span>
+
+<span class="c"># Server Error</span>
+
+<span class="c">## Preparation</span>
+<span class="c">## `chmod` both keys directory and file to the octal 311 (-wx--x--x).</span>
+<span class="c">## `chmod` back to 755 to delete them afterwards.</span>
+
+<span class="c">## Request</span>
+curl <span class="nt">-v</span> <span class="nt">-X</span> POST <span class="nt">-d</span> @payload.json <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> localhost:9000/sign/b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a
+
+<span class="c">## Response</span>
+Note: Unnecessary use of <span class="nt">-X</span> or <span class="nt">--request</span>, POST is already inferred.
+<span class="k">*</span>   Trying 127.0.0.1:9000...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to localhost <span class="o">(</span>127.0.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> POST /sign/b7354252aa5bce27ab9537fd0158515935f3c3861419e1b4b6c8219b5dbd15fcf907bddf275442f3e32f904f79807a2a HTTP/1.1
+<span class="o">&gt;</span> Host: localhost:9000
+<span class="o">&gt;</span> User-Agent: curl/7.68.0
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> Content-Type: application/json
+<span class="o">&gt;</span> Content-Length: 84
+<span class="o">&gt;</span>
+<span class="k">*</span> upload completely sent off: 84 out of 84 bytes
+<span class="k">*</span> Mark bundle as not supporting multiuse
+&lt; HTTP/1.1 500 Internal Server Error
+&lt; content-length: 43
+&lt; <span class="nb">date</span>: Wed, 30 Sep 2020 02:21:08 GMT
+&lt;
+<span class="k">*</span> Connection <span class="c">#0 to host localhost left intact</span>
+<span class="o">{</span><span class="s2">"error"</span>:<span class="s2">"Storage error: PermissionDenied"</span><span class="o">}</span>
+</code></pre></div></div>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<table>
+<thead>
+<tr>
+<th>Repository Url</th>
+<th>Language</th>
+<th>Organization</th>
+<th>Commentary</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/sigp/rust-bls-remote-signer">BLS Remote Signer</a></td>
+<td>Rust</td>
+<td>Sigma Prime</td>
+<td>Supports proposed specification.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/PegaSysEng/web3signer">Web3signer</a></td>
+<td>Java</td>
+<td>PegaSys</td>
+<td>Supports proposed specification, although with <a href="https://pegasyseng.github.io/web3signer/web3signer-eth2.html">slightly different methods</a>:<br />{<code class="language-plaintext highlighter-rouge">/sign</code> =&gt; <code class="language-plaintext highlighter-rouge">/api/v1/eth2/sign</code>, <code class="language-plaintext highlighter-rouge">/publicKeys</code> =&gt; <code class="language-plaintext highlighter-rouge">/api/v1/eth2/publicKeys</code>}.</td>
+</tr>
+<tr>
+<td><a href="https://docs.prylabs.network/docs/wallet/remote/">Remote Signing Wallet</a></td>
+<td>Golang</td>
+<td>Prysmatics Labs</td>
+<td>Supports both gRPC and JSON over HTTP.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="threat-model">
+<a href="#threat-model" class="anchor-link"></a> Threat model
+</h3>
+<p>Let’s consider the following threats and their mitigations:</p>
+<table>
+<thead>
+<tr>
+<th>Threat</th>
+<th>Mitigation(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>An attacker can spoof the validator client.</td>
+<td>See the discussion at <a href="#authentication">Authentication</a>.</td>
+</tr>
+<tr>
+<td>An attacker can send a crafted message to the signer, leading to a slashing offense.</td>
+<td>It is the responsibility of the operator of the remote signer to add a validation module, as discussed at <a href="#implementation-of-additional-features">Implementation of additional features</a>.</td>
+</tr>
+<tr>
+<td>An attacker can create, update, or delete secret keys.</td>
+<td>Keys are not to be writable via any interface of the remote signer.</td>
+</tr>
+<tr>
+<td>An attacker can repudiate a sent message.</td>
+<td>Implement logging in the signer. Enhance it by sending logs to a syslog box.</td>
+</tr>
+<tr>
+<td>An attacker can disclose the contents of a private key by retrieving the key from storage.</td>
+<td>Storage in Hardware security module (HSM).<br /><em>or</em><br />Storage in Secrets management applications (e.g. Hashicorp Vault).</td>
+</tr>
+<tr>
+<td>An attacker can eavesdrop on the uploading of a secret key.</td>
+<td>Upload the keys using a secure channel, based on each storage specification.</td>
+</tr>
+<tr>
+<td>An attacker can eavesdrop on the retrieval of a key from the remote signer.</td>
+<td>Always pass the data between storage and remote signer node using a secure channel.</td>
+</tr>
+<tr>
+<td>An attacker can dump the memory in the remote signer to disclose a secret key.</td>
+<td>Prevent physical access to the node running the remote signer.<br /><em>or</em><br />Prevent access to the terminal of the node running the remote signer: Logs being sent to a syslog box. Deployments triggered by a simple, non-parameterized API.<br /><em>or</em><br />Implement zeroization of the secret key at memory.<br /><em>or</em><br />Explore the compilation and running of the remote signer in a Trusted execution environment (TEE).</td>
+</tr>
+<tr>
+<td>An attacker can DoS the remote signer.</td>
+<td>Implement IP filtering.<br /><em>or</em><br />Implement Rate limiting.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/hermanjunge">Herman Junge</a>, "EIP-3030: BLS Remote Signer HTTP API [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3030, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3030.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3030: BLS Remote Signer HTTP API [DRAFT]",
+    "author": "Herman Junge (@hermanjunge)",
+    "name": "EIP-3030: BLS Remote Signer HTTP API [DRAFT]",
+    "dateCreated": "2020-09-30",
+    "datePublished": "2020-09-30",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3030-bls-remote-signer-http-api-standard/4810",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

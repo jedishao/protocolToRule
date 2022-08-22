@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1186: RPC-Method to get Merkle Proofs - eth_getProof</title>
+<meta property="og:title" content="EIP-1186: RPC-Method to get Merkle Proofs - eth_getProof" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1186" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1186" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1186: RPC-Method to get Merkle Proofs - eth_getProof
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1186.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#e7948e8a8889c98d8289939d94848fa7948b88848cc98e93">Simon Jentzsch</a>, <a href="/cdn-cgi/l/email-protection#8fece7fde6fcfbe0ffe7a1e5eae1fbf5fcece7cffce3e0ece4a1e6fb">Christoph Jentzsch</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1186">https://github.com/ethereum/EIPs/issues/1186</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2018-06-24</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-1474">1474</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#proofs-for-non-existent-values">Proofs for non existent values</a></li>
+<li><a href="#possible-changes-to-be-discussed">possible Changes to be discussed:</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>One of the great features of Ethereum is the fact, that you can verify all data of the state. But in order to allow verification of accounts outside the client, we need an additional function delivering us the required proof. These proofs are important to secure Layer2-Technologies.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Ethereum uses a <a href="https://github.com/ethereum/wiki/wiki/Patricia-Tree">Merkle Tree</a> to store the state of accounts and their storage. This allows verification of each value by simply creating a Merkle Proof. But currently, the standard RPC-Interface does not give you access to these proofs. This EIP suggests an additional RPC-Method, which creates Merkle Proofs for Accounts and Storage Values.</p>
+<p>Combined with a stateRoot (from the blockheader) it enables offline verification of any account or storage-value. This allows especially IOT-Devices or even mobile apps which are not able to run a light client to verify responses from an untrusted source only given a trusted blockhash.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>In order to create a MerkleProof access to the full state db is required. The current RPC-Methods allow an application to access single values (<code class="language-plaintext highlighter-rouge">eth_getBalance</code>,<code class="language-plaintext highlighter-rouge">eth_getTransactionCount</code>,<code class="language-plaintext highlighter-rouge">eth_getStorageAt</code>,<code class="language-plaintext highlighter-rouge">eth_getCode</code>), but it is impossible to read the data needed for a MerkleProof through the standard RPC-Interface. (There are implementations using leveldb and accessing the data via filesystems, but this can not be used for production systems since it requires the client to be stopped first - See https://github.com/zmitton/eth-proof)</p>
+<p>Today MerkleProofs are already used internally. For example, the <a href="https://github.com/zsfelfoldi/go-ethereum/wiki/Light-Ethereum-Subprotocol-%28LES%29#on-demand-data-retrieval">Light Client Protocol</a> supports a function creating MerkleProof, which is used in order to verify the requested account or storage-data.</p>
+<p>Offering these already existing function through the RPC-Interface as well would enable Applications to store and send these proofs to devices which are not directly connected to the p2p-network and still are able to verify the data. This could be used to verify data in mobile applications or IOT-devices, which are currently only using a remote client.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>As Part of the eth-Module, an additional Method called <code class="language-plaintext highlighter-rouge">eth_getProof</code> should be defined as follows:</p>
+<h4 id="eth_getproof">
+<a href="#eth_getproof" class="anchor-link"></a> eth_getProof
+</h4>
+<p>Returns the account- and storage-values of the specified account including the Merkle-proof.</p>
+<h5 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h5>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">DATA</code>, 20 Bytes - address of the account.</li>
+<li><code class="language-plaintext highlighter-rouge">ARRAY</code>, 32 Bytes - array of storage-keys which should be proofed and included. See <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getstorageat"><code class="language-plaintext highlighter-rouge">eth_getStorageAt</code></a></li>
+<li><code class="language-plaintext highlighter-rouge">QUANTITY|TAG</code> - integer block number, or the string <code class="language-plaintext highlighter-rouge">"latest"</code> or <code class="language-plaintext highlighter-rouge">"earliest"</code>, see the <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC#the-default-block-parameter">default block parameter</a></li>
+</ol>
+<h5 id="returns">
+<a href="#returns" class="anchor-link"></a> Returns
+</h5>
+<p><code class="language-plaintext highlighter-rouge">Object</code> - A account object:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">balance</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - the balance of the account. See <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getbalance"><code class="language-plaintext highlighter-rouge">eth_getBalance</code></a></li>
+<li><code class="language-plaintext highlighter-rouge">codeHash</code>: <code class="language-plaintext highlighter-rouge">DATA</code>, 32 Bytes - hash of the code of the account. For a simple Account without code it will return <code class="language-plaintext highlighter-rouge">"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"</code></li>
+<li><code class="language-plaintext highlighter-rouge">nonce</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code>, - nonce of the account. See <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_gettransactioncount"><code class="language-plaintext highlighter-rouge">eth_getTransactionCount</code></a></li>
+<li><code class="language-plaintext highlighter-rouge">storageHash</code>: <code class="language-plaintext highlighter-rouge">DATA</code>, 32 Bytes - SHA3 of the StorageRoot. All storage will deliver a MerkleProof starting with this rootHash.</li>
+<li><code class="language-plaintext highlighter-rouge">accountProof</code>: <code class="language-plaintext highlighter-rouge">ARRAY</code> - Array of rlp-serialized MerkleTree-Nodes, starting with the stateRoot-Node, following the path of the SHA3 (address) as key.</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">storageProof</code>: <code class="language-plaintext highlighter-rouge">ARRAY</code> - Array of storage-entries as requested. Each entry is a object with these properties:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">key</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - the requested storage key</li>
+<li><code class="language-plaintext highlighter-rouge">value</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - the storage value</li>
+<li><code class="language-plaintext highlighter-rouge">proof</code>: <code class="language-plaintext highlighter-rouge">ARRAY</code> - Array of rlp-serialized MerkleTree-Nodes, starting with the storageHash-Node, following the path of the SHA3 (key) as path.</li>
+</ul>
+</li>
+</ul>
+<h5 id="example">
+<a href="#example" class="anchor-link"></a> Example
+</h5>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jsonrpc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eth_getProof"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"params"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"0x7F0d15C7FAae65896648C8273B6d7E43f58Fa842"</span><span class="p">,</span><span class="w">
+    </span><span class="p">[</span><span class="w">  </span><span class="s2">"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"</span><span class="w"> </span><span class="p">],</span><span class="w">
+    </span><span class="s2">"latest"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>The result will look like this:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jsonrpc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"accountProof"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"0xf90211a...0701bc80"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0xf90211a...0d832380"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0xf90211a...5fb20c80"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0xf90211a...0675b80"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0xf90151a0...ca08080"</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"balance"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"codeHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"storageHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"storageProof"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"proof"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="s2">"0xf90211a...0701bc80"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"0xf90211a...0d832380"</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This one Method actually returns 3 different important data points:</p>
+<ol>
+<li>The 4 fields of an account-object as specified in the yellow paper <code class="language-plaintext highlighter-rouge">[nonce, balance, storageHash, codeHash ]</code>, which allows storing a hash of the account-object in order to keep track of changes.</li>
+<li>The MerkleProof for the account starting with a stateRoot from the specified block.</li>
+<li>The MerkleProof for each requested storage entry starting with a storageHash from the account.</li>
+</ol>
+<p>Combining these in one Method allows the client to work very efficient since the required data are already fetched from the db.</p>
+<h3 id="proofs-for-non-existent-values">
+<a href="#proofs-for-non-existent-values" class="anchor-link"></a> Proofs for non existent values
+</h3>
+<p>In case an address or storage-value does not exist, the proof needs to provide enough data to verify this fact. This means the client needs to follow the path from the root node and deliver until the last matching node. If the last matching node is a branch, the proof value in the node must be an empty one. In case of leaf-type, it must be pointing to a different relative-path in order to proof that the requested path does not exist.</p>
+<h3 id="possible-changes-to-be-discussed">
+<a href="#possible-changes-to-be-discussed" class="anchor-link"></a> possible Changes to be discussed:
+</h3>
+<ul>
+<li>instead of providing the blocknumber maybe the blockhash would be better since it would allow proofs of uncles-states.</li>
+<li>in order to reduce data, the account-object may only provide the <code class="language-plaintext highlighter-rouge">accountProof</code> and <code class="language-plaintext highlighter-rouge">storageProof</code>. The Fields <code class="language-plaintext highlighter-rouge">balance</code>, <code class="language-plaintext highlighter-rouge">nonce</code>, <code class="language-plaintext highlighter-rouge">storageHash</code> and <code class="language-plaintext highlighter-rouge">codeHash</code> could be taken from the last Node in the proof by deserializing it.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Since this only adds a new Method there are no issues with Backwards Compatibility.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TODO: Tests still need to be implemented, but the core function creating the proof already exists inside the clients and are well tested.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#35465c585a5b1b5f505b414f46565d7546595a565e1b5c41">Simon Jentzsch</a>, <a href="/cdn-cgi/l/email-protection#42212a302b31362d322a6c28272c363831212a02312e2d21296c2b36">Christoph Jentzsch</a>, "EIP-1186: RPC-Method to get Merkle Proofs - eth_getProof [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1186, June 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1186.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1186: RPC-Method to get Merkle Proofs - eth_getProof [DRAFT]",
+    "author": "Simon Jentzsch <simon.jentzsch@slock.it>, Christoph Jentzsch <christoph.jentzsch@slock.it>",
+    "name": "EIP-1186: RPC-Method to get Merkle Proofs - eth_getProof [DRAFT]",
+    "dateCreated": "2018-06-24",
+    "datePublished": "2018-06-24",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1186",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

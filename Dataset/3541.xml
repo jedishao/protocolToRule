@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3541: Reject new contract code starting with the 0xEF byte</title>
+<meta property="og:title" content="EIP-3541: Reject new contract code starting with the 0xEF byte" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3541" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3541" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-3541: Reject new contract code starting with the 0xEF byte
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3541.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/AlexeyAkhunov">Alexey Akhunov</a>, <a href="https://github.com/chriseth">Christian Reitwiessner</a>, <a href="https://github.com/holiman">Martin Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/evm-object-format-eof/5727">https://ethereum-magicians.org/t/evm-object-format-eof/5727</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-03-16</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#remarks">Remarks</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Disallow new code starting with the <code class="language-plaintext highlighter-rouge">0xEF</code> byte to be deployed. Code already existing in the account trie starting with <code class="language-plaintext highlighter-rouge">0xEF</code> byte is not affected semantically by this change.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Contracts conforming to the EVM Object Format (EOF) are going to be validated at deploy time. In order to guarantee that every EOF-formatted contract in the state is valid, we need to prevent already deployed (and not validated) contracts from being recognized as such format. This will be achieved by choosing a byte sequence for the <em>magic</em> that doesn’t exist in any of the already deployed contracts. To prevent the growth of the search space and to limit the analysis to the contracts existing before this fork, we disallow the starting byte of the format (the first byte of the magic).</p>
+<p>Should the EVM Object Format proposal not be deployed in the future, the <em>magic</em> can be used by other features depending on versioning. In the case versioning becomes obsolete, it is simple to roll this back by allowing contracts starting with the <code class="language-plaintext highlighter-rouge">0xEF</code> byte to be deployed again.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>After <code class="language-plaintext highlighter-rouge">block.number == HF_BLOCK</code> new contract creation (via create transaction, <code class="language-plaintext highlighter-rouge">CREATE</code> or <code class="language-plaintext highlighter-rouge">CREATE2</code> instructions) results in an exceptional abort if the <em>code</em>’s first byte is <code class="language-plaintext highlighter-rouge">0xEF</code>.</p>
+<h3 id="remarks">
+<a href="#remarks" class="anchor-link"></a> Remarks
+</h3>
+<p>The <em>initcode</em> is the code executed in the context of the <em>create</em> transaction, <code class="language-plaintext highlighter-rouge">CREATE</code>, or <code class="language-plaintext highlighter-rouge">CREATE2</code> instructions. The <em>initcode</em> returns <em>code</em> (via the <code class="language-plaintext highlighter-rouge">RETURN</code> instruction), which is inserted into the account. See section 7 (“Contract Creation”) in the Yellow Paper for more information.</p>
+<p>The opcode <code class="language-plaintext highlighter-rouge">0xEF</code> is currently an undefined instruction, therefore: <em>It pops no stack items and pushes no stack items, and it causes an exceptional abort when executed.</em> This means <em>initcode</em> or already deployed <em>code</em> starting with this instruction will continue to abort execution.</p>
+<p>The exceptional abort due to <em>code</em> starting with <code class="language-plaintext highlighter-rouge">0xEF</code> behaves exactly the same as any other exceptional abort that can occur during <em>initcode</em> execution, i.e. in case of abort all gas provided to a <code class="language-plaintext highlighter-rouge">CREATE*</code> or create transaction is consumed.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">0xEF</code> byte was chosen because it resembles <strong>E</strong>xecutable <strong>F</strong>ormat.</p>
+<p>Contracts using unassigned opcodes are generally understood to be at risk of changing semantics. Hence using the unassigned <code class="language-plaintext highlighter-rouge">0xEF</code> should have lesser effects, than choosing an assigned opcode, such as <code class="language-plaintext highlighter-rouge">0xFD</code> (<code class="language-plaintext highlighter-rouge">REVERT</code>), <code class="language-plaintext highlighter-rouge">0xFE</code> (<code class="language-plaintext highlighter-rouge">INVALID)</code>, or <code class="language-plaintext highlighter-rouge">0xFF</code> (<code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>). Arguably while such contracts may not be very useful, they are still using valid opcodes.</p>
+<p>Analysis in May 2021, on <code class="language-plaintext highlighter-rouge">18084433</code> contracts in state, showed that there are 0 existing contracts starting with the <code class="language-plaintext highlighter-rouge">0xEF</code> byte, as opposed to 1, 4, and 12 starting with <code class="language-plaintext highlighter-rouge">0xFD</code>, <code class="language-plaintext highlighter-rouge">0xFE</code>, and <code class="language-plaintext highlighter-rouge">0xFF</code>, respectively.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Each test case below may be executed in 3 different contexts:</p>
+<ul>
+<li>create transaction (no account code)</li>
+<li><code class="language-plaintext highlighter-rouge">CREATE</code>, with account code: <code class="language-plaintext highlighter-rouge">0x6000356000523660006000f0151560165760006000fd5b</code> (Yul code: <code class="language-plaintext highlighter-rouge">mstore(0, calldataload(0)) if iszero(create(0, 0, calldatasize())) { revert(0, 0) }</code>),</li>
+<li><code class="language-plaintext highlighter-rouge">CREATE2</code>, with account code: <code class="language-plaintext highlighter-rouge">0x60003560005260003660006000f5151560185760006000fd5b</code> (Yul code: <code class="language-plaintext highlighter-rouge">mstore(0, calldataload(0)) if iszero(create2(0, 0, calldatasize(), 0)) { revert(0, 0) }</code>)</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Calldata</th>
+<th>Expected result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>deploy one byte <code class="language-plaintext highlighter-rouge">ef</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x60ef60005360016000f3</code></td>
+<td>new contract not deployed, transaction fails</td>
+</tr>
+<tr>
+<td>deploy two bytes <code class="language-plaintext highlighter-rouge">ef00</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x60ef60005360026000f3</code></td>
+<td>new contract not deployed, transaction fails</td>
+</tr>
+<tr>
+<td>deploy three bytes <code class="language-plaintext highlighter-rouge">ef0000</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x60ef60005360036000f3</code></td>
+<td>new contract not deployed, transaction fails</td>
+</tr>
+<tr>
+<td>deploy 32 bytes <code class="language-plaintext highlighter-rouge">ef00...00</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x60ef60005360206000f3</code></td>
+<td>new contract not deployed, transaction fails</td>
+</tr>
+<tr>
+<td>deploy one byte <code class="language-plaintext highlighter-rouge">fe</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x60fe60005360016000f3</code></td>
+<td>new contract deployed, transaction succeeds</td>
+</tr>
+</tbody>
+</table>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This is a breaking change given new code starting with the <code class="language-plaintext highlighter-rouge">0xEF</code> byte will not be deployable, and contract creation will result in a failure. However, given bytecode is executed starting at its first byte, code deployed with <code class="language-plaintext highlighter-rouge">0xEF</code> as the first byte is not executable anyway.</p>
+<p>While this means no currently executable contract is affected, it does rejects deployment of new data contracts starting with the <code class="language-plaintext highlighter-rouge">0xEF</code> byte.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The authors are not aware of any security or DoS risks posed by this change.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/AlexeyAkhunov">Alexey Akhunov</a>, <a href="https://github.com/chriseth">Christian Reitwiessner</a>, <a href="https://github.com/holiman">Martin Swende</a>, "EIP-3541: Reject new contract code starting with the 0xEF byte," <em>Ethereum Improvement Proposals</em>, no. 3541, March 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3541.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3541: Reject new contract code starting with the 0xEF byte",
+    "author": "Alex Beregszaszi (@axic), Paweł Bylica (@chfast), Andrei Maiboroda (@gumb0), Alexey Akhunov (@AlexeyAkhunov), Christian Reitwiessner (@chriseth), Martin Swende (@holiman)",
+    "name": "EIP-3541: Reject new contract code starting with the 0xEF byte",
+    "dateCreated": "2021-03-16",
+    "datePublished": "2021-03-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/evm-object-format-eof/5727",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-214: New opcode STATICCALL</title>
+<meta property="og:title" content="EIP-214: New opcode STATICCALL" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-214" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-214" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-214: New opcode STATICCALL
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-214.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#17617e63767b7e7c5772637f726572627a39786570">Vitalik Buterin</a>, <a href="/cdn-cgi/l/email-protection#086b607a617b486d7c606d7a6d7d6526677a6f">Christian Reitwiessner</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2017-02-13</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>To increase smart contract security, this proposal adds a new opcode that can be used to call another contract (or itself) while disallowing any modifications to the state during the call (and its subcalls, if present).</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal adds a new opcode that can be used to call another contract (or itself) while disallowing any modifications to the state during the call (and its subcalls, if present). Any opcode that attempts to perform such a modification (see below for details) will result in an exception instead of performing the modification.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently, there is no restriction about what a called contract can do, as long as the computation can be performed with the amount of gas provided. This poses certain difficulties about smart contract engineers; after a regular call, unless you know the called contract, you cannot make any assumptions about the state of the contracts. Furthermore, because you cannot know the order of transactions before they are confirmed by miners, not even an outside observer can be sure about that in all cases.</p>
+<p>This EIP adds a way to call other contracts and restrict what they can do in the simplest way. It can be safely assumed that the state of all accounts is the same before and after a static call.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Introduce a new <code class="language-plaintext highlighter-rouge">STATIC</code> flag to the virtual machine. This flag is set to <code class="language-plaintext highlighter-rouge">false</code> initially. Its value is always copied to sub-calls with an exception for the new opcode below.</p>
+<p>Opcode: <code class="language-plaintext highlighter-rouge">0xfa</code>.</p>
+<p><code class="language-plaintext highlighter-rouge">STATICCALL</code> functions equivalently to a <code class="language-plaintext highlighter-rouge">CALL</code>, except it takes only 6 arguments (the “value” argument is not included and taken to be zero), and calls the child with the <code class="language-plaintext highlighter-rouge">STATIC</code> flag set to <code class="language-plaintext highlighter-rouge">true</code> for the execution of the child. Once this call returns, the flag is reset to its value before the call.</p>
+<p>Any attempts to make state-changing operations inside an execution instance with <code class="language-plaintext highlighter-rouge">STATIC</code> set to <code class="language-plaintext highlighter-rouge">true</code> will instead throw an exception. These operations include <code class="language-plaintext highlighter-rouge">CREATE</code>, <code class="language-plaintext highlighter-rouge">CREATE2</code>, <code class="language-plaintext highlighter-rouge">LOG0</code>, <code class="language-plaintext highlighter-rouge">LOG1</code>, <code class="language-plaintext highlighter-rouge">LOG2</code>, <code class="language-plaintext highlighter-rouge">LOG3</code>, <code class="language-plaintext highlighter-rouge">LOG4</code>, <code class="language-plaintext highlighter-rouge">SSTORE</code>, and <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>. They also include <code class="language-plaintext highlighter-rouge">CALL</code> with a non-zero value. As an exception, <code class="language-plaintext highlighter-rouge">CALLCODE</code> is not considered state-changing, even with a non-zero value.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This allows contracts to make calls that are clearly non-state-changing, reassuring developers and reviewers that re-entrancy bugs or other problems cannot possibly arise from that particular call; it is a pure function that returns an output and does nothing else. This may also make purely functional HLLs easier to implement.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This proposal adds a new opcode but does not modify the behaviour of other opcodes and thus is backwards compatible for old contracts that do not use the new opcode and are not called via the new opcode.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>To be written.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#b7c1dec3d6dbdedcf7d2c3dfd2c5d2c2da99d8c5d0">Vitalik Buterin</a>, <a href="/cdn-cgi/l/email-protection#16757e647f655673627e736473637b38796471">Christian Reitwiessner</a>, "EIP-214: New opcode STATICCALL," <em>Ethereum Improvement Proposals</em>, no. 214, February 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-214.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-214: New opcode STATICCALL",
+    "author": "Vitalik Buterin <vitalik@ethereum.org>, Christian Reitwiessner <chris@ethereum.org>",
+    "name": "EIP-214: New opcode STATICCALL",
+    "dateCreated": "2017-02-13",
+    "datePublished": "2017-02-13",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

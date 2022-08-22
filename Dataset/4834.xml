@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4834: Hierarchical Domains</title>
+<meta property="og:title" content="EIP-4834: Hierarchical Domains" />
+<meta name="description" content="Extremely generic name resolution" />
+<meta property="og:description" content="Extremely generic name resolution" />
+<meta name="twitter:description" content="Extremely generic name resolution" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4834" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4834" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4834: Hierarchical Domains
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4834.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Extremely generic name resolution</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/Pandapip1">Pandapip1</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-4834-hierarchical-domains-standard/8388">https://ethereum-magicians.org/t/erc-4834-hierarchical-domains-standard/8388</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2022-08-31</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-02-22</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-20">20</a>,
+<a href="eip-137">137</a>,
+<a href="eip-165">165</a>,
+<a href="eip-173">173</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#contract-interface">Contract Interface</a></li>
+<li><a href="#name-resolution">Name Resolution</a></li>
+<li><a href="#optional-extension-enumerable">Optional Extension: Enumerable</a></li>
+<li><a href="#optional-extension-access-control">Optional Extension: Access Control</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#malicious-canmovesubdomain-black-hole">Malicious canMoveSubdomain (Black Hole)</a></li>
+<li><a href="#parent-domain-resolution">Parent Domain Resolution</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This is a standard for generic name resolution with access control. It permits a contract that implements this EIP (referred to as a “domain” hereafter) to be addressable with a more human-friendly name, with a similar purpose to <a href="/EIPS/eip-137">EIP-137</a> (referred to as “ENS” hereafter).</p>
+<p>Unlike ENS, any program that resolves domains should treat domains as equivalent to their resolved addresses. In practice, this means users of DApps that implement this EIP’s name resolution may specify an address that looks like <code class="language-plaintext highlighter-rouge">dai.token</code> instead of <code class="language-plaintext highlighter-rouge">0x6b175474e89094c44da98b954eedeac495271d0f</code>. In this instance, <code class="language-plaintext highlighter-rouge">dai.token</code> and <code class="language-plaintext highlighter-rouge">0x6b175474e89094c44da98b954eedeac495271d0f</code> are not different, unlike ENS, where names are simply keys to be hashed and inputted into a storage contract that then resolves the name to an address.</p>
+<p>Another notable divergence from ENS is that access control can be arbitrarily complex. ENS domains have a defined owner that has full permission to create, update, and delete subdomains, as well as update the metadata of the domain in resolver contracts. While this can be made more strict by delegating control of the ENS domain to a smart contract, this EIP takes a different approach, and permits any access control patterns to be implemented. This could allow for interesting use-cases, such as an <a href="/EIPS/eip-20">EIP-20</a> token that could be “redeemed” for subdomains by linking permission to create subdomains to ownership of a specific amount of that token and having that much token burned when a domain is created.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The advantage of this EIP over those existing standards is that it provides a minimal interface that supports name resolution, adds standardized access control, and has a simple architecture. ENS, although useful, has a comparatively complex architecture.</p>
+<p>In addition, all domains (including subdomains, TLDs, and even the root itself) are actually implemented as domains, meaning that name resolution is a simple iterative algorithm.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="contract-interface">
+<a href="#contract-interface" class="anchor-link"></a> Contract Interface
+</h3>
+<p>Solidity Interface with NatSpec &amp; OpenZeppelin v4 Interfaces (also available at <a href="/assets/eip-4834/IDomain.sol">IDomain.sol</a>):</p>
+<pre><code class="language-sol">interface IDomain is IERC165 {
+    //// Events
+    
+    /// @notice     Must be emitted when a new subdomain is created (eg. through `createDomain`.)
+    /// @param      sender msg.sender for createDomain
+    /// @param      name name for createDomain
+    /// @param      subdomain subdomain in createDomain
+    event SubdomainCreate(address indexed sender, string name, address subdomain);
+
+    /// @notice     Must be emitted when the resolved address for a domain is changed (eg. with `setDomain`)
+    /// @param      sender msg.sender for setDomain
+    /// @param      name name for setDomain
+    /// @param      subdomain subdomain in setDomain
+    /// @param      oldSubdomain the old subdomain
+    event SubdomainUpdate(address indexed sender, string name, address subdomain, address oldSubdomain);
+
+    /// @notice     Must be emitted when a domain is unmapped (eg. with `deleteDomain`)
+    /// @param      sender msg.sender for deleteDomain
+    /// @param      name name for deleteDomain
+    /// @param      subdomain the old subdomain
+    event SubdomainDelete(address indexed sender, string name, address subdomain);
+
+
+    //// CRUD
+
+    /// @notice     Query if a domain has a subdomain with a given name
+    /// @param      name The subdomain to query
+    /// @return     `true` if the domain has a subdomain with the given name, `false` otherwise
+    function hasDomain(string memory name) external view returns (bool);
+
+    /// @notice     Fetch the subdomain with a given name
+    /// @dev        This should revert if `hasDomain(name)` is `false`
+    /// @param      name The subdomain to fetch
+    /// @return     The subdomain with the given name
+    function getDomain(string memory name) external view returns (address);
+    
+    /// @notice     Create a subdomain with a given name
+    /// @dev        This should revert if `canCreateDomain(msg.sender, name, pointer)` is `false` or if the domain exists
+    /// @param      name The subdomain name to be created
+    /// @param      subdomain The subdomain to create
+    function createDomain(string memory name, address subdomain) external;
+
+    /// @notice     Update a subdomain with a given name
+    /// @dev        This should revert if `canSetDomain(msg.sender, name, pointer)` is `false` of if the domain doesn't exist
+    /// @param      name The subdomain name to be updated
+    /// @param      subdomain The subdomain to set
+    function setDomain(string memory name, address subdomain) external;
+
+    /// @notice     Delete the subdomain with a given name
+    /// @dev        This should revert if the domain doesn't exist or if
+    ///             `canDeleteDomain(msg.sender, name, this)` is `false`
+    /// @param      name The subdomain to delete
+    function deleteDomain(string memory name) external;
+
+
+    //// Parent Domain Access Control
+
+    /// @notice     Get if an account can create a subdomain with a given name
+    /// @dev        This must return `false` if `hasDomain(name)` is `true`.
+    /// @param      updater The account that may or may not be able to create/update a subdomain
+    /// @param      name The subdomain name that would be created/updated
+    /// @param      subdomain The subdomain that would be set
+    /// @return     Whether an account can update or create the subdomain
+    function canCreateDomain(address updater, string memory name, address subdomain) external view returns (bool);
+
+    /// @notice     Get if an account can update or create a subdomain with a given name
+    /// @dev        This must return `false` if `hasDomain(name)` is `false`.
+    ///             If `getDomain(name)` is also a domain, this should return `false` if
+    ///             `getDomain(name).canMoveSubdomain(msg.sender, this, subdomain)` is `false`.
+    /// @param      updater The account that may or may not be able to create/update a subdomain
+    /// @param      name The subdomain name that would be created/updated
+    /// @param      subdomain The subdomain that would be set
+    /// @return     Whether an account can update or create the subdomain
+    function canSetDomain(address updater, string memory name, address subdomain) external view returns (bool);
+
+    /// @notice     Get if an account can delete the subdomain with a given name
+    /// @dev        This must return `false` if `hasDomain(name)` is `false`.
+    ///             If `getDomain(name)` is a domain, this should return `false` if
+    ///             `getDomain(name).canDeleteSubdomain(msg.sender, this, subdomain)` is `false`.
+    /// @param      updater The account that may or may not be able to delete a subdomain
+    /// @param      name The subdomain to delete
+    /// @return     Whether an account can delete the subdomain
+    function canDeleteDomain(address updater, string memory name) external view returns (bool);
+}
+</code></pre>
+<h3 id="name-resolution">
+<a href="#name-resolution" class="anchor-link"></a> Name Resolution
+</h3>
+<p>To resolve a name (like <code class="language-plaintext highlighter-rouge">"a.b.c"</code>), you first split it by the delimiter (resulting in something like <code class="language-plaintext highlighter-rouge">["a", "b", "c"]</code>). Set <code class="language-plaintext highlighter-rouge">domain</code> initially to the root domain.</p>
+<p>Pop off the last element of the array (<code class="language-plaintext highlighter-rouge">"c"</code>), then call <code class="language-plaintext highlighter-rouge">domain.hasDomain(lastElement)</code>. If it’s <code class="language-plaintext highlighter-rouge">false</code>, then the domain resolution fails. Otherwise, set the domain to <code class="language-plaintext highlighter-rouge">domain.getDomain(lastElement)</code>. Repeat until the list of split segments is empty.</p>
+<p>There is no limit to the amount of nesting that is possible. For example, <code class="language-plaintext highlighter-rouge">0.1.2.3.4.5.6.7.8.9.a.b.c.d.e.f.g.h.i.j.k.l.m.n.o.p.q.r.s.t.u.v.w.x.y.z</code> would be valid if the root contains <code class="language-plaintext highlighter-rouge">z</code>, and <code class="language-plaintext highlighter-rouge">z</code> contains <code class="language-plaintext highlighter-rouge">y</code>, and so on.</p>
+<p>Here is a solidity function that resolves a name:</p>
+<pre><code class="language-sol">function resolve(string[] calldata splitName, IDomain root) public view returns (address) {
+    IDomain current = root;
+    for (uint i = splitName.length - 1; i &gt;= 0; i--) {
+        // Require that the current domain has a domain
+        require(current.hasDomain(splitName[i]), "Name resolution failed: );
+        // Resolve subdomain
+        current = current.getDomain(splitName[i]);
+    }
+    return current;
+}
+</code></pre>
+<h3 id="optional-extension-enumerable">
+<a href="#optional-extension-enumerable" class="anchor-link"></a> Optional Extension: Enumerable
+</h3>
+<p>Solidity Interface with NatSpec &amp; OpenZeppelin v4 Interfaces (also available at <a href="/assets/eip-4834/IDomainEnumerable.sol">IDomainEnumerable.sol</a>):</p>
+<pre><code class="language-sol">interface IDomainEnumerable is IDomain {
+    /// @notice     Query all subdomains. Must revert if the list of domains is unknown or infinite.
+    /// @return     The list of all subdomains.
+    function listDomains() external view returns (string[] memory);
+}
+</code></pre>
+<h3 id="optional-extension-access-control">
+<a href="#optional-extension-access-control" class="anchor-link"></a> Optional Extension: Access Control
+</h3>
+<p>Solidity Interface with NatSpec &amp; OpenZeppelin v4 Interfaces (also available at <a href="/assets/eip-4834/IDomainAccessControl.sol">IDomainAccessControl.sol</a>):</p>
+<pre><code class="language-sol">interface IDomainAccessControl is IDomain {
+    /// @notice     Get if an account can move the subdomain away from the current domain
+    /// @dev        May be called by `canSetDomain` of the parent domain - implement access control here!!!
+    /// @param      updater The account that may be moving the subdomain
+    /// @param      name The subdomain name
+    /// @param      parent The parent domain
+    /// @param      newSubdomain The domain that will be set next
+    /// @return     Whether an account can update the subdomain
+    function canMoveSubdomain(address updater, string memory name, IDomain parent, address newSubdomain) external view returns (bool);
+
+    /// @notice     Get if an account can unset this domain as a subdomain
+    /// @dev        May be called by `canDeleteDomain` of the parent domain - implement access control here!!!
+    /// @param      updater The account that may or may not be able to delete a subdomain
+    /// @param      name The subdomain to delete
+    /// @param      parent The parent domain
+    /// @return     Whether an account can delete the subdomain
+    function canDeleteSubdomain(address updater, string memory name, IDomain parent) external view returns (bool);
+}
+</code></pre>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP’s goal, as mentioned in the abstract, is to have a simple interface for resolving names. Here are a few design decisions and why they were made:</p>
+<ul>
+<li>Name resolution algorithm
+<ul>
+<li>Unlike ENS’s resolution algorithm, this EIP’s name resolution is fully under the control of the contracts along the resolution path.</li>
+<li>This behavior is more intuitive to users.</li>
+<li>This behavior allows for greater flexibility - e.g. a contract that changes what it resolves to based on the time of day.</li>
+</ul>
+</li>
+<li>Parent domain access control
+<ul>
+<li>A simple “ownable” implementation was not used because this specification was designed to be as generic as possible. If an ownable implementation is desired, it can be implemented.</li>
+<li>This also gives parent domains the ability to call subdomains’ access control methods so that subdomains, too, can choose whatever access control mechanism they desire</li>
+</ul>
+</li>
+<li>Subdomain access control
+<ul>
+<li>These methods are included so that subdomains aren’t always limited to their parent domain’s access control</li>
+<li>The root domain can be controlled by a DAO with a non-transferable token with equal shares, a TLD can be controlled by a DAO with an EIP-20 token representing stake, a domain of that TLD can be controlled by a single owner, a subdomain of that domain can be controlled by a single owner linked to an NFT, and so on.</li>
+<li>Subdomain access control functions are suggestions: an ownable domain might implement an owner override, so that perhaps subdomains might be recovered if the keys are lost.</li>
+</ul>
+</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>There is no compatibility with ENS because ENS domains are indexed by the hash of the entire domain, while domains under this EIP are indexed by the subdomain name.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>Some of these implementations use some contracts from OpenZeppelin for ease of understandability.</p>
+<p>Naive Domain Implementation: <a href="/assets/eip-4834/NaiveDomain.sol">NaiveDomain.sol</a></p>
+<p><a href="/EIPS/eip-173">EIP-173</a> (Ownable) Domain Implementation: <a href="/assets/eip-4834/OwnableDomain.sol">OwnableDomain.sol</a></p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="malicious-canmovesubdomain-black-hole">
+<a href="#malicious-canmovesubdomain-black-hole" class="anchor-link"></a> Malicious canMoveSubdomain (Black Hole)
+</h3>
+<h4 id="description-malicious-canmovesubdomain">
+<a href="#description-malicious-canmovesubdomain" class="anchor-link"></a> Description: Malicious canMoveSubdomain
+</h4>
+<p>Moving a subdomain using <code class="language-plaintext highlighter-rouge">setDomain</code> is a potentially dangerous operation.</p>
+<p>Depending on the parent domain’s implementation, if a malicious new subdomain unexpectedly returns <code class="language-plaintext highlighter-rouge">false</code> on <code class="language-plaintext highlighter-rouge">canMoveSubdomain</code>, that subdomain can effectively lock the ownership of the domain.</p>
+<p>Alternatively, it might return <code class="language-plaintext highlighter-rouge">true</code> when it isn’t expected (i.e. a backdoor), allowing the contract owner to take over the domain.</p>
+<h4 id="mitigation-malicious-canmovesubdomain">
+<a href="#mitigation-malicious-canmovesubdomain" class="anchor-link"></a> Mitigation: Malicious canMoveSubdomain
+</h4>
+<p>Clients should help by warning if <code class="language-plaintext highlighter-rouge">canMoveSubdomain</code> or <code class="language-plaintext highlighter-rouge">canDeleteSubdomain</code> for the new subdomain changes to <code class="language-plaintext highlighter-rouge">false</code>. It is important to note, however, that since these are functions, it is possible for the value to change depending on whether or not it has already been linked. It is also still possible for it to unexpectedly return true. It is therefore recommended to <strong>always</strong> audit the new subdomain’s source code before calling <code class="language-plaintext highlighter-rouge">setDomain</code>.</p>
+<h3 id="parent-domain-resolution">
+<a href="#parent-domain-resolution" class="anchor-link"></a> Parent Domain Resolution
+</h3>
+<h4 id="description-parent-domain-resolution">
+<a href="#description-parent-domain-resolution" class="anchor-link"></a> Description: Parent Domain Resolution
+</h4>
+<p>Parent domains have full control of name resolution for their subdomains. If a particular domain is linked to <code class="language-plaintext highlighter-rouge">a.b.c</code>, then <code class="language-plaintext highlighter-rouge">b.c</code> can, depending on its code, set <code class="language-plaintext highlighter-rouge">a.b.c</code> to any domain, and <code class="language-plaintext highlighter-rouge">c</code> can set <code class="language-plaintext highlighter-rouge">b.c</code> itself to any domain.</p>
+<h4 id="examples-parent-domain-resolution">
+<a href="#examples-parent-domain-resolution" class="anchor-link"></a> Examples: Parent Domain Resolution
+</h4>
+<p>The reference Ownable domain implementation: <a href="/assets/eip-4834/OwnableDomain.sol">OwnableDomain.sol</a></p>
+<h4 id="mitigation-parent-domain-resolution">
+<a href="#mitigation-parent-domain-resolution" class="anchor-link"></a> Mitigation: Parent Domain Resolution
+</h4>
+<p>Before acquiring a domain that has been pre-linked, it is recommended to always have the contract <strong>and</strong> all the parents up to the root audited.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/Pandapip1">Pandapip1</a>, "EIP-4834: Hierarchical Domains [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4834, February 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4834.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4834: Hierarchical Domains [DRAFT]",
+    "author": "Pandapip1 (@Pandapip1)",
+    "name": "EIP-4834: Hierarchical Domains [DRAFT]",
+    "dateCreated": "2022-02-22",
+    "datePublished": "2022-02-22",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-4834-hierarchical-domains-standard/8388",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

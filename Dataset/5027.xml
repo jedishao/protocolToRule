@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5027: Remove the limit on contract code size</title>
+<meta property="og:title" content="EIP-5027: Remove the limit on contract code size" />
+<meta name="description" content="Change the limit on contract size from 24576 to infinity" />
+<meta property="og:description" content="Change the limit on contract size from 24576 to infinity" />
+<meta name="twitter:description" content="Change the limit on contract size from 24576 to infinity" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5027" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5027" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5027: Remove the limit on contract code size
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5027.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Change the limit on contract size from 24576 to infinity</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/qizhou">Qi Zhou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-5027-unlimit-contract-code-size/9010">https://ethereum-magicians.org/t/eip-5027-unlimit-contract-code-size/9010</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2022-04-21</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-170">170</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#gas-metering">Gas Metering</a></li>
+</ul>
+</li>
+<li><a href="#backward-compatibility">Backward Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Remove the limit on the contract code size, i.e., only limit the contract code size by block gas limit, with minimal changes to existing code and proper gas metering adjustment to avoid possible attacks.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The motivation is to remove the limit on the code size so that users can deploy a large-code contract without worrying about splitting the contract into several sub-contracts.</p>
+<p>With the dramatic growth of dApplications, the functionalities of smart contracts are becoming more and more complicated, and thus, the sizes of newly developed contracts are steadily increasing. As a result, we are facing more and more issues with the 24576-bytes contract size limit. Although several techniques such as splitting a large contract into several sub-contracts can alleviate the issue, these techniques inevitably increase the burden of developing/deploying/maintaining smart contracts.</p>
+<p>The proposal implements a solution to remove the existing 24576-bytes limit of the code size. Further, the proposal aims to minimize the changes in the client implementation (e.g., Geth) with</p>
+<ul>
+<li>proper gas metering to avoid abusing the node resources for contract-related opcodes, i.e, <code class="language-plaintext highlighter-rouge">CODESIZE (0x38)/CODECOPY (0x39)/EXTCODESIZE (0x3B)/EXTCODECOPY (0x3C)/EXTCODEHASH (0x3F)/DELEGATECALL (0xF4)/CALL (0xF1)/CALLCODE (0xF2)/STATICCALL (0xFA)/CREATE (0xF0)/CREATE2 (0xF5)</code>; and</li>
+<li>no change to the existing structure of the Ethereum state.</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_BLKNUM</code></td>
+<td>TBD</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">CODE_SIZE_UNIT</code></td>
+<td>24576</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">READ_GAS_PER_UNIT</code></td>
+<td>700</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">CREATE_DATA_GAS</code></td>
+<td>200</td>
+</tr>
+</tbody>
+</table>
+<p>If <code class="language-plaintext highlighter-rouge">block.number &gt;= FORK_BLKNUM</code>, the contract creation initialization can return data with any length, but the contract-related opcodes will take extra gas as defined below:</p>
+<ul>
+<li>
+<p>For <code class="language-plaintext highlighter-rouge">CODESIZE/CODECOPY/EXTCODESIZE/EXTCODEHASH</code>, the gas is unchanged.</p>
+</li>
+<li>
+<p>For <code class="language-plaintext highlighter-rouge">EXTCODECOPY/CALL/CALLCODE/DELEGATECALL/STATICCALL</code>, if the contract code size &gt; <code class="language-plaintext highlighter-rouge">CODE_SIZE_UNIT</code>, then the opcodes will take extra gas as</p>
+</li>
+</ul>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(CODE_SIZE - 1) // CODE_SIZE_UNIT * READ_GAS_PER_UNIT
+</code></pre></div></div>
+<p>where <code class="language-plaintext highlighter-rouge">//</code> is the integer divide operator.</p>
+<ul>
+<li>For CREATE/CREATE2, if the newly created contract size &gt; <code class="language-plaintext highlighter-rouge">CODE_SIZE_UNIT</code>, the opcodes will take extra write gas as</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">(CODE_SIZE - CODE_SIZE_UNIT) * CREATE_DATA_GAS</code>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="gas-metering">
+<a href="#gas-metering" class="anchor-link"></a> Gas Metering
+</h3>
+<p>The goal is to measure the CPU/IO cost of the contract read/write operations reusing existing gas metering so that the resources will not be abused.</p>
+<ul>
+<li>
+<p>For code-size-related opcodes (<code class="language-plaintext highlighter-rouge">CODESIZE</code>/<code class="language-plaintext highlighter-rouge">EXTCODESIZE</code>), we would expect the client to implement a mapping from the hash of code to the size, so reading the code size of a large contract should still be O(1).</p>
+</li>
+<li>
+<p>For <code class="language-plaintext highlighter-rouge">CODECOPY</code>, the data is already loaded in memory (as part of <code class="language-plaintext highlighter-rouge">CALL/CALLCODE/DELEGATECALL/STATICCALL</code>), so we do not charge extra gas.</p>
+</li>
+<li>
+<p>For <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code>, the value is already in the account, so we do not charge extra gas.</p>
+</li>
+<li>
+<p>For <code class="language-plaintext highlighter-rouge">EXTCODECOPY/CALL/CALLCODE/DELEGATECALL/STATICCALL</code>, since it will read extra data from the database, we will additionally charge READ_GAS_PER_UNIT per extra <code class="language-plaintext highlighter-rouge">CODE_SIZE</code>. Note that <code class="language-plaintext highlighter-rouge">READ_GAS_PER_UNIT = CALLGAS = EXTCODECOPYBASE = 700</code>.</p>
+</li>
+<li>
+<p>For <code class="language-plaintext highlighter-rouge">CREATE/CREATE2</code>, since it will create extra data to the database, we will additionally charge <code class="language-plaintext highlighter-rouge">CREATE_DATA_GAS</code> per extra bytes.</p>
+</li>
+</ul>
+<h2 id="backward-compatibility">
+<a href="#backward-compatibility" class="anchor-link"></a> Backward Compatibility
+</h2>
+<p>All existing contracts will not be impacted by the proposal.</p>
+<p>Only contracts deployed before EIP-170 could possibly be longer than the current max code size, and the reference implementation was able to successfully import all blocks before that fork.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>The reference implementation on Geth is available at <a href="/assets/eip-5027/0001-unlimit-code-size.patch">0001-unlimit-code-size.patch</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TBD</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/qizhou">Qi Zhou</a>, "EIP-5027: Remove the limit on contract code size [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5027, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5027.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5027: Remove the limit on contract code size [DRAFT]",
+    "author": "Qi Zhou (@qizhou)",
+    "name": "EIP-5027: Remove the limit on contract code size [DRAFT]",
+    "dateCreated": "2022-04-21",
+    "datePublished": "2022-04-21",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-5027-unlimit-contract-code-size/9010",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

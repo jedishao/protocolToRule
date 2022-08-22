@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1386: Attestation management contract</title>
+<meta property="og:title" content="EIP-1386: Attestation management contract" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1386" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1386" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1386: Attestation management contract
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1386.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#f899b89b9794978d8a9e8d94d69499969c">Weiwu Zhang</a>, <a href="/cdn-cgi/l/email-protection#2b41054705584a454c4a4747426b4c464a424705484446">James Sangalli</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1386">https://github.com/ethereum/EIPs/issues/1386</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+ <tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-09-08</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#purpose">Purpose</a></li>
+<li><a href="#example-use-cases">Example use cases</a></li>
+<li><a href="#draft-interface">Draft interface</a></li>
+<li><a href="#related-ercs">Related ERC’s</a></li>
+</ul>
+</div>
+<h3 id="introduction">
+<a href="#introduction" class="anchor-link"></a> Introduction
+</h3>
+<p>Very often, we will need to use Attestations like “Alice lives in Australia” on the blockchain; that is issued by a valid issuer off chain for privacy reasons and is revokable inside a smart contract.</p>
+<p>An issuer can create a smart contract where he revokes multiple attestations in one go by building a bloom filter of all the hashes of the revoked attestations.</p>
+<p>An issuer can also put the validation method in their smart contract that can be called by other smart contracts who need to validate attestations issued by them. This allows each attestor to update their attestation format separately.</p>
+<h3 id="purpose">
+<a href="#purpose" class="anchor-link"></a> Purpose
+</h3>
+<p>This ERC provides an interface for attestation issuers to manage their attestation signing keys and the attestations that are issued off chain for actions such as revocation and validation.</p>
+<p>In our draft implementation we include functions to hold cryptographic attestations, change the issuing contracts of attestations, revoke attestations and verify the authenticity of a cryptographic attestation.</p>
+<h3 id="example-use-cases">
+<a href="#example-use-cases" class="anchor-link"></a> Example use cases
+</h3>
+<p>Let’s say that our friend, Alice, wants to buy a bottle of wine to consume with her friends. She wants to do the order online and have it delivered to her home address whilst paying for it with Ether.</p>
+<p>Alice has a cryptographic attestation from her local road and maritime services who attests to her age, date of birth, country of residence and ability to drive.</p>
+<p>Alice is able to split up this attestation (see merkle tree attestations ERC <a href="https://github.com/alpha-wallet/blockchain-attestation/blob/master/ethereum/lib/MerkleTreeAttestation.sol">here</a>) and provides only the leaf that states she is over the age of 21.</p>
+<p>Alice goes to buy the wine through the wine vendors smart contract and feeds in the merkle tree attestation proving that she is above 21 and can thus buy the wine, whilst attaching the appropriate amount of ether to complete the purchase.</p>
+<p>The issuer smart contract is able to validate her attestation, check that the issuer contract is valid and capable of performing such an attestation to her age. In this case it would have to be from someone like a driver’s licence authority, as attestations to age from a school ID are not of a high enough capacity.</p>
+<p>The wine vendors smart contract validates the attestation, checks the payment amount is correct and credits Alice with the wine tokens she needs to complete the sale and deliver the wine.</p>
+<p>When the wine vendor shows up to her apartment with the wine, there is no need to prove her age again.</p>
+<h3 id="draft-interface">
+<a href="#draft-interface" class="anchor-link"></a> Draft interface
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/* each attestation issuer should provide their own verify() for the
+ * attestations they issued. There are two reasons for this. First, we
+ * need to leave room for new attestation methods other than the
+ * Merkle Tree format we are recommending. Second, the validity of the
+ * attestation may depend on the context that only the attestor
+ * knows. For example, a ticket as an attestation issued on a
+ * successful redemption of an American Express credit */</span>
+
+<span class="k">contract</span> <span class="n">Issuer</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">Attestation</span>
+    <span class="p">{</span>
+        <span class="kt">bytes32</span><span class="p">[]</span> <span class="n">merklePath</span><span class="p">;</span>
+        <span class="kt">bool</span> <span class="n">valid</span><span class="p">;</span>
+        <span class="kt">uint8</span> <span class="n">v</span><span class="p">;</span>
+        <span class="kt">bytes32</span> <span class="n">r</span><span class="p">;</span>
+        <span class="kt">bytes32</span> <span class="n">s</span><span class="p">;</span>
+        <span class="kt">address</span> <span class="n">attestor</span><span class="p">;</span>
+        <span class="kt">address</span> <span class="n">recipient</span><span class="p">;</span>
+        <span class="kt">bytes32</span> <span class="n">salt</span><span class="p">;</span>
+        <span class="kt">bytes32</span> <span class="n">key</span><span class="p">;</span>
+        <span class="kt">bytes32</span> <span class="n">val</span><span class="p">;</span>
+    <span class="p">}</span><span class="err">`</span>
+  <span class="cm">/* Verify the authenticity of an attestation */</span>
+  <span class="k">function</span> <span class="n">verify</span><span class="p">(</span><span class="n">Attestation</span> <span class="n">attestation</span><span class="p">);</span>
+  <span class="k">function</span> <span class="n">addattestorKey</span><span class="p">(</span><span class="kt">address</span> <span class="n">newAttestor</span><span class="p">,</span> <span class="kt">string</span> <span class="n">capacity</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">expiry</span><span class="p">);</span>
+
+  <span class="cm">/* this should call the revoke first */</span>
+  <span class="k">function</span> <span class="n">replaceKey</span><span class="p">(</span><span class="kt">address</span> <span class="n">attestorToReplace</span><span class="p">,</span> <span class="kt">string</span> <span class="n">capacity</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">expiry</span><span class="p">,</span> <span class="kt">address</span> <span class="n">newAttestor</span><span class="p">);</span>
+
+  <span class="cm">/* this revokes a single key */</span>
+  <span class="k">function</span> <span class="n">removeKey</span><span class="p">(</span><span class="kt">address</span> <span class="n">attestor</span><span class="p">);</span>
+
+  <span class="cm">/* if the key exists with such capacity and isn't revoked or expired */</span>
+  <span class="k">function</span> <span class="n">validateKey</span><span class="p">(</span><span class="kt">address</span> <span class="n">attestor</span><span class="p">,</span> <span class="kt">string</span> <span class="n">capacity</span><span class="p">)</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+  <span class="cm">/* revoke an attestation by replace the bloom filter, this helps preserve privacy */</span>
+  <span class="k">function</span> <span class="n">revokeAttestations</span><span class="p">(</span><span class="n">Bloomfilter</span> <span class="n">b</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Please click <a href="https://github.com/alpha-wallet/blockchain-attestation/blob/master/ethereum/example-james-squire/james-squire.sol">here</a> to see a draft implementation of this interface</p>
+<h3 id="related-ercs">
+<a href="#related-ercs" class="anchor-link"></a> Related ERC’s
+</h3>
+<p>#1388 #1387</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#b0d1f0d3dfdcdfc5c2d6c5dc9edcd1ded4">Weiwu Zhang</a>, <a href="/cdn-cgi/l/email-protection#38521654164b59565f59545451785f55595154165b5755">James Sangalli</a>, "EIP-1386: Attestation management contract [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1386, September 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1386.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1386: Attestation management contract [DRAFT]",
+    "author": "Weiwu Zhang <a@colourful.land>, James Sangalli <j.l.sangalli@gmail.com>",
+    "name": "EIP-1386: Attestation management contract [DRAFT]",
+    "dateCreated": "2018-09-08",
+    "datePublished": "2018-09-08",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1386",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

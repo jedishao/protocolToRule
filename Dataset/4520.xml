@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4520: Mult-byte opcodes prefixed by EB and EC.</title>
+<meta property="og:title" content="EIP-4520: Mult-byte opcodes prefixed by EB and EC." />
+<meta name="description" content="Reserve `0xEB` and `0xEC` for usage as extended opcode space." />
+<meta property="og:description" content="Reserve `0xEB` and `0xEC` for usage as extended opcode space." />
+<meta name="twitter:description" content="Reserve `0xEB` and `0xEC` for usage as extended opcode space." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4520" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4520" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4520: Mult-byte opcodes prefixed by EB and EC.
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4520.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Reserve `0xEB` and `0xEC` for usage as extended opcode space.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/Spore-Druid-Bray">Brayton Goodall</a>, <a href="https://github.com/uink45">Mihir Faujdar</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/multi-byte-opcodes/7681">https://ethereum-magicians.org/t/multi-byte-opcodes/7681</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-12-1</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Reserve <code class="language-plaintext highlighter-rouge">0xEB</code> and <code class="language-plaintext highlighter-rouge">0xEC</code> for usage as extended opcode space.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>It would be convenient to introduce new opcodes that are likely to be infrequently used, whilst also being able to have greater than 256 opcodes in total. As a single byte opcode is half the size of a double byte opcode, the greatest efficiency in code sizes will be one where frequently used opcodes are single bytes. Two prefix bytes are used to accommodate up to 510 double byte opcodes.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>For example, a new arithmetic opcode may be allocated to <code class="language-plaintext highlighter-rouge">0xEC 01</code>(<code class="language-plaintext highlighter-rouge">ADD</code>), and a novel opcode may be introduced at <code class="language-plaintext highlighter-rouge">0xEB F4</code>(<code class="language-plaintext highlighter-rouge">DELEGATECALL</code>).</p>
+<p>Triple byte opcodes may be doubly-prefixed by <code class="language-plaintext highlighter-rouge">0xEB EB</code>, <code class="language-plaintext highlighter-rouge">0xEC EC</code>, <code class="language-plaintext highlighter-rouge">0xEB EC</code> and <code class="language-plaintext highlighter-rouge">0xEC EB</code>. It is possible to allocate experimental opcodes to this triple-byte space initially, and if they prove safe and useful, they could later be allocated a location in double-byte or single-byte space.</p>
+<p>Only <code class="language-plaintext highlighter-rouge">0xEB EB</code>, <code class="language-plaintext highlighter-rouge">0xEC EC</code>, <code class="language-plaintext highlighter-rouge">0xEC EC</code>, and <code class="language-plaintext highlighter-rouge">0xEB EC</code> may be interpreted as further extensions of the opcode space. <code class="language-plaintext highlighter-rouge">0xEB</code> and <code class="language-plaintext highlighter-rouge">0xEC</code> do not themselves affect the stack or memory, however opcodes specified by further bytes may. If a multi-byte opcode is yet to be defined, it is to be treated as <code class="language-plaintext highlighter-rouge">INVALID</code> rather than as a <code class="language-plaintext highlighter-rouge">NOP</code>, as per usual for undefined opcodes.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>It was considered that two prefix bytes rather than one would be adequate for reservation as extension addresses. Both <code class="language-plaintext highlighter-rouge">0xEB</code> and <code class="language-plaintext highlighter-rouge">0xEC</code> were chosen to be part of the E-series of opcodes. For example, the <code class="language-plaintext highlighter-rouge">0xEF</code> byte is reserved for contracts conforming to the Ethereum Object Format. By having unassigned opcodes for extending the opcode space, there will be a lower risk of breaking the functionalities of deployed contracts compared to choosing assigned opcodes.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Previous usage of <code class="language-plaintext highlighter-rouge">0xEB</code> and <code class="language-plaintext highlighter-rouge">0xEC</code> may result in unexpected behaviour and broken code.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>There are no known security considerations.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/Spore-Druid-Bray">Brayton Goodall</a>, <a href="https://github.com/uink45">Mihir Faujdar</a>, "EIP-4520: Mult-byte opcodes prefixed by EB and EC. [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4520, December 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4520.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4520: Mult-byte opcodes prefixed by EB and EC. [DRAFT]",
+    "author": "Brayton Goodall (@Spore-Druid-Bray), Mihir Faujdar (@uink45)",
+    "name": "EIP-4520: Mult-byte opcodes prefixed by EB and EC. [DRAFT]",
+    "dateCreated": "2021-12-01",
+    "datePublished": "2021-12-01",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/multi-byte-opcodes/7681",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

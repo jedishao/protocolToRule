@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3372: 5 FNV primes for ethash</title>
+<meta property="og:title" content="EIP-3372: 5 FNV primes for ethash" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3372" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3372" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3372: 5 FNV primes for ethash
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3372.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/mineruniter969">mineruniter969</a>, <a href="/cdn-cgi/l/email-protection#8ae7e3e4eff8ffe4e3feeff8b3bcb3cafefffeebe4e5feeba4e9e5e7">mineruniter969</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3372-apply-minor-modifications-to-the-ethash-algorithm-to-break-current-asic-implementations-eip-969-resubmission/5655">https://ethereum-magicians.org/t/eip-3372-apply-minor-modifications-to-the-ethash-algorithm-to-break-current-asic-implementations-eip-969-resubmission/5655</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-03-13</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#ethash11">ethash1.1</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#technical-overview">Technical Overview</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-vectors">Test Vectors</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Introduce 5 new FNV primes into the ethash algorithm.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP is to kick current ASIC implementations out of the network to keep the Ethereum network secure and healthy by changing the <code class="language-plaintext highlighter-rouge">fnv</code> constants.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>ASICs provide a severe centralization risk for the Ethereum network. If we do not get rid of them, small GPU miners will be forced to exit the Ethereum mining because EIP-1559 will make them mining at a loss. Furthermore, ASIC production will be concentrated only at one or two parties, which will make the Ethereum hashrate centralized. Also, it is worth noting that Ethash ASIC machines cost 10k+ USD, while GPUs are priced less than 1000 USD.</p>
+<p>With GPUs, miners can switch to other mining algorithms, but with ASICs, it is impossible. Leaving everything as-is will almost certainly a very tough (from the side of miners) integration of the Ethereum 2.0.</p>
+<p>In short, this EIP is required to keep the Ethereum network stable and decentralized by keeping the ASIC business away.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>If <code class="language-plaintext highlighter-rouge">block.number &gt;= ETHASH11_BLKNUM</code>, activate the <code class="language-plaintext highlighter-rouge">ethash1.1</code> algorithm version.</p>
+<h3 id="ethash11">
+<a href="#ethash11" class="anchor-link"></a> ethash1.1
+</h3>
+<p>Prior to this change, <code class="language-plaintext highlighter-rouge">fnv</code> hash function is used throughout the <code class="language-plaintext highlighter-rouge">hashimoto</code> function. <code class="language-plaintext highlighter-rouge">fnv</code> is identical for all steps, <code class="language-plaintext highlighter-rouge">ethash1.1</code> will introduce additional <code class="language-plaintext highlighter-rouge">fnvA</code>, <code class="language-plaintext highlighter-rouge">fnvB</code>, <code class="language-plaintext highlighter-rouge">fnvC</code>, <code class="language-plaintext highlighter-rouge">fnvD</code>, and <code class="language-plaintext highlighter-rouge">fnvE</code> functions. All those functions will have different FNV constants.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Previously used FNV prime
+#define FNV_PRIME_0 0x1000193
+
+// New FNV primes
+#define FNV_PRIME_A 0x10001a7
+#define FNV_PRIME_B 0x10001ab
+#define FNV_PRIME_C 0x10001cf
+#define FNV_PRIME_D 0x10001e3
+#define FNV_PRIME_E 0x10001f9
+</code></pre></div></div>
+<p>Prior to this EIP, all parts of Ethash are using the <code class="language-plaintext highlighter-rouge">fnv</code> (hereinafter referenced as <code class="language-plaintext highlighter-rouge">fnv0</code>) function. As of the introduction of this EIP:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">fnvA</code> replaces <code class="language-plaintext highlighter-rouge">fnv0</code> in the DAG item selection step</li>
+<li><code class="language-plaintext highlighter-rouge">fnvB</code> replaces <code class="language-plaintext highlighter-rouge">fnv0</code> in the DAG item mix step</li>
+<li><code class="language-plaintext highlighter-rouge">fnvC(fnvD(fnvE</code> replaces <code class="language-plaintext highlighter-rouge">fnv0(fnv0(fnv0(</code> in the compress mix step</li>
+<li><code class="language-plaintext highlighter-rouge">fnv0</code> in the DAG generation step should remain unchanged.</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>ASIC Miners have become a threat to the future of Ethereum and a hard fork is required to remove them from the network before additional damage is caused. EIP-3372 proposes the minimum necessary to do so and will not affect ETH stakeholders or the network like Ethash 2.0 would. The threat ASICs pose is legal, social, moral, technical, monetary, and environmental. As we continue to come closer to the merge ASICs will attack the network and the developers personally as they have done in the past because miners will always pursue profits.</p>
+<p>Legally and socially ASIC’s have previously been a threat and a nuisance. As Hudson describes Linzhi attacked the EF and developers personally seeking to spread lies and misinformation while sending legal threats during discussions around EIP-1057. His account is <a href="https://github.com/Souptacular/linzhi">here</a> and in his own words</p>
+<blockquote>
+<p>ASIC manufacturer Linzhi has both pressured me and told lies</p>
+</blockquote>
+<p>With their attacks and harassment on staff demonstrated in the below image:
+<img src="upload://n8TJsS8hEEH4DXYJ2WDzblm5qJo.jpeg" alt="" /></p>
+<p>Socially and morally the Ethereum community must adopt a no-tolerance policy towards personal attacks on its developers. It is only because of the core developers that Ethereum has value, the community cannot allow large companies free reign to attack them personally and must seek to protect each developer as they are a resource that keeps Ethereum viable. Multiple developers were “burned” during this event. As we accelerate the merge, it is likely that ASIC companies will repeat their actions and again attack the developers personally while pursuing legal options. This is seen not only by their actions during EIP-1057 but recent discussion around EIP-969 where legal threats from them caused the champion of that EIP to dropout and forcing me to submit this EIP anonymously. Ethereum cannot allow its actors to be threatened without consequence and this is a fight that must happen now while they are weak rather than pre-merge where they are stronger which will result in a delayed merge and hurt the value of Ethereum.</p>
+<p>ASICs have the greatest incentives and resources to commit bad acts because they are centralized in farms this is why Vitalik designed ETH to be ASIC-resistant because ASICs had ruined BTC’s principles of decentralization. Each day their power and control over the network grows. ASICs are against the founding principles of Ethereum which promotes a decentralized system run by common people, not a single owner of large warehouses. F2Pool which consists largely of ASIC farms has become the #3 largest pool controlling around 10% of hashrate. Their farms can be viewed on their webpage. In November 2020 they were 23TH/s yet today they are 45.6 TH/s. That’s a doubling in 4 months and their growth is accelerating as additional ASICs come online. ASICs are becoming a threat that will soon dominate the network and action must be taken now to head them off.</p>
+<p>ASICs on F2Pool have long been known to be “bad actors” on the BTC network. They are known for market manipulation and dumping BTC to manipulate prices (I could not post the source link as this is a new account). What will these ASICs do once they find out that they are about to lose millions prior to the merge? Ethereum is not just a network it is a community and they will use their financial resources and pour millions into delaying the merge as they launch legal case after legal case. They will attack the developers and the community as they seek to squeeze every last dollar.</p>
+<p>The reason Ethereum was founded on the principle of being anti-ASIC is because Vitalik had seen the damage ASICs had caused to the BTC network as they pursued profits rather than the betterment of the network. GPU miners are decentralized and disorganized which makes them a much lower threat than warehouses under one central corporation that is outside the legal system and thus cannot be held to account for bad acts.</p>
+<p>EIP-3372 also works to protect the environment. Post merge, gpus will go into the secondary market or move to other coins. However, ASICs will become junk. As more ASICs are produced, Ethereum increases its environmental footprint. These ASICs are being mass produced in greater numbers despite it being public that the merge is being accelerated. It is clear that these ASIC manufacturers and buyers must either be ignorant of the accelerated merge or plan to delay it. Because they dump their ETH they have no stake in the network except the money they can squeeze from it and if by making trouble they can give themselves another day than they will do it.</p>
+<p>Finally, Ethereum has always sought to pursue “minimum issuance”. By reducing the amount of miners that can pose a threat to the network, Ethereum also decreases how much it needs to pay for protection. Some EIP’s are being prepared to increase miner incomes post EIP-1559 should a threat appear. EIP-3372 eliminates the need to pay more for security and allows miners to be paid less without compromising the network’s security. As we go forward closer to the merge, the community must reduce attack vectors so as to reduce the cost of the merge itself and maximize the security of the network. The community already pays too much for protection and by reducing threats we can reduce this cost. ASIC warehouse farms are dumping all the ETH they make which is suppressing the price of ETH. Although rare, several individual GPU miners are taking part in staking or have gone on to join the community in development or our financial endeavors. They thus are more valuable to the community than a warehouse of future junk. There is no need for the Ethereum community to continue to pay for soon-to-be obsolete hardware that will end up in landfills.</p>
+<h3 id="technical-overview">
+<a href="#technical-overview" class="anchor-link"></a> Technical Overview
+</h3>
+<p>Ethash 1.1 will replace the only FNV prime with five new primes at the stage of the hash computation. The prime used for the DAG generation is remained unchanged, while all others are be changed. This will not prevent ASIC companies from creating new ASICs that adapt but so close to the merge it is unlikely they will do so, and even if they do they are unlikely to be able to produce enough to again be a threat.
+The choice of FNV constants are based on the formal specification that is available on <a href="https://ietf">https://tools.ietf.org/html/draft-eastlake-fnv-14#section-2.1</a></p>
+<p>We apologize for the delay in submitting the justification for this EIP. As the community may or may not be aware, the original champion was forced to stop working on this EIP due to legal attacks from ASIC companies. It has taken us this long to review his work and find a new champion. To protect ourselves we are submitting this anonymously and would request the community’s aid in our endeavor to maintain our anonymity and some lenience given the circumstances and threats we face pursuing this EIP.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Mining hardware that is optimized for ethash may no longer work if the <code class="language-plaintext highlighter-rouge">fnv</code> constants are baked into the hardware and cannot be changed.</p>
+<h2 id="test-vectors">
+<a href="#test-vectors" class="anchor-link"></a> Test Vectors
+</h2>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"first"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4242424242424242"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"mixHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"aa6a928db9b548ebf20fc9a74e9200321426f1c2db1571636cdd3a33eb162b36"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"header"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f901f3a00000000000000000000000000000000000000000000000000000000000000000a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347940000000000000000000000000000000000000000a09178d0f23c965d81f0834a4c72c6253ce6830f4022b1359aaebfc1ecba442d4ea056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302000080830f4240808080a058f759ede17a706c93f13030328bcea40c1d1341fb26f2facd21ceb0dae57017884242424242424242"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"result"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3972318778d2af9d3c5c3dfc463bc2a5ebeebd1a7a04392708ff94d29aa18c5f"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cache_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">16776896</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"full_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">1073739904</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"header_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2a8de2adf89af77358250bf908bf04ba94a6e8c3ba87775564a41d269a05e4ce"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cache_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"35ded12eecf2ce2e8da2e15c06d463aae9b84cb2530a00b932e4bbc484cde353"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"second"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"307692cf71b12f6d"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"mixHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"4a2ef8287dc21f5def0d4e9694208c56e574b1692d7b254822a3f4704d8ad1ba"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"header"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f901f7a01bef91439a3e070a6586851c11e6fd79bbbea074b2b836727b8e75c7d4a6b698a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d4934794ea3cb5f94fa2ddd52ec6dd6eb75cf824f4058ca1a00c6e51346be0670ce63ac5f05324e27d20b180146269c5aab844d09a2b108c64a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008302004002832fefd880845511ed2a80a0e55d02c555a7969361cf74a9ec6211d8c14e4517930a00442f171bdb1698d17588307692cf71b12f6d"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"seed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"result"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5ab98957ba5520d4e367080f442e37a047cfd9d2857b6e00dd12d82900d108a6"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cache_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">16776896</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"full_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">1073739904</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"header_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"100cbec5e5ef82991290d0d93d758f19082e71f234cf479192a8b94df6da6bfe"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"cache_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"35ded12eecf2ce2e8da2e15c06d463aae9b84cb2530a00b932e4bbc484cde353"</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>There are no known security issues with this change.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/mineruniter969">mineruniter969</a>, <a href="/cdn-cgi/l/email-protection#7b1612151e090e15120f1e09424d423b0f0e0f1a15140f1a55181416">mineruniter969</a>, "EIP-3372: 5 FNV primes for ethash [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3372, March 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3372.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3372: 5 FNV primes for ethash [DRAFT]",
+    "author": "mineruniter969 (@mineruniter969), mineruniter969 <mineruniter969@tutanota.com>",
+    "name": "EIP-3372: 5 FNV primes for ethash [DRAFT]",
+    "dateCreated": "2021-03-13",
+    "datePublished": "2021-03-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3372-apply-minor-modifications-to-the-ethash-algorithm-to-break-current-asic-implementations-eip-969-resubmission/5655",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

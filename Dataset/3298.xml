@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3298: Removal of refunds</title>
+<meta property="og:title" content="EIP-3298: Removal of refunds" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3298" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3298" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3298: Removal of refunds
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3298.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430">https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-02-26</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#test-case-changes">Test case changes</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Remove gas refunds for SSTORE and SELFDESTRUCT.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Gas refunds for SSTORE and SELFDESTRUCT were originally introduced to motivate application developers to write applications that practice “good state hygiene”, clearing storage slots and contracts that are no longer needed. However, they are not widely used for this, and poor state hygiene continues to be the norm. It is now widely accepted that the only solution to state growth is some form of <a href="https://hackmd.io/@HWeNw8hNRimMm2m2GH56Cw/state_size_management">statelessness or state expiry</a>, and if such a solution is implemented, then disused storage slots and contracts would start to be ignored automatically.</p>
+<p>Gas refunds additionally have multiple harmful consequences:</p>
+<ul>
+<li>Refunds give rise to <a href="https://gastoken.io/">GasToken</a>. GasToken has benefits in moving gas space from low-fee periods to high-fee periods, but it also has downsides to the network, particularly in exacerbating state size (as state slots are effectively used as a “battery” to save up gas) and inefficiently clogging blockchain gas usage</li>
+<li>Refunds increase block size variance. The theoretical maximum amount of actual gas consumed in a block is nearly twice the on-paper gas limit (as refunds add gas space for subsequent transactions in a block, though refunds are capped at 50% of a transaction’s gas used). This is <a href="https://notes.ethereum.org/@vbuterin/eip_1559_spikes">not fatal</a>, but is still undesirable, especially given that refunds can be used to maintain 2x usage spikes for far longer than EIP 1559 can.</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></td>
+<td>TBD</td>
+</tr>
+</tbody>
+</table>
+<p>For blocks where <code class="language-plaintext highlighter-rouge">block.number &gt;= FORK_BLOCK</code>, the following changes apply.</p>
+<p>Do not apply the <code class="language-plaintext highlighter-rouge">refund</code>.</p>
+<p>The description above is sufficient to describe the change, but for the sake of clarity we enumerate all places where gas refunds are currently used and which should/could be removed within a node implementation.</p>
+<ol>
+<li>
+<p>Remove all use of the “refund counter” in SSTORE gas accounting, as defined in <a href="https://eips.ethereum.org/EIPS/eip-2200">EIP 2200</a>. Particularly:</p>
+<ul>
+<li>If a storage slot is changed and the <em>current value</em> equals the <em>original value</em>, but does not equal the <em>new value</em>, <code class="language-plaintext highlighter-rouge">SSTORE_RESET_GAS</code> is deducted (plus <code class="language-plaintext highlighter-rouge">COLD_SLOAD_COST</code> if <a href="https://eips.ethereum.org/EIPS/eip-2929#sstore-changes">prescribed by EIP 2929 rules</a>), but no modifications to the refund counter are made.</li>
+<li>If a storage slot is changed and the <em>current value</em> equals neither the <em>new value</em> nor the <em>original value</em> (regardless of whether or not the latter two are equal), <code class="language-plaintext highlighter-rouge">SLOAD_GAS</code> is deducted (plus <code class="language-plaintext highlighter-rouge">COLD_SLOAD_COST</code> if <a href="https://eips.ethereum.org/EIPS/eip-2929#sstore-changes">prescribed by EIP 2929 rules</a>), but no modifications to the refund counter are made.</li>
+</ul>
+</li>
+<li>
+<p>Remove the <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> refund.</p>
+</li>
+</ol>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>A full removal of refunds is the simplest way to solve the issues with refunds; any gains from partial retention of the refund mechanism are not worth the complexity that that would leave remaining in the Ethereum protocol.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Refunds are currently only applied <em>after</em> transaction execution, so they cannot affect how much gas is available to any particular call frame during execution. Hence, removing them will not break the ability of any code to execute, though it will render some applications economically nonviable.</p>
+<p><a href="https://gastoken.io/">GasToken</a> in particular will become valueless. DeFi arbitrage bots, which today frequently use either established GasToken schemes or a custom alternative to reduce on-chain costs, would benefit from rewriting their code to remove calls to these no-longer-functional gas storage mechanisms.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>An implementation can be found here: https://gist.github.com/holiman/460f952716a74eeb9ab358bb1836d821#gistcomment-3642048</p>
+<h2 id="test-case-changes">
+<a href="#test-case-changes" class="anchor-link"></a> Test case changes
+</h2>
+<ul>
+<li>The “original”, “1st”, “2nd”, “3rd” columns refer to the value of storage slot 0 before the execution and after each SSTORE.</li>
+<li>The “Berlin (cold)” column gives the post-Berlin (EIP 2929) gas cost assuming the storage slot had not yet been accessed.</li>
+<li>The “Berlin (hot)” column gives the post-Berlin gas cost assuming the storage slot has already been accessed.</li>
+<li>The “Berlin (hot) + norefund” column gives the post-Berlin gas cost assuming the storage slot has already been accessed, <strong>and assuming this EIP has been implemented</strong>.</li>
+</ul>
+<p>Gas costs are provided with refunds subtracted; if the number is negative this means that refunds exceed gas costs. The 50% refund limit is not applied (due to the implied assumption that this code is only a small fragment of a much larger execution).</p>
+<p>If refunds were to be removed, this would be the comparative table
+| Code | Original | 1st | 2nd | 3rd | Istanbul | Berlin (cold) | Berlin (hot)| Berlin (hot)+norefund |
+| – | – | – | – | – | – | – | – | – |
+| <code class="language-plaintext highlighter-rouge">0x60006000556000600055</code> | 0 | 0 | 0 | | 1612 | 2312 | 212 | 212 |
+| <code class="language-plaintext highlighter-rouge">0x60006000556001600055</code> | 0 | 0 | 1 | | 20812 | 22212 | 20112 | 20112 |
+| <code class="language-plaintext highlighter-rouge">0x60016000556000600055</code> | 0 | 1 | 0 | | 1612 | 2312 | 212 | 20112 |
+| <code class="language-plaintext highlighter-rouge">0x60016000556002600055</code> | 0 | 1 | 2 | | 20812 | 22212 | 20112 | 20112 |
+| <code class="language-plaintext highlighter-rouge">0x60016000556001600055</code> | 0 | 1 | 1 | | 20812 | 22212 | 20112 | 20112 |
+| <code class="language-plaintext highlighter-rouge">0x60006000556000600055</code> | 1 | 0 | 0 | | -9188 | -9888 | -11988 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60006000556001600055</code> | 1 | 0 | 1 | | 1612 | 2312 | 212 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60006000556002600055</code> | 1 | 0 | 2 | | 5812 | 5112 | 3012 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60026000556000600055</code> | 1 | 2 | 0 | | -9188 | -9888 | -11988 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60026000556003600055</code> | 1 | 2 | 3 | | 5812 | 5112 | 3012 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60026000556001600055</code> | 1 | 2 | 1 | | 1612 | 2312 | 212 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60026000556002600055</code> | 1 | 2 | 2 | | 5812 | 5112 | 3012 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60016000556000600055</code> | 1 | 1 | 0 | | -9188 | -9888 | -11988 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60016000556002600055</code> | 1 | 1 | 2 | | 5812 | 5112 | 3012 | 3012 |
+| <code class="language-plaintext highlighter-rouge">0x60016000556001600055</code> | 1 | 1 | 1 | | 1612 | 2312 | 212 | 212 |
+| <code class="language-plaintext highlighter-rouge">0x600160005560006000556001600055</code> | 0 | 1 | 0 | 1 | 21618 | 22318 | 20218 | 40118 |
+| <code class="language-plaintext highlighter-rouge">0x600060005560016000556000600055</code> | 1 | 0 | 1 | 0 | -8382 | -9782 | -11882 | 5918 |</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TBD</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a>, "EIP-3298: Removal of refunds [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3298, February 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3298.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3298: Removal of refunds [DRAFT]",
+    "author": "Vitalik Buterin (@vbuterin), Martin Swende (@holiman)",
+    "name": "EIP-3298: Removal of refunds [DRAFT]",
+    "dateCreated": "2021-02-26",
+    "datePublished": "2021-02-26",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

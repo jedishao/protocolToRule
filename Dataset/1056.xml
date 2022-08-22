@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1056: Ethereum Lightweight Identity</title>
+<meta property="og:title" content="EIP-1056: Ethereum Lightweight Identity" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1056" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1056" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1056: Ethereum Lightweight Identity
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1056.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#3e4e5b52525b105c4c5f5b505a595f5f4c5a7e5d51504d5b504d474d10505b4a">Pelle Braendgaard</a>, <a href="/cdn-cgi/l/email-protection#a1cec4c5e1c2cecfd2c4cfd2d8d28fcfc4d5">Joel Torstensson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1056">https://github.com/ethereum/EIPs/issues/1056</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-05-03</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#identity-ownership">Identity ownership</a></li>
+<li><a href="#delegate-management">Delegate management</a></li>
+<li><a href="#attribute-management">Attribute management</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#efficient-lookup-of-events-through-linked-identity-events">Efficient lookup of events through linked identity events</a></li>
+<li><a href="#building-a-did-document-for-an-identity">Building a DID document for an identity</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#implementation">Implementation</a>
+<ul>
+<li><a href="#deployment">Deployment</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A registry for key and attribute management of lightweight blockchain identities.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This ERC describes a standard for creating and updating identities with a limited use of blockchain resources. An identity can have an unlimited number of <code class="language-plaintext highlighter-rouge">delegates</code> and <code class="language-plaintext highlighter-rouge">attributes</code> associated with it. Identity creation is as simple as creating a regular key pair ethereum account, which means that it’s free (no gas costs) and all ethereum accounts are valid identities. Furthermore this ERC is fully <a href="https://w3c-ccg.github.io/did-spec/">DID compliant</a>.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>As we have been developing identity systems for the last couple of years at uPort it has become apparent that the cost of identity creation is a large issue. The previous Identity proposal <a href="/EIPS/eip-725">ERC-725</a> faces this exact issue. Our requirements when creating this ERC is that identity creation should be free, and should be possible to do in an offline environment (e.g. refugee scenario). However it must also be possible to rotate keys without changing the primary identifier of the identity. The identity system should be fit to use off-chain as well as on-chain.</p>
+<h2 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h2>
+<ul>
+<li>
+<p><code class="language-plaintext highlighter-rouge">Identifier</code>: a piece of data that uniquely identifies the identity, an ethereum address</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">delegate</code>: an address that is delegated for a specific time to perform some sort of function on behalf of an identity</p>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">delegateType</code>: the type of a delegate, is determined by a protocol or application higher up
+Examples:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">did-jwt</code></li>
+<li><code class="language-plaintext highlighter-rouge">raiden</code></li>
+</ul>
+</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">attribute</code>: a piece of data associated with the identity</p>
+</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>This ERC specifies a contract called <code class="language-plaintext highlighter-rouge">EthereumDIDRegistry</code> that is deployed once and can then be commonly used by everyone.</p>
+<h3 id="identity-ownership">
+<a href="#identity-ownership" class="anchor-link"></a> Identity ownership
+</h3>
+<p>By default an identity is owned by itself, meaning whoever controls the ethereum account with that address. The owner can be updated to a new key pair account or to a multisig account etc.</p>
+<h4 id="identityowner">
+<a href="#identityowner" class="anchor-link"></a> identityOwner
+</h4>
+<p>Returns the owner of the given identity.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">identityOwner</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">view</span> <span class="nx">returns</span><span class="p">(</span><span class="nx">address</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="changeowner">
+<a href="#changeowner" class="anchor-link"></a> changeOwner
+</h4>
+<p>Sets the owner of the given identity to another ethereum account.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">changeOwner</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">newOwner</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="changeownersigned">
+<a href="#changeownersigned" class="anchor-link"></a> changeOwnerSigned
+</h4>
+<p>Same as above but with raw signature.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">changeOwnerSigned</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">uint8</span> <span class="nx">sigV</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigR</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigS</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">newOwner</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="delegate-management">
+<a href="#delegate-management" class="anchor-link"></a> Delegate management
+</h3>
+<p>Delegates can be used both on- and off-chain. They all have a <code class="language-plaintext highlighter-rouge">delegateType</code> which can be used to specify the purpose of the delegate.</p>
+<h4 id="validdelegate">
+<a href="#validdelegate" class="anchor-link"></a> validDelegate
+</h4>
+<p>Returns true if the given <code class="language-plaintext highlighter-rouge">delegate</code> is a delegate with type <code class="language-plaintext highlighter-rouge">delegateType</code> of <code class="language-plaintext highlighter-rouge">identity</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">validDelegate</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">delegateType</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">delegate</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">view</span> <span class="nx">returns</span><span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="adddelegate">
+<a href="#adddelegate" class="anchor-link"></a> addDelegate
+</h4>
+<p>Adds a new delegate with the given type. <code class="language-plaintext highlighter-rouge">validity</code> indicates the number of seconds that the delegate will be valid for, after which it will no longer be a delegate of <code class="language-plaintext highlighter-rouge">identity</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">addDelegate</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">delegateType</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">delegate</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">validity</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="adddelegatesigned">
+<a href="#adddelegatesigned" class="anchor-link"></a> addDelegateSigned
+</h4>
+<p>Same as above but with raw signature.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">addDelegateSigned</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">uint8</span> <span class="nx">sigV</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigR</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigS</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">delegateType</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">delegate</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">validity</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="revokedelegate">
+<a href="#revokedelegate" class="anchor-link"></a> revokeDelegate
+</h4>
+<p>Revokes the given <code class="language-plaintext highlighter-rouge">delegate</code> for the given <code class="language-plaintext highlighter-rouge">identity</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">revokeDelegate</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">delegateType</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">delegate</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="revokedelegatesigned">
+<a href="#revokedelegatesigned" class="anchor-link"></a> revokeDelegateSigned
+</h4>
+<p>Same as above but with raw signature.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">revokeDelegateSigned</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">uint8</span> <span class="nx">sigV</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigR</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigS</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">delegateType</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">delegate</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="attribute-management">
+<a href="#attribute-management" class="anchor-link"></a> Attribute management
+</h3>
+<p>Attributes contain simple data about the identity. They can be managed only by the owner of the identity.</p>
+<h4 id="setattribute">
+<a href="#setattribute" class="anchor-link"></a> setAttribute
+</h4>
+<p>Sets an attribute with the given <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">value</code>, valid for <code class="language-plaintext highlighter-rouge">validity</code> seconds.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">setAttribute</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">validity</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="setattributesigned">
+<a href="#setattributesigned" class="anchor-link"></a> setAttributeSigned
+</h4>
+<p>Same as above but with raw signature.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">setAttributeSigned</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">uint8</span> <span class="nx">sigV</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigR</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigS</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">validity</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="revokeattrubte">
+<a href="#revokeattrubte" class="anchor-link"></a> revokeAttrubte
+</h4>
+<p>Revokes an attribute.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">revokeAttribute</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">value</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="revokeattributesigned">
+<a href="#revokeattributesigned" class="anchor-link"></a> revokeAttributeSigned
+</h4>
+<p>Same as above but with raw signature.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">revokeAttributeSigned</span><span class="p">(</span><span class="nx">address</span> <span class="nx">identity</span><span class="p">,</span> <span class="nx">uint8</span> <span class="nx">sigV</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigR</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">sigS</span><span class="p">,</span> <span class="nx">bytes32</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">value</span><span class="p">)</span> <span class="kr">public</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="events">
+<a href="#events" class="anchor-link"></a> Events
+</h3>
+<h4 id="didownerchanged">
+<a href="#didownerchanged" class="anchor-link"></a> DIDOwnerChanged
+</h4>
+<p>MUST be triggered when <code class="language-plaintext highlighter-rouge">changeOwner</code> or <code class="language-plaintext highlighter-rouge">changeOwnerSigned</code> was successfully called.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">DIDOwnerChanged</span><span class="p">(</span>
+  <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">identity</span><span class="p">,</span>
+  <span class="nx">address</span> <span class="nx">owner</span><span class="p">,</span>
+  <span class="nx">uint</span> <span class="nx">previousChange</span>
+<span class="p">);</span>
+</code></pre></div></div>
+<h4 id="diddelegatechanged">
+<a href="#diddelegatechanged" class="anchor-link"></a> DIDDelegateChanged
+</h4>
+<p>MUST be triggered when a change to a delegate was successfully made.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">DIDDelegateChanged</span><span class="p">(</span>
+  <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">identity</span><span class="p">,</span>
+  <span class="nx">bytes32</span> <span class="nx">delegateType</span><span class="p">,</span>
+  <span class="nx">address</span> <span class="nx">delegate</span><span class="p">,</span>
+  <span class="nx">uint</span> <span class="nx">validTo</span><span class="p">,</span>
+  <span class="nx">uint</span> <span class="nx">previousChange</span>
+<span class="p">);</span>
+</code></pre></div></div>
+<h4 id="didattrituechanged">
+<a href="#didattrituechanged" class="anchor-link"></a> DIDAttritueChanged
+</h4>
+<p>MUST be triggered when a change to an attribute was successfully made.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">DIDAttributeChanged</span><span class="p">(</span>
+  <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">identity</span><span class="p">,</span>
+  <span class="nx">bytes32</span> <span class="nx">name</span><span class="p">,</span>
+  <span class="nx">bytes</span> <span class="nx">value</span><span class="p">,</span>
+  <span class="nx">uint</span> <span class="nx">validTo</span><span class="p">,</span>
+  <span class="nx">uint</span> <span class="nx">previousChange</span>
+<span class="p">);</span>
+</code></pre></div></div>
+<h3 id="efficient-lookup-of-events-through-linked-identity-events">
+<a href="#efficient-lookup-of-events-through-linked-identity-events" class="anchor-link"></a> Efficient lookup of events through linked identity events
+</h3>
+<p>Contract Events are a useful feature for storing data from smart contracts exclusively for off-chain use. Unfortunately current ethereum implementations provide a very inefficient lookup mechanism. By using linked events that always link to the previous block with a change for the identity, we can solve this problem with much improved performance. Each identity has its previously changed block stored in the <code class="language-plaintext highlighter-rouge">changed</code> mapping.</p>
+<ol>
+<li>
+<p>Lookup <code class="language-plaintext highlighter-rouge">previousChange</code> block for identity</p>
+</li>
+<li>
+<p>Lookup all events for given identity address using web3, but only for the <code class="language-plaintext highlighter-rouge">previousChange</code> block</p>
+</li>
+<li>
+<p>Do something with event</p>
+</li>
+<li>
+<p>Find <code class="language-plaintext highlighter-rouge">previousChange</code> from the event and repeat</p>
+</li>
+</ol>
+<p>Example code:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">history</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="nx">previousChange</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">didReg</span><span class="p">.</span><span class="nx">changed</span><span class="p">(</span><span class="nx">identity</span><span class="p">)</span>
+<span class="k">while</span> <span class="p">(</span><span class="nx">previousChange</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">const</span> <span class="nx">filter</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">didReg</span><span class="p">.</span><span class="nx">allEvents</span><span class="p">({</span><span class="na">topics</span><span class="p">:</span> <span class="p">[</span><span class="nx">identity</span><span class="p">],</span> <span class="na">fromBlock</span><span class="p">:</span> <span class="nx">previousChange</span><span class="p">,</span> <span class="na">toBlock</span><span class="p">:</span> <span class="nx">previousChange</span><span class="p">})</span>
+  <span class="kd">const</span> <span class="nx">events</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">getLogs</span><span class="p">(</span><span class="nx">filter</span><span class="p">)</span>
+  <span class="nx">previousChange</span> <span class="o">=</span> <span class="kc">undefined</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">event</span> <span class="k">of</span> <span class="nx">events</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">history</span><span class="p">.</span><span class="nx">unshift</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span>
+    <span class="nx">previousChange</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">args</span><span class="p">.</span><span class="nx">previousChange</span>
+  <span class="p">}</span>
+<span class="p">}</span>     
+</code></pre></div></div>
+<h3 id="building-a-did-document-for-an-identity">
+<a href="#building-a-did-document-for-an-identity" class="anchor-link"></a> Building a DID document for an identity
+</h3>
+<p>The primary owner key should be looked up using <code class="language-plaintext highlighter-rouge">identityOwner(identity)</code>. This should be the first of the publicKeys listed. Iterate through the <code class="language-plaintext highlighter-rouge">DIDDelegateChanged</code> events to build a list of additional keys and authentication sections as needed. The list of delegateTypes to include is still to be determined. Iterate through <code class="language-plaintext highlighter-rouge">DIDAttributeChanged</code> events for service entries, encryption public keys and other public names. The attribute names are still to be determined.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>For on-chain interactions Ethereum has a built in account abstraction that can be used regardless of whether the account is a smart contract or a key pair. Any transaction has a <code class="language-plaintext highlighter-rouge">msg.sender</code> as the verified send of the transaction.</p>
+<p>Since each Ethereum transaction has to be funded, there is a growing trend of on-chain transactions that are authenticated via an externally created signature and not by the actual transaction originator. This allows 3rd party funding services or receiver pays without any fundamental changes to the underlying Ethereum architecture. These kinds of transactions have to be signed by an actual key pair and thus can not be used to represent smart contract based Ethereum accounts.</p>
+
+<p>We propose a way of a Smart Contract or regular key pair delegating signing for various purposes to externally managed key pairs. This allows a smart contract to be represented both on-chain as well as off-chain or in payment channels through temporary or permanent delegates.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>All ethereum accounts are valid identities (and DID compatible) using this standard. This means that any wallet provider that uses key pair accounts already supports the bare minimum of this standard, and can implement <code class="language-plaintext highlighter-rouge">delegate</code> and <code class="language-plaintext highlighter-rouge">attribute</code> functionality by simply using the <code class="language-plaintext highlighter-rouge">ethr-did</code> referenced below. As the <strong>DID Auth</strong> standard solidifies it also means that all of these wallets will be compatible with the <a href="https://github.com/decentralized-identity">DID decentralized login system</a>.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p><a href="https://github.com/uport-project/ethr-did-registry/blob/develop/contracts/EthereumDIDRegistry.sol">ethr-did-registry</a> (<code class="language-plaintext highlighter-rouge">EthereumDIDRegistry</code> contract implementation)</p>
+<p><a href="https://github.com/uport-project/ethr-did-resolver">ethr-did-resolver</a> (DID compatible resolver)</p>
+<p><a href="https://github.com/uport-project/ethr-did">ethr-did</a> (javascript library for using the identity)</p>
+<h3 id="deployment">
+<a href="#deployment" class="anchor-link"></a> Deployment
+</h3>
+<p>The address for the <code class="language-plaintext highlighter-rouge">EthereumDIDRegistry</code> is <code class="language-plaintext highlighter-rouge">0xdca7ef03e98e0dc2b855be647c39abe984fcf21b</code> on Mainnet, Ropsten, Rinkeby and Kovan.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#3040555c5c551e524251555e54575151425470535f5e43555e4349431e5e5544">Pelle Braendgaard</a>, <a href="/cdn-cgi/l/email-protection#432c262703202c2d30262d303a306d2d2637">Joel Torstensson</a>, "EIP-1056: Ethereum Lightweight Identity [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1056, May 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1056.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1056: Ethereum Lightweight Identity [DRAFT]",
+    "author": "Pelle Braendgaard <pelle.braendgaard@consensys.net>, Joel Torstensson <oed@consensys.net>",
+    "name": "EIP-1056: Ethereum Lightweight Identity [DRAFT]",
+    "dateCreated": "2018-05-03",
+    "datePublished": "2018-05-03",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1056",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

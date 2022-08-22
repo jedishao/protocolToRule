@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2330: EXTSLOAD opcode</title>
+<meta property="og:title" content="EIP-2330: EXTSLOAD opcode" />
+<meta name="description" content="A new EVM opcode to read external contract storage data." />
+<meta property="og:description" content="A new EVM opcode to read external contract storage data." />
+<meta name="twitter:description" content="A new EVM opcode to read external contract storage data." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2330" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2330" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2330: EXTSLOAD opcode
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2330.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A new EVM opcode to read external contract storage data.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/dominicletz">Dominic Letz</a>, <a href="https://github.com/spalladino">Santiago Palladino</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2330-extsload-and-abi-for-lower-gas-cost-and-off-chain-apps/3733">https://ethereum-magicians.org/t/eip-2330-extsload-and-abi-for-lower-gas-cost-and-off-chain-apps/3733</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2019-10-29</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2929">2929</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#gas-cost-pre-verkle">Gas cost pre-verkle</a></li>
+<li><a href="#gas-cost-post-verkle">Gas cost post-verkle</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal adds a new opcode <code class="language-plaintext highlighter-rouge">EXTSLOAD</code> at <code class="language-plaintext highlighter-rouge">0x5c</code> which pops two items from the stack: <code class="language-plaintext highlighter-rouge">&lt;account address&gt; &lt;storage key&gt;</code> and pushes one item: <code class="language-plaintext highlighter-rouge">&lt;storage value&gt;</code>. The gas cost is sum of account access cost and storage read based on <a href="/EIPS/eip-2929">EIP-2929</a> Access Lists.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>While any off-chain application can read all contract storage data of all contracts, this is not possible for deployed smart contracts themselves. These are bound to use contract calls for any interaction including reading data from other contracts. This EIP adds an EVM opcode to directly read external contract storage.</p>
+<p>The gas cost when reading from registry style contract such as <a href="/EIPS/eip-20">EIP-20s</a>, ENS and other data contracts is very high, because they incur cross contract call cost, cost for ABI encoding, decoding and dispatching and finally loading the data. In many cases the underlying storage that is being queried is though just a simple mapping. On top of that, the view function may SLOAD many other slots which caller may not be interested in, which further adds to the gas costs. In these cases a new <code class="language-plaintext highlighter-rouge">EXTSLOAD</code> call directly accessing the mapping in storage could not only <strong>reduce the gas cost</strong> of the interaction more than 10x, but also it would make the gas cost <strong>predictable</strong> for the reading contract.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>A new EVM instruction <code class="language-plaintext highlighter-rouge">EXTSLOAD (0x5c)</code> that works like <code class="language-plaintext highlighter-rouge">SLOAD (0x54)</code> but an additional parameter representing the contract that is to be read from.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>EXTSLOAD <span class="o">(</span>0x5c<span class="o">)</span>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">EXTSLOAD</code> instruction pops 2 values from the stack, first <code class="language-plaintext highlighter-rouge">contract</code> a contract address and then second <code class="language-plaintext highlighter-rouge">slot</code> a storage address within <code class="language-plaintext highlighter-rouge">contract</code>. As result <code class="language-plaintext highlighter-rouge">EXTSLOAD</code> pushes on the stack the value from the contract storage of <code class="language-plaintext highlighter-rouge">contract</code> at the storage <code class="language-plaintext highlighter-rouge">slot</code> address or <code class="language-plaintext highlighter-rouge">0</code> in case the account <code class="language-plaintext highlighter-rouge">contract</code> does not exist.</p>
+<h3 id="gas-cost-pre-verkle">
+<a href="#gas-cost-pre-verkle" class="anchor-link"></a> Gas cost pre-verkle
+</h3>
+<p>Gas to be charged before Verkle Tree change is specified as <code class="language-plaintext highlighter-rouge">ACCOUNT_ACCESS_COST + STORAGE_READ_COST</code> where:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ACCOUNT_ACCESS_COST</code> is <code class="language-plaintext highlighter-rouge">0</code> if the account address is already in <code class="language-plaintext highlighter-rouge">accessed_addresses</code> set, otherwise <code class="language-plaintext highlighter-rouge">COLD_ACCOUNT_ACCESS_COST</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">STORAGE_READ_COST</code> is <code class="language-plaintext highlighter-rouge">WARM_STORAGE_READ_COST</code> if storage key is already in <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code> set, otherwise <code class="language-plaintext highlighter-rouge">COLD_STORAGE_READ_COST</code>.</li>
+</ul>
+<h3 id="gas-cost-post-verkle">
+<a href="#gas-cost-post-verkle" class="anchor-link"></a> Gas cost post-verkle
+</h3>
+<p>It is important to consider that post Verkle tree change, <code class="language-plaintext highlighter-rouge">ACCOUNT_ACCESS_COST</code> will not be needed since a single account’s storage would be spread across the entire global trie. Hence gas to be charged post Verkle Tree change is just <code class="language-plaintext highlighter-rouge">STORAGE_READ_COST</code>, which is as specified in <a href="#gas-cost-pre-verkle">Gas cost pre-verkle</a>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<ul>
+<li>Without this EIP, a contract can still opt-in to make their entire state public, by having a method that simply SLOADs and returns the values (<a href="/assets/eip-2330/Extsload.sol">example</a>). The complexity of the gas cost can be seen as <code class="language-plaintext highlighter-rouge">1</code>x CALL cost + <code class="language-plaintext highlighter-rouge">N</code>x SLOAD cost. Hence, the gas cost specified for using EXTSLOAD opcode on an account for <code class="language-plaintext highlighter-rouge">N</code> times, the charge of <code class="language-plaintext highlighter-rouge">1</code>x <code class="language-plaintext highlighter-rouge">COLD_ACCOUNT_ACCESS_COST</code> and <code class="language-plaintext highlighter-rouge">N</code>x <code class="language-plaintext highlighter-rouge">STORAGE_READ_COST</code> is hereby justified.</li>
+<li>Without this EIP, a contract can still use internal state of other contracts. An external party can supply a value and proof to a contract, which the contract can verify using <code class="language-plaintext highlighter-rouge">BLOCKHASH</code>. This is only possible for the previous blocks and not the latest state (since current blockhash cannot be determined before execution).</li>
+<li>This opcode can be seen as breaking object-oriented (OO) model because it allows to read storage of other contracts. In usual systems using OO is net positive, because there is no limit on machine code and it hardly adds any cost to add more methods or use single method to get a ton of data while the caller needs to just a small portion of data. However on EVM, there are visible costs, i.e. about $0.2 per SLOAD (20 gwei and ETHUSD 2000). Also, OO has caused misleading assumptions for developers where variables marked as “private” in smart contracts are encrypted in some way/impossible to read which has resulted bad designs. Hence, this EIP can be beneficial in terms of making smart contract systems more efficient as well as preventing misconceptions as well.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change is fully backwards compatible since it adds a new instruction.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<ul>
+<li>Since the opcode is similar to SLOAD, it should be easy to implement in various clients.</li>
+<li>This opcode allows the callee <code class="language-plaintext highlighter-rouge">A</code> to re-enter a caller contract <code class="language-plaintext highlighter-rouge">B</code> and read state of <code class="language-plaintext highlighter-rouge">B</code> and <code class="language-plaintext highlighter-rouge">B</code> cannot stop <code class="language-plaintext highlighter-rouge">A</code> from doing that. Since this does not change any state, it should not be a security issue. Contracts generally use re-entrancy guards, but that is only added to write methods. So even currently without EXTSLOAD, <code class="language-plaintext highlighter-rouge">A</code> can re-enter <code class="language-plaintext highlighter-rouge">B</code> and read their state exposed by any view methods and it has not been an issue.</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/dominicletz">Dominic Letz</a>, <a href="https://github.com/spalladino">Santiago Palladino</a>, "EIP-2330: EXTSLOAD opcode [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2330, October 2019. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2330.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2330: EXTSLOAD opcode [DRAFT]",
+    "author": "Dominic Letz (@dominicletz), Santiago Palladino (@spalladino)",
+    "name": "EIP-2330: EXTSLOAD opcode [DRAFT]",
+    "dateCreated": "2019-10-29",
+    "datePublished": "2019-10-29",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2330-extsload-and-abi-for-lower-gas-cost-and-off-chain-apps/3733",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2019"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-969: Modifications to ethash to invalidate existing dedicated hardware implementations</title>
+<meta property="og:title" content="EIP-969: Modifications to ethash to invalidate existing dedicated hardware implementations" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-969" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-969" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-969: Modifications to ethash to invalidate existing dedicated hardware implementations
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-969.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#60040116090420010912131115091212050c134e030f0d">David Stanfill</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://gitter.im/ethereum/topics/topic/5ac4d974109bb043328911ce/eip-969-discussion">https://gitter.im/ethereum/topics/topic/5ac4d974109bb043328911ce/eip-969-discussion</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2018-04-03</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#ethashv2">EthashV2</a></li>
+<li><a href="#agent-changes-optional-variant">Agent Changes (Optional Variant)</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This EIP modifies ethash in order to break ASIC miners specialized for the current ethash
+mining algorithm.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>There are companies who currently have dedicated hardware based ethereum miners in
+production, and may be actively mining. This EIP aims to “poison
+the well” by modifying the block mining algorithm in a low risk manner that
+may <em>“break”</em> these miners if they are in-fact built as traditional ASICs.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>ASIC-based miners will have lower operational costs than GPU-based miners, which
+will result in GPU-based mining quickly becoming unprofitable. Given that
+production of ASIC-based miners has a high barrier to entry and few market players,
+this will cause a trend towards centralization of mining power.</p>
+<p>Risks include market dominance by a single manufacturer that may utilize production
+stock to mine themselves, introduce backdoors in their hardware, or facilitate a 51%
+attack that would otherwise be infeasible.</p>
+<p>This trend towards centralization has a negative effect on network security,
+putting significant control of the network in the hands of only a few entities.</p>
+<p>Ethash remains ASIC-resistant, however ASIC manufacturer technology is advancing
+and ethash may require further changes in order to remain resistant to unforeseen
+design techniques. This EIP seeks explicitly to buy time during which newly-developed
+ASIC technology will face a barrier while more long-term mechanisms to ensure
+continued ASIC resistance can be explored.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>If <code class="language-plaintext highlighter-rouge">block.number &gt;= ASIC_MITIGATION_FORK_BLKNUM</code>, require that the ethash solution
+sealing the block has been mined using <code class="language-plaintext highlighter-rouge">ethashV2</code>.</p>
+<h2 id="ethashv2">
+<a href="#ethashv2" class="anchor-link"></a> EthashV2
+</h2>
+<p><code class="language-plaintext highlighter-rouge">ethashV2</code> will be identical in specification to the current <code class="language-plaintext highlighter-rouge">ethash</code>(v1) algorithm, with
+the exception of the implementation of <code class="language-plaintext highlighter-rouge">fnv</code>.</p>
+<p>The new algorithm replaces the 5 current uses of <code class="language-plaintext highlighter-rouge">fnv</code> inside <code class="language-plaintext highlighter-rouge">hashimoto</code> with 5
+separate instances defined as <code class="language-plaintext highlighter-rouge">fnvA</code>, <code class="language-plaintext highlighter-rouge">fnvB</code>, <code class="language-plaintext highlighter-rouge">fnvC</code>, <code class="language-plaintext highlighter-rouge">fnvD</code>, and <code class="language-plaintext highlighter-rouge">fnvE</code>, utilizing</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">FNV_PRIME_A</span><span class="o">=</span><span class="mh">0x10001a7</span>
+<span class="n">FNV_PRIME_B</span><span class="o">=</span><span class="mh">0x10001ab</span>
+<span class="n">FNV_PRIME_C</span><span class="o">=</span><span class="mh">0x10001cf</span>
+<span class="n">FNV_PRIME_D</span><span class="o">=</span><span class="mh">0x10001e3</span>
+<span class="n">FNV_PRIME_E</span><span class="o">=</span><span class="mh">0x10001f9</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">fnvA</code> replaces <code class="language-plaintext highlighter-rouge">fnv</code> in the DAG item selection step;
+<code class="language-plaintext highlighter-rouge">fnvB</code> replaces <code class="language-plaintext highlighter-rouge">fnv</code> in the DAG item mix step;
+<code class="language-plaintext highlighter-rouge">fnvC(fnvD(fnvE</code> replaces <code class="language-plaintext highlighter-rouge">fnv(fnv(fnv(</code> in the compress mix step.</p>
+<p><code class="language-plaintext highlighter-rouge">fnv</code> as utilized in DAG-item creation should remain unchanged.</p>
+<h2 id="agent-changes-optional-variant">
+<a href="#agent-changes-optional-variant" class="anchor-link"></a> Agent Changes (Optional Variant)
+</h2>
+<p>The JSON-RPC <code class="language-plaintext highlighter-rouge">eth_GetWork</code> call may optionally return the proposed blocks algorithm.
+While a miner or pool may infer the requirement for <code class="language-plaintext highlighter-rouge">ethashV2</code> based on the computed
+epoch of the provided seedHash, it is beneficial to explicitly provide this
+field so a miner does not require special configuration when mining on a chain
+that chooses not to implement the <code class="language-plaintext highlighter-rouge">ASIC_Mitigation</code> hardfork.</p>
+<p>Due to compatibility concerns with implementations that already add additional
+parameters to <code class="language-plaintext highlighter-rouge">GetWork</code>, it is desired to add <code class="language-plaintext highlighter-rouge">BlockNumber</code> as an explicit 4th parameter
+as suggested in https://github.com/ethereum/go-ethereum/issues/2333. Algorithm
+should then be returned as either <code class="language-plaintext highlighter-rouge">"ethash"</code> or <code class="language-plaintext highlighter-rouge">"ethashV2"</code> according to the
+<code class="language-plaintext highlighter-rouge">block.number &gt;= ASIC_MITIGATION_FORK_BLKNUM</code> criteria.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP is aimed at breaking existing ASIC-based miners via small changes to the
+existing ethash algorithm. We hope to accomplish the following:</p>
+<ol>
+<li>Break existing ASIC-based miners.</li>
+<li>Demonstrate a willingness to fork in the event of future ASIC miner production.</li>
+</ol>
+<p>Goal #1 is something that we can only do probabilistically without detailed
+knowledge of existing ASIC miner design. The known released miner is available for
+purchase <a href="https://shop.bitmain.com/product/detail?pid=00020180403174908564M8dMJKtz06B7">here</a>,
+with delivery slated for mid-summer 2018.</p>
+<p>Our approach should balance the inherent security risks involved with changing
+the mining algorithm with the risk that the change we make does not break existing
+ASIC miners. This EIP leans towards minimizing the security risks by making minimal
+changes to the algorithm, accepting the risk that the change may not break dedicated
+hardware miners that utilize partially- or fully-configurable logic.</p>
+<p>Furthermore, we do not wish to introduce significant algorithm changes that
+may alter the power utilization or performance profile of existing GPU hardware.</p>
+<p>The change of FNV constant is a minimal change that can be quickly
+implemented across the various network node and miner implementations.</p>
+<p>It is proposed that <code class="language-plaintext highlighter-rouge">ASIC_MITIGATION_FORK_BLKNUM</code> be no more than 5550000 (epoch 185), giving
+around 30 days of notice to node and miner developers and a sufficient window
+for formal analysis of the changes by experts. We must weigh this window against
+the risk introduced by allowing ASICs that may exist to continue to propagate
+on the network, as well as the risk of providing too much advanced warning to
+ASIC developers.</p>
+<p>It is further understood that this change will not prevent redesign of existing
+dedicated hardware with new ASIC chips. The intention of this change is only
+to disable currently active or mid-production hardware and provide time for
+POS development as well as larger algorithim changes to be well analyzed by
+experts.</p>
+<p>The choice of FNV constants is made based on the formal specification at
+https://tools.ietf.org/html/draft-eastlake-fnv-14#section-2.1</p>
+<p>@goobur provided the following python code to output primes matching this criteria:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="o">**</span><span class="mi">24</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="mi">8</span> <span class="o">+</span> <span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">256</span><span class="p">)]</span>
+<span class="n">candidates</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">candidates</span> <span class="k">if</span> <span class="n">is_prime</span><span class="p">(</span><span class="n">_</span><span class="p">)]</span>
+<span class="p">[</span><span class="s">"0x%x"</span> <span class="o">%</span> <span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">candidates</span> <span class="k">if</span> <span class="n">_</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">40</span> <span class="o">-</span> <span class="mi">2</span><span class="o">**</span><span class="mi">24</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="mi">24</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="mi">8</span> <span class="o">+</span> <span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">)]</span>
+</code></pre></div></div>
+<p>The minimal prime constraint was relaxed, as has already been the case in <code class="language-plaintext highlighter-rouge">ethashV1</code>.</p>
+<p>Typical ASIC synthesis tools would optimize multiplication of a constant
+in the FNV algorithm, while reducing the area needed for the multiplier according
+to the hamming weight of the constant. To reduce the chance of ASIC adaptation
+through minor mask changes, we propose choosing new constants with a larger
+hamming weight, however care should be taken not to choose constants with too
+large of a weight.</p>
+<p>The current FNV prime, <code class="language-plaintext highlighter-rouge">0x1000193</code>, has a hamming weight of 6.</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001a7</span><span class="p">)</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001ab</span><span class="p">)</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001cf</span><span class="p">)</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001e3</span><span class="p">)</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+<span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001ef</span><span class="p">)</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span> <span class="c1">// Not chosen</span>
+<span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001f9</span><span class="p">)</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="n">HammingWeight</span><span class="p">(</span><span class="mh">0x10001fb</span><span class="p">)</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span> <span class="c1">// Not chosen</span>
+</code></pre></div></div>
+<p>An analysis can be done regarding the dispersion of these constants as compared to
+<code class="language-plaintext highlighter-rouge">0x01000193</code>, using the following snippet.</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// https://eips.ethereum.org/EIPS/eip-969</span>
+
+<span class="cp">#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">u_int32_t</span> <span class="n">candidate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">u_int32_t</span> <span class="n">dups</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">u_int32_t</span> <span class="n">fnv_candidate</span> <span class="o">=</span> <span class="mh">0x10001a7</span><span class="p">;</span> <span class="c1">// MODIFY!</span>
+    <span class="n">u_int8_t</span> <span class="o">*</span><span class="n">counts</span> <span class="o">=</span> <span class="n">malloc</span><span class="p">(</span><span class="mh">0xFFFFFFFF</span><span class="p">);</span>
+
+    <span class="n">memset</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="sc">'\0'</span><span class="p">,</span> <span class="mh">0xFFFFFFFF</span><span class="p">);</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">candidate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">candidate</span> <span class="o">&lt;</span> <span class="mh">0xFFFFFFFF</span><span class="p">;</span> <span class="n">candidate</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">u_int32_t</span> <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">u_int32_t</span><span class="p">)(</span><span class="n">candidate</span> <span class="o">*</span> <span class="n">fnv_candidate</span><span class="p">);</span>
+        <span class="n">u_int8_t</span> <span class="n">oldCount</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">result</span><span class="p">];</span>
+
+        <span class="n">counts</span><span class="p">[</span><span class="n">result</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">result</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">oldCount</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">dups</span><span class="o">++</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">//// progress display: remove comment to speed down</span>
+        <span class="c1">//if ((candidate &amp; 0xFFFFF) == 0xFFFFF) printf("0x%08x\n", candidate);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">FNV candidate 0x%08x : %i dups</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">fnv_candidate</span><span class="p">,</span> <span class="n">dups</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>It can be empirically confirmed that no more than 1 duplicate occurs in the
+32-bit word space with these constants.</p>
+<p>It is worth noting that FNV is not a cryptographic hash, and it is not used as
+such in ethash. That said, a more invasive hash algorithm change could be considered.</p>
+<p>One suggestion has been <a href="https://github.com/aappleby/smhasher/blob/master/src/MurmurHash3.cpp">MurmurHash3</a>.</p>
+<p><a href="https://twitter.com/el33th4xor/status/981292363627810818">Other suggestions have been made</a>:
+<a href="https://github.com/P-H-C/phc-winner-argon2">Argon2</a>,
+<a href="https://blog.z.cash/why-equihash/">Equihash</a> of Zcash fame, and
+<a href="https://crypto.stanford.edu/balloon/">Balloon Hashing</a>.</p>
+<p>Another possible candidate is <a href="https://github.com/tromp/cuckoo">Cuckoo Cycle</a>,
+although there are some concerns regarding unaddressed optimization
+vulnerabilities. One review can be found
+<a href="https://da-data.blogspot.com/2014/03/a-public-review-of-cuckoo-cycle.html">here</a>.</p>
+<p>This may be considered once the exact mechanism of the released ASICs is known and
+their effectiveness against its optimisations can be fully evaluated.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change implements a backwards incompatible change to proof of work based
+block mining. All existing miners will be required to update to clients which
+implement this new algorithm, and all nodes will require updates to accept
+solutions from the new proof of work algorithm.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TODO: will need to generate test cases for <code class="language-plaintext highlighter-rouge">ethereum/tests</code> repository corresponding to the consensus
+changes.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>TODO</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#4a2e2b3c232e0a2b2338393b3f2338382f263964292527">David Stanfill</a>, "EIP-969: Modifications to ethash to invalidate existing dedicated hardware implementations [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 969, April 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-969.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-969: Modifications to ethash to invalidate existing dedicated hardware implementations [DRAFT]",
+    "author": "David Stanfill <david@airsquirrels.com>",
+    "name": "EIP-969: Modifications to ethash to invalidate existing dedicated hardware implementations [DRAFT]",
+    "dateCreated": "2018-04-03",
+    "datePublished": "2018-04-03",
+
+    "discussionUrl": "https://gitter.im/ethereum/topics/topic/5ac4d974109bb043328911ce/eip-969-discussion",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

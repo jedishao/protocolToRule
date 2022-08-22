@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5485: Legitimacy, Jurisdiction and Sovereignty</title>
+<meta property="og:title" content="EIP-5485: Legitimacy, Jurisdiction and Sovereignty" />
+<meta name="description" content="An interface for identifying the legitimacy, jurisdiction and sovereignty." />
+<meta property="og:description" content="An interface for identifying the legitimacy, jurisdiction and sovereignty." />
+<meta name="twitter:description" content="An interface for identifying the legitimacy, jurisdiction and sovereignty." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5485" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5485" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5485: Legitimacy, Jurisdiction and Sovereignty
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5485.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An interface for identifying the legitimacy, jurisdiction and sovereignty.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-5485-interface-for-legitimacy-jurisdiction-and-sovereignty/10425">https://ethereum-magicians.org/t/erc-5485-interface-for-legitimacy-jurisdiction-and-sovereignty/10425</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-08-17</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>,
+<a href="eip-5247">5247</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Provide a way for compliant smart contracts to declare their legitimacy lineage, jurisdiction they observe, and sovereignty if they choose to not fall onto any jurisdiction.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Today, smart contracts have no standard way to specify their legitimacy lineage, jurisdiction, or sovereignty relationship. The introduction of such a standard, supports better integration with today’s legal and regulative scenarios:</p>
+<ol>
+<li>it supports a regulative body to allow or deny interoperability with smart contracts.</li>
+<li>it also allows DAOs to clearly declare “self-sovereignty” by announcing via this interface by saying they do not assert legitimacy from any source other than themselves.</li>
+</ol>
+<p>A real-world example is that ContractA represents an <strong>A company registered in a country</strong>, ContractB represents a <strong>The Secretary of State of the country</strong>, and ContractC represents the <strong>Supreme Court of the Country</strong>.</p>
+<p>Another real example is a contract that declares “self-sovereignty” that doesn’t follow any jurisdiction.</p>
+<p>This interface supports both cases, providing a way to allow smart contracts to determine if they want to allow/prohibit interaction based on sovereignty.</p>
+<p>For example, a country might want to require any digital money service’s all smart contracts to observe their <a href="/EIPS/eip-5485">EIP-5485</a> jurisdiction before they are allowed to operate money in their (real world) legal jurisdiction.</p>
+<p>Another real world use-case is that in some jurisdiction e.g. in United States, if an token issuer choose to issue a token,
+they can try to petition SEC to recognize their token as registered security, if approved, will gain legitimacy from SEC.
+Should they choose to petition Commodity Futures Trading Commission (CFTC) to recognize them as a commodity, if approved, will
+gain legitimacy from CFTC.</p>
+<p>On the other hand, a DAO with a strong decentralized ideology might choose to only inter-operate with EOA or “self-sovereign” smart contracts to avoid being affected by any country.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<ol>
+<li>Compliant contract MUSTS implement the following interface.</li>
+</ol>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">IERC5485</span> <span class="p">{</span>
+    <span class="c1">/// A function that returns the source of legitimacy in an address
+</span>    <span class="c1">///
+</span>    <span class="c1">/// @returns address of EOA or contract that grants legitimacy status to this contract.
+</span>    <span class="c1">/// See Specification #2 and #3 for more details.
+</span>    <span class="k">function</span> <span class="n">sourceOfLegitimacy</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+
+    <span class="c1">/// A function that returns the sovereign jurisdiction in an address
+</span>    <span class="c1">///
+</span>    <span class="c1">/// @returns address of EOA or contract that *ultimately* grants legitimacy status (root of legitimacy lineage).
+</span>    <span class="c1">/// See Specification #4 and #4 for more details.
+</span>    <span class="k">function</span> <span class="n">jurisdiction</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<ol>
+<li>
+<p>Suppose a compliant <code class="language-plaintext highlighter-rouge">ContractA</code> is deployed at address <code class="language-plaintext highlighter-rouge">0x&lt;Contract_Address_A&gt;</code> and gains its legitimacy from another contract or External Owned Account (EOA) at <code class="language-plaintext highlighter-rouge">0x&lt;ADDRESS_B&gt;</code>. In this case, it MUST return the <code class="language-plaintext highlighter-rouge">0x&lt;ADDRESS_B&gt;</code> when being queried for <code class="language-plaintext highlighter-rouge">sourceOfLegitimacy()</code>. For example. If <code class="language-plaintext highlighter-rouge">ContractA</code> gains legitimacy from <code class="language-plaintext highlighter-rouge">ContractB</code>, <code class="language-plaintext highlighter-rouge">ContractB</code> gains legitimacy from <code class="language-plaintext highlighter-rouge">ContractC</code> but <code class="language-plaintext highlighter-rouge">ContractC</code> doesn’t gain legitimacy from anyone, ContractC is considered the “jurisdiction” that both <code class="language-plaintext highlighter-rouge">ContractB</code> and <code class="language-plaintext highlighter-rouge">ContractA</code> observe. Both <code class="language-plaintext highlighter-rouge">ContractA</code> and <code class="language-plaintext highlighter-rouge">ContractB</code> MUST return the address of <code class="language-plaintext highlighter-rouge">ContractC</code> as the result of jurisdiction.</p>
+</li>
+<li>
+<p>A contract that matches ANY of the following cases is considered a “sovereign contract”:</p>
+</li>
+</ol>
+<ul>
+<li>Case 1: it does not implement this EIP</li>
+<li>Case 2: it implements this EIP but return its <em>own address</em>.</li>
+<li>Case 3: it implements this EIP but return a ZERO address.</li>
+</ul>
+<ol>
+<li>
+<p>Any compliant contract MUST return its legitimacy sources chain up to the sovereign contract when queried by <code class="language-plaintext highlighter-rouge">jurisdiction()</code>.</p>
+</li>
+<li>If ContractA gains legitimacy from ContractB, ContractA MUST observe the ContractB’s order to ANY of the following
+<ul>
+<li>Order Type 1: execute a <code class="language-plaintext highlighter-rouge">selfdestruct</code> of ContractA</li>
+</ul>
+</li>
+<li>If ContractA observes jurisdiction of ContractC (a sovereignty), ContractA MUST observe ContractC’s order to ANY the following
+<ul>
+<li>Order Type 1: execute a <code class="language-plaintext highlighter-rouge">selfdestruct</code> of ContractA</li>
+<li>Order Type 2: execute ANY smart contract executable proposals as specified in <a href="/EIPS/eip-5247">EIP-5247</a></li>
+</ul>
+</li>
+</ol>
+
+<p>TODO determine whether to address “add/remove legitimacy” in this EIP or leave it as a future EIP</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Needs discussion.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Needs discussion.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Needs discussion.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a>, "EIP-5485: Legitimacy, Jurisdiction and Sovereignty [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5485, August 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5485.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5485: Legitimacy, Jurisdiction and Sovereignty [DRAFT]",
+    "author": "Zainan Victor Zhou (@xinbenlv)",
+    "name": "EIP-5485: Legitimacy, Jurisdiction and Sovereignty [DRAFT]",
+    "dateCreated": "2022-08-17",
+    "datePublished": "2022-08-17",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-5485-interface-for-legitimacy-jurisdiction-and-sovereignty/10425",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

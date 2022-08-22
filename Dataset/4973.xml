@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4973: Account-bound Tokens</title>
+<meta property="og:title" content="EIP-4973: Account-bound Tokens" />
+<meta name="description" content="An interface for non-transferrable NFTs binding to an Ethereum account like a legendary World of Warcraft item binds to a character." />
+<meta property="og:description" content="An interface for non-transferrable NFTs binding to an Ethereum account like a legendary World of Warcraft item binds to a character." />
+<meta name="twitter:description" content="An interface for non-transferrable NFTs binding to an Ethereum account like a legendary World of Warcraft item binds to a character." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4973" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4973" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4973: Account-bound Tokens
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4973.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An interface for non-transferrable NFTs binding to an Ethereum account like a legendary World of Warcraft item binds to a character.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/TimDaub">Tim Daubenschütz</a>, <a href="https://github.com/ra-phael">Raphael Roullet</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4973-non-transferrable-non-fungible-tokens-soulbound-tokens-or-badges/8825">https://ethereum-magicians.org/t/eip-4973-non-transferrable-non-fungible-tokens-soulbound-tokens-or-badges/8825</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-04-01</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>,
+<a href="eip-712">712</a>,
+<a href="eip-721">721</a>,
+<a href="eip-1271">1271</a>,
+<a href="eip-2098">2098</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#solidity-interface">Solidity Interface</a></li>
+<li><a href="#eip-712-typed-structured-data-hashing-and-eip-2098-compact-signature-creation">EIP-712 Typed Structured Data Hashing and EIP-2098 Compact Signature Creation</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#interface">Interface</a></li>
+<li><a href="#exception-handling">Exception handling</a></li>
+<li><a href="#provenance-indexing">Provenance Indexing</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Proposes a standard API for account-bound Tokens (ABT) within smart contracts. An ABT is a non-fungible token bound to a single account. ABTs don’t implement a canonical interface for transfers. This EIP defines basic functionality to mint, assign, revoke and track ABTs.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>In the popular MMORPG World of Warcraft, its game designers intentionally took some items out of the world’s auction house market system to prevent them from having a publicly-discovered price and limit their accessibility.</p>
+<p>Vanilla WoW’s “Thunderfury, Blessed Blade of the Windseeker” was one such legendary item, and it required a forty-person raid, among other sub-tasks, to slay the firelord “Ragnaros” to gain the “Essence of the Firelord,” a material needed to craft the sword once.</p>
+<p>Upon voluntary pickup, the sword permanently <strong>binds</strong> to a character’s “soul,” making it impossible to trade, sell or even swap it between a player’s characters.</p>
+<p>In other words, “Thunderfury”’s price was the aggregate of all social costs related to completing the difficult quest line with friends and guild members. Other players spotting Thunderfuries could be sure their owner had slain “Ragnaros,” the blistering firelord.</p>
+<p>World of Warcraft players could <strong>trash</strong> legendary and soulbound items like the Thunderfury to permanently remove them from their account. It was their choice to visibly <strong>equip</strong> or <strong>unequip</strong> an item and hence show their achievements to everyone.</p>
+<p>The Ethereum community has expressed a need for non-transferrable, non-fungible, and socially-priced tokens similar to WoW’s soulbound items. Popular contracts implicitly implement account-bound interaction rights today. A principled standardization helps interoperability and improves on-chain data indexing.</p>
+<p>The purpose of this document is to make ABTs a reality on Ethereum by creating consensus around a <strong>maximally backward-compatible</strong> but otherwise <strong>minimal</strong> interface definition.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="solidity-interface">
+<a href="#solidity-interface" class="anchor-link"></a> Solidity Interface
+</h3>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p>ABTs <em>must</em> implement the interfaces:</p>
+<ul>
+<li><a href="/EIPS/eip-165">EIP-165</a>’s <code class="language-plaintext highlighter-rouge">ERC165</code> (<code class="language-plaintext highlighter-rouge">0x01ffc9a7</code>)</li>
+<li><a href="/EIPS/eip-721">EIP-721</a>’s <code class="language-plaintext highlighter-rouge">ERC721Metadata</code> (<code class="language-plaintext highlighter-rouge">0x5b5e139f</code>)</li>
+</ul>
+<p>ABTs <em>must not</em> implement the interfaces:</p>
+<ul>
+<li><a href="/EIPS/eip-721">EIP-721</a>’s <code class="language-plaintext highlighter-rouge">ERC721</code> (<code class="language-plaintext highlighter-rouge">0x80ac58cd</code>)</li>
+</ul>
+<p>An ABT receiver must be able to always call <code class="language-plaintext highlighter-rouge">function unequip(address _tokenId)</code> to take their ABT off-chain.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">6</span><span class="p">;</span>
+
+<span class="c1">/// @title Account-bound tokens
+/// @dev See https://eips.ethereum.org/EIPS/eip-4973
+/// Note: the ERC-165 identifier for this interface is 0x5164cf47
+</span><span class="k">interface</span> <span class="n">IERC4973</span> <span class="p">{</span>
+  <span class="c1">/// @dev This emits when ownership of any ABT changes by any mechanism.
+</span>  <span class="c1">///  This event emits when ABTs are given or equipped and unequipped
+</span>  <span class="c1">///  (`to` == 0).
+</span>  <span class="k">event</span> <span class="n">Transfer</span><span class="p">(</span>
+    <span class="kt">address</span> <span class="k">indexed</span> <span class="n">from</span><span class="p">,</span>
+    <span class="kt">address</span> <span class="k">indexed</span> <span class="n">to</span><span class="p">,</span>
+    <span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span>
+  <span class="p">);</span>
+  <span class="c1">/// @notice Count all ABTs assigned to an owner
+</span>  <span class="c1">/// @dev ABTs assigned to the zero address are considered invalid, and this
+</span>  <span class="c1">///  function throws for queries about the zero address.
+</span>  <span class="c1">/// @param owner An address for whom to query the balance
+</span>  <span class="c1">/// @return The number of ABTs owned by `address owner`, possibly zero
+</span>  <span class="k">function</span> <span class="n">balanceOf</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+  <span class="c1">/// @notice Find the address bound to an ERC4973 account-bound token
+</span>  <span class="c1">/// @dev ABTs assigned to zero address are considered invalid, and queries
+</span>  <span class="c1">///  about them do throw.
+</span>  <span class="c1">/// @param tokenId The identifier for an ABT.
+</span>  <span class="c1">/// @return The address of the owner bound to the ABT.
+</span>  <span class="k">function</span> <span class="n">ownerOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+  <span class="c1">/// @notice Removes the `uint256 tokenId` from an account. At any time, an
+</span>  <span class="c1">///  ABT receiver must be able to disassociate themselves from an ABT
+</span>  <span class="c1">///  publicly through calling this function. After successfully executing this
+</span>  <span class="c1">///  function, given the parameters for calling `function give` or
+</span>  <span class="c1">///  `function take` a token must be re-equipable.
+</span>  <span class="c1">/// @dev Must emit a `event Transfer` with the `address to` field pointing to
+</span>  <span class="c1">///  the zero address.
+</span>  <span class="c1">/// @param tokenId The identifier for an ABT.
+</span>  <span class="k">function</span> <span class="n">unequip</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+  <span class="c1">/// @notice Creates and transfers the ownership of an ABT from the
+</span>  <span class="c1">///  transaction's `msg.sender` to `address to`.
+</span>  <span class="c1">/// @dev Throws unless `bytes signature` represents an EIP-2098 Compact
+</span>  <span class="c1">///  Signature of the EIP-712 structured data hash
+</span>  <span class="c1">///  `Agreement(address active,address passive,string tokenURI)` expressing
+</span>  <span class="c1">///  `address to`'s explicit agreement to be publicly associated with
+</span>  <span class="c1">///  `msg.sender` and `string tokenURI`. A unique `uint256 tokenId` must be
+</span>  <span class="c1">///  generated by type-casting the `bytes32` EIP-712 structured data hash to a
+</span>  <span class="c1">///  `uint256`. If `bytes signature` is empty or `address to` is a contract,
+</span>  <span class="c1">///  an EIP-1271-compatible call to `function isValidSignatureNow(...)` must
+</span>  <span class="c1">///  be made to `address to`. A successful execution must result in the
+</span>  <span class="c1">///  `event Transfer(msg.sender, to, tokenId)`. Once an ABT exists as an
+</span>  <span class="c1">///  `uint256 tokenId` in the contract, `function give(...)` must throw.
+</span>  <span class="c1">/// @param to The receiver of the ABT.
+</span>  <span class="c1">/// @param uri A distinct Uniform Resource Identifier (URI) for a given ABT.
+</span>  <span class="c1">/// @param signature A EIP-2098-compatible Compact Signature of the EIP-712
+</span>  <span class="c1">///  structured data hash
+</span>  <span class="c1">///  `Agreement(address active,address passive,string tokenURI)` signed by
+</span>  <span class="c1">///  `address to`.
+</span>  <span class="c1">/// @return A unique `uint256 tokenId` generated by type-casting the `bytes32`
+</span>  <span class="c1">///  EIP-712 structured data hash to a `uint256`.
+</span>  <span class="k">function</span> <span class="n">give</span><span class="p">(</span>
+    <span class="kt">address</span> <span class="n">to</span><span class="p">,</span>
+    <span class="kt">string</span> <span class="k">calldata</span> <span class="n">uri</span><span class="p">,</span>
+    <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">signature</span>
+  <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+  <span class="c1">/// @notice Creates and transfers the ownership of an ABT from an
+</span>  <span class="c1">/// `address from` to the transaction's `msg.sender`.
+</span>  <span class="c1">/// @dev Throws unless `bytes signature` represents an EIP-2098 Compact
+</span>  <span class="c1">///  Signature of the EIP-712 structured data hash
+</span>  <span class="c1">///  `Agreement(address active,address passive,string tokenURI)` expressing
+</span>  <span class="c1">///  `address from`'s explicit agreement to be publicly associated with
+</span>  <span class="c1">///  `msg.sender` and `string tokenURI`. A unique `uint256 tokenId` must be
+</span>  <span class="c1">///  generated by type-casting the `bytes32` EIP-712 structured data hash to a
+</span>  <span class="c1">///  `uint256`. If `bytes signature` is empty or `address from` is a contract,
+</span>  <span class="c1">///  an EIP-1271-compatible call to `function isValidSignatureNow(...)` must
+</span>  <span class="c1">///  be made to `address from`. A successful execution must result in the
+</span>  <span class="c1">///  emission of an `event Transfer(from, msg.sender, tokenId)`. Once an ABT
+</span>  <span class="c1">///  exists as an `uint256 tokenId` in the contract, `function take(...)` must
+</span>  <span class="c1">///  throw.
+</span>  <span class="c1">/// @param from The origin of the ABT.
+</span>  <span class="c1">/// @param uri A distinct Uniform Resource Identifier (URI) for a given ABT.
+</span>  <span class="c1">/// @param signature A EIP-2098-compatible Compact Signature of the EIP-712
+</span>  <span class="c1">///  structured data hash
+</span>  <span class="c1">///  `Agreement(address active,address passive,string tokenURI)` signed by
+</span>  <span class="c1">///  `address from`.
+</span>  <span class="c1">/// @return A unique `uint256 tokenId` generated by type-casting the `bytes32`
+</span>  <span class="c1">///  EIP-712 structured data hash to a `uint256`.
+</span>  <span class="k">function</span> <span class="n">take</span><span class="p">(</span>
+    <span class="kt">address</span> <span class="n">from</span><span class="p">,</span>
+    <span class="kt">string</span> <span class="k">calldata</span> <span class="n">uri</span><span class="p">,</span>
+    <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">signature</span>
+  <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>See <a href="/EIPS/eip-721">EIP-721</a> for a definition of its metadata JSON Schema.</p>
+<h3 id="eip-712-typed-structured-data-hashing-and-eip-2098-compact-signature-creation">
+<a href="#eip-712-typed-structured-data-hashing-and-eip-2098-compact-signature-creation" class="anchor-link"></a> <a href="/EIPS/eip-712">EIP-712</a> Typed Structured Data Hashing and <a href="./eip-2098">EIP-2098</a> Compact Signature Creation
+</h3>
+<p>To invoke <code class="language-plaintext highlighter-rouge">function give(...)</code> and <code class="language-plaintext highlighter-rouge">function take(...)</code> an <a href="/EIPS/eip-2098">EIP-2098</a> compact signature must be created using <a href="/EIPS/eip-712">EIP-712</a>. A tested reference implementation is attached at <a href="/assets/eip-4973/generateSignature.mjs">../assets/eip-4973/generateSignature.mjs</a> and <a href="/assets/eip-4973/generateSignature_test.mjs">../assets/eip-4973/generateSignature_test.mjs</a>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="interface">
+<a href="#interface" class="anchor-link"></a> Interface
+</h3>
+<p>ABTs shall be maximally backward-compatible but still only expose a minimal and simple to implement interface definition.</p>
+<p>As <a href="/EIPS/eip-721">EIP-721</a> tokens have seen widespread adoption with wallet providers and marketplaces, using its <code class="language-plaintext highlighter-rouge">ERC721Metadata</code> interface with <a href="/EIPS/eip-165">EIP-165</a> for feature-detection potentially allows implementers to support ABTs out of the box.</p>
+<p>If an implementer of <a href="/EIPS/eip-721">EIP-721</a> properly built <a href="/EIPS/eip-165">EIP-165</a>’s <code class="language-plaintext highlighter-rouge">function supportsInterface(bytes4 interfaceID)</code> function, already by recognizing that <a href="/EIPS/eip-721">EIP-721</a>’s track and transfer interface component with the identifier <code class="language-plaintext highlighter-rouge">0x80ac58cd</code> is not implemented, transferring of a token should not be suggested as a user interface option.</p>
+<p>Still, since ABTs support <a href="/EIPS/eip-721">EIP-721</a>’s <code class="language-plaintext highlighter-rouge">ERC721Metadata</code> extension, wallets and marketplaces should display an account-bound token with no changes needed.</p>
+<p>Although other implementations of account-bound tokens are possible, e.g., by having all transfer functions revert, ABTs are superior as it supports feature detection through <a href="/EIPS/eip-165">EIP-165</a>.</p>
+<p>We expose <code class="language-plaintext highlighter-rouge">function unequip(address _tokenId)</code> and require it to be callable at any time by an ABT’s owner as it ensures an owner’s right to publicly disassociate themselves from what has been issued towards their account.</p>
+<h3 id="exception-handling">
+<a href="#exception-handling" class="anchor-link"></a> Exception handling
+</h3>
+<p>Given the non-transferable between accounts property of ABTs, if a user’s keys to an account or a contract get compromised or rotated, a user may lose the ability to associate themselves with the token. In some cases, this can be the desired effect. Therefore, ABT implementers should build re-issuance and revocation processes to enable recourse. We recommend implementing strictly decentralized, permissionless, and censorship-resistant re-issuance processes.</p>
+<p>But this document is deliberately abstaining from offering a standardized form of exception handling in cases where user keys are compromised or rotated.</p>
+<p>In cases where implementers want to make account-bound tokens shareable among different accounts, e.g., to avoid losing access when keys get compromised, we suggest issuing the account-bound token towards a contract’s account that implements a multi-signature functionality.</p>
+<h3 id="provenance-indexing">
+<a href="#provenance-indexing" class="anchor-link"></a> Provenance Indexing
+</h3>
+<p>ABTs can be indexed by tracking the emission of <code class="language-plaintext highlighter-rouge">event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)</code>. As with <a href="/EIPS/eip-721">EIP-721</a>, transfers between two accounts are represented by <code class="language-plaintext highlighter-rouge">address from</code> and <code class="language-plaintext highlighter-rouge">address to</code> being non-zero addresses. Unequipping a token is represented through emitting a transfer with <code class="language-plaintext highlighter-rouge">address to</code> being set to the zero address. Mint operations where <code class="language-plaintext highlighter-rouge">address from</code> is set to zero don’t exist. To avoid being spoofed by maliciously-implemented <code class="language-plaintext highlighter-rouge">event Transfer</code> emitting contracts, an indexer should ensure that the transaction’s sender is equal to <code class="language-plaintext highlighter-rouge">event Transfer</code>’s <code class="language-plaintext highlighter-rouge">from</code> value.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>We have adopted the <a href="/EIPS/eip-165">EIP-165</a> and <code class="language-plaintext highlighter-rouge">ERC721Metadata</code> functions purposefully to create a high degree of backward compatibility with <a href="/EIPS/eip-721">EIP-721</a>. We have deliberately used <a href="/EIPS/eip-721">EIP-721</a> terminology such as <code class="language-plaintext highlighter-rouge">function ownerOf(...)</code>, <code class="language-plaintext highlighter-rouge">function balanceOf(...)</code> to minimize the effort of familiarization for ABT implementers already familiar with, e.g., <a href="/EIPS/eip-20">EIP-20</a> or <a href="/EIPS/eip-721">EIP-721</a>. For indexers, we’ve re-used the widely-implemented <code class="language-plaintext highlighter-rouge">event Transfer</code> event signature.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>You can find an implementation of this standard in <a href="/assets/eip-4973/ERC-4973.sol">../assets/eip-4973</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>There are no security considerations related directly to the implementation of this standard.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/TimDaub">Tim Daubenschütz</a>, <a href="https://github.com/ra-phael">Raphael Roullet</a>, "EIP-4973: Account-bound Tokens [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4973, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4973.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4973: Account-bound Tokens [DRAFT]",
+    "author": "Tim Daubenschütz (@TimDaub), Raphael Roullet (@ra-phael)",
+    "name": "EIP-4973: Account-bound Tokens [DRAFT]",
+    "dateCreated": "2022-04-01",
+    "datePublished": "2022-04-01",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4973-non-transferrable-non-fungible-tokens-soulbound-tokens-or-badges/8825",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

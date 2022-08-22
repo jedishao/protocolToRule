@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4337: Account Abstraction via Entry Point Contract specification</title>
+<meta property="og:title" content="EIP-4337: Account Abstraction via Entry Point Contract specification" />
+<meta name="description" content="An account abstraction proposal which completely avoids consensus-layer protocol changes, instead relying on higher-layer infrastructure." />
+<meta property="og:description" content="An account abstraction proposal which completely avoids consensus-layer protocol changes, instead relying on higher-layer infrastructure." />
+<meta name="twitter:description" content="An account abstraction proposal which completely avoids consensus-layer protocol changes, instead relying on higher-layer infrastructure." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4337" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4337" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4337: Account Abstraction via Entry Point Contract specification
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4337.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An account abstraction proposal which completely avoids consensus-layer protocol changes, instead relying on higher-layer infrastructure.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/yoavw">Yoav Weiss</a>, <a href="https://github.com/kristofgazso">Kristof Gazso</a>, <a href="https://github.com/namrapatel">Namra Patel</a>, <a href="https://github.com/drortirosh">Dror Tirosh</a>, <a href="https://github.com/shahafn">Shahaf Nacson</a>, <a href="https://github.com/tjade273">Tjaden Hess</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-4337-account-abstraction-via-entry-point-contract-specification/7160">https://ethereum-magicians.org/t/erc-4337-account-abstraction-via-entry-point-contract-specification/7160</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-09-29</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#required-entry-point-contract-functionality">Required entry point contract functionality</a></li>
+<li><a href="#extension-paymasters">Extension: paymasters</a></li>
+<li><a href="#client-behavior-upon-receiving-a-useroperation">Client behavior upon receiving a UserOperation</a></li>
+<li><a href="#simulation">Simulation</a></li>
+<li><a href="#reputation-scoring-and-throttlingbanning-for-paymasters">Reputation scoring and throttling/banning for paymasters</a></li>
+<li><a href="#rpc-methods">RPC methods</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#paymasters">Paymasters</a></li>
+<li><a href="#first-time-wallet-creation">First-time wallet creation</a></li>
+<li><a href="#entry-point-upgrading">Entry point upgrading</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>An account abstraction proposal which completely avoids the need for consensus-layer protocol changes. Instead of adding new protocol features and changing the bottom-layer transaction type, this proposal instead introduces a higher-layer pseudo-transaction object called a <code class="language-plaintext highlighter-rouge">UserOperation</code>. Users send <code class="language-plaintext highlighter-rouge">UserOperation</code> objects into a separate mempool. A special class of actor called bundlers (either miners, or users that can send transactions to miners through a bundle marketplace) package up a set of these objects into a transaction making a <code class="language-plaintext highlighter-rouge">handleOps</code> call to a special contract, and that transaction then gets included in a block.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>See also <a href="https://ethereum-magicians.org/t/implementing-account-abstraction-as-part-of-eth1-x/4020">“Implementing Account Abstraction as Part of Eth 1.x”</a> and the links therein for historical work and motivation, and <a href="/EIPS/eip-2938">EIP-2938</a> for a consensus layer proposal for implementing the same goal.</p>
+<p>This proposal takes a different approach, avoiding any adjustments to the consensus layer. It seeks to achieve the following goals:</p>
+<ul>
+<li><strong>Achieve the key goal of account abstraction</strong>: allow users to use smart contract wallets containing arbitrary verification logic instead of EOAs as their primary account. Completely remove any need at all for users to also have EOAs (as status quo SC wallets and EIP-3074 both require)</li>
+<li><strong>Decentralization</strong>
+<ul>
+<li>Allow any bundler (think: miner) to participate in the process of including account-abstracted user operations</li>
+<li>Work with all activity happening over a public mempool; users do not need to know the direct communication addresses (eg. IP, onion) of any specific actors</li>
+<li>Avoid trust assumptions on bundlers</li>
+</ul>
+</li>
+<li><strong>Do not require any Ethereum consensus changes</strong>: Ethereum consensus layer development is focusing on the merge and later on scalability-oriented features, and there may not be any opportunity for further protocol changes for a long time. Hence, to increase the chance of faster adoption, this proposal avoids Ethereum consensus changes.</li>
+<li><strong>Try to support other use cases</strong>
+<ul>
+<li>Privacy-preserving applications</li>
+<li>Atomic multi-operations (similar goal to EIP-3074)</li>
+<li>Pay tx fees with ERC-20 tokens, allow developers to pay fees for their users, and <a href="/EIPS/eip-3074">EIP-3074</a>-like <strong>sponsored transaction</strong> use cases more generally</li>
+</ul>
+</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>To avoid Ethereum consensus changes, we do not attempt to create new transaction types for account-abstracted transactions. Instead, users package up the action they want their wallet to take in an ABI-encoded struct called a <code class="language-plaintext highlighter-rouge">UserOperation</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">sender</code></td>
+<td><code class="language-plaintext highlighter-rouge">address</code></td>
+<td>The wallet making the operation</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">nonce</code></td>
+<td><code class="language-plaintext highlighter-rouge">uint256</code></td>
+<td>Anti-replay parameter; also used as the salt for first-time wallet creation</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">initCode</code></td>
+<td><code class="language-plaintext highlighter-rouge">bytes</code></td>
+<td>The initCode of the wallet (only needed if the wallet is not yet on-chain and needs to be created)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">callData</code></td>
+<td><code class="language-plaintext highlighter-rouge">bytes</code></td>
+<td>The data to pass to the <code class="language-plaintext highlighter-rouge">sender</code> during the main execution call</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">callGas</code></td>
+<td><code class="language-plaintext highlighter-rouge">uint256</code></td>
+<td>The amount of gas to allocate the main execution call</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">verificationGas</code></td>
+<td><code class="language-plaintext highlighter-rouge">uint256</code></td>
+<td>The amount of gas to allocate for the verification step</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">preVerificationGas</code></td>
+<td><code class="language-plaintext highlighter-rouge">uint256</code></td>
+<td>The amount of gas to pay for to compensate the bundler for pre-verification execution and calldata</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">maxFeePerGas</code></td>
+<td><code class="language-plaintext highlighter-rouge">uint256</code></td>
+<td>Maximum fee per gas (similar to EIP 1559 <code class="language-plaintext highlighter-rouge">max_fee_per_gas</code>)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">maxPriorityFeePerGas</code></td>
+<td><code class="language-plaintext highlighter-rouge">uint256</code></td>
+<td>Maximum priority fee per gas (similar to EIP 1559 <code class="language-plaintext highlighter-rouge">max_priority_fee_per_gas</code>)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">paymaster</code></td>
+<td><code class="language-plaintext highlighter-rouge">address</code></td>
+<td>Address sponsoring the transaction (or zero for regular self-sponsored transactions)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">paymasterData</code></td>
+<td><code class="language-plaintext highlighter-rouge">bytes</code></td>
+<td>Extra data to send to the paymaster</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">signature</code></td>
+<td><code class="language-plaintext highlighter-rouge">bytes</code></td>
+<td>Data passed into the wallet along with the nonce during the verification step</td>
+</tr>
+</tbody>
+</table>
+<p>Users send <code class="language-plaintext highlighter-rouge">UserOperation</code> objects to a dedicated user operation mempool. A specialized class of actors called <strong>bundlers</strong> (either miners running special-purpose code, or users that can relay transactions to miners eg. through a bundle marketplace such as Flashbots that can guarantee next-block-or-never inclusion) listen in on the user operation mempool, and create <strong>bundle transactions</strong>. A bundle transaction packages up multiple <code class="language-plaintext highlighter-rouge">UserOperation</code> objects into a single <code class="language-plaintext highlighter-rouge">handleOps</code> call to a pre-published global <strong>entry point contract</strong>.</p>
+<p>To prevent replay attacks (both cross-chain and multiple <code class="language-plaintext highlighter-rouge">EntryPoint</code> implementations), the <code class="language-plaintext highlighter-rouge">signature</code> should depend on <code class="language-plaintext highlighter-rouge">chainid</code> and the <code class="language-plaintext highlighter-rouge">EntryPoint</code> address.</p>
+<p>The core interface of the entry point contract is as follows:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">function</span> <span class="n">handleOps</span>
+    <span class="p">(</span><span class="n">UserOperation</span><span class="p">[]</span> <span class="n">calldata</span> <span class="n">ops</span><span class="p">,</span> <span class="n">address</span> <span class="n">payable</span> <span class="n">beneficiary</span><span class="p">)</span>
+    <span class="k">public</span><span class="p">;</span>
+
+<span class="n">function</span> <span class="nf">simulateValidation</span>
+    <span class="p">(</span><span class="n">UserOperation</span> <span class="n">calldata</span> <span class="n">userOp</span><span class="p">)</span>
+    <span class="n">external</span> <span class="n">returns</span> <span class="p">(</span><span class="n">uint256</span> <span class="n">preOpGas</span><span class="p">,</span> <span class="n">uint256</span> <span class="n">prefund</span><span class="p">)</span> <span class="p">{</span>
+</code></pre></div></div>
+<p>The core interface required for a wallet to have is:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">function</span> <span class="n">validateUserOp</span>
+    <span class="p">(</span><span class="n">UserOperation</span> <span class="n">calldata</span> <span class="n">userOp</span><span class="p">,</span> <span class="n">bytes32</span> <span class="n">requestId</span><span class="p">,</span> <span class="n">uint256</span> <span class="n">missingWalletFunds</span><span class="p">)</span>
+    <span class="n">external</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="required-entry-point-contract-functionality">
+<a href="#required-entry-point-contract-functionality" class="anchor-link"></a> Required entry point contract functionality
+</h3>
+<p>The entry point’s <code class="language-plaintext highlighter-rouge">handleOps</code> function must perform the following steps (we first describe the simpler non-paymaster case). It must make two loops, the <strong>verification loop</strong> and the <strong>execution loop</strong>. In the verification loop, the <code class="language-plaintext highlighter-rouge">handleOps</code> call must perform the following steps for each <code class="language-plaintext highlighter-rouge">UserOperation</code>:</p>
+<ul>
+<li><strong>Create the wallet if it does not yet exist</strong>, using the initcode provided in the <code class="language-plaintext highlighter-rouge">UserOperation</code>. If the wallet does not exist, <em>and</em> the initcode is empty, or the newly deployed contract address differs from <code class="language-plaintext highlighter-rouge">UserOperation.sender</code>, the call must fail.</li>
+<li><strong>Call <code class="language-plaintext highlighter-rouge">validateUserOp</code> on the wallet</strong>, passing in the <code class="language-plaintext highlighter-rouge">UserOperation</code> and the required fee. The wallet should verify the operation’s signature, and pay the fee if the wallet considers the operation valid. If any <code class="language-plaintext highlighter-rouge">validateUserOp</code> call fails, <code class="language-plaintext highlighter-rouge">handleOps</code> must skip execution of at least that operation, and may revert entirely.</li>
+</ul>
+<p>In the execution loop, the <code class="language-plaintext highlighter-rouge">handleOps</code> call must perform the following steps for each <code class="language-plaintext highlighter-rouge">UserOperation</code>:</p>
+<ul>
+<li><strong>Call the wallet with the <code class="language-plaintext highlighter-rouge">UserOperation</code>’s calldata</strong>. It’s up to the wallet to choose how to parse the calldata; an expected worlflow is for the wallet to have an <code class="language-plaintext highlighter-rouge">execute</code> function that parses the remaining calldata as a series of one or more calls that the wallet should make.</li>
+<li><strong>Refund unused gas fees</strong> to the wallet</li>
+</ul>
+<p><img src="/assets/eip-4337/image1.png" alt="" /></p>
+<p>Before accepting a <code class="language-plaintext highlighter-rouge">UserOperation</code>, bundlers must use an RPC method to locally simulate calling the <code class="language-plaintext highlighter-rouge">simulateValidation</code> function of the entry point, to verify that the signature is correct and the operation actually pays fees; see the <a href="#simulation">Simulation section below</a> for details.</p>
+<h3 id="extension-paymasters">
+<a href="#extension-paymasters" class="anchor-link"></a> Extension: paymasters
+</h3>
+<p>We extend the entry point logic to support <strong>paymasters</strong> that can sponsor transactions for other users. This feature can be used to allow application developers to subsidize fees for their users, allow users to pay fees with ERC-20 tokens and many other use cases. When the paymaster is not equal to the zero address, the entry point implements a different flow:</p>
+<p><img src="/assets/eip-4337/image2.png" alt="" /></p>
+<p>During the verification loop, in addition to calling <code class="language-plaintext highlighter-rouge">validateUserOp</code>, the <code class="language-plaintext highlighter-rouge">handleOps</code> execution also must check that the paymaster is staked, and also has enough ETH deposited with the entry point to pay for the operation, and then call <code class="language-plaintext highlighter-rouge">validatePaymasterUserOp</code> on the paymaster to verify that the paymaster is willing to pay for the operation. Additionally, the <code class="language-plaintext highlighter-rouge">validateUserOp</code> must be called with a <code class="language-plaintext highlighter-rouge">requiredPrefund</code> of 0 to reflect that it’s the paymaster, and not the wallet, that’s paying the fees.</p>
+<p>During the execution loop, the <code class="language-plaintext highlighter-rouge">handleOps</code> execution must call <code class="language-plaintext highlighter-rouge">postOp</code> on the paymaster after making the main execution call. It must guarantee the execution of <code class="language-plaintext highlighter-rouge">postOp</code>, by making the main execution inside an inner call context, and if the inner call context reverts attempting to call <code class="language-plaintext highlighter-rouge">postOp</code> again in an outer call context.</p>
+<p>Maliciously crafted paymasters <em>can</em> DoS the system. To prevent this, we use a paymaster reputation system; see the <a href="#reputation-scoring-and-throttlingbanning-for-paymasters">reputation, throttling and banning section</a> for details.</p>
+<p>The paymaster interface is as follows:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">function</span> <span class="nf">validatePaymasterUserOp</span>
+    <span class="p">(</span><span class="n">UserOperation</span> <span class="n">calldata</span> <span class="n">userOp</span><span class="p">,</span> <span class="n">bytes32</span> <span class="n">requestId</span><span class="p">,</span> <span class="n">uint256</span> <span class="n">maxCost</span><span class="p">)</span>
+    <span class="n">external</span> <span class="n">view</span> <span class="n">returns</span> <span class="p">(</span><span class="n">bytes</span> <span class="n">memory</span> <span class="n">context</span><span class="p">);</span>
+
+<span class="n">function</span> <span class="n">postOp</span>
+    <span class="p">(</span><span class="n">PostOpMode</span> <span class="n">mode</span><span class="p">,</span> <span class="n">bytes</span> <span class="n">calldata</span> <span class="n">context</span><span class="p">,</span> <span class="n">uint256</span> <span class="n">actualGasCost</span><span class="p">)</span>
+    <span class="n">external</span><span class="p">;</span>
+
+<span class="k">enum</span> <span class="n">PostOpMode</span> <span class="p">{</span>
+    <span class="n">opSucceeded</span><span class="p">,</span> <span class="c1">// user op succeeded</span>
+    <span class="n">opReverted</span><span class="p">,</span> <span class="c1">// user op reverted. still has to pay for gas.</span>
+    <span class="n">postOpReverted</span> <span class="c1">// user op succeeded, but caused postOp to revert</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>To prevent attacks involving malicious <code class="language-plaintext highlighter-rouge">UserOperation</code> objects listing other users’ wallets as their paymasters, the entry point contract must require a paymaster to call the entry point to lock their stake and thereby consent to being a paymaster. Unlocking stake must have a delay. The extended interface for the entry point, adding functions for paymasters to add and withdraw stake, is:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// add a paymaster stake (must be called by the paymaster)</span>
+<span class="n">function</span> <span class="n">addStake</span><span class="p">(</span><span class="n">uint32</span> <span class="n">_unstakeDelaySec</span><span class="p">)</span> <span class="n">external</span> <span class="n">payable</span>
+
+<span class="c1">// unlock the stake (must wait unstakeDelay before can withdraw)</span>
+<span class="n">function</span> <span class="n">unlockStake</span><span class="p">()</span> <span class="n">external</span>
+
+<span class="c1">// withdraw the unlocked stake</span>
+<span class="n">function</span> <span class="n">withdrawStake</span><span class="p">(</span><span class="n">address</span> <span class="n">payable</span> <span class="n">withdrawAddress</span><span class="p">)</span> <span class="n">external</span>
+</code></pre></div></div>
+<p>The paymaster must also have a deposit, which the entry point will charge UserOperation costs from. The entry point must implement the following interface to allow paymasters (and optionally wallets) manage their deposit:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// return the deposit of an account</span>
+<span class="n">function</span> <span class="n">balanceOf</span><span class="p">(</span><span class="n">address</span> <span class="n">account</span><span class="p">)</span> <span class="k">public</span> <span class="n">view</span> <span class="n">returns</span> <span class="p">(</span><span class="n">uint256</span><span class="p">)</span>
+
+<span class="c1">// add to the deposit of the given account</span>
+<span class="n">function</span> <span class="n">depositTo</span><span class="p">(</span><span class="n">address</span> <span class="n">account</span><span class="p">)</span> <span class="k">public</span> <span class="n">payable</span>
+
+<span class="c1">// withdraw from the deposit</span>
+<span class="n">function</span> <span class="n">withdrawTo</span><span class="p">(</span><span class="n">address</span> <span class="n">payable</span> <span class="n">withdrawAddress</span><span class="p">,</span> <span class="n">uint256</span> <span class="n">withdrawAmount</span><span class="p">)</span> <span class="n">external</span>
+
+</code></pre></div></div>
+<h3 id="client-behavior-upon-receiving-a-useroperation">
+<a href="#client-behavior-upon-receiving-a-useroperation" class="anchor-link"></a> Client behavior upon receiving a UserOperation
+</h3>
+<p>When a client receives a <code class="language-plaintext highlighter-rouge">UserOperation</code>, it must first run some basic sanity checks, namely that:</p>
+<ul>
+<li>Either the <code class="language-plaintext highlighter-rouge">sender</code> is an existing contract, or the <code class="language-plaintext highlighter-rouge">initCode</code> is not empty (but not both)</li>
+<li>The <code class="language-plaintext highlighter-rouge">verificationGas</code> is sufficiently low (<code class="language-plaintext highlighter-rouge">&lt;= MAX_VERIFICATION_GAS</code>) and the <code class="language-plaintext highlighter-rouge">preVerificationGas</code> is sufficiently high (enough to pay for the calldata gas cost of serializing the <code class="language-plaintext highlighter-rouge">UserOperation</code> plus <code class="language-plaintext highlighter-rouge">PRE_VERIFICATION_OVERHEAD_GAS</code>)</li>
+<li>The paymaster is either the zero address or is a contract which (i) currently has nonempty code on chain, (ii) has registered and staked, (iii) has a sufficient deposit to pay for the UserOperation, and (iv) is not currently banned.</li>
+<li>The callgas is at least the cost of a <code class="language-plaintext highlighter-rouge">CALL</code> with non-zero value.</li>
+<li>The <code class="language-plaintext highlighter-rouge">maxFeePerGas</code> and <code class="language-plaintext highlighter-rouge">maxPriorityFeePerGas</code> are above a configurable minimum value that the client is willing to accept. At the minimum, they are sufficiently high to be included with the current <code class="language-plaintext highlighter-rouge">block.basefee</code>.</li>
+<li>The sender doesn’t have another <code class="language-plaintext highlighter-rouge">UserOperation</code> already present in the pool (or it replaces an existing entry with the same sender and nonce, with a higher <code class="language-plaintext highlighter-rouge">maxPriorityFeePerGas</code> and an equally increased <code class="language-plaintext highlighter-rouge">maxFeePerGas</code>). Only one <code class="language-plaintext highlighter-rouge">UserOperation</code> per sender may be included in a single batch.</li>
+</ul>
+<p>If the <code class="language-plaintext highlighter-rouge">UserOperation</code> object passes these sanity checks, the client must next run the first op simulation, and if the simulation succeeds, the client must add the op to the pool. A second simulation must also happen during bundling to make sure that the storage accessed is the same as the <code class="language-plaintext highlighter-rouge">accessList</code> that was saved during the initial simulation.</p>
+<h3 id="simulation">
+<a href="#simulation" class="anchor-link"></a> Simulation
+</h3>
+<p>To simulate a <code class="language-plaintext highlighter-rouge">UserOperation</code> <code class="language-plaintext highlighter-rouge">op</code> validation, the client makes an <code class="language-plaintext highlighter-rouge">eth_call</code> with the following params:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+    <span class="s">"from"</span><span class="p">:</span> <span class="mh">0x0000000000000000000000000000000000000000</span><span class="p">,</span>
+    <span class="s">"to"</span><span class="p">:</span> <span class="p">[</span><span class="n">entry</span> <span class="n">point</span> <span class="n">address</span><span class="p">],</span>
+    <span class="s">"input"</span><span class="p">:</span> <span class="p">[</span><span class="n">simulateValidation</span> <span class="n">header</span><span class="p">]</span> <span class="o">+</span> <span class="n">serialize</span><span class="p">(</span><span class="n">op</span><span class="p">),</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>If the call returns an error, the client rejects the <code class="language-plaintext highlighter-rouge">op</code>.</p>
+<p>The simulated call performs the full validation, calling both <code class="language-plaintext highlighter-rouge">wallet.validateUserOp</code> and (if specified) <code class="language-plaintext highlighter-rouge">paymaster.validatePaymasterUserOp</code>.
+The two operations differ in their opcode banning policy.
+In order to distinguish between the two, there is a single call to the NUMBER opcode (<code class="language-plaintext highlighter-rouge">block.number</code>), used as a delimiter between wallet validation restrictions and paymaster validation restrictions.
+While simulating <code class="language-plaintext highlighter-rouge">op</code> validation, the client should make sure that:</p>
+<ol>
+<li>Neither call’s execution trace invokes any <strong>forbidden opcodes</strong></li>
+<li>The first call does not access <em>mutable state</em> of any contract except the wallet itself and its deposit in the entry point contract. <em>Mutable state</em> definition includes both storage and balance.</li>
+<li>The second call does not access <em>mutable state</em> of any contract except the paymaster itself.</li>
+<li>Any <code class="language-plaintext highlighter-rouge">CALL</code> or <code class="language-plaintext highlighter-rouge">CALLCODE</code> during validation has <code class="language-plaintext highlighter-rouge">value=0</code>, except for the transfer from the wallet to the entry point.</li>
+<li>No <code class="language-plaintext highlighter-rouge">CALL</code>, <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>, <code class="language-plaintext highlighter-rouge">CALLCODE</code>, <code class="language-plaintext highlighter-rouge">STATICCALL</code> results in an out-of-gas revert.</li>
+<li>Any <code class="language-plaintext highlighter-rouge">GAS</code> opcode is followed immediately by one of { <code class="language-plaintext highlighter-rouge">CALL</code>, <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>, <code class="language-plaintext highlighter-rouge">CALLCODE</code>, <code class="language-plaintext highlighter-rouge">STATICCALL</code> }.</li>
+<li><code class="language-plaintext highlighter-rouge">EXTCODEHASH</code> of every address accessed (by any opcode) does not change between first and second simulations of the op.</li>
+<li>If <code class="language-plaintext highlighter-rouge">op.initcode.length != 0</code> , allow only one <code class="language-plaintext highlighter-rouge">CREATE2</code> opcode call, otherwise forbid <code class="language-plaintext highlighter-rouge">CREATE2</code>.</li>
+</ol>
+<p>Since the wallet is allowed to access its own entry point deposit in order to top it up when needed, the client must know the storage slot in order to whitelist it. The entry point therefore implements the following view function:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">function</span> <span class="n">getSenderStorage</span><span class="p">(</span><span class="n">address</span> <span class="n">sender</span><span class="p">)</span> <span class="n">external</span> <span class="n">view</span> <span class="n">returns</span> <span class="p">(</span><span class="n">uint256</span><span class="p">[]</span> <span class="n">memory</span> <span class="n">senderStorageCells</span><span class="p">)</span>
+</code></pre></div></div>
+<p>During batching, the client should:</p>
+<ul>
+<li>Exclude UserOps that access any sender address created by another UserOp on the same batch (via CREATE2 factory).</li>
+<li>For each paymaster used in the batch, keep track of the balance while adding UserOps. Ensure that it has sufficient deposit to pay for all the UserOps that use it.</li>
+</ul>
+<p>After creating the batch, before including the transaction in a block, the client should:</p>
+<ul>
+<li>Run <code class="language-plaintext highlighter-rouge">eth_estimateGas</code> with maximum possible gas, to verify the entire <code class="language-plaintext highlighter-rouge">handleOps</code> batch transaction, and use the estimated gas for the actual transaction execution.</li>
+<li>If the call reverted, check the <code class="language-plaintext highlighter-rouge">FailedOp</code> event. A <code class="language-plaintext highlighter-rouge">FailedOp</code> during <code class="language-plaintext highlighter-rouge">handleOps</code> simulation is an unexpected event since it was supposed to be caught by the single-UserOperation simulation. Remove the failed op that caused the revert from the batch and drop from the mempool. Other ops from the same paymaster should be removed from the current batch, but kept in the mempool. Repeat until <code class="language-plaintext highlighter-rouge">eth_estimateGas</code> succeeds.</li>
+</ul>
+<p>In practice, restrictions (2) and (3) basically mean that the only external accesses that the wallet and the paymaster can make are reading code of other contracts if their code is guaranteed to be immutable (eg. this is useful for calling or delegatecalling to libraries).</p>
+<p>If any of the three conditions is violated, the client should reject the <code class="language-plaintext highlighter-rouge">op</code>. If both calls succeed (or, if <code class="language-plaintext highlighter-rouge">op.paymaster == ZERO_ADDRESS</code> and the first call succeeds) without violating the three conditions, the client should accept the op. On a bundler node, the storage keys accessed by both calls must be saved as the <code class="language-plaintext highlighter-rouge">accessList</code> of the <code class="language-plaintext highlighter-rouge">UserOperation</code></p>
+<p>When a bundler includes a bundle in a block it must ensure that earlier transactions in the block don’t make any UserOperation fail. It should either use access lists to prevent conflicts, or place the bundle as the first transaction in the block.</p>
+<h4 id="forbidden-opcodes">
+<a href="#forbidden-opcodes" class="anchor-link"></a> Forbidden opcodes
+</h4>
+<p>The forbidden opcodes are to be forbidden when <code class="language-plaintext highlighter-rouge">depth &gt; 2</code> (i.e. when it is the wallet, paymaster, or other contracts called by them that are being executed). They are: <code class="language-plaintext highlighter-rouge">GASPRICE</code>, <code class="language-plaintext highlighter-rouge">GASLIMIT</code>, <code class="language-plaintext highlighter-rouge">DIFFICULTY</code>, <code class="language-plaintext highlighter-rouge">TIMESTAMP</code>, <code class="language-plaintext highlighter-rouge">BASEFEE</code>, <code class="language-plaintext highlighter-rouge">BLOCKHASH</code>, <code class="language-plaintext highlighter-rouge">NUMBER</code>, <code class="language-plaintext highlighter-rouge">SELFBALANCE</code>, <code class="language-plaintext highlighter-rouge">BALANCE</code>, <code class="language-plaintext highlighter-rouge">ORIGIN</code>, <code class="language-plaintext highlighter-rouge">GAS</code>, <code class="language-plaintext highlighter-rouge">CREATE</code>, <code class="language-plaintext highlighter-rouge">COINBASE</code>. They should only be forbidden during verification, not execution. These opcodes are forbidden because their outputs may differ between simulation and execution, so simulation of calls using these opcodes does not reliably tell what would happen if these calls are later done on-chain.</p>
+<p>Exceptions to the forbidden opcodes:</p>
+<ol>
+<li>A single <code class="language-plaintext highlighter-rouge">CREATE2</code> is allowed if <code class="language-plaintext highlighter-rouge">op.initcode.length != 0</code> and must result in the deployment of a previously-undeployed <code class="language-plaintext highlighter-rouge">UserOperation.sender</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">GAS</code> is allowed if followed immediately by one of { <code class="language-plaintext highlighter-rouge">CALL</code>, <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>, <code class="language-plaintext highlighter-rouge">CALLCODE</code>, <code class="language-plaintext highlighter-rouge">STATICCALL</code> }.</li>
+</ol>
+<h3 id="reputation-scoring-and-throttlingbanning-for-paymasters">
+<a href="#reputation-scoring-and-throttlingbanning-for-paymasters" class="anchor-link"></a> Reputation scoring and throttling/banning for paymasters
+</h3>
+<p>Clients maintain two mappings with a value for each paymaster:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">opsSeen: Map[Address, int]</code></li>
+<li><code class="language-plaintext highlighter-rouge">opsIncluded: Map[Address, int]</code></li>
+</ul>
+<p>When the client learns of a new <code class="language-plaintext highlighter-rouge">paymaster</code>, it sets <code class="language-plaintext highlighter-rouge">opsSeen[paymaster] = 0</code> and <code class="language-plaintext highlighter-rouge">opsIncluded[paymaster] = 0</code> .</p>
+<p>The client sets <code class="language-plaintext highlighter-rouge">opsSeen[paymaster] +=1</code> each time it adds an op with that <code class="language-plaintext highlighter-rouge">paymaster</code> to the <code class="language-plaintext highlighter-rouge">UserOperationPool</code>, and the client sets <code class="language-plaintext highlighter-rouge">opsIncluded[paymaster] += 1</code> each time an op that was in the <code class="language-plaintext highlighter-rouge">UserOperationPool</code> is included on-chain.</p>
+<p>Every hour, the client sets <code class="language-plaintext highlighter-rouge">opsSeen[paymaster] -= opsSeen[paymaster] // 24</code> and <code class="language-plaintext highlighter-rouge">opsIncluded[paymaster] -= opsIncluded[paymaster] // 24</code> for all paymasters (so both values are 24-hour exponential moving averages).</p>
+<p>We define the <strong>status</strong> of a paymaster as follows:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">OK</span><span class="p">,</span> <span class="n">THROTTLED</span><span class="p">,</span> <span class="n">BANNED</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">status</span><span class="p">(</span><span class="n">paymaster</span><span class="p">:</span> <span class="n">Address</span><span class="p">,</span>
+           <span class="n">opsSeen</span><span class="p">:</span> <span class="n">Map</span><span class="p">[</span><span class="n">Address</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+           <span class="n">opsIncluded</span><span class="p">:</span> <span class="n">Map</span><span class="p">[</span><span class="n">Address</span><span class="p">,</span> <span class="nb">int</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="n">paymaster</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">opsSeen</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OK</span>
+    <span class="n">min_expected_included</span> <span class="o">=</span> <span class="n">opsSeen</span><span class="p">[</span><span class="n">paymaster</span><span class="p">]</span> <span class="o">//</span> <span class="n">MIN_INCLUSION_RATE_DENOMINATOR</span>
+    <span class="k">if</span> <span class="n">min_expected_included</span> <span class="o">&lt;=</span> <span class="n">opsIncluded</span><span class="p">[</span><span class="n">paymaster</span><span class="p">]</span> <span class="o">+</span> <span class="n">THROTTLING_SLACK</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OK</span>
+    <span class="k">elif</span> <span class="n">min_expected_included</span> <span class="o">&lt;=</span> <span class="n">opsIncluded</span><span class="p">[</span><span class="n">paymaster</span><span class="p">]</span> <span class="o">+</span> <span class="n">BAN_SLACK</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">THROTTLED</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">BANNED</span>
+</code></pre></div></div>
+<p>Stated in simpler terms, we expect at least <code class="language-plaintext highlighter-rouge">1 / MIN_INCLUSION_RATE_DENOMINATOR</code> of all ops seen on the network to get included. If a paymaster falls too far behind this minimum, the paymaster gets <strong>throttled</strong> (meaning, the client does not accept ops from that paymaster if there is already an op from that paymaster, and an op only stays in the pool for 10 blocks), If the paymaster falls even further behind, it gets <strong>banned</strong>. Throttling and banning naturally reverse over time because of the exponential-moving-average rule.</p>
+<p><strong>Non-bundling clients and bundlers should use different settings for the above params</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Param</th>
+<th>Client setting</th>
+<th>Bundler setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MIN_INCLUSION_RATE_DENOMINATOR</code></td>
+<td>100</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">THROTTLING_SLACK</code></td>
+<td>10</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">BAN_SLACK</code></td>
+<td>50</td>
+<td>50</td>
+</tr>
+</tbody>
+</table>
+<p>To help make sense of these params, note that a malicious paymaster can at most cause the network (only the p2p network, not the blockchain) to process <code class="language-plaintext highlighter-rouge">BAN_SLACK * MIN_INCLUSION_RATE_DENOMINATOR / 24</code> non-paying ops per hour.</p>
+<h3 id="rpc-methods">
+<a href="#rpc-methods" class="anchor-link"></a> RPC methods
+</h3>
+<p><code class="language-plaintext highlighter-rouge">eth_sendUserOperation</code></p>
+<p>eth_sendUserOperation submits a User Operation object to the User Operation pool of the client. An entryPoint address <code class="language-plaintext highlighter-rouge">MUST</code> be specified, and the client <code class="language-plaintext highlighter-rouge">MUST</code> only simulate and submit the User Operation through the specified entryPoint.</p>
+<p>The result <code class="language-plaintext highlighter-rouge">SHOULD</code> be set to true if and only if the request passed simulation and was accepted in the client’s User Operation pool. If the validation, simulation, or User Operation pool inclusion fails, <code class="language-plaintext highlighter-rouge">result</code> <code class="language-plaintext highlighter-rouge">SHOULD NOT</code> be returned. Rather, the client <code class="language-plaintext highlighter-rouge">SHOULD</code> return the failure reason.</p>
+<pre><code class="language-json="># Request
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "eth_sendUserOperation",
+  "params": [
+    {
+      sender, // address
+      nonce, // uint256
+      initCode, // bytes
+      callData, // bytes
+      callGas, // uint256
+      verificationGas, // uint256
+      preVerificationGas, // uint256
+      maxFeePerGas, // uint256
+      maxPriorityFeePerGas, // uint256
+      paymaster, // address
+      paymasterData, // bytes
+      signature // bytes
+    },
+    entryPoint // address
+  ]
+}
+
+# Response
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": true
+}
+</code></pre>
+<p><code class="language-plaintext highlighter-rouge">eth_supportedEntryPoints</code></p>
+<p>eth_supportedEntryPoints returns an array of the entryPoint addresses supported by the client. The first element of the array <code class="language-plaintext highlighter-rouge">SHOULD</code> be the entryPoint addressed preferred by the client.</p>
+<pre><code class="language-json="># Request
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "eth_supportedEntryPoints",
+  "params": []
+}
+
+# Response
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": [
+    "0xcd01C8aa8995A59eB7B2627E69b40e0524B5ecf8",
+    "0x7A0A0d159218E6a2f407B99173A2b12A6DDfC2a6"
+  ]
+}
+</code></pre>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The main challenge with a purely smart contract wallet based account abstraction system is DoS safety: how can a miner including an operation make sure that it will actually pay fees, without having to first execute the entire operation? Requiring the miner to execute the entire operation opens a DoS attack vector, as an attacker could easily send many operations that pretend to pay a fee but then revert at the last moment after a long execution. Similarly, to prevent attackers from cheaply clogging the mempool, nodes in the P2P network need to check if an operation will pay a fee before they are willing to forward it.</p>
+<p>In this proposal, we expect wallets to have a <code class="language-plaintext highlighter-rouge">validateUserOp</code> method that takes as input a <code class="language-plaintext highlighter-rouge">UserOperation</code>, and verify the signature and pay the fee. This method is required to be almost-pure: it is only allowed to access the storage of the wallet itself, cannot use environment opcodes (eg. <code class="language-plaintext highlighter-rouge">TIMESTAMP</code>), and can only edit the storage of the wallet, and can also send out ETH (needed to pay the entry point). The method is gas-limited by the <code class="language-plaintext highlighter-rouge">verificationGas</code> of the <code class="language-plaintext highlighter-rouge">UserOperation</code>; nodes can choose to reject operations whose <code class="language-plaintext highlighter-rouge">verificationGas</code> is too high. These restrictions allow miners and network nodes to simulate the verification step locally, and be confident that the result will match the result when the operation actually gets included into a block.</p>
+<p>The entry point-based approach allows for a clean separation between verification and execution, and keeps wallets’ logic simple. The alternative would be to require wallets to follow a template where they first self-call to verify and then self-call to execute (so that the execution is sandboxed and cannot cause the fee payment to revert); template-based approaches were rejected due to being harder to implement, as existing code compilation and verification tooling is not designed around template verification.</p>
+<h3 id="paymasters">
+<a href="#paymasters" class="anchor-link"></a> Paymasters
+</h3>
+<p>Paymasters facilitate transaction sponsorship, allowing third-party-designed mechanisms to pay for transactions. Many of these mechanisms <em>could</em> be done by having the paymaster wrap a <code class="language-plaintext highlighter-rouge">UserOperation</code> with their own, but there are some important fundamental limitations to that approach:</p>
+<ul>
+<li>No possibility for “passive” paymasters (eg. that accept fees in some ERC-20 token at an exchange rate pulled from an on-chain DEX)</li>
+<li>Paymasters run the risk of getting griefed, as users could send ops that appear to pay the paymaster but then change their behavior after a block</li>
+</ul>
+<p>The paymaster scheme allows a contract to passively pay on users’ behalf under arbitrary conditions. It even allows ERC-20 token paymasters to secure a guarantee that they would only need to pay if the user pays them: the paymaster contract can check that there is sufficient approved ERC-20 balance in the <code class="language-plaintext highlighter-rouge">validatePaymasterUserOp</code> method, and then extract it with <code class="language-plaintext highlighter-rouge">transferFrom</code> in the <code class="language-plaintext highlighter-rouge">postOp</code> call; if the op itself transfers out or de-approves too much of the ERC-20s, the inner <code class="language-plaintext highlighter-rouge">postOp</code> will fail and revert the execution and the outer <code class="language-plaintext highlighter-rouge">postOp</code> can extract payment (note that because of storage access restrictions the ERC-20 would need to be a wrapper defined within the paymaster itself).</p>
+<h3 id="first-time-wallet-creation">
+<a href="#first-time-wallet-creation" class="anchor-link"></a> First-time wallet creation
+</h3>
+<p>It is an important design goal of this proposal to replicate the key property of EOAs that users do not need to perform some custom action or rely on an existing user to create their wallet; they can simply generate an address locally and immediately start accepting funds.</p>
+<p>This is accomplished by having the entry point itself create wallets using CREATE2. The <code class="language-plaintext highlighter-rouge">UserOperation</code> struct has an <code class="language-plaintext highlighter-rouge">initCode</code> field; this field would be empty for all operations by a given wallet after the first, but the first operation would fill in the <code class="language-plaintext highlighter-rouge">initCode</code>. The entry point uses <a href="/EIPS/eip-2470">EIP-2470</a> deployer contract to create the wallet, and then performs the operation. The user can compute the address of their wallet by locally running the <a href="/EIPS/eip-1014">EIP 1014</a> CREATE2 address formula. The salt used is the <code class="language-plaintext highlighter-rouge">nonce</code> of the <code class="language-plaintext highlighter-rouge">UserOperation</code>.
+(The entry point contract has a utility method <code class="language-plaintext highlighter-rouge">getSenderAddress()</code> for that purpose)</p>
+<h3 id="entry-point-upgrading">
+<a href="#entry-point-upgrading" class="anchor-link"></a> Entry point upgrading
+</h3>
+<p>Wallets are encouraged to be DELEGATECALL forwarding contracts for gas efficiency and to allow wallet upgradability. The wallet code is expected to hard-code the entry point into their code for gas efficiency. If a new entry point is introduced, whether to add new functionality, improve gas efficiency, or fix a critical security bug, users can self-call to replace their wallet’s code address with a new code address containing code that points to a new entry point. During an upgrade process, it’s expected that two mempools will run in parallel.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This ERC does not change the consensus layer, so there are no backwards compatibility issues for Ethereum as a whole. Unfortunately it is not easily compatible with pre-ERC-4337 wallets, because those wallets do not have a <code class="language-plaintext highlighter-rouge">validateUserOp</code> function. If the wallet has a function for authorizing a trusted op submitter, then this could be fixed by creating an ERC-4337-compatible wallet that re-implements the verification logic as a wrapper and setting it to be the original wallet’s trusted op submitter.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>See https://github.com/eth-infinitism/account-abstraction/tree/audit</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security considerations
+</h2>
+<p>The entry point contract will need to be very heavily audited and formally verified, because it will serve as a central trust point for <em>all</em> ERC 4337 wallets. In total, this architecture reduces auditing and formal verification load for the ecosystem, because the amount of work that individual <em>wallets</em> have to do becomes much smaller (they need only verify the <code class="language-plaintext highlighter-rouge">validateUserOp</code> function and its “check signature, increment nonce and pay fees” logic) and check that other functions are <code class="language-plaintext highlighter-rouge">msg.sender == ENTRY_POINT</code> gated (perhaps also allowing <code class="language-plaintext highlighter-rouge">msg.sender == self</code>), but it is nevertheless the case that this is done precisely by concentrating security risk in the entry point contract that needs to be verified to be very robust.</p>
+<p>Verification would need to cover two primary claims (not including claims needed to protect paymasters, and claims needed to establish p2p-level DoS resistance):</p>
+<ul>
+<li><strong>Safety against arbitrary hijacking</strong>: The entry point only calls a wallet generically if <code class="language-plaintext highlighter-rouge">validateUserOp</code> to that specific wallet has passed (and with <code class="language-plaintext highlighter-rouge">op.calldata</code> equal to the generic call’s calldata)</li>
+<li><strong>Safety against fee draining</strong>: If the entry point calls <code class="language-plaintext highlighter-rouge">validateUserOp</code> and passes, it also must make the generic call with calldata equal to <code class="language-plaintext highlighter-rouge">op.calldata</code></li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/yoavw">Yoav Weiss</a>, <a href="https://github.com/kristofgazso">Kristof Gazso</a>, <a href="https://github.com/namrapatel">Namra Patel</a>, <a href="https://github.com/drortirosh">Dror Tirosh</a>, <a href="https://github.com/shahafn">Shahaf Nacson</a>, <a href="https://github.com/tjade273">Tjaden Hess</a>, "EIP-4337: Account Abstraction via Entry Point Contract specification [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4337, September 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4337.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4337: Account Abstraction via Entry Point Contract specification [DRAFT]",
+    "author": "Vitalik Buterin (@vbuterin), Yoav Weiss (@yoavw), Kristof Gazso (@kristofgazso), Namra Patel (@namrapatel), Dror Tirosh (@drortirosh), Shahaf Nacson (@shahafn), Tjaden Hess (@tjade273)",
+    "name": "EIP-4337: Account Abstraction via Entry Point Contract specification [DRAFT]",
+    "dateCreated": "2021-09-29",
+    "datePublished": "2021-09-29",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-4337-account-abstraction-via-entry-point-contract-specification/7160",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

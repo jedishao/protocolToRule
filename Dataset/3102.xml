@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3102: Binary trie structure</title>
+<meta property="og:title" content="EIP-3102: Binary trie structure" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3102" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3102" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3102: Binary trie structure
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3102.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gballet">Guillaume Ballet</a>, <a href="https://github.com/vbuterin">Vitalik Buterin</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethresear.ch/t/binary-trie-format/7621">https://ethresear.ch/t/binary-trie-format/7621</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-09-01</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#conventions">Conventions</a></li>
+<li><a href="#notable-changes-from-the-hexary-structure">Notable changes from the hexary structure</a></li>
+<li><a href="#the-trie">The trie</a></li>
+<li><a href="#node-merkelization-rule">Node merkelization rule</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#blake2b">blake2b</a></li>
+<li><a href="#merging-of-the-account-and-storage-tries">Merging of the account and storage tries</a></li>
+<li><a href="#prefixes-and-extension-nodes">Prefixes and extension nodes</a></li>
+<li><a href="#2x32-byte-inputs">2x32-byte inputs</a></li>
+<li><a href="#binary-tries">Binary tries</a></li>
+<li><a href="#path-length-instead-of-bit-prefix">Path length instead of bit prefix</a></li>
+<li><a href="#value-hashing">Value hashing</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Change the storage structure from hexary to binary, merge the account and storage tries, and use blake2b.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal presents a binary structure and merkelization rule for the account and storage tries, which are merged into a single “state” trie. RLP and most of the MPT’s optimizations are dropped to simplify the design. Keccak256 is replaced with blake2b.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The current design of the Merkle Patricia Trie (MPT) uses an hexary trie. Hexary Merkle trees are more shallow than their binary counterparts, which means less hashing.
+Over the course of the 5 years of Ethereum’s existence, it has become apparent that disk accesses are a greater bottleneck than hashing. Clients are therefore moving away from a storage model in which all internal nodes are stored, in favor of a flat (key, value) storage model first used by turbo-geth, in which the intermediate nodes are recalculated only when needed.</p>
+<p>There is a push for making Ethereum easier to use in a stateless fashion. Binary tries make for smaller (~4x) proofs than hexary tries, making it the design of choice for a stateless-friendly Ethereum.</p>
+<p>For that same reason, the account and storage tries are merged in order to have a single proof for all changes.</p>
+<p>The MPT design is also rife with uncanny optimizations for size, that have a limited effect - at the cost of prohibitive complexity. For example, nesting for children whose RLP is less than 32 bytes saves an estimated 1MB of disk space. A paltry compared to the 300GB required by a fast sync at the time of this writing. These optimizations are a significant source of errors, and therefore a consensus-breaking risk.
+The reliance on RLP has also been criticized for its complexity, while the overhead of a general-purpose encoding scheme isn’t warranted for the rigid structure of a Merkle trie.</p>
+<p>The desire to switch the storage model from an hexary trie to a binary trie provides an opportunity to adopt a simpler trie architecture that pushes optimizations from the protocol level down to that of the client implementors.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="conventions">
+<a href="#conventions" class="anchor-link"></a> Conventions
+</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Code</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">u256(x)</code></td>
+<td>Big endian, 32-byte representation of number <em>x</em></td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">||</code></td>
+<td>Byte-wise concatenation operator</td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">++</code></td>
+<td>Bit-wise concatenation operator</td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">0b0101</code></td>
+<td>The binary string <code class="language-plaintext highlighter-rouge">0101</code></td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">hash()</code></td>
+<td>The usual hashing function</td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">empty_hash</code></td>
+<td>The empty hash: <code class="language-plaintext highlighter-rouge">hash("")</code></td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">length(x)</code></td>
+<td>The byte length of object <code class="language-plaintext highlighter-rouge">x</code></td>
+</tr>
+<tr>
+<td style="text-align: center"><code class="language-plaintext highlighter-rouge">d[a..b]</code></td>
+<td>The big-endian bit sequence taken from byte sequence <code class="language-plaintext highlighter-rouge">d</code>, starting at bit index <code class="language-plaintext highlighter-rouge">a</code>, up to and including the bit at index <code class="language-plaintext highlighter-rouge">b</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="notable-changes-from-the-hexary-structure">
+<a href="#notable-changes-from-the-hexary-structure" class="anchor-link"></a> Notable changes from the hexary structure
+</h3>
+<ul>
+<li>Account and storage tries are merged, with key length between 32 and 64 bytes;</li>
+<li>RLP is no longer used;</li>
+<li>The “leaf marker” bit used in the hex prefix is also dropped. Leaves are identified as nodes with no children;</li>
+<li>Serialized nodes are hashed, no matter how small the byte length of the serialized nodes.</li>
+</ul>
+<h3 id="the-trie">
+<a href="#the-trie" class="anchor-link"></a> The trie
+</h3>
+<h4 id="structure">
+<a href="#structure" class="anchor-link"></a> Structure
+</h4>
+<p>The trie structure is made up of <em>nodes</em>. A node <code class="language-plaintext highlighter-rouge">N ≡ (N_l,N_r,N_p,N_v)</code> has the following 4 components:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">N_l</code> is the hash to the node’s <em>left child</em>. If the node does not have a left child, then <code class="language-plaintext highlighter-rouge">N_l</code> is the empty hash <code class="language-plaintext highlighter-rouge">empty_hash</code>;</li>
+<li><code class="language-plaintext highlighter-rouge">N_r</code> is the hash to the node’s <em>right child</em>. If the node does not have a right child, then <code class="language-plaintext highlighter-rouge">N_r</code> is the empty hash <code class="language-plaintext highlighter-rouge">empty_hash</code>;</li>
+<li>the optional <code class="language-plaintext highlighter-rouge">N_p</code> is the node’s <em>prefix</em> : every key into the subtrie rooted at <code class="language-plaintext highlighter-rouge">N</code> is prefixed by this bit string;</li>
+<li><code class="language-plaintext highlighter-rouge">N_v</code> is the <em>value</em> stored at this node. The value is <strong>only present in leaf nodes</strong>.</li>
+</ul>
+<p>Nodes with <code class="language-plaintext highlighter-rouge">empty_hash</code> as both children are called <em>leaf nodes</em>, and the remaining nodes are known as <em>internal nodes</em>.</p>
+<h4 id="accessing-accounts-balance-nonce-code-storage-root-and-storage-slots">
+<a href="#accessing-accounts-balance-nonce-code-storage-root-and-storage-slots" class="anchor-link"></a> Accessing account’s balance, nonce, code, storage root and storage slots
+</h4>
+<p>Assuming an account <code class="language-plaintext highlighter-rouge">A ≡ (A_b, A_n, A_c, A_s)</code> at address <code class="language-plaintext highlighter-rouge">A_a</code>, the following elements can be found at the following addresses:</p>
+<ul>
+<li>The account balance <code class="language-plaintext highlighter-rouge">A_b</code> can be found at key <code class="language-plaintext highlighter-rouge">hash(A_a)[0..253] ++ 0b00</code> and is of type <code class="language-plaintext highlighter-rouge">uint256</code>;</li>
+<li>The account nonce <code class="language-plaintext highlighter-rouge">A_n</code> can be found at key <code class="language-plaintext highlighter-rouge">hash(A_a)[0..253] ++ 0b01</code> and is of type <code class="language-plaintext highlighter-rouge">uint64</code>;</li>
+<li>The code <code class="language-plaintext highlighter-rouge">A_c</code> is an arbitrary-length byte sequence that can be found at key <code class="language-plaintext highlighter-rouge">hash(A_a)[0..253] ++ 0b10</code>;</li>
+<li>The root of the storage trie <code class="language-plaintext highlighter-rouge">A_s</code> can be found at key <code class="language-plaintext highlighter-rouge">hash(A_a)[0..253] ++ 0b11</code>
+<ul>
+<li>The storage slot number <code class="language-plaintext highlighter-rouge">k</code> can be found at key <code class="language-plaintext highlighter-rouge">hash(A_a)[0..253] ++ 0b11 ++ hash(k)</code>.</li>
+</ul>
+</li>
+</ul>
+<p>After <a href="/EIPS/eip-2926">EIP-2926</a> has been rolled out, <code class="language-plaintext highlighter-rouge">A_c</code> will represent the root of the code merkelization tree. The key accessing code chunk number <code class="language-plaintext highlighter-rouge">c</code> is <code class="language-plaintext highlighter-rouge">hash(A_a)[0..253] ++ 0b10 ++ u256(c)</code>.</p>
+<p>In the unlikely future case that extra items are to be added to the trie at account level, a third bit can be reserved for future use.</p>
+<h3 id="node-merkelization-rule">
+<a href="#node-merkelization-rule" class="anchor-link"></a> Node merkelization rule
+</h3>
+<p>Leaves and nodes that have no prefix are hashed according to the rule below:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>internal_hash = hash(left_child_hash || right_child_hash)
+leaf_hash = hash(hash(key) || hash(leaf_value))
+</code></pre></div></div>
+<p>If a prefix is present, the length of the path from the root to the prefixed node is further concatenated with the output of the prefix-less rule, and hashed again:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>internal_hash_with_prefix = hash(u256(path_length_u256 - 1) || internal_hash)
+leaf_hash_with_prefix = hash(u256(path_length_u256 - 1) || leaf_hash)
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="blake2b">
+<a href="#blake2b" class="anchor-link"></a> blake2b
+</h3>
+<p>BLAKE2 offers better performance, which is key to compensate for the loss of performance associated to a ~4x increase in the number of nodes.</p>
+<p>BLAKE3 offers even better performance. No official golang release exists at the time of the writing of this document. This presents a security risk, and therefore BLAKE2 is considered instead.</p>
+<h3 id="merging-of-the-account-and-storage-tries">
+<a href="#merging-of-the-account-and-storage-tries" class="anchor-link"></a> Merging of the account and storage tries
+</h3>
+<p>The trend in clients is to store the keys and values in a “flat” database. Having the key of any storage slot prefixed with the address key of the account it belongs to helps grouping all of an account’s data on disk, as well as simplifying the witness structure.</p>
+<h3 id="prefixes-and-extension-nodes">
+<a href="#prefixes-and-extension-nodes" class="anchor-link"></a> Prefixes and extension nodes
+</h3>
+<p>An alternative proposal has been made, which provides optimal witnesses. The trade-off is that extension nodes must be removed.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node_hash = hash(left_child_hash || right_child_hash)
+leaf_hash = hash(0 || leaf_value)
+</code></pre></div></div>
+<p>The removal of extension nodes induces 40x higher hashing costs (on the order of 25ms for a trie with only 1k leaves) and as a result they have been kept.</p>
+<p>An attempt to keep extension nodes for witness and not the merkelization rule can be found <a href="https://notes.ethereum.org/m5VMkX8FRvi0Q_OOR7TF4A">here</a>.</p>
+<p>Getting rid of complex methods like RLP, the hex prefix and children nesting is already offering great simplification.</p>
+<h3 id="2x32-byte-inputs">
+<a href="#2x32-byte-inputs" class="anchor-link"></a> 2x32-byte inputs
+</h3>
+<p>It has been requested to keep each node hash calculation as a function that takes two 256-bit integer as an input and outputs one 256-bit integer. This property is expected to play nice with circuit constructions and is therefore expected to greatly help with future zero-knowledge applications.</p>
+<h3 id="binary-tries">
+<a href="#binary-tries" class="anchor-link"></a> Binary tries
+</h3>
+<p>Binary tries have been chosen primarily because they reduce the witness size. In general, in an <code class="language-plaintext highlighter-rouge">N</code>-element tree with each element having <code class="language-plaintext highlighter-rouge">k</code> children, the average length of a branch is roughly <code class="language-plaintext highlighter-rouge">32 * (k-1) * log(N) / log(k)</code> plus a few percent for overhead. 32 is the length of a hash; the <code class="language-plaintext highlighter-rouge">k-1</code> refers to the fact that a Merkle proof needs to provide all <code class="language-plaintext highlighter-rouge">k-1</code> sister nodes at each level, and <code class="language-plaintext highlighter-rouge">log(N) / log(k)</code> is an approximation of the number of levels in the tree (eg. a tree where each node has 5 children, with 625 nodes total, would have depth 4, as <code class="language-plaintext highlighter-rouge">625 = 5**4</code> and so <code class="language-plaintext highlighter-rouge">log(625) / log(5) = 4</code>).</p>
+<p>For any <code class="language-plaintext highlighter-rouge">N</code>, the expression is minimized at <code class="language-plaintext highlighter-rouge">k = 2</code>. Here’s a table of branch lengths for different <code class="language-plaintext highlighter-rouge">k</code> values assuming <code class="language-plaintext highlighter-rouge">N = 2**24</code>:</p>
+<table>
+<thead>
+<tr>
+<th><code class="language-plaintext highlighter-rouge">k</code> (children per node)</th>
+<th>Branch length (chunks)</th>
+<th>Branch length (bytes)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td>1 * 24 = 24</td>
+<td>768</td>
+</tr>
+<tr>
+<td>4</td>
+<td>3 * 12 = 36</td>
+<td>1152</td>
+</tr>
+<tr>
+<td>8</td>
+<td>7 * 8 = 56</td>
+<td>1792</td>
+</tr>
+<tr>
+<td>16</td>
+<td>15 * 6 = 90</td>
+<td>2880</td>
+</tr>
+</tbody>
+</table>
+<p>Actual branch lengths will be slightly larger than this due to uneven distribution and overhead, but the pattern of <code class="language-plaintext highlighter-rouge">k=2</code> being by far the best remains.</p>
+<p>The ethereum tree was originally hexary because this would reduce the number of database reads (eg. 6 instead of 24 in the above example). It is now understood that this reasoning was flawed, because nodes can still “pretend” that a binary tree is a hexary (or even 256-ary) tree at the database layer (eg. see https://ethresear.ch/t/optimizing-sparse-merkle-trees/3751), and thereby get the best-of-both-worlds of having the low proof sizes of the tree being binary from a hash-structure perspective and at the same time a much more efficient representation in the database.</p>
+<p>Additionally, binary trees are expected to be widely used in Eth2, so this path improves forward-compatibility and reduces long-run total complexity for the protocol.</p>
+<h3 id="path-length-instead-of-bit-prefix">
+<a href="#path-length-instead-of-bit-prefix" class="anchor-link"></a> Path length instead of bit prefix
+</h3>
+<p>In order to remove the complexity associated with byte manipulation, only the bit-length of the extension is used to merkelize a node with a prefix.</p>
+<p>Storing the length of the path from the root node instead of that from the parent node has the nice property that siblings need not be hashed when deleting a leaf.</p>
+<p><img src="/assets/eip-3102/sibling.svg" alt="Sibling deletion diagram" /></p>
+<p><em>On the left, a trie with the prefix length, and on the right, a trie with the full path length. Each both have values <code class="language-plaintext highlighter-rouge">10000100</code> and <code class="language-plaintext highlighter-rouge">10000000</code>. After deleting <code class="language-plaintext highlighter-rouge">10000100</code>,the sibling node has to be updated in the left tree, while it need not be in the case on the right.</em></p>
+<h3 id="value-hashing">
+<a href="#value-hashing" class="anchor-link"></a> Value hashing
+</h3>
+<p>Except for the code, all values in the trie are less than 32 bytes. EIP-2926 introduces code chunks, with <code class="language-plaintext highlighter-rouge">CHUNK_SIZE = 32 bytes</code>. The hashing of the leaf’s value could therefore be saved. The authors of the EIP are however considering a future increase of <code class="language-plaintext highlighter-rouge">CHUNK_SIZE</code>, making <code class="language-plaintext highlighter-rouge">hash(value)</code> the future-proof choice.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>A hard fork is required in order for blocks to have a trie root using a different structure.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TBD</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<ul>
+<li>As of <a href="https://github.com/gballet/multiproof-rs/commit/6d22b1aef9548581826b3c04b3e00d6cc709388c">commit 0db87e187dc0bfb96046a47e3d6768c93a2e3331</a>, <a href="https://github.com/gballet/multiproof-rs">multiproof-rs</a> implements this merkelization rule in the <code class="language-plaintext highlighter-rouge">hash_m5()</code> function, found in file <code class="language-plaintext highlighter-rouge">src/binary_tree.rs</code>.</li>
+<li>An implementation of this structure for go-ethereum is available <a href="https://github.com/gballet/go-ethereum/tree/rebased-binary-trie-m5-full-path">in this branch</a>.</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Issues could arise when performing the transition. In particular, a heavy conversion process could incentivize clients to wait the transition out. This could lead to a lowered network security at the time of the transition. A transition process has been proposed with <a href="/EIPS/eip-2584">EIP-2584</a>.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gballet">Guillaume Ballet</a>, <a href="https://github.com/vbuterin">Vitalik Buterin</a>, "EIP-3102: Binary trie structure [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3102, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3102.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3102: Binary trie structure [DRAFT]",
+    "author": "Guillaume Ballet (@gballet), Vitalik Buterin (@vbuterin)",
+    "name": "EIP-3102: Binary trie structure [DRAFT]",
+    "dateCreated": "2020-09-01",
+    "datePublished": "2020-09-01",
+
+    "discussionUrl": "https://ethresear.ch/t/binary-trie-format/7621",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

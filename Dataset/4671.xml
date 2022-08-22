@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4671: Non-Tradable Tokens Standard</title>
+<meta property="og:title" content="EIP-4671: Non-Tradable Tokens Standard" />
+<meta name="description" content="A standard interface for non-tradable tokens, aka badges or souldbound NFTs." />
+<meta property="og:description" content="A standard interface for non-tradable tokens, aka badges or souldbound NFTs." />
+<meta name="twitter:description" content="A standard interface for non-tradable tokens, aka badges or souldbound NFTs." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4671" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4671" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4671: Non-Tradable Tokens Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4671.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A standard interface for non-tradable tokens, aka badges or souldbound NFTs.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/omaraflak">Omar Aflak</a>, Pol-Malo Le Bris, <a href="https://github.com/MarvinMartin24">Marvin Martin</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4671-non-tradable-token/7976">https://ethereum-magicians.org/t/eip-4671-non-tradable-token/7976</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-01-13</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#non-tradable-token">Non-Tradable Token</a></li>
+<li><a href="#ntt-store">NTT Store</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#on-chain-vs-off-chain">On-chain vs Off-chain</a></li>
+</ul>
+</li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>A non-tradable token, or NTT, represents inherently personal possessions (material or immaterial), such as university diplomas, online training certificates, government issued documents (national id, driving license, visa, wedding, etc.), labels, and so on.</p>
+<p>As the name implies, non-tradable tokens are made to not be traded or transferred, they are “soulbound”. They don’t have monetary value, they are personally delivered to <strong>you</strong>, and they only serve as a <strong>proof of possession/achievement</strong>.</p>
+<p>In other words, the possession of a token carries a strong meaning in itself depending on <strong>why</strong> it was delivered.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>We have seen in the past smart contracts being used to deliver university diplomas or driving licenses, for food labeling or attendance to events, and much more. All of these implementations are different, but they have a common ground: the tokens are <strong>non-tradable</strong>.</p>
+<p>The blockchain has been used for too long as a means of speculation, and non-tradable tokens want to be part of the general effort aiming to provide usefulness through the blockchain.</p>
+<p>By providing a common interface for non-tradable tokens, we allow more applications to be developed and we position blockchain technology as a standard gateway for verification of personal possessions and achievements.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="non-tradable-token">
+<a href="#non-tradable-token" class="anchor-link"></a> Non-Tradable Token
+</h3>
+<p>A NTT contract is seen as representing <strong>one type of certificate</strong> delivered by <strong>one authority</strong>. For instance, one NTT contract for the French National Id, another for Ethereum EIP creators, and so on…</p>
+<ul>
+<li>An address might possess multiple tokens. Each token has a unique identifier: <code class="language-plaintext highlighter-rouge">tokenId</code>.</li>
+<li>An authority who delivers a certificate should be in position to revoke it. Think of driving licenses or weddings. However, it cannot delete your token, i.e. the record will show that you once owned a token from that contract.</li>
+<li>The most typical usage for third-parties will be to verify if a user has a valid token in a given contract.</li>
+</ul>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC165.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671</span> <span class="k">is</span> <span class="n">IERC165</span> <span class="p">{</span>
+    <span class="c1">/// Event emitted when a token `tokenId` is minted for `owner`
+</span>    <span class="k">event</span> <span class="n">Minted</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">);</span>
+
+    <span class="c1">/// Event emitted when token `tokenId` of `owner` is revoked
+</span>    <span class="k">event</span> <span class="n">Revoked</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Count all tokens assigned to an owner
+</span>    <span class="c1">/// @param owner Address for whom to query the balance
+</span>    <span class="c1">/// @return Number of tokens owned by `owner`
+</span>    <span class="k">function</span> <span class="n">balanceOf</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get owner of a token
+</span>    <span class="c1">/// @param tokenId Identifier of the token
+</span>    <span class="c1">/// @return Address of the owner of `tokenId`
+</span>    <span class="k">function</span> <span class="n">ownerOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Check if a token hasn't been revoked
+</span>    <span class="c1">/// @param tokenId Identifier of the token
+</span>    <span class="c1">/// @return True if the token is valid, false otherwise
+</span>    <span class="k">function</span> <span class="n">isValid</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Check if an address owns a valid token in the contract
+</span>    <span class="c1">/// @param owner Address for whom to check the ownership
+</span>    <span class="c1">/// @return True if `owner` has a valid token, false otherwise
+</span>    <span class="k">function</span> <span class="n">hasValid</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="extensions">
+<a href="#extensions" class="anchor-link"></a> Extensions
+</h4>
+<h5 id="metadata">
+<a href="#metadata" class="anchor-link"></a> Metadata
+</h5>
+<p>An interface allowing to add metadata linked to each token.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4671.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671Metadata</span> <span class="k">is</span> <span class="n">IERC4671</span> <span class="p">{</span>
+    <span class="c1">/// @return Descriptive name of the tokens in this contract
+</span>    <span class="k">function</span> <span class="n">name</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="c1">/// @return An abbreviated name of the tokens in this contract
+</span>    <span class="k">function</span> <span class="n">symbol</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="c1">/// @notice URI to query to get the token's metadata
+</span>    <span class="c1">/// @param tokenId Identifier of the token
+</span>    <span class="c1">/// @return URI for the token
+</span>    <span class="k">function</span> <span class="n">tokenURI</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h5 id="enumerable">
+<a href="#enumerable" class="anchor-link"></a> Enumerable
+</h5>
+<p>An interface allowing to enumerate the tokens of an owner.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4671.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671Enumerable</span> <span class="k">is</span> <span class="n">IERC4671</span> <span class="p">{</span>
+    <span class="c1">/// @return emittedCount Number of tokens emitted
+</span>    <span class="k">function</span> <span class="n">emittedCount</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+    <span class="c1">/// @return holdersCount Number of token holders  
+</span>    <span class="k">function</span> <span class="n">holdersCount</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get the tokenId of a token using its position in the owner's list
+</span>    <span class="c1">/// @param owner Address for whom to get the token
+</span>    <span class="c1">/// @param index Index of the token
+</span>    <span class="c1">/// @return tokenId of the token
+</span>    <span class="k">function</span> <span class="n">tokenOfOwnerByIndex</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">index</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get a tokenId by it's index, where 0 &lt;= index &lt; total()
+</span>    <span class="c1">/// @param index Index of the token
+</span>    <span class="c1">/// @return tokenId of the token
+</span>    <span class="k">function</span> <span class="n">tokenByIndex</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">index</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h5 id="delegation">
+<a href="#delegation" class="anchor-link"></a> Delegation
+</h5>
+<p>An interface allowing delegation rights of token minting.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4671.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671Delegate</span> <span class="k">is</span> <span class="n">IERC4671</span> <span class="p">{</span>
+    <span class="c1">/// @notice Grant one-time minting right to `operator` for `owner`
+</span>    <span class="c1">/// An allowed operator can call the function to transfer rights.
+</span>    <span class="c1">/// @param operator Address allowed to mint a token
+</span>    <span class="c1">/// @param owner Address for whom `operator` is allowed to mint a token
+</span>    <span class="k">function</span> <span class="n">delegate</span><span class="p">(</span><span class="kt">address</span> <span class="n">operator</span><span class="p">,</span> <span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Grant one-time minting right to a list of `operators` for a corresponding list of `owners`
+</span>    <span class="c1">/// An allowed operator can call the function to transfer rights.
+</span>    <span class="c1">/// @param operators Addresses allowed to mint
+</span>    <span class="c1">/// @param owners Addresses for whom `operators` are allowed to mint a token
+</span>    <span class="k">function</span> <span class="n">delegateBatch</span><span class="p">(</span><span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">operators</span><span class="p">,</span> <span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">owners</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Mint a token. Caller must have the right to mint for the owner.
+</span>    <span class="c1">/// @param owner Address for whom the token is minted
+</span>    <span class="k">function</span> <span class="n">mint</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Mint tokens to multiple addresses. Caller must have the right to mint for all owners.
+</span>    <span class="c1">/// @param owners Addresses for whom the tokens are minted
+</span>    <span class="k">function</span> <span class="n">mintBatch</span><span class="p">(</span><span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">owners</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Get the issuer of a token
+</span>    <span class="c1">/// @param tokenId Identifier of the token
+</span>    <span class="c1">/// @return Address who minted `tokenId`
+</span>    <span class="k">function</span> <span class="n">issuerOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h5 id="consensus">
+<a href="#consensus" class="anchor-link"></a> Consensus
+</h5>
+<p>An interface allowing minting/revocation of tokens based on a consensus of a predefined set of addresses.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4671.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671Consensus</span> <span class="k">is</span> <span class="n">IERC4671</span> <span class="p">{</span>
+    <span class="c1">/// @notice Get voters addresses for this consensus contract
+</span>    <span class="c1">/// @return Addresses of the voters
+</span>    <span class="k">function</span> <span class="n">voters</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Cast a vote to mint a token for a specific address
+</span>    <span class="c1">/// @param owner Address for whom to mint the token
+</span>    <span class="k">function</span> <span class="n">approveMint</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Cast a vote to revoke a specific token
+</span>    <span class="c1">/// @param tokenId Identifier of the token to revoke
+</span>    <span class="k">function</span> <span class="n">approveRevoke</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h5 id="pull">
+<a href="#pull" class="anchor-link"></a> Pull
+</h5>
+<p>An interface allowing a token owner to pull his token to a another of his wallets (here <code class="language-plaintext highlighter-rouge">recipient</code>). The caller must provide a signature of the tuple <code class="language-plaintext highlighter-rouge">(tokenId, owner, recipient)</code> using the <code class="language-plaintext highlighter-rouge">owner</code> wallet.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4671.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671Pull</span> <span class="k">is</span> <span class="n">IERC4671</span> <span class="p">{</span>
+    <span class="c1">/// @notice Pull a token from the owner wallet to the caller's wallet
+</span>    <span class="c1">/// @param tokenId Identifier of the token to transfer
+</span>    <span class="c1">/// @param owner Address that owns tokenId
+</span>    <span class="c1">/// @param signature Signed data (tokenId, owner, recipient) by the owner of the token
+</span>    <span class="k">function</span> <span class="n">pull</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">signature</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="ntt-store">
+<a href="#ntt-store" class="anchor-link"></a> NTT Store
+</h3>
+<p>Non-tradable tokens are meant to be fetched by third-parties, which is why there needs to be a convenient way for users to expose some or all of their tokens. We achieve this result using a store which must implement the following interface.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC165.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4671Store</span> <span class="k">is</span> <span class="n">IERC165</span> <span class="p">{</span>
+    <span class="c1">// Event emitted when a IERC4671Enumerable contract is added to the owner's records
+</span>    <span class="k">event</span> <span class="n">Added</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">address</span> <span class="n">token</span><span class="p">);</span>
+
+    <span class="c1">// Event emitted when a IERC4671Enumerable contract is removed from the owner's records
+</span>    <span class="k">event</span> <span class="n">Removed</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">address</span> <span class="n">token</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Add a IERC4671Enumerable contract address to the caller's record
+</span>    <span class="c1">/// @param token Address of the IERC4671Enumerable contract to add
+</span>    <span class="k">function</span> <span class="n">add</span><span class="p">(</span><span class="kt">address</span> <span class="n">token</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Remove a IERC4671Enumerable contract from the caller's record
+</span>    <span class="c1">/// @param token Address of the IERC4671Enumerable contract to remove
+</span>    <span class="k">function</span> <span class="n">remove</span><span class="p">(</span><span class="kt">address</span> <span class="n">token</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Get all the IERC4671Enumerable contracts for a given owner
+</span>    <span class="c1">/// @param owner Address for which to retrieve the IERC4671Enumerable contracts
+</span>    <span class="k">function</span> <span class="n">get</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="on-chain-vs-off-chain">
+<a href="#on-chain-vs-off-chain" class="anchor-link"></a> On-chain vs Off-chain
+</h3>
+<p>A decision was made to keep the data off-chain (via <code class="language-plaintext highlighter-rouge">tokenURI()</code>) for two main reasons:</p>
+<ul>
+<li>Non-tradable tokens represent personal possessions. Therefore, there might be cases where the data should be encrypted. The standard should not outline decisions about encryption because there are just so many ways this could be done, and every possibility is specific to the use-case.</li>
+<li>Non-tradable tokens must stay generic. There could have been a possibility to make a <code class="language-plaintext highlighter-rouge">MetadataStore</code> holding the data of tokens in an elegant way, unfortunately we would have needed a support for generics in solidity (or struct inheritance), which is not available today.</li>
+</ul>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>You can find an implementation of this standard in <a href="https://github.com/ethereum/EIPs/tree/master/assets/eip-4671">../assets/eip-4671</a>.</p>
+<p>Using this implementation, this is how you would create a token:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: MIT
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./ERC4671.sol"</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">EIPCreatorBadge</span> <span class="k">is</span> <span class="n">ERC4671</span> <span class="p">{</span>
+    <span class="k">constructor</span><span class="p">()</span> <span class="n">ERC4671</span><span class="p">(</span><span class="s">"EIP Creator Badge"</span><span class="p">,</span> <span class="s">"EIP"</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="k">function</span> <span class="n">giveThatManABadge</span><span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">_isCreator</span><span class="p">(),</span> <span class="s">"You must be the contract creator"</span><span class="p">);</span>
+        <span class="n">_mint</span><span class="p">(</span><span class="n">owner</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">_baseURI</span><span class="p">()</span> <span class="k">internal</span> <span class="k">pure</span> <span class="k">override</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="s">"https://eips.ethereum.org/ntt/"</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>This could be a contract managed by the Ethereum foundation and which allows them to deliver tokens to EIP creators.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>One security aspect is related to the <code class="language-plaintext highlighter-rouge">tokenURI</code> method which returns the metadata linked to a token. Since the standard represents inherently personal possessions, users might want to encrypt the data in some cases e.g. national id cards. Moreover, it is the responsibility of the contract creator to make sure the URI returned by this method is available at all times.</p>
+<p>The standard does not define any way to transfer a token from one wallet to another. Therefore, users must be very cautious with the wallet they use to receive these tokens. If a wallet is lost, the only way to get the tokens back is for the issuing authorities to deliver the tokens again, akin real life.</p>
+<h2 id="copyright">
+
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/omaraflak">Omar Aflak</a>, Pol-Malo Le Bris, <a href="https://github.com/MarvinMartin24">Marvin Martin</a>, "EIP-4671: Non-Tradable Tokens Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4671, January 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4671.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4671: Non-Tradable Tokens Standard [DRAFT]",
+    "author": "Omar Aflak (@omaraflak), Pol-Malo Le Bris, Marvin Martin (@MarvinMartin24)",
+    "name": "EIP-4671: Non-Tradable Tokens Standard [DRAFT]",
+    "dateCreated": "2022-01-13",
+    "datePublished": "2022-01-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4671-non-tradable-token/7976",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

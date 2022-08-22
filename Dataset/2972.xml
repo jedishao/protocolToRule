@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2972: Wrapped Legacy Transactions</title>
+<meta property="og:title" content="EIP-2972: Wrapped Legacy Transactions" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2972" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2972" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="withdrawn">
+🛑 This EIP has been withdrawn.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2972: Wrapped Legacy Transactions
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2972.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/MicahZoltu">Micah Zoltu</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2972-wrapped-legacy-transactions/4604">https://ethereum-magicians.org/t/eip-2972-wrapped-legacy-transactions/4604</a></td></tr>
+<tr><th>Status</th><td>Withdrawn
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-09-12</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-155">155</a>,
+<a href="eip-2718">2718</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#transactions">Transactions</a></li>
+<li><a href="#receipts">Receipts</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#signature-doesnt-include-transaction-type-as-first-signature-byte">Signature doesn’t include transaction type as first signature byte</a></li>
+<li><a href="#two-transaction-types-instead-of-one">Two transaction types instead of one</a></li>
+<li><a href="#signature-separate-from-signed-data">Signature separate from signed data</a></li>
+<li><a href="#ssz-for-serialization">SSZ for serialization</a></li>
+<li><a href="#deprecating-legacy-transactions">Deprecating legacy transactions</a></li>
+<li><a href="#max-length-of-logs-and-logs-data">Max length of logs and logs data</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Two new transaction types for wrapping legacy transactions with and without a chain ID.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduces two new <a href="/EIPS/eip-2718">EIP-2718</a> transactions that are signature compatible with legacy transactions and can be automatically upgraded by any client.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">0x00 || ssz.serialize(yParity, r, s, rlp([nonce, gasPrice, gasLimit, to, value, data]))</code></li>
+<li><code class="language-plaintext highlighter-rouge">0x01 || ssz.serialize(yParity, r, s, rlp([nonce, gasPrice, gasLimit, to, value, data, chainId, 0, 0]))</code></li>
+</ul>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>We would like to eventually deprecate legacy transactions so we no longer have to retain code in the networking and signer layer that deals with them.
+However, we also want to ensure that signatures for transactions that were generated prior to that deprecation are still valid and funds don’t end up stuck because of an inability to sign a new style transaction.
+This EIP provides a mechanism for transmitting/including transactions in a way that is <a href="/EIPS/eip-2718">EIP-2718</a> compatible while still being signature compatible with legacy transactions.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">||</code> is the byte/byte-array concatenation operator.</li>
+<li><code class="language-plaintext highlighter-rouge">yParity</code> is the parity (0 for even, 1 for odd) of the <code class="language-plaintext highlighter-rouge">y</code> value of the curve point for which <code class="language-plaintext highlighter-rouge">r</code> is the <code class="language-plaintext highlighter-rouge">x</code> value in the secp256k1 signing process.</li>
+</ul>
+<h3 id="transactions">
+<a href="#transactions" class="anchor-link"></a> Transactions
+</h3>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, <code class="language-plaintext highlighter-rouge">0x00 || ssz.serialize(yParity, r, s, rlp([nonce, gasPrice, gasLimit, to, value, data]))</code> will be a valid transaction where:</p>
+<ul>
+<li>the RLP encoded transaction portion is signed/processed/handled exactly the same as legacy transactions were signed/processed/handled, with the exception of the final encoding</li>
+<li>TODO: Hashing or Merkleizing for block transaction root</li>
+</ul>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, <code class="language-plaintext highlighter-rouge">0x01 || ssz.serialize(yParity, r, s, rlp([nonce, gasPrice, gasLimit, to, value, data, chainId, 0, 0]))</code> will be a valid transaction where:</p>
+<ul>
+<li>the RLP encoded transaction portion is signed/processed/handled exactly the same as legacy transactions were signed/processed/handled, with the exception of the final encoding</li>
+<li>TODO: Hashing or Merkleizing for block transaction root</li>
+</ul>
+<p>The SSZ schema for both transaction types is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Transaction[
+    yParity: boolean,
+    r: bytes32,
+    s: bytes32,
+    signedData: bytes,
+  ]
+</code></pre></div></div>
+<p>Note: <code class="language-plaintext highlighter-rouge">sszencode(yParity, r, s, rlp(...))</code> is the same as <code class="language-plaintext highlighter-rouge">yParity || r || s || 0x45000000 || rlp(...)</code></p>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, <code class="language-plaintext highlighter-rouge">rlp(nonce, gasPrice, gasLimit, to, value, data, v, r, s)</code> will no longer be a valid transaction in a block.</p>
+<h3 id="receipts">
+<a href="#receipts" class="anchor-link"></a> Receipts
+</h3>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, <code class="language-plaintext highlighter-rouge">0 || ssz.serialize(status, cumulativeGasUsed, logsBloom, logs)</code> will be a valid receipt where:</p>
+<ul>
+<li>the <code class="language-plaintext highlighter-rouge">ReceiptPayload</code> will be generated/processed/handled exactly the same as legacy receipts were processed/handled with the exception of its encoding</li>
+<li>TODO: Hashing or Merkleizing for block receipt root</li>
+</ul>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, <code class="language-plaintext highlighter-rouge">1 || ssz.serialize(status, cumulativeGasUsed, logsBloom, logs)</code> will be a valid receipt where:</p>
+<ul>
+<li>the <code class="language-plaintext highlighter-rouge">ReceiptPayload</code> will be generated/processed/handled exactly the same as legacy receipts were processed/handled with the exception of its encoding</li>
+<li>TODO: Hashing or Merkleizing for block receipt root</li>
+</ul>
+<p>The SSZ schema for both receipt types is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Log[
+  address: bytes20,
+  topics: List[bytes32, 4],
+  data: List[uint8, 0xffffff],
+]
+Receipt[
+  status: uint8,
+  cumulativeGasUsed: uint64,
+  logsBloom: BitVector[2048],
+  logs: List[Log, 0xffffff],
+]
+</code></pre></div></div>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, <code class="language-plaintext highlighter-rouge">rlp(status, cumulativeGasUsed, logsBloom, logs)</code> will no longer be a valid receipt in a block.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="signature-doesnt-include-transaction-type-as-first-signature-byte">
+<a href="#signature-doesnt-include-transaction-type-as-first-signature-byte" class="anchor-link"></a> Signature doesn’t include transaction type as first signature byte
+</h3>
+<p>These transaction types are explicitly designed to be signature compatible with legacy transactions, which means we cannot change the data being signed.
+See Security Considerations section for more details.</p>
+<h3 id="two-transaction-types-instead-of-one">
+<a href="#two-transaction-types-instead-of-one" class="anchor-link"></a> Two transaction types instead of one
+</h3>
+<p>With the introduction of typed transactions, we no longer need to do bit packing to avoid changing the shape of the signature.
+Legacy transactions introduced chain ID in <a href="/EIPS/eip-155">EIP-155</a> and wanted to avoid changing the transaction array length, so it bitpacked the chainID into the signature’s <code class="language-plaintext highlighter-rouge">v</code> value.
+Since we no longer need to guarantee consistent payload lengths between transaction types, we have opted to have two transaction types with clear fields.</p>
+<h3 id="signature-separate-from-signed-data">
+<a href="#signature-separate-from-signed-data" class="anchor-link"></a> Signature separate from signed data
+</h3>
+<p>When validating a signature, one must first separate out the signed data from the signature and then validate the signature against the signed data.
+In the case of legacy transactions, this was a bit of a burden since you had to first RLP decode the transaction, then extract out the signature, then RLP encode a subset of the transaction.
+EIP-155 made this process even worse by requiring the validator to further decode the <code class="language-plaintext highlighter-rouge">v</code> signature value to extract the chain ID (if present) and include that in the signed data payload.
+By having the signed data encoded exactly as it is signed, we make it so one can verify the transaction’s signature without having to do any decoding before hand.
+By having the signature SSZ encoded up front, we can easily extract the signature without even having to use a decoder.</p>
+<h3 id="ssz-for-serialization">
+<a href="#ssz-for-serialization" class="anchor-link"></a> SSZ for serialization
+</h3>
+<p>There is a weak consensus that RLP is not a particularly good encoding scheme for hashed data partially due to its inability to be streamed.
+SSZ is almost certainly going to be included in Ethereum at some point in the future, so clients likely have access to an SSZ decoder.
+For this particular case, manual decoding without a full SSZ decoder isn’t too complicated, though it does require doing a bit of “pointer math” since <code class="language-plaintext highlighter-rouge">logs</code> is an array of variable length items.</p>
+<h3 id="deprecating-legacy-transactions">
+<a href="#deprecating-legacy-transactions" class="anchor-link"></a> Deprecating legacy transactions
+</h3>
+<p>By deprecating legacy transactions, we make it easier for clients as they can always deal with typed transactions in blocks.</p>
+<h3 id="max-length-of-logs-and-logs-data">
+<a href="#max-length-of-logs-and-logs-data" class="anchor-link"></a> Max length of logs and logs data
+</h3>
+<p><a href="/EIPS/eip-706">EIP-706</a> limits devp2p messages to 24 bit length, which gives us a pragmatic cap at that for any single transaction at the moment.
+This number seems to far exceed what is reasonable anytime in the near future, so feels like as reasonable of a cap as any.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The new transactions are signature compatible with legacy transactions.
+Legacy transactions can be decoded and then encoded as type 0 or type 1 transactions.
+This EIP does not introduce any deprecation process for legacy encoded transactions, though the authors do encourage client developers to upgrade legacy encoded transactions to typed transactions as soon as it is reasonable.</p>
+<p>The signature compatibility means that a client may see the same transaction encoded both ways.
+In such a case the client can choose which to retain, but it is encouraged to retain the typed transaction rather than the legacy encoded transaction.
+Since the two transactions would share a nonce, only one will ever be valid in a chain at a time.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TBD</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>TBD</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>While <a href="/EIPS/eip-2718">EIP-2718</a> strongly recommends including the transaction type as the first byte of the signed data, we cannot accomplish that in this case because we need to remain signature compatible with legacy transactions.
+Luckily, <a href="/EIPS/eip-2718">EIP-2718</a> also excludes transaction types <code class="language-plaintext highlighter-rouge">0xc0</code> to <code class="language-plaintext highlighter-rouge">0xfe</code> from valid transaction types, and the first byte of the signature in this case is in that range so we can be sure this will not conflict with any future transaction types.</p>
+<p>A signature for these transaction types <strong>does</strong> collide with legacy transactions, but the transactions will be processed the same so it doesn’t matter if the transaction ends up included as a legacy transaction or a typed transaction.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/MicahZoltu">Micah Zoltu</a>, "EIP-2972: Wrapped Legacy Transactions [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2972, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2972.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2972: Wrapped Legacy Transactions [DRAFT]",
+    "author": "Micah Zoltu (@MicahZoltu)",
+    "name": "EIP-2972: Wrapped Legacy Transactions [DRAFT]",
+    "dateCreated": "2020-09-12",
+    "datePublished": "2020-09-12",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2972-wrapped-legacy-transactions/4604",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

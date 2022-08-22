@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4974: Experience (EXP) Token Standard</title>
+<meta property="og:title" content="EIP-4974: Experience (EXP) Token Standard" />
+<meta name="description" content="A standard interface for fungible, non-tradable tokens, also known as EXP." />
+<meta property="og:description" content="A standard interface for fungible, non-tradable tokens, also known as EXP." />
+<meta name="twitter:description" content="A standard interface for fungible, non-tradable tokens, also known as EXP." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4974" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4974" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4974: Experience (EXP) Token Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4974.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A standard interface for fungible, non-tradable tokens, also known as EXP.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/dtedesco1">Daniel Tedesco</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/8805">https://ethereum-magicians.org/t/8805</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-04-02</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#participation">Participation</a></li>
+<li><a href="#transfers">Transfers</a></li>
+<li><a href="#token-destruction">Token Destruction</a></li>
+<li><a href="#exp-word-choice">EXP Word Choice</a></li>
+<li><a href="#participants-word-choice">Participants Word Choice</a></li>
+<li><a href="#erc-165-interface">ERC-165 Interface</a></li>
+<li><a href="#metadata-choices">Metadata Choices</a></li>
+<li><a href="#privacy">Privacy</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following describes a standard interface for fungible non-tradable tokens, or EXP. This standard provides basic functionality for participant addresses to consent to receive tokens and for an operator address to transfer tokens.</p>
+<p>EXP, shorthand for “experience points”, may represent accumulated recognition within a smart contract. Like experience points in video games, citations on an academic paper, or Reddit Karma, EXP is bestowed for useful contributions, accumulates as indistinguishable units, and should only be reallocated or destroyed by a reliable authority so empowered.</p>
+<p>The standard described here allows reputation earned to be codified within a smart contract and recognized by other applications: from a five-member local bicycle club to a million-member green energy DAO.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>How reputation manifests across groups can vary widely. Healthy communities allocate reputation to their participants using three key principles:</p>
+<ol>
+<li>Consent – No one is forced to be part of the group, but joining requires abiding by the governance structure of the group.</li>
+<li>Meritocracy – Reputation is earned by recognition from the group. It cannot be claimed, purchased, or sold.</li>
+<li>Ethics – The group can decrease an individual’s reputation after bad behavior.</li>
+</ol>
+<p>Since the creation of Bitcoin in 2008, the vast majority of blockchain applications have centered on buying and selling digital assets. While these use cases are substantial, digital assets need not be created with trading in mind. In fact, trading can be detrimental to community-based blockchain projects. This was evident in the pay-to-play dynamics of many EVM-based games and DAOs in 2021.</p>
+<p>A smart contract cannot directly imbue consent, meritocracy, and ethics into a community, but it can encourage those principles. In doing so, the standard set out below will hopefully unlock a diverse array of new use cases for tokens:</p>
+<ul>
+<li>Voting weight in a DAO</li>
+<li>Experience points in a decentralized game</li>
+<li>Loyalty points for customers of a business</li>
+</ul>
+<p>This standard is influenced by the <a href="./eip-20">ERC-20</a> and <a href="./eip-721">ERC-721</a> token standards and takes cues from each in its structure, style, and semantics. Neither, however, was created for fungible operator-managed token contracts such as EXP. Nor do existing proposals for non-tradable tokens meet the requirements of EXP use cases.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p>Every ERC-4974 compliant contract MUST implement the ERC4974 and ERC165 interfaces:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// SPDX-License-Identifier: CC0
+
+pragma solidity ^0.8.0;
+
+/// @title ERC-4974 Experience (EXP) Token Standard
+/// @dev See https://eips.ethereum.org/EIPS/EIP-4974
+///  Note: the ERC-165 identifier for this interface is 0x696e7752.
+///  Must initialize contracts with an `operator` address that is not `address(0)`.
+///  Must initialize contracts assigning participation as `true` for both `operator` and `address(0)`.
+interface IERC4974 /* is ERC165 */ {
+
+    /// @dev Emits when operator changes.
+    ///  MUST emit when `operator` changes by any mechanism.
+    ///  MUST ONLY emit by `setOperator`.
+    event Appointment(address indexed _operator);
+
+    /// @dev Emits when an address activates or deactivates its participation.
+    ///  MUST emit emit when participation status changes by any mechanism.
+    ///  MUST ONLY emit by `setParticipation`.
+    event Participation(address indexed _participant, bool _participation);
+
+    /// @dev Emits when operator transfers EXP. 
+    ///  MUST emit when EXP is transferred by any mechanism.
+    ///  MUST ONLY emit by `transfer`.
+    event Transfer(address indexed _from, address indexed _to, uint256 _amount);
+
+    /// @notice Appoint operator authority.
+    /// @dev MUST throw unless `msg.sender` is `operator`.
+    ///  MUST throw if `operator` address is either already current `operator`
+    ///  or is the zero address.
+    ///  MUST emit an `Appointment` event.
+    /// @param _operator New operator of the smart contract.
+    function setOperator(address _operator) external;
+
+    /// @notice Activate or deactivate participation. CALLER IS RESPONSIBLE TO
+    ///  UNDERSTAND THE TERMS OF THEIR PARTICIPATION.
+    /// @dev MUST throw unless `msg.sender` is `participant`.
+    ///  MUST throw if `participant` is `operator` or zero address.
+    ///  MUST emit a `Participation` event for status changes.
+    /// @param _participant Address opting in or out of participation.
+    /// @param _participation Participation status of _participant.
+    function setParticipation(address _participant, bool _participation) external;
+
+    /// @notice Transfer EXP from one address to a participating address.
+    /// @dev MUST throw unless `msg.sender` is `operator`.
+    ///  MUST throw unless `to` address is participating.
+    ///  MUST throw if `to` and `from` are the same address.
+    ///  MUST emit a Transfer event with each successful call.
+    ///  SHOULD throw if `amount` is zero.
+    ///  MAY allow minting from zero address, burning to the zero address, 
+    ///  transferring between accounts, and transferring between contracts.
+    ///  MAY limit interaction with non-participating `from` addresses.
+    /// @param _from Address from which to transfer EXP tokens.
+    /// @param _to Address to which EXP tokens at `from` address will transfer.
+    /// @param _amount Total EXP tokens to reallocate.
+    function transfer(address _from, address _to, uint256 _amount) external;
+
+    /// @notice Return total EXP managed by this contract.
+    /// @dev MUST sum EXP tokens of all `participant` addresses, 
+    ///  regardless of participation status, excluding only the zero address.
+    function totalSupply() external view returns (uint256);
+
+    /// @notice Return total EXP allocated to a participant.
+    /// @dev MUST register each time `Transfer` emits.
+    ///  SHOULD throw for queries about the zero address.
+    /// @param _participant An address for whom to query EXP total.
+    /// @return uint256 The number of EXP allocated to `participant`, possibly zero.
+    function balanceOf(address _participant) external view returns (uint256);
+}
+
+interface IERC165 {
+    /// @notice Query if a contract implements an interface.
+    /// @dev Interface identification is specified in ERC-165. This function
+    ///  uses less than 30,000 gas.
+    /// @param interfaceID The interface identifier, as specified in ERC-165.
+    /// @return bool `true` if the contract implements `interfaceID` and
+    ///  `interfaceID` is not 0xffffffff, `false` otherwise.
+    function supportsInterface(bytes4 interfaceID) external view returns (bool);
+}
+</code></pre></div></div>
+<p>The <em>metadata extension</em> is OPTIONAL for ERC-4974 smart contracts. This allows an EXP smart contract to be interrogated for its name and description.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// SPDX-License-Identifier: CC0
+
+pragma solidity ^0.8.0;
+
+import "./IERC4974.sol";
+
+/// @title ERC-4974 EXP Token Standard, optional metadata extension
+/// @dev See https://eips.ethereum.org/EIPS/EIP-4974
+///  Note: the ERC-165 identifier for this interface is 0x74793a15.
+interface IERC4974Metadata is IERC4974 {
+    /// @notice A descriptive name for the EXP in this contract.
+    function name() external view returns (string memory);
+
+    /// @notice A one-line description of the EXP in this contract.
+    function description() external view returns (string memory);
+}
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="participation">
+<a href="#participation" class="anchor-link"></a> Participation
+</h3>
+<p>EXP drops SHALL require pre-approval from the delivery address. This ensures the receiver is a consenting participant in the smart contract.</p>
+<h3 id="transfers">
+<a href="#transfers" class="anchor-link"></a> Transfers
+</h3>
+<p>EXP transfers SHALL be at the sole discretion of the contract operator. This party may be a sports team coach or a multisig DAO wallet. We decide not to specify how governance occurs, but only <em>that</em> governance occurs. This allows for a wider range of potential use cases than optimizing for particular decision-making forms.</p>
+<p>ERC-4974 standardizes a control mechanism to allocate community recognition without encouraging financialization of that recognition or easily allowing non-contributors to acquire EXP representing contribution. While it does not ensure meritocracy, it opens the door.</p>
+<h3 id="token-destruction">
+<a href="#token-destruction" class="anchor-link"></a> Token Destruction
+</h3>
+<p>EXP SHOULD allow burning tokens by contract operators. If Bob has contributed greatly to the community, but then is caught stealing from Alice, the community may decide this should lower Bob’s standing and influence in the community. Again, while this does not ensure an ethical standard within the community, it opens the door.</p>
+<h3 id="exp-word-choice">
+<a href="#exp-word-choice" class="anchor-link"></a> EXP Word Choice
+</h3>
+<p>EXP, or experience points, are common parlance in the video game industry and generally known among modern internet users. Allocated EXP typically confers to strength and accumulates as one progresses in a game. This serves as a fair analogy to what we aim to achieve with ERC-4974 by encouraging members of a community to have more strength in that community the more they contribute.</p>
+<p><em>Alternatives Considered: Soulbound Tokens, Soulbounds, Fungible Soulbound Tokens, Non-tradable Fungible Tokens, Non-transferrable Fungible Tokens, Karma Points, Reputation Tokens, Kudos</em></p>
+<h3 id="participants-word-choice">
+<a href="#participants-word-choice" class="anchor-link"></a> Participants Word Choice
+</h3>
+<p>Participants have agency over their <em>participation</em> in an activity, but not over the <em>outcomes</em>. Parties to ERC-4974 contracts are not owners in the same sense as owners of ERC-20 or ERC-721 tokens. The EXP sits in their wallets, but those wallets do not directly control any use of the EXP.</p>
+<p><em>Alternatives Considered: members, parties, contributors, players, entrants</em></p>
+<h3 id="erc-165-interface">
+<a href="#erc-165-interface" class="anchor-link"></a> ERC-165 Interface
+</h3>
+<p>We chose Standard Interface Detection (ERC-165) to expose the interfaces that an ERC-4974 smart contract supports.</p>
+<h3 id="metadata-choices">
+ <a href="#metadata-choices" class="anchor-link"></a> Metadata Choices
+</h3>
+<p>We have required <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">description</code> functions in the metadata extension. Name common among major token standards (namely, ERC-20 and ERC-721). We eschewed <code class="language-plaintext highlighter-rouge">symbol</code> as we do not wish them to be listed on any tickers that might tempt operators to engage in financial activities with these assets. We included a <code class="language-plaintext highlighter-rouge">description</code> function that may be helpful for games or other applications with multiple ERC-4974 tokens.</p>
+<p>We remind implementation authors that the empty string is a valid response to <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">description</code> if you protest to the usage of this mechanism. We also remind everyone that any smart contract can use the same name and symbol as your contract. How a client may determine which ERC-4974 smart contracts are well-known (canonical) is outside the scope of this standard.</p>
+<h3 id="privacy">
+<a href="#privacy" class="anchor-link"></a> Privacy
+</h3>
+<p>Users identified in the motivation section have a strong need to identify how much EXP an address holds. Since EXP contracts are opt-in, we hope users will be proud of their accumulated recognition and not wish to keep it secret. Without metadata associated to individual tokens or wallets, the privacy risks of this standard are limited.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>We have adopted <code class="language-plaintext highlighter-rouge">Transfer</code>, <code class="language-plaintext highlighter-rouge">transfer</code>, <code class="language-plaintext highlighter-rouge">balanceOf</code>, <code class="language-plaintext highlighter-rouge">totalSupply</code>, and <code class="language-plaintext highlighter-rouge">name</code> semantics from the ERC-20 and ERC-721 specifications. An implementation may also include a function <code class="language-plaintext highlighter-rouge">decimals</code> that returns <code class="language-plaintext highlighter-rouge">uint8(0)</code> if its goal is to be more compatible with ERC-20 while supporting this standard.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>A reference implementation of this standard can be found in the assets folder.
+</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">operator</code> address has total control over the allocation and transfer of tokens. Therefore, ensuring this party is secure and trustworthy is critical for the contract to function. No alternative exists if the operator is corrupted or lost.</p>
+<p>We strongly encourage <code class="language-plaintext highlighter-rouge">operator</code> to be a smart contract with robust access control features to manage EXP.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/dtedesco1">Daniel Tedesco</a>, "EIP-4974: Experience (EXP) Token Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4974, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4974.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4974: Experience (EXP) Token Standard [DRAFT]",
+    "author": "Daniel Tedesco (@dtedesco1)",
+    "name": "EIP-4974: Experience (EXP) Token Standard [DRAFT]",
+    "dateCreated": "2022-04-02",
+    "datePublished": "2022-04-02",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/8805",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2917: Staking Reward Calculation</title>
+<meta property="og:title" content="EIP-2917: Staking Reward Calculation" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2917" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2917" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2917: Staking Reward Calculation
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2917.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#c5b1aaabbceba6a4b7b6aaabab85a2a8a4aca9eba6aaa8">Tony Carson</a>, <a href="/cdn-cgi/l/email-protection#39541752504b5843795e54585055175a5654">Mehmet Sabir Kiraz</a>, <a href="/cdn-cgi/l/email-protection#16657d776472776556717b777f7a3875797b">Süleyman Kardaş</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2925">https://github.com/ethereum/EIPs/issues/2925</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-08-28</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#interestrateperblockchanged">InterestRatePerBlockChanged</a></li>
+<li><a href="#productivityincreased">ProductivityIncreased</a></li>
+<li><a href="#productivitydecreased">ProductivityDecreased</a></li>
+<li><a href="#interestsperblock">interestsPerBlock</a></li>
+<li><a href="#changeinterestrateperblock">changeInterestRatePerBlock</a></li>
+<li><a href="#getproductivity">getProductivity</a></li>
+<li><a href="#increaseproductivity">increaseProductivity</a></li>
+<li><a href="#decreaseproductivity">decreaseProductivity</a></li>
+<li><a href="#take">take</a></li>
+<li><a href="#takewithblock">takeWithBlock</a></li>
+<li><a href="#mint">mint</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>ERC2917 is a new standardization for on-chain calculation of staking reward.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Based on the product of effective collateral and time, ERC2917 calculates the reward a user can get at any time, and realize the real decentralized DeFi. Here below is the formula for the calculation of reward for a user U:</p>
+<p><img src="../assets/eip-2917/erc-reward-formula.png" alt="concept image" title="erc-reward-formula" /></p>
+<p>where ∆p<sub>i</sub> denotes individual productivity of the user U between the consecutive block numbers t<sub>i-1</sub> and t<sub>i</sub>, ∆P<sub>i</sub> denotes global productivity between the consecutive block numbers t<sub>i-1</sub> and t<sub>i</sub>, and ∆G<sub>i</sub> denotes gross product between the consecutive block numbers t<sub>i-1</sub> and t<sub>i</sub>. The formula ensures that there is no benefit in case of exiting earlier or entering later in the computation. The reward a user can get for a period is based on his total productivity during that specific time. The formula has been simplified through Solidity and generalized design to make it available across all DeFi products.
+We note that the smart contract can be triggered for every computation of on the following events:</p>
+<ul>
+<li>whenever the productivity of a user changes (increase/decrease),</li>
+<li>whenever a user withdraws.</li>
+</ul>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>One of the main drawbacks of many DeFi projects is the reward distribution mechanism within the smart contract. In fact, there are two main mechanisms are adopted so far.</p>
+<ol>
+<li>Distribution of rewards is only given when all users exit the contract</li>
+<li>The project collects on-chain data, conducts calculation off-chain, and sends the results
+to the chain before starting rewards distribution accordingly</li>
+</ol>
+<p>The first approach conducts all calculation in an on-chain fashion, the cycle of its rewards distribution is too long. Furthermore, users need to remove their collateral before getting the rewards, which can be harmful for their rewards. The second approach is a semi-decentralized model since the main algorithm involves an off-chain computation. Therefore, the fairness and transparency properties cannot be reflected and this can even create the investment barrier for users.</p>
+<p>Since there is more DeFi projects coming out everyday, users could not find a proper way to get to know:
+1) amount of interests he/she would get
+2) how the interest calculated
+3) what is his/her contribution compare to the overall</p>
+<p>By standardizing ERC2917, it abstracts the interface for interests generation process. Making wallet applications easier to collect each DeFi’s metrics, user friendlier.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Every ERC-2917 compliant contract must implement the ERC2917 and ERC20 interfaces (if necessary):</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">IERC2917</span> <span class="k">is</span> <span class="n">IERC20</span> <span class="p">{</span>
+
+    <span class="c1">/// @dev This emit when interests amount per block is changed by the owner of the contract.
+</span>    <span class="c1">/// It emits with the old interests amount and the new interests amount.
+</span>    <span class="k">event</span> <span class="n">InterestRatePerBlockChanged</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">oldValue</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">newValue</span><span class="p">);</span>
+
+    <span class="c1">/// @dev This emit when a users' productivity has changed
+</span>    <span class="c1">/// It emits with the user's address and the the value after the change.
+</span>    <span class="k">event</span> <span class="n">ProductivityIncreased</span> <span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">value</span><span class="p">);</span>
+
+    <span class="c1">/// @dev This emit when a users' productivity has changed
+</span>    <span class="c1">/// It emits with the user's address and the the value after the change.
+</span>    <span class="k">event</span> <span class="n">ProductivityDecreased</span> <span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">value</span><span class="p">);</span>
+
+    
+    <span class="c1">/// @dev Return the current contract's interests rate per block.
+</span>    <span class="c1">/// @return The amount of interests currently producing per each block.
+</span>    <span class="k">function</span> <span class="n">interestsPerBlock</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Change the current contract's interests rate.
+</span>    <span class="c1">/// @dev Note the best practice will be restrict the gross product provider's contract address to call this.
+</span>    <span class="c1">/// @return The true/false to notice that the value has successfully changed or not, when it succeed, it will emite the InterestRatePerBlockChanged event.
+</span>    <span class="k">function</span> <span class="n">changeInterestRatePerBlock</span><span class="p">(</span><span class="kt">uint</span> <span class="n">value</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+    <span class="c1">/// @notice It will get the productivity of given user.
+</span>    <span class="c1">/// @dev it will return 0 if user has no productivity proved in the contract.
+</span>    <span class="c1">/// @return user's productivity and overall productivity.
+</span>    <span class="k">function</span> <span class="n">getProductivity</span><span class="p">(</span><span class="kt">address</span> <span class="n">user</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">,</span> <span class="kt">uint</span><span class="p">);</span>
+
+    <span class="c1">/// @notice increase a user's productivity.
+</span>    <span class="c1">/// @dev Note the best practice will be restrict the callee to prove of productivity's contract address.
+</span>    <span class="c1">/// @return true to confirm that the productivity added success.
+</span>    <span class="k">function</span> <span class="n">increaseProductivity</span><span class="p">(</span><span class="kt">address</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">value</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+    <span class="c1">/// @notice decrease a user's productivity.
+</span>    <span class="c1">/// @dev Note the best practice will be restrict the callee to prove of productivity's contract address.
+</span>    <span class="c1">/// @return true to confirm that the productivity removed success.
+</span>    <span class="k">function</span> <span class="n">decreaseProductivity</span><span class="p">(</span><span class="kt">address</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">value</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+    <span class="c1">/// @notice take() will return the interests that callee will get at current block height.
+</span>    <span class="c1">/// @dev it will always calculated by block.number, so it will change when block height changes.
+</span>    <span class="c1">/// @return amount of the interests that user are able to mint() at current block height.
+</span>    <span class="k">function</span> <span class="n">take</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+
+    <span class="c1">/// @notice similar to take(), but with the block height joined to calculate return.
+</span>    <span class="c1">/// @dev for instance, it returns (_amount, _block), which means at block height _block, the callee has accumulated _amount of interests.
+</span>    <span class="c1">/// @return amount of interests and the block height.
+</span>    <span class="k">function</span> <span class="n">takeWithBlock</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">,</span> <span class="kt">uint</span><span class="p">);</span>
+
+    <span class="c1">/// @notice mint the available interests to callee.
+</span>    <span class="c1">/// @dev once it mint, the amount of interests will transfer to callee's address.
+</span>    <span class="c1">/// @return the amount of interests minted.
+</span>    <span class="k">function</span> <span class="n">mint</span><span class="p">()</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="interestrateperblockchanged">
+<a href="#interestrateperblockchanged" class="anchor-link"></a> InterestRatePerBlockChanged
+</h3>
+<p>This emit when interests amount per block is changed by the owner of the contract. It emits with the old interests amount and the new interests amount.</p>
+<h3 id="productivityincreased">
+<a href="#productivityincreased" class="anchor-link"></a> ProductivityIncreased
+</h3>
+<p>It emits with the user’s address and the the value after the change.</p>
+<h3 id="productivitydecreased">
+
+<a href="#productivitydecreased" class="anchor-link"></a> ProductivityDecreased
+</h3>
+<p>It emits with the user’s address and the the value after the change.</p>
+<h3 id="interestsperblock">
+<a href="#interestsperblock" class="anchor-link"></a> interestsPerBlock
+</h3>
+<p>It returns the amount of interests currently producing per each block.</p>
+<h3 id="changeinterestrateperblock">
+<a href="#changeinterestrateperblock" class="anchor-link"></a> changeInterestRatePerBlock
+</h3>
+<p>Note the best practice will be restrict the gross product provider’s contract address to call this.</p>
+<p>The true/false to notice that the value has successfully changed or not, when it succeed, it will emite the InterestRatePerBlockChanged event.</p>
+<h3 id="getproductivity">
+<a href="#getproductivity" class="anchor-link"></a> getProductivity
+</h3>
+<p>It returns user’s productivity and overall productivity. It returns 0 if user has no productivity proved in the contract.</p>
+<h3 id="increaseproductivity">
+<a href="#increaseproductivity" class="anchor-link"></a> increaseProductivity
+</h3>
+<p>It increases a user’s productivity.</p>
+<h3 id="decreaseproductivity">
+<a href="#decreaseproductivity" class="anchor-link"></a> decreaseProductivity
+</h3>
+<p>It decreases a user’s productivity.</p>
+<h3 id="take">
+<a href="#take" class="anchor-link"></a> take
+</h3>
+<p>It returns the interests that callee will get at current block height.</p>
+<h3 id="takewithblock">
+<a href="#takewithblock" class="anchor-link"></a> takeWithBlock
+</h3>
+<p>Similar to take(), but with the block height joined to calculate return.</p>
+<p>For instance, it returns (_amount, _block), which means at block height _block, the callee has accumulated _amount of interests.</p>
+<p>It returns amount of interests and the block height.</p>
+<h3 id="mint">
+<a href="#mint" class="anchor-link"></a> mint
+</h3>
+<p>it mints the amount of interests will transfer to callee’s address. It returns the amount of interests minted.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>TBD</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>The implementation code is on the github:</p>
+<ul>
+<li><a href="https://github.com/gnufoo/ERC3000-Proposal">ERC2917 Demo</a></li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TBD</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#0a7e65647324696b78796564644a6d676b636624696567">Tony Carson</a>, <a href="/cdn-cgi/l/email-protection#f39edd989a819289b3949e929a9fdd909c9e">Mehmet Sabir Kiraz</a>, <a href="/cdn-cgi/l/email-protection#34475f5546505547745359555d581a575b59">Süleyman Kardaş</a>, "EIP-2917: Staking Reward Calculation [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2917, August 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2917.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2917: Staking Reward Calculation [DRAFT]",
+    "author": "Tony Carson <tony.carsonn@gmail.com>, Mehmet Sabir Kiraz <m.kiraz@gmail.com>, Süleyman Kardaş <skardas@gmail.com>",
+    "name": "EIP-2917: Staking Reward Calculation [DRAFT]",
+    "dateCreated": "2020-08-28",
+    "datePublished": "2020-08-28",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2925",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

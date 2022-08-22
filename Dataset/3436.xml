@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3436: Expanded Clique Block Choice Rule</title>
+<meta property="og:title" content="EIP-3436: Expanded Clique Block Choice Rule" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3436" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3436" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3436: Expanded Clique Block Choice Rule
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3436.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/shemnon">Danno Ferrin</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3436-expanded-clique-block-choice-rule/5809">https://ethereum-magicians.org/t/eip-3436-expanded-clique-block-choice-rule/5809</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-03-25</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-225">225</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Add a four step block rule to Clique that should reduce block production deadlocks</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The current specification of Clique allows for multiple competing blocks from producers but does not
+provide any strategies to pick blocks aside from the current “highest total difficulty” rule. This
+EIP proposes a four step choice rule of highest total difficulty, shortest chain, most recently
+in-turn, and lowest hash. This would prevent deadlocks that have occurred in production systems.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There has been more than one deadlock in the Goerli multi-client Clique network. The number of
+active validators was greater than 1/2 of the available validators so a chain halt should not have
+occurred. The halt was resolved by an inactive validator coming back on line. The state of the chain
+was in one of two configurations of 8 validators that can result in a chain halt. Three of the four
+clients observed a choice sequence of lowest total difficulty followed by first observed block. Geth
+added one extra rule of preferring the shortest chain before preferring the first observed block.
+This fork would have resolved itself with Geth’s rule, but there is still a configuration where the
+chain can halt with a shortest chain rule.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>When a Clique validator is arbitrating the canonical status between two different chain head blocks,
+they should choose the canonical block with the following ordered priorities.</p>
+<ol>
+<li>Choose the block with the most total difficulty.</li>
+<li>Then choose the block with the lowest block number.</li>
+<li>Then choose the block whose validator had the least recent in-turn block assignment.</li>
+<li>Then choose the block with the lowest hash.</li>
+</ol>
+<p>When resolving rule 3 clients should use the following formula, where <code class="language-plaintext highlighter-rouge">validator_index</code> is the integer
+index of the validator that signed the block when sorted as per epoch checkpointing,
+<code class="language-plaintext highlighter-rouge">header_number</code> is the number of the header, and <code class="language-plaintext highlighter-rouge">validator_count</code> is the count of the current
+validators. Clients should choose the block with the <strong>largest</strong> value. Note that an in-turn block
+is considered to be the most recent in-turn block.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(header_number - validator_index) % validator_count
+</code></pre></div></div>
+<p>When resolving rule 4 the hash should be converted into an unsigned 256 bit integer.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Two scenarios of a halted chain are known based on the current total difficulty then first observed
+rule. One of the scenarios is also resistant to the shortest chain rule.</p>
+<p>For the first scenario where chains of different lengths can halt consider a block with 8
+validators, whose addresses sort to the same order as their designation in this example. A fully
+in-order chain exists and validator number 8 has just produced an in-turn block and then validators
+5, 7 and 8 go offline, leaving validators 1 to 6 to produce blocks. Two forks form, one with an
+in-order block from validator 1 and then an out of order block from validator 3. The second fork
+forms from validators 2, 4, and 6 in order. Both have a net total difficulty of 3 more than the
+common ancestor. So in this case if both forks become aware of the other fork then both are
+considered equally viable and neither set of validators should switch to the newly observed fork. In
+this case, adding a shortest chain rule would break the deadlock as the even numbered validators
+would adopt the shorter chain.</p>
+<p>For the second scenario with the same validator set and in-order chain with validator 7 having just
+produced an in order block, then validators 7 and 8 go offline. Two forks form, 1,3,5 on one side
+and 2,4,6 on the other. Both forks become aware of the other fork after producing their third block.
+In this case both forks have equal total difficulty and equal length. So Geth’s rule would not break
+the tie and only the arrival of one of the missing validators fix the chain. In a worst case
+scenario the odd and even chains would produce a block for 7 and 8 respectively, and chain halt
+would result with no validators that have not chosen a fork. Only a manual rollback would fix this.</p>
+<p>One consideration when formulating the rules is that the block choice should be chosen so that it
+would encourage the maximum amount of in-order blocks. Selecting a chain based on shortest chain
+implicitly prefers the chain with more in-order blocks. When selecting between competing out of
+order chains the validator who is closest to producing an in-order block in the future should have
+their chain declined so that they are available to produce an in-order block sooner.</p>
+<p>At least one client has been observed producing multiple blocks at the same height with the same
+difficulty, so a final catch-all standard of lowest block hash should break any remaining ties.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The current block choice rules are a mix of most total difficulty and most total difficulty plus
+shortest chain.</p>
+<p>As long as the majority of the active validators implement the block choice rules then a client who
+only implements the existing difficulty based rule will eventually align with the chain preferred by
+these rules. If less than a majority implement these rules then deadlocks can still occur, and
+depend on the first observation of problematic blocks, which is no worse than the current situation.</p>
+<p>If clients only partially implement the rule as long as every higher ranked rule is also implemented
+then the situation will be no worse than today.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Malicious and motivated attackers who are participating in the network can force the chain to halt
+with well crafted block production. With a fully deterministic choice rule the opportunity to halt
+is diminished. Attackers still have the same opportunities to flood the network with multiple blocks
+at the same height. A deterministic rule based on the lowest hash reduces the impact of such a
+flooding attack. A malicious validator could exploit this deterministic rule to produce a
+replacement block. Such an attack exists in current implementations but a deterministic hash rule
+makes such replacements more likely. However the impact of such an attack seems low to trivial at
+this time.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/shemnon">Danno Ferrin</a>, "EIP-3436: Expanded Clique Block Choice Rule [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3436, March 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3436.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3436: Expanded Clique Block Choice Rule [DRAFT]",
+    "author": "Danno Ferrin (@shemnon)",
+    "name": "EIP-3436: Expanded Clique Block Choice Rule [DRAFT]",
+    "dateCreated": "2021-03-25",
+    "datePublished": "2021-03-25",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3436-expanded-clique-block-choice-rule/5809",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

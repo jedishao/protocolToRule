@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4519: Non-Fungible Tokens Tied to Physical Assets</title>
+<meta property="og:title" content="EIP-4519: Non-Fungible Tokens Tied to Physical Assets" />
+<meta name="description" content="Interface for non-fungible tokens representing physical assets that can generate or recover their own accounts and obey users." />
+<meta property="og:description" content="Interface for non-fungible tokens representing physical assets that can generate or recover their own accounts and obey users." />
+<meta name="twitter:description" content="Interface for non-fungible tokens representing physical assets that can generate or recover their own accounts and obey users." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4519" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4519" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4519: Non-Fungible Tokens Tied to Physical Assets
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4519.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Interface for non-fungible tokens representing physical assets that can generate or recover their own accounts and obey users.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/Hardblock-IMSE-CNM">Javier Arcenegui</a>, <a href="https://github.com/RosarioArjona">Rosario Arjona</a>, <a href="/cdn-cgi/l/email-protection#65170a08040b250c08160048060b084b06160c064b0016">Roberto Román</a>, <a href="https://github.com/lumi2018">Iluminada Baturone</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/new-proposal-of-smart-non-fungible-token/7677">https://ethereum-magicians.org/t/new-proposal-of-smart-non-fungible-token/7677</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-12-03</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>,
+<a href="eip-721">721</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP proposes a standard interface for non-fungible tokens that represent physical assets, such as Internet of Things (IoT) devices. A SmartNFT is tied to a physical asset that can check if the tie is authentic or not. The SmartNFT can include an Ethereum address of the physical asset and, consequently, the physical asset can sign messages or transactions. The physical asset can operate with an operating mode that is defined by its SmartNFT with an attribute named state. The token state can define if the token owner or the token user can use the asset or not. A cryptographically secure mutual authentication process can be carried out between the physical asset and its owner or its user. SmartNFTs extend <a href="/EIPS/eip-721">ERC-721</a> non-fungible tokens, which only allow representing assets by a unique identifier, but not by an Ethereum address. Moreover, SmartNFTs extend ERC-721 NFTs to include users in addition to owners.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>This SmartNFT was developed because the ERC-721 NFT does not include the users of an asset (only include the owners) and does not include the Ethereum address of the asset. Smart assets (for example, IoT devices) are increasing nowadays. If smart assets are tied to SmartNFTs then they can be managed in a secure and traceable way. The reason is that SmartNFTs, unlike ERC-721 NFTs, allow establishing secure communication channels between the physical asset and its owner and its user. In this way, assets, owners and users can be assured of exchanging information with trusted parties.</p>
+<p><strong>Secure Physical Asset Tied to a SmartNFT</strong>
+Current non-fungible tokens are associated with passive assets, either virtual or physical things, but they do not include any standardized mechanism to tie the non-fungible token to the asset. Tying physical assets to NFTs is interesting because the asset can know anytime its owner, user, operating mode, and how to establish secure communication channels with its owner and user. The assets, owners and users are identified by their Ethereum addresses and the Ethereum address of the asset can be obtained from a unique physical property of the physical asset (for example, using a physical unclonable function). The asset can be an active part in any transfer of ownership and use. In addition, the asset is smart, for example to not obey orders from a non-authorized user, or to be inoperative if a successful authentication with the user or the owner has not been fulfilled.</p>
+<p><strong>User Management Mechanism</strong>
+SmartNFTs allow implementing a new and useful user management mechanism. In the last few years, many projects concerning assets sharing (for example, vehicles) have been created and developed. SmartNFTs incorporate the Ethereum address of the user as another attribute of the token in order to distinguish between the user, who employs the asset for a specific application, and the owner, who assigns the token to users. Hence, both users and owners of an asset can be traced.</p>
+<p><strong>Secure Key Exchange Mechanism</strong>
+The engagement of the asset with an owner or a user is carried out after a mutual authentication protocol (for example, based on elliptic curve Diffie-Hellman key exchange protocol). This protocol can be employed for a key agreement between the asset and its owner, in the one side, and between the asset and its user, in the other side.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The SmartNFT attributes <code class="language-plaintext highlighter-rouge">addressAsset</code> and <code class="language-plaintext highlighter-rouge">addressUser</code> are, respectively, the Ethereum addresses of the physical asset and the user. They are optional attributes but at least one of them should be used in a SmartNFT. In the case of using only the attribute <code class="language-plaintext highlighter-rouge">addressUser</code>, two states define if the token is assigned or not to a user. <code class="language-plaintext highlighter-rouge">Figure 1</code> shows these states in a flow chart. When a token is created, transferred or unassigned, the token state is set to <code class="language-plaintext highlighter-rouge">notAssigned</code>. If the token is assigned to a valid user, the state is set to <code class="language-plaintext highlighter-rouge">userAssigned</code>.</p>
+<p><img src="/assets/eip-4519/images/Figure1.jpg" alt="Figure 1 : Flow chart of the token states with `addressUser` defined (and `addressAsset` undefined)" /></p>
+<p>In the case of defining the attribute <code class="language-plaintext highlighter-rouge">addressAsset</code> but not the attribute <code class="language-plaintext highlighter-rouge">addressUser</code>, two states define if the token is waiting for authentication with the owner or if the authentication has finished successfully. <code class="language-plaintext highlighter-rouge">Figure 2</code> shows these states in a flow chart. When a token is created or transferred to a new owner, then the token changes its state to <code class="language-plaintext highlighter-rouge">waitingForOwner</code>. In this state, the token is waiting for the mutual authentication between the asset and the owner. Once authentication is finished successfully, the token changes its state to <code class="language-plaintext highlighter-rouge">engagedWithOwner</code>.</p>
+<p><img src="/assets/eip-4519/images/Figure2.jpg" alt="Figure 2 : Flow chart of the token states with `addressAsset` defined (and `addressUser` undefined)" /></p>
+<p>Finally, if both the attributes <code class="language-plaintext highlighter-rouge">addressAsset</code> and <code class="language-plaintext highlighter-rouge">addressUser</code> are defined, the states of the SmartNFT define if the asset has been engaged or not with the owner or the user (<code class="language-plaintext highlighter-rouge">waitingForOwner</code>, <code class="language-plaintext highlighter-rouge">engagedWithOwner</code>, <code class="language-plaintext highlighter-rouge">waitingForUser</code> and <code class="language-plaintext highlighter-rouge">engagedWithUser</code>). The flow chart in <code class="language-plaintext highlighter-rouge">Figure 3</code> shows all the possible state changes. The states related to the owner are the same as in <code class="language-plaintext highlighter-rouge">Figure 2</code>. The difference is that, at the state <code class="language-plaintext highlighter-rouge">engagedWithOwner</code>, the token can be assigned to a user. If a user is assigned (the token being at states <code class="language-plaintext highlighter-rouge">engagedWithOwner</code>, <code class="language-plaintext highlighter-rouge">waitingForUser</code> or <code class="language-plaintext highlighter-rouge">engagedWithUser</code>), then the token changes its state to <code class="language-plaintext highlighter-rouge">waitingForUser</code>. Once the asset and the user authenticate each other, the state of the token is set to <code class="language-plaintext highlighter-rouge">engagedWithUser</code>, and the user is able to use the asset.</p>
+<p><img src="/assets/eip-4519/images/Figure3.jpg" alt="Figure 3 : Flow chart of the token states with `addressUser` and `addressUser` defined" /></p>
+<p>In order to complete the ownership transfer of a token, the new owner must carry out a mutual authentication process with the asset, which is off-chain with the asset and on-chain with the token, by using their Ethereum addresses. Similarly, a new user must carry out a mutual authentication process with the asset to complete a use transfer. SmartNFTs define how the authentication processes start and finish. These authentication processes allow deriving fresh session cryptographic keys for secure communication between assets and owners, and between assets and users. Therefore, the trustworthiness of the assets can be traced even if new owners and users manage them.</p>
+<p>When the SmartNFT is created or when the ownership is transferred, the token state is <code class="language-plaintext highlighter-rouge">waitingForOwner</code>. Assuming that the asset is an electronic physical asset, it saves in its memory the owner address and sets its operating mode to <code class="language-plaintext highlighter-rouge">waitingForOwner</code>. The owner generates a pair of keys using the elliptic curve secp256k1 and the primitive element P used on this curve: a secret key SK<sub>O_A</sub> and a Public Key PK<sub>O_A</sub>, so that PK<sub>O_A</sub> = SK<sub>O_A</sub>*P. To generate the shared key between the owner and the asset, K<sub>O</sub>, the public key of the asset, PK<sub>A</sub>, is employed as follows:</p>
+<p>K<sub>O</sub>=PK<sub>A</sub>*SK<sub>O_A</sub></p>
+<p>Using the function <code class="language-plaintext highlighter-rouge">startOwnerEngagement</code>, the owner saves PK<sub>O_A</sub> as the attribute <code class="language-plaintext highlighter-rouge">dataEngagement</code> and the hash of K<sub>O</sub> as the attribute <code class="language-plaintext highlighter-rouge">hashK_OA</code> in the SmartNFT. The owner sends PK<sub>O_A</sub> signed to the asset. The asset checks the signature of the owner and, if signature is correct, the asset uses PK<sub>O_A</sub> to calculate:</p>
+<p>K<sub>A</sub> = SK<sub>A</sub>*PK<sub>O_A</sub></p>
+<p>If everything is correctly done, K<sub>O</sub> and K<sub>A</sub> are the same since:</p>
+<p>K<sub>O</sub>=PK<sub>A</sub>*SK<sub>O_A</sub>=(SK<sub>A</sub>*P)*SK<sub>O_A</sub>= SK<sub>A</sub>*(SK<sub>O_A</sub>*P)=SK<sub>A</sub>*PK<sub>O_A</sub></p>
+<p>Using the function <code class="language-plaintext highlighter-rouge">ownerEngagement</code>, the asset sends the hash of K<sub>A</sub> obtained and if it is the same as the data in <code class="language-plaintext highlighter-rouge">hashK_OA</code>, then the state of the token changes to <code class="language-plaintext highlighter-rouge">engagedWithOwner</code> and the event <code class="language-plaintext highlighter-rouge">OwnerEngaged</code> is sent. Once the asset receives the event, it changes its operation mode to <code class="language-plaintext highlighter-rouge">engagedWithOwner</code>. This process is shown in <code class="language-plaintext highlighter-rouge">Figure 4</code>. From this moment, the asset can be managed by the owner and they can communicate in a secure way using the shared key.</p>
+<p><img src="/assets/eip-4519/images/Figure4.jpg" alt="Figure 4: Steps in a successful owner and asset mutual authentication process" /></p>
+<p>If the asset consults Ethereum and the state of its SmartNFT is <code class="language-plaintext highlighter-rouge">waitingForUser</code>, the asset (assuming it is an electronic physical asset) saves in its memory the user address and sets its operating mode to <code class="language-plaintext highlighter-rouge">waitingForUser</code>. Then, a mutual authentication process is carried out with the user, as already done with the owner. The user sends the transaction associated with the function <code class="language-plaintext highlighter-rouge">startUserEngagement</code>. As in <code class="language-plaintext highlighter-rouge">startOwnerEngagement</code>, this function saves the public key generated by the user, PK<sub>U_A</sub>, as the attribute <code class="language-plaintext highlighter-rouge">dataEngagement</code> and the hash of K<sub>U</sub>=PK<sub>A</sub>*SK<sub>U_A</sub> as the attribute <code class="language-plaintext highlighter-rouge">hashK_UA</code> in the SmartNFT.</p>
+<p>The user sends PK<sub>U_A</sub> signed to the asset. The latter checks the signature of the user and, if signature is correct, the asset uses PK<sub>U_A</sub> to calculate:</p>
+<p>K<sub>A</sub> = SK<sub>A</sub>*PK<sub>U_A</sub></p>
+<p>If everything is correctly done, K<sub>U</sub> and K<sub>A</sub> are the same since:</p>
+<p>K<sub>U</sub>=PK<sub>A</sub>*SK<sub>U_A</sub>=(SK<sub>A</sub>*P)*SK<sub>U_A</sub>= SK<sub>A</sub>*(SK<sub>U_A</sub>*P)=SK<sub>A</sub>*PK<sub>U_A</sub></p>
+<p>Using the function <code class="language-plaintext highlighter-rouge">userEngagement</code>, the asset sends the hash of K<sub>A</sub> obtained and if it is the same as the data in <code class="language-plaintext highlighter-rouge">hashK_UA</code>, then the state of the token changes to <code class="language-plaintext highlighter-rouge">engagedWithUser</code> and the event <code class="language-plaintext highlighter-rouge">UserEngaged</code> is sent. Once the asset receives the event, it changes its operation mode to <code class="language-plaintext highlighter-rouge">engagedWithUser</code>. This process is shown in <code class="language-plaintext highlighter-rouge">Figure 5</code>. From this moment, the asset can be managed by the user and they can communicate in a secure way using the shared key.</p>
+<p><img src="/assets/eip-4519/images/Fig5_rev.png" alt="Figure 5: Steps in a successful user and asset mutual authentication process" /></p>
+<p>Since the establishment of a shared secret key is very important for a secure communication, SmartNFTs include the attributes
+<code class="language-plaintext highlighter-rouge">hashK_OA</code>, <code class="language-plaintext highlighter-rouge">hashK_UA</code> and <code class="language-plaintext highlighter-rouge">dataEngagement</code>. The first two attributes define, respectively, the hash of the secret key shared between the asset and its owner and between the asset and its user. Assets, owners and users should check they are using the correct shared secret keys. The attribute <code class="language-plaintext highlighter-rouge">dataEngagement</code> defines the public data needed for the agreement.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+ <span class="c1">/// @title SmartNFT: Extension of ERC-721 Non-Fungible Token Standard. 
+///  Note: the ERC-165 identifier for this interface is 0x8a68abe3
+</span> <span class="k">interface</span> <span class="n">SmartNFT</span> <span class="k">is</span> <span class="n">ERC721</span><span class="cm">/*,ERC165*/</span><span class="p">{</span>
+    <span class="c1">/// @dev This emits when the NFT is assigned as utility of a new user.
+</span>    <span class="c1">///  This event emits when the user of the token changes.
+</span>    <span class="c1">///  (`_addressUser` == 0) when no user is assigned.
+</span>    <span class="k">event</span> <span class="n">UserAssigned</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_addressUser</span><span class="p">);</span>
+    
+    <span class="c1">/// @dev This emits when user and asset finish mutual authentication process successfully.
+</span>    <span class="c1">///  This event emits when both the user and the asset prove they share a secure communication channel.
+</span>    <span class="k">event</span> <span class="n">UserEngaged</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">);</span>
+    
+    <span class="c1">/// @dev This emits when owner and asset finish mutual authentication process successfully.
+</span>    <span class="c1">///  This event emits when both the owner and the asset prove they share a secure communication channel.
+</span>    <span class="k">event</span> <span class="n">OwnerEngaged</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">);</span>
+    
+    <span class="c1">/// @dev This emits when it is checked that the timeout has expired.
+</span>    <span class="c1">///  This event emits when the timestamp of the SmartNFT is not updated in timeout.
+</span>    <span class="k">event</span> <span class="n">TimeoutAlarm</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">);</span>
+    <span class="c1">/// @notice This function defines how the NFT is assigned as utility of a new user (if "addressUser" is defined).
+</span>    <span class="c1">/// @dev Only the owner of the SmartNFT can assign a user. If "addressAsset" is defined, then the state of the token must be
+</span>    <span class="c1">/// "engagedWithOwner","waitingForUser" or "engagedWithUser" and this function changes the state of the token defined by "_tokenId" to
+</span>    <span class="c1">/// "waitingForUser". If "addressAsset" is not defined, the state is set to "userAssigned". In both cases, this function sets the parameter 
+</span>    <span class="c1">/// "addressUser" to "_addressUser". 
+</span>    <span class="c1">/// @param _tokenId is the tokenId of the SmartNFT tied to the asset.
+</span>    <span class="c1">/// @param _addressUser is the address of the new user.
+</span>    <span class="k">function</span> <span class="n">setUser</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_addressUser</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span><span class="p">;</span> 
+    <span class="c1">/// @notice This function defines the initialization of the mutual authentication process between the owner and the asset.
+</span>    <span class="c1">/// @dev Only the owner of the token can start this authentication process if "addressAsset" is defined and the state of the token is "waitingForOwner".
+</span>    <span class="c1">/// The function does not change the state of the token and saves "_dataEngagement" 
+</span>    <span class="c1">/// and "_hashK_OA" in the parameters of the token.
+</span>    <span class="c1">/// @param _tokenId is the tokenId of the SmartNFT tied to the asset.
+</span>    <span class="c1">/// @param _dataEngagement is the public data proposed by the owner for the agreement of the shared key.
+</span>    <span class="c1">/// @param _hashK_OA is the hash of the secret proposed by the owner to share with the asset.
+</span>    <span class="k">function</span> <span class="n">startOwnerEngagement</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_dataEngagement</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_hashK_OA</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span><span class="p">;</span>
+ 
+    <span class="c1">/// @notice This function completes the mutual authentication process between the owner and the asset.
+</span>    <span class="c1">/// @dev Only the asset tied to the token can finish this authentication process provided that the state of the token is
+</span>    <span class="c1">/// "waitingForOwner" and dataEngagement is different from 0. This function compares hashK_OA saved in
+</span>    <span class="c1">/// the token with hashK_A. If they are equal then the state of the token changes to "engagedWithOwner", dataEngagement is set to 0,
+</span>    <span class="c1">/// and the event "OwnerEngaged" is emitted.
+</span>    <span class="c1">/// @param _hashK_A is the hash of the secret generated by the asset to share with the owner.
+</span>    <span class="k">function</span> <span class="n">ownerEngagement</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_hashK_A</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span><span class="p">;</span> 
+ 
+    <span class="c1">/// @notice This function defines the initialization of the mutual authentication process between the user and the asset.
+</span>    <span class="c1">/// @dev Only the user of the token can start this authentication process if "addressAsset" and "addressUser" are defined and
+</span>    <span class="c1">/// the state of the token is "waitingForUser". The function does not change the state of the token and saves "_dataEngagement" 
+</span>    <span class="c1">/// and "_hashK_UA" in the parameters of the token.
+</span>    <span class="c1">/// @param _tokenId is the tokenId of the SmartNFT tied to the asset.
+</span>    <span class="c1">/// @param _dataEngagement is the public data proposed by the user for the agreement of the shared key.
+</span>    <span class="c1">/// @param _hashK_UA is the hash of the secret proposed by the user to share with the asset.
+</span>    <span class="k">function</span> <span class="n">startUserEngagement</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_dataEngagement</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_hashK_UA</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span><span class="p">;</span>
+    
+    <span class="c1">/// @notice This function completes the mutual authentication process between the user and the asset.
+</span>    <span class="c1">/// @dev Only the asset tied to the token can finish this authentication process provided that the state of the token is
+</span>    <span class="c1">/// "waitingForUser" and dataEngagement if different from 0. This function compares hashK_UA saved in
+</span>    <span class="c1">/// the token with hashK_A. If they are equal then the state of the token changes to "engagedWithUser", dataEngagement is set to 0,
+</span>    <span class="c1">/// and the event "UserEngaged" is emitted.
+</span>    <span class="c1">/// @param _hashK_A is the hash of the secret generated by the asset to share with the user.
+</span>    <span class="k">function</span> <span class="n">userEngagement</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_hashK_A</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span><span class="p">;</span> 
+ 
+    <span class="c1">/// @notice This function checks if the timeout has expired.
+</span>    <span class="c1">/// @dev Everybody can call this function to check if the timeout has expired. The event "TimeoutAlarm" is emitted
+</span>    <span class="c1">/// if the timeout has expired.
+</span>    <span class="c1">/// @param _tokenId is the tokenId of the SmartNFT tied to the asset.
+</span>    <span class="c1">/// @return true if timeout has expired and false in other case.
+</span>    <span class="k">function</span> <span class="n">checkTimeout</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+    
+    <span class="c1">/// @notice This function sets the value of timeout.
+</span>    <span class="c1">/// @dev Only the owner of the token can set this value provided that the state of the token is "engagedWithOwner",
+</span>    <span class="c1">/// "waitingForUser" or "engagedWithUser".
+</span>    <span class="c1">/// @param _tokenId is the tokenId of the SmartNFT tied to the asset.
+</span>    <span class="c1">/// @param _timeout is the value to assign to timeout.
+</span>    <span class="k">function</span> <span class="n">setTimeout</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_timeout</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span> 
+    
+    <span class="c1">/// @notice This function updates the timestamp, thus avoiding the timeout alarm.
+</span>    <span class="c1">/// @dev Only the asset tied to the token can update its own timestamp.
+</span>    <span class="k">function</span> <span class="n">updateTimestamp</span><span class="p">()</span> <span class="k">external</span><span class="p">;</span> 
+    
+    <span class="c1">/// @notice This function lets obtain the tokenId from an address. 
+</span>    <span class="c1">/// @dev Everybody can call this function. The code executed only reads from Ethereum.
+</span>    <span class="c1">/// @param _addressAsset is the address to obtain the tokenId from it.
+</span>    <span class="c1">/// @return tokenId of the token tied to the asset that generates _addressAsset.
+</span>    <span class="k">function</span> <span class="n">tokenFromBCA</span><span class="p">(</span><span class="kt">address</span> <span class="n">_addressAsset</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+    
+    <span class="c1">/// @notice This function lets know the owner of the token from the address of the asset tied to the token.
+</span>    <span class="c1">/// @dev Everybody can call this function. The code executed only reads from Ethereum.
+</span>    <span class="c1">/// @param _addressAsset is the address to obtain the owner from it.
+</span>    <span class="c1">/// @return owner of the token bound to the asset that generates _addressAsset.
+</span>    <span class="k">function</span> <span class="n">ownerOfFromBCA</span><span class="p">(</span><span class="kt">address</span> <span class="n">_addressAsset</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+    
+    <span class="c1">/// @notice This function lets know the user of the token from its tokenId.
+</span>    <span class="c1">/// @dev Everybody can call this function. The code executed only reads from Ethereum.
+</span>    <span class="c1">/// @param _tokenId is the tokenId of the SmartNFT tied to the asset.
+</span>    <span class="c1">/// @return user of the token from its _tokenId.
+</span>    <span class="k">function</span> <span class="n">userOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+    
+    <span class="c1">/// @notice This function lets know the user of the token from the address of the asset tied to the token.
+</span>    <span class="c1">/// @dev Everybody can call this function. The code executed only reads from Ethereum.
+</span>    <span class="c1">/// @param _addressAsset is the address to obtain the user from it.
+</span>    <span class="c1">/// @return user of the token tied to the asset that generates _addressAsset.
+</span>    <span class="k">function</span> <span class="n">userOfFromBCA</span><span class="p">(</span><span class="kt">address</span> <span class="n">_addressAsset</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+    
+    <span class="c1">/// @notice This function lets know how many tokens are assigned to a user.
+</span>    <span class="c1">/// @dev Everybody can call this function. The code executed only reads from Ethereum.
+</span>    <span class="c1">/// @param _addressUser is the address of the user.
+</span>    <span class="c1">/// @return number of tokens assigned to a user.
+</span>    <span class="k">function</span> <span class="n">userBalanceOf</span><span class="p">(</span><span class="kt">address</span> <span class="n">_addressUser</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+    
+    <span class="c1">/// @notice This function lets know how many tokens of a particular owner are assigned to a user.
+</span>    <span class="c1">/// @dev Everybody can call this function. The code executed only reads from Ethereum.
+</span>    <span class="c1">/// @param _addressUser is the address of the user.
+</span>    <span class="c1">/// @param _addressOwner is the address of the owner.
+</span>    <span class="c1">/// @return number of tokens assigned to a user from an owner.
+</span>    <span class="k">function</span> <span class="n">userBalanceOfAnOwner</span><span class="p">(</span><span class="kt">address</span> <span class="n">_addressUser</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_addressOwner</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The demand for SmartNFTs, which allow user management and a tie to a physical asset are growing (for example, in the context of the Internet of Things). Therefore, it is essential to establish a standard capable of including all these options working together or separately. The incorporation of an Ethereum address of the user or an Ethereum address of a physical asset to the SmartNFT is optional. However, it does not make sense that the SmartNFT does not include any of them because, in that case, the SmartNFT would be an ERC-721 token. Since some functions such as <code class="language-plaintext highlighter-rouge">startUserEngagement</code> are available only if both addresses are implemented, a single interface with all the options is proposed.</p>
+<p><strong>SmartNFT</strong>
+This EIP proposes a non-fungible token tied to a physical asset. The asset is able to generate an Ethereum address and authenticate its user and its owner. Hence, the asset can be considered as a smart asset associated with an NFT. If the asset and the token are regarded as one thing, we can talk about a SmartNFT.</p>
+<p><strong>Authentication</strong>
+This EIP proposes using the smart contract to verify the mutual authentication process between the physical asset and the owner or the user by verifying the hash of a shared key.</p>
+<p><strong>Tie Time</strong>
+This EIP proposes including the attribute timestamp (to register in Ethereum the last time that the physical asset checked the tie with its token) and the attribute timeout (to register the maximum delay time established for the physical asset to prove again the tie). These attributes avoid that a malicious owner or user could use the asset endlessly.
+When the asset calls <code class="language-plaintext highlighter-rouge">updateTimestamp</code>, the smart contract must call <code class="language-plaintext highlighter-rouge">block.timestamp</code>, which provides current block timestamp as seconds since Unix epoch. For this reason, <code class="language-plaintext highlighter-rouge">timeout</code> must be provided in seconds.</p>
+<p><strong>ERC-721-based</strong>
+<a href="/EIPS/eip-721">EIP-721</a> is the most commonly-used standard for generic NFTs. This EIP extends ERC-721 for backwards compatibility.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This standard is an extension of ERC-721. It is fully compatible with both of the commonly used optional extensions (<code class="language-plaintext highlighter-rouge">IERC721Metadata</code> and <code class="language-plaintext highlighter-rouge">IERC721Enumerable</code>) mentioned in the EIP-721 standard.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>The test cases presented in the paper shown below are available [here] (../assets/eip-4519/PoC_SmartNFT/README.md).</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>A first version was presented in a paper of the Special Issue <strong>Security, Trust and Privacy in New Computing Environments</strong> of <strong>Sensors</strong> journal of <strong>MDPI</strong> editorial. The paper, entitled <a href="/assets/eip-4519/sensors-21-03119.pdf">Secure Combination of IoT and Blockchain by Physically Binding IoT Devices to Smart Non-Fungible Tokens Using PUFs</a>, was written by the same authors of this EIP.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>In this EIP, a generic system has been proposed for the creation of non-fungible tokens tied to physical assets. A generic point of view based on the improvements of the current ERC-721 NFT is provided, such as the implementation of the user management mechanism, which does not affect the token’s ownership. The physical asset should have the ability to generate an Ethereum address from itself in a totally random way so that only the asset is able to know the secret from which the Ethereum address is generated. In this way, identity theft is avoided and the asset can be proven to be completely genuine. In order to ensure this, it is recommended that only the manufacturer of the asset has the ability to create its associated token. In the case of an IoT device, the device firmware will be unable to share and modify the secret. Instead of storing the secrets, it is recommended that assets reconstruct their secrets from non-sensitive information such as the helper data associated with Physical Unclonable Functions (PUFs). Although a secure key exchange protocol based on elliptic curves has been proposed, the token is open to coexist with other types of key exchange.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/Hardblock-IMSE-CNM">Javier Arcenegui</a>, <a href="https://github.com/RosarioArjona">Rosario Arjona</a>, <a href="/cdn-cgi/l/email-protection#0f7d60626e614f66627c6a226c6162216c7c666c216a7c">Roberto Román</a>, <a href="https://github.com/lumi2018">Iluminada Baturone</a>, "EIP-4519: Non-Fungible Tokens Tied to Physical Assets [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4519, December 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4519.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4519: Non-Fungible Tokens Tied to Physical Assets [DRAFT]",
+    "author": "Javier Arcenegui (@Hardblock-IMSE-CNM), Rosario Arjona (@RosarioArjona), Roberto Román <roman@imse-cnm.csic.es>, Iluminada Baturone (@lumi2018)",
+    "name": "EIP-4519: Non-Fungible Tokens Tied to Physical Assets [DRAFT]",
+    "dateCreated": "2021-12-03",
+    "datePublished": "2021-12-03",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/new-proposal-of-smart-non-fungible-token/7677",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

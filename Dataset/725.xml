@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-725: General key-value store and execution standard</title>
+<meta property="og:title" content="EIP-725: General key-value store and execution standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-725" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-725" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-725: General key-value store and execution standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-725.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/frozeman">Fabian Vogelsteller</a>, <a href="https://github.com/tyleryasaka">Tyler Yasaka</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/725">https://github.com/ethereum/EIPs/issues/725</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2017-10-02</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>,
+<a href="eip-173">173</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#erc725x">ERC725X</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#erc725y">ERC725Y</a></li>
+<li><a href="#events-1">Events</a></li>
+<li><a href="#ownership">Ownership</a></li>
+<li><a href="#data-keys">Data keys</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a>
+<ul>
+<li><a href="#solidity-interfaces">Solidity Interfaces</a></li>
+</ul>
+</li>
+<li><a href="#additional-references">Additional References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard interface for a smart contract based account with attachable key value store.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following describes standard functions for a unique smart contract based account that can be used by humans,
+groups, organisations, objects and machines.</p>
+<p>The standard is divided into two sub standards:</p>
+<p><code class="language-plaintext highlighter-rouge">ERC725X</code>:
+Can execute arbitrary smart contracts and deploy other smart contracts.</p>
+<p><code class="language-plaintext highlighter-rouge">ERC725Y</code>:
+Can hold arbitrary data through a generic key/value store.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Standardizing a minimal interface for a smart contract based account allows any interface to operate through these account types.
+Smart contact based accounts following this standard have the following advantages:</p>
+<ul>
+<li>can hold any asset (native token, e.g. ERC20 like tokens)</li>
+<li>can execute any smart contract and deploy smart contracts</li>
+<li>have upgradeable security (through owner change, e.g. to a gnosis safe)</li>
+<li>are basic enough to work for for a long time</li>
+<li>are extensible though additional standardisation of the key/value data.</li>
+<li>can function as an owner/controller or proxy of other smart contracts</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="erc725x">
+<a href="#erc725x" class="anchor-link"></a> ERC725X
+</h3>
+<p>ERC165 identifier: <code class="language-plaintext highlighter-rouge">0x44c028fe</code></p>
+<h4 id="execute">
+<a href="#execute" class="anchor-link"></a> execute
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">execute</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">operationType</span><span class="p">,</span> <span class="kt">address</span> <span class="n">to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">value</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">data</span><span class="p">)</span> <span class="k">public</span> <span class="k">payable</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bytes</span> <span class="k">memory</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Executes a call on any other smart contracts, transfers the blockchains native token, or deploys a new smart contract.
+MUST only be called by the current owner of the contract.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">operationType</code>: the operation to execute.</li>
+<li><code class="language-plaintext highlighter-rouge">to</code>: the smart contract or address to interact with. <code class="language-plaintext highlighter-rouge">to</code> will be unused if a contract is created (operation 1 and 2).</li>
+<li><code class="language-plaintext highlighter-rouge">value</code>: the value of ETH to transfer.</li>
+<li><code class="language-plaintext highlighter-rouge">data</code>: the call data, or the contract data to deploy.</li>
+</ul>
+<p><em>Returns:</em> <code class="language-plaintext highlighter-rouge">bytes</code> , the returned data of the called function, or the address of the contract created (operation 1 and 2).</p>
+<p>The <code class="language-plaintext highlighter-rouge">operationType</code> can be the following:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">0</code> for <code class="language-plaintext highlighter-rouge">call</code></li>
+<li><code class="language-plaintext highlighter-rouge">1</code> for <code class="language-plaintext highlighter-rouge">create</code></li>
+<li><code class="language-plaintext highlighter-rouge">2</code> for <code class="language-plaintext highlighter-rouge">create2</code></li>
+<li><code class="language-plaintext highlighter-rouge">3</code> for <code class="language-plaintext highlighter-rouge">staticcall</code></li>
+<li><code class="language-plaintext highlighter-rouge">4</code> for <code class="language-plaintext highlighter-rouge">delegatecall</code></li>
+</ul>
+<p>Others may be added in the future.</p>
+<p><strong>Triggers Event:</strong> <a href="#contractcreated">ContractCreated</a>, <a href="#executed">Executed</a></p>
+<h3 id="events">
+<a href="#events" class="anchor-link"></a> Events
+</h3>
+<h4 id="executed">
+<a href="#executed" class="anchor-link"></a> Executed
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">Executed</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">_operation</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">_value</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">_data</span><span class="p">);</span>
+</code></pre></div></div>
+<p>MUST be triggered when <code class="language-plaintext highlighter-rouge">execute</code> creates a new call using the <code class="language-plaintext highlighter-rouge">operationType</code> <code class="language-plaintext highlighter-rouge">0</code>, <code class="language-plaintext highlighter-rouge">3</code>, <code class="language-plaintext highlighter-rouge">4</code>.</p>
+<h4 id="contractcreated">
+<a href="#contractcreated" class="anchor-link"></a> ContractCreated
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">ContractCreated</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">_operation</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_contractAddress</span><span class="p">,</span> <span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">_value</span><span class="p">);</span>
+</code></pre></div></div>
+<p>MUST be triggered when <code class="language-plaintext highlighter-rouge">execute</code> creates a new contract using the <code class="language-plaintext highlighter-rouge">operationType</code> <code class="language-plaintext highlighter-rouge">1</code>, <code class="language-plaintext highlighter-rouge">2</code>.</p>
+<h3 id="erc725y">
+<a href="#erc725y" class="anchor-link"></a> ERC725Y
+</h3>
+<p>ERC165 identifier: <code class="language-plaintext highlighter-rouge">0x714df77c</code></p>
+<h4 id="setdata">
+<a href="#setdata" class="anchor-link"></a> setData
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">setData</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">key</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">value</span><span class="p">)</span> <span class="k">public</span>
+</code></pre></div></div>
+<p>Sets data as bytes in the storage for a single key. MUST only be called by the current owner of the contract.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">key</code>: the key which value to set.</li>
+<li><code class="language-plaintext highlighter-rouge">value</code>: the data to set.</li>
+</ul>
+<p><strong>Triggers Event:</strong> <a href="#datachanged">DataChanged</a></p>
+<h4 id="setdata-array">
+<a href="#setdata-array" class="anchor-link"></a> setData (Array)
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">setData</span><span class="p">(</span><span class="kt">bytes32</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">keys</span><span class="p">,</span> <span class="kt">bytes</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">values</span><span class="p">)</span> <span class="k">public</span>
+</code></pre></div></div>
+<p>Sets array of data at multiple keys. MUST only be called by the current owner of the contract.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">keys</code>: the keys which values to set.</li>
+<li><code class="language-plaintext highlighter-rouge">values</code>: the array of bytes to set.</li>
+</ul>
+<p><strong>Triggers Event:</strong> <a href="#datachanged">DataChanged</a></p>
+<h4 id="getdata">
+<a href="#getdata" class="anchor-link"></a> getData
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getData</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">key</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bytes</span> <span class="k">memory</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Gets the data set for the given key.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">key</code>: the key which value to retrieve.</li>
+</ul>
+<p><em>Returns:</em> <code class="language-plaintext highlighter-rouge">bytes</code> , The data for the requested key.</p>
+<h4 id="getdata-array">
+<a href="#getdata-array" class="anchor-link"></a> getData (Array)
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getData</span><span class="p">(</span><span class="kt">bytes32</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">keys</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bytes</span><span class="p">[]</span> <span class="k">memory</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Gets array of data at multiple given key.</p>
+<p><em>Parameters:</em></p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">keys</code>: the keys which values to retrieve.</li>
+</ul>
+<p><em>Returns:</em> <code class="language-plaintext highlighter-rouge">bytes[]</code> , array of the values for the requested keys.</p>
+<h3 id="events-1">
+<a href="#events-1" class="anchor-link"></a> Events
+</h3>
+<h4 id="datachanged">
+<a href="#datachanged" class="anchor-link"></a> DataChanged
+</h4>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">DataChanged</span><span class="p">(</span><span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">key</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">value</span><span class="p">)</span>
+</code></pre></div></div>
+<p>MUST be triggered when <code class="language-plaintext highlighter-rouge">setData</code> was successfully called.</p>
+<h3 id="ownership">
+<a href="#ownership" class="anchor-link"></a> Ownership
+</h3>
+<p>This contract is controlled by an owner. The owner can be a smart contract or an external account.
+This standard requires <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-173.md">ERC173</a> and should implement the functions:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">owner() view</code></li>
+<li><code class="language-plaintext highlighter-rouge">transferOwnership(address newOwner)</code> <br /></li>
+</ul>
+<p>The event:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">OwnershipTransferred(address indexed previousOwner, address indexed newOwner)</code></li>
+</ul>
+<h3 id="data-keys">
+<a href="#data-keys" class="anchor-link"></a> Data keys
+</h3>
+<p>Data keys, should be the keccak256 hash of a type name.
+e.g. <code class="language-plaintext highlighter-rouge">keccak256('ERCXXXMyNewKeyType')</code> is <code class="language-plaintext highlighter-rouge">0x6935a24ea384927f250ee0b954ed498cd9203fc5d2bf95c735e52e6ca675e047</code></p>
+<p>The <a href="https://github.com/lukso-network/LIPs/blob/master/LSPs/LSP-2-ERC725YJSONSchema.md">ERC725JSONSchema standard</a> defines how keys should be named and generated.
+This JSON schema can be used to auto decode ERC725Y values from smart contracts for application and smart contract interactions.</p>
+<h4 id="default-key-values">
+<a href="#default-key-values" class="anchor-link"></a> Default key values
+</h4>
+<p>ERC725 key standards need to be defined within new standards, we suggest the following defaults:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Key</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SupportedStandards:XYZ</td>
+<td>Allows to determine standards supported by this contract</td>
+<td><code class="language-plaintext highlighter-rouge">0xeafec4d89fa9619884b6b89135626455000000000000000000000000xxxxxxxx</code>, where <code class="language-plaintext highlighter-rouge">xxxxxxxx</code> is the 4 bytes identifier of the standard supported</td>
+<td>Value can be defined by the standard, by default it should be the 4 bytes identifier e.g. <code class="language-plaintext highlighter-rouge">0x7a30e6fc</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="erc725account">
+<a href="#erc725account" class="anchor-link"></a> ERC725Account
+</h4>
+<p>The specification of an ERC725Account can be found in <a href="https://github.com/lukso-network/LIPs/blob/master/LSPs/LSP-0-ERC725Account.md">LSP0-ERC725Account</a>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The purpose of an smart contract account is to allow an entity to exist as a first-class citizen with the ability to execute arbitrary contract calls.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<ul>
+<li><a href="https://github.com/ERC725Alliance/ERC725/tree/master/implementations/contracts">Latest implementation</a></li>
+</ul>
+<h3 id="solidity-interfaces">
+<a href="#solidity-interfaces" class="anchor-link"></a> Solidity Interfaces
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.5</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">//ERC165 identifier: `0x44c028fe`
+</span><span class="k">interface</span> <span class="n">IERC725X</span>  <span class="cm">/* is ERC165, ERC173 */</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">ContractCreated</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">operation</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">contractAddress</span><span class="p">,</span> <span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">value</span><span class="p">);</span>
+    <span class="k">event</span> <span class="n">Executed</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">operation</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="k">indexed</span>  <span class="n">value</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">data</span><span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">execute</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">operationType</span><span class="p">,</span> <span class="kt">address</span> <span class="n">to</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">value</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">data</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bytes</span> <span class="k">memory</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">//ERC165 identifier: `0x714df77c`
+</span><span class="k">interface</span> <span class="n">IERC725Y</span> <span class="cm">/* is ERC165, ERC173 */</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">DataChanged</span><span class="p">(</span><span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">key</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">value</span><span class="p">);</span>
+
+    <span class="k">function</span> <span class="n">setData</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">key</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">value</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+    <span class="k">function</span> <span class="n">setData</span><span class="p">(</span><span class="kt">bytes32</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">keys</span><span class="p">,</span> <span class="kt">bytes</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">values</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+    <span class="k">function</span> <span class="n">getData</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">key</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bytes</span> <span class="k">memory</span><span class="p">);</span>
+    <span class="k">function</span> <span class="n">getData</span><span class="p">(</span><span class="kt">bytes32</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">keys</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bytes</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="n">IERC725</span> <span class="cm">/* is IERC725X, IERC725Y */</span> <span class="p">{</span>
+
+<span class="p">}</span>
+
+</code></pre></div></div>
+<h2 id="additional-references">
+<a href="#additional-references" class="anchor-link"></a> Additional References
+</h2>
+<ul>
+<li><a href="https://www.slideshare.net/FabianVogelsteller/erc-725-identity">Slides of the ERC Identity presentation</a></li>
+<li><a href="https://github.com/ethereum/wiki/wiki/ERC-735:-Claim-Holder-Registry-vs.-in-contract">In-contract claim VS claim registry</a></li>
+<li><a href="https://www.weboftrust.info/specs.html">Identity related reports</a></li>
+<li><a href="https://w3c.github.io/vc-use-cases/">W3C Verifiable Claims Use Cases</a></li>
+<li><a href="https://identity.foundation">Decentralised Identity Foundation</a></li>
+<li><a href="https://sovrin.org/wp-content/uploads/2017/06/The-Inevitable-Rise-of-Self-Sovereign-Identity.pdf">Sovrin Foundation Self Sovereign Identity</a></li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/frozeman">Fabian Vogelsteller</a>, <a href="https://github.com/tyleryasaka">Tyler Yasaka</a>, "EIP-725: General key-value store and execution standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 725, October 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-725.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-725: General key-value store and execution standard [DRAFT]",
+    "author": "Fabian Vogelsteller (@frozeman), Tyler Yasaka (@tyleryasaka)",
+    "name": "EIP-725: General key-value store and execution standard [DRAFT]",
+    "dateCreated": "2017-10-02",
+    "datePublished": "2017-10-02",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/725",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

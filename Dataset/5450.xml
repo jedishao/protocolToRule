@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5450: EOF - Stack Validation</title>
+<meta property="og:title" content="EIP-5450: EOF - Stack Validation" />
+<meta name="description" content="Deploy-time validation of stack usage for EOF functions." />
+<meta property="og:description" content="Deploy-time validation of stack usage for EOF functions." />
+<meta name="twitter:description" content="Deploy-time validation of stack usage for EOF functions." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5450" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5450" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5450: EOF - Stack Validation
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5450.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Deploy-time validation of stack usage for EOF functions.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gumb0">Andrei Maiboroda</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410">https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2022-08-12</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3540">3540</a>,
+<a href="eip-3670">3670</a>,
+<a href="eip-4200">4200</a>,
+<a href="eip-4750">4750</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#code-validation">Code validation</a></li>
+<li><a href="#execution">Execution</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduce extended code section validation that guarantees that stack underflow cannot happen during execution of validated contracts.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently existing EVM implementations perform a number of validity checks for each executed instructions, such as checks for stack overflow/underflow, sufficient gas etc. This change aims to minimize the number of the checks required at run-time, by verifying at deploy-time that no exceptional condition can happen, and preventing to deploy the code where it could happen.</p>
+<p>In particular this extended code validation eliminates the need for EVM stack underflow checks done for every executed instruction. It also prevents deploying the code that can be statically proven to require more than 1024 stack items.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="code-validation">
+<a href="#code-validation" class="anchor-link"></a> Code validation
+</h3>
+<p><em>Remark:</em> We rely on the notions of <em>data stack</em> and <em>type section</em> as defined by <a href="/EIPS/eip-4750">EIP-4750</a>.</p>
+<p>Code section validation rules as defined by <a href="/EIPS/eip-3670">EIP-3670</a> (which has been extended by <a href="/EIPS/eip-4200">EIP-4200</a> and <a href="/EIPS/eip-4750">EIP-4750</a>) are extended again to include the instruction flow traversal procedure, where every possible code path is examined, while keeping track of minimum required data stack height and verifying the following properties:</p>
+<ol>
+<li>For each reachable instruction in the section, data stack height when executing it is the same for all possible code paths going through this instruction.</li>
+<li>For each instruction, data stack always has enough items, i.e. stack underflow is invalid.</li>
+<li>For <code class="language-plaintext highlighter-rouge">CALLF</code> instruction data stack has enough items to use as input arguments to a called function according to its type defined in the type section.</li>
+<li>For every terminating instruction except <code class="language-plaintext highlighter-rouge">RETF</code>, data stack is empty after executing it.</li>
+<li>For <code class="language-plaintext highlighter-rouge">RETF</code> instruction data stack before executing it has exactly <code class="language-plaintext highlighter-rouge">n</code> items to use as output values returned from a function, where <code class="language-plaintext highlighter-rouge">n</code> is function’s number of outputs according to its type defined in the type section.</li>
+<li>Maximum data stack height required by a function does not exceed <code class="language-plaintext highlighter-rouge">1024</code>.</li>
+</ol>
+<p>To examine every reachable code path, validation needs to traverse every instruction in order, while also following each non-conditional jump, and following both possible branches for each conditional jump. See below for reference implementation.</p>
+<p>The complexity of this traversal is linear in the number of instructions, because each code path is examined only once, and property 1 guarantees no loops in the validation.</p>
+<h3 id="execution">
+<a href="#execution" class="anchor-link"></a> Execution
+</h3>
+<p>Given new deploy-time guarantees, EVM implementation is not required anymore to have run-time stack underflow check for each executed instruction.</p>
+<p>Stack overflow check, on the other hand, is still required at run-time, because function execution can start at arbitrary (i.e. known only at run-time) stack height at CALLF instruction of a caller (i.e. each execution can be in arbitrary inner call frame). Verification alrogirthm examines only stack height changes relative to starting stack height of the function.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>TBA</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change requires a “network upgrade”, since it modifies consensus rules.</p>
+<p>It poses no risk to backwards compatibility, as it is introduced only for EOF1 contracts, for which deploying undefined instructions is not allowed, therefore there are no existing contracts using these instructions. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Returns maximum stack height required by function execution frame
+# (not including frames of internal calls)
+# Raises ValidateExceptin if code is invalid.
+</span><span class="k">def</span> <span class="nf">validate_function</span><span class="p">(</span><span class="n">func_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">FunctionType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">FunctionType</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">func_id</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">types</span><span class="p">[</span><span class="n">func_id</span><span class="p">].</span><span class="n">inputs</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="n">types</span><span class="p">[</span><span class="n">func_id</span><span class="p">].</span><span class="n">outputs</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+
+    <span class="n">validate_code_section</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">types</span><span class="p">))</span>
+
+    <span class="n">stack_heights</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">start_stack_height</span> <span class="o">=</span> <span class="n">types</span><span class="p">[</span><span class="n">func_id</span><span class="p">].</span><span class="n">inputs</span>
+    <span class="n">max_stack_height</span> <span class="o">=</span> <span class="n">start_stack_height</span>
+
+    <span class="c1"># queue of instructions to analyze, list of (pos, stack_height) pairs
+</span>    <span class="n">worklist</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">start_stack_height</span><span class="p">)]</span>
+
+    <span class="k">while</span> <span class="n">worklist</span><span class="p">:</span>
+        <span class="n">pos</span><span class="p">,</span> <span class="n">stack_height</span> <span class="o">=</span> <span class="n">worklist</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="c1"># Assuming code ends with a terminating instruction due to previous validation in validate_code_section()
+</span>            <span class="k">assert</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">),</span> <span class="s">"code is invalid"</span> 
+            <span class="n">op</span> <span class="o">=</span> <span class="n">code</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">TABLE</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+
+            <span class="c1"># Check if stack height (type arity) at given position is the same
+</span>            <span class="c1"># for all control flow paths reaching this position.
+</span>            <span class="k">if</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">stack_heights</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">stack_height</span> <span class="o">!=</span> <span class="n">stack_heights</span><span class="p">[</span><span class="n">pos</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="n">ValidationException</span><span class="p">(</span><span class="s">"stack height mismatch for different paths"</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stack_heights</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">stack_height</span>
+
+
+            <span class="n">stack_height_required</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">stack_height_required</span>
+            <span class="n">stack_height_change</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">stack_height_change</span>
+
+            <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">OP_CALLF</span><span class="p">:</span>
+                <span class="n">called_func_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">3</span><span class="p">],</span> <span class="n">byteorder</span><span class="o">=</span><span class="s">"big"</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+                <span class="c1"># Assuming called_func_id is valid due to previous validation in validate_code_section()
+</span>                <span class="n">stack_height_required</span> <span class="o">+=</span> <span class="n">types</span><span class="p">[</span><span class="n">called_func_id</span><span class="p">].</span><span class="n">inputs</span>
+                <span class="n">stack_height_change</span> <span class="o">+=</span> <span class="n">types</span><span class="p">[</span><span class="n">called_func_id</span><span class="p">].</span><span class="n">outputs</span> <span class="o">-</span> <span class="n">types</span><span class="p">[</span><span class="n">called_func_id</span><span class="p">].</span><span class="n">inputs</span>
+
+            <span class="c1"># Detect stack underflow
+</span>            <span class="k">if</span> <span class="n">stack_height</span> <span class="o">&lt;</span> <span class="n">stack_height_required</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ValidationException</span><span class="p">(</span><span class="s">"stack underflow"</span><span class="p">)</span>
+
+            <span class="n">stack_height</span> <span class="o">+=</span> <span class="n">stack_height_change</span>
+            <span class="n">max_stack_height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">max_stack_height</span><span class="p">,</span> <span class="n">stack_height</span><span class="p">)</span>
+
+            <span class="c1"># Handle jumps
+</span>            <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">OP_RJUMP</span><span class="p">:</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">3</span><span class="p">],</span> <span class="n">byteorder</span><span class="o">=</span><span class="s">"big"</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">pos</span> <span class="o">+=</span> <span class="n">info</span><span class="p">.</span><span class="n">immediate_size</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">offset</span>  <span class="c1"># pos is valid for validated code.
+</span>
+            <span class="k">elif</span> <span class="n">op</span> <span class="o">==</span> <span class="n">OP_RJUMPI</span><span class="p">:</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">3</span><span class="p">],</span> <span class="n">byteorder</span><span class="o">=</span><span class="s">"big"</span><span class="p">,</span> <span class="n">signed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="c1"># Save True branch for later and continue to False branch.
+</span>                <span class="n">worklist</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">+</span> <span class="n">offset</span><span class="p">,</span> <span class="n">stack_height</span><span class="p">))</span>
+                <span class="n">pos</span> <span class="o">+=</span> <span class="n">info</span><span class="p">.</span><span class="n">immediate_size</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">info</span><span class="p">.</span><span class="n">is_terminating</span><span class="p">:</span>
+                <span class="n">expected_height</span> <span class="o">=</span> <span class="n">types</span><span class="p">[</span><span class="n">func_id</span><span class="p">].</span><span class="n">outputs</span> <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">OP_RETF</span> <span class="k">else</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">stack_height</span> <span class="o">!=</span> <span class="n">expected_height</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ValidationException</span><span class="p">(</span><span class="s">"non-empty stack on terminating instruction"</span><span class="p">)</span>
+                <span class="k">break</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pos</span> <span class="o">+=</span> <span class="n">info</span><span class="p">.</span><span class="n">immediate_size</span> <span class="o">+</span> <span class="mi">1</span>
+
+
+    <span class="k">if</span> <span class="n">max_stack_height</span> <span class="o">&gt;</span> <span class="mi">1024</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ValidationException</span><span class="p">(</span><span class="s">"max stack above limit"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">max_stack_height</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Needs discussion.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gumb0">Andrei Maiboroda</a>, "EIP-5450: EOF - Stack Validation [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5450, August 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5450.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5450: EOF - Stack Validation [DRAFT]",
+    "author": "Andrei Maiboroda (@gumb0)",
+    "name": "EIP-5450: EOF - Stack Validation [DRAFT]",
+    "dateCreated": "2022-08-12",
+    "datePublished": "2022-08-12",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-5450-eof-stack-validation/10410",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

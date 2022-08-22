@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2929: Gas cost increases for state access opcodes</title>
+<meta property="og:title" content="EIP-2929: Gas cost increases for state access opcodes" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2929" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2929" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-2929: Gas cost increases for state access opcodes
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2929.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2929-gas-cost-increases-for-state-access-opcodes/4558">https://ethereum-magicians.org/t/eip-2929-gas-cost-increases-for-state-access-opcodes/4558</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-09-01</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#storage-read-changes">Storage read changes</a></li>
+<li><a href="#sstore-changes">SSTORE changes</a></li>
+<li><a href="#selfdestruct-changes">SELFDESTRUCT changes</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#opcode-costs-vs-charging-per-byte-of-witness-data">Opcode costs vs charging per byte of witness data</a></li>
+<li><a href="#adding-the-accessed_addresses--accessed_storage_keys-sets">Adding the accessed_addresses / accessed_storage_keys sets</a></li>
+<li><a href="#sstore-gas-cost-change">SSTORE gas cost change</a></li>
+<li><a href="#change-sstore-accounting-only-minimally">Change SSTORE accounting only minimally</a></li>
+<li><a href="#how-would-gas-consumption-of-average-applications-increase-under-this-proposal">How would gas consumption of average applications increase under this proposal?</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#contract-breakage-mitigations">Contract breakage mitigations</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Increases gas cost for <code class="language-plaintext highlighter-rouge">SLOAD</code>, <code class="language-plaintext highlighter-rouge">*CALL</code>, <code class="language-plaintext highlighter-rouge">BALANCE</code>, <code class="language-plaintext highlighter-rouge">EXT*</code> and <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> when used for the first time in a transaction.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Increase the gas cost of <code class="language-plaintext highlighter-rouge">SLOAD</code> (<code class="language-plaintext highlighter-rouge">0x54</code>) to 2100, and the <code class="language-plaintext highlighter-rouge">*CALL</code> opcode family (<code class="language-plaintext highlighter-rouge">0xf1</code>, <code class="language-plaintext highlighter-rouge">f2</code>, <code class="language-plaintext highlighter-rouge">f4</code>, <code class="language-plaintext highlighter-rouge">fA</code>), <code class="language-plaintext highlighter-rouge">BALANCE</code> <code class="language-plaintext highlighter-rouge">0x31</code> and the <code class="language-plaintext highlighter-rouge">EXT*</code> opcode family (<code class="language-plaintext highlighter-rouge">0x3b</code>, <code class="language-plaintext highlighter-rouge">0x3c</code>, <code class="language-plaintext highlighter-rouge">0x3f</code>) to 2600. Exempts (i) precompiles, and (ii) addresses and storage slots that have already been accessed in the same transaction, which get a decreased gas cost. Additionally reforms <code class="language-plaintext highlighter-rouge">SSTORE</code> metering and <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> to ensure “de-facto storage loads” inherent in those opcodes are priced correctly.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Generally, the main function of gas costs of opcodes is to be an estimate of the time needed to process that opcode, the goal being for the gas limit to correspond to a limit on the time needed to process a block. However, storage-accessing opcodes (<code class="language-plaintext highlighter-rouge">SLOAD</code>, as well as the <code class="language-plaintext highlighter-rouge">*CALL</code>, <code class="language-plaintext highlighter-rouge">BALANCE</code> and <code class="language-plaintext highlighter-rouge">EXT*</code> opcodes) have historically been underpriced. In the 2016 Shanghai DoS attacks, once the most serious client bugs were fixed, one of the more durably successful strategies used by the attacker was to simply send transactions that access or call a large number of accounts.</p>
+<p>Gas costs were increased to mitigate this, but recent numbers suggest they were not increased enough. Quoting <a href="https://arxiv.org/pdf/1909.07220.pdf">https://arxiv.org/pdf/1909.07220.pdf</a>:</p>
+<blockquote>
+<p>Although by itself, this issue might seem benign, <code class="language-plaintext highlighter-rouge">EXTCODESIZE</code> forces the client to search the contract ondisk, resulting in IO heavy transactions. While replaying the Ethereum history on our hardware, the malicious transactions took around 20 to 80 seconds to execute, compared to a few milliseconds for the average transactions</p>
+</blockquote>
+<p>This proposed EIP increases the costs of these opcodes by a factor of ~3, reducing the worst-case processing time to ~7-27 seconds. Improvements in database layout that involve redesigning the client to read storage directly instead of hopping through the Merkle tree would decrease this further, though these technologies may take a long time to fully roll out, and even with such technologies the IO overhead of accessing storage would remain substantial.</p>
+<p>A secondary benefit of this EIP is that it also performs most of the work needed to make <a href="https://ethereum-magicians.org/t/protocol-changes-to-bound-witness-size/3885">stateless witness sizes</a> in Ethereum acceptable. Assuming <a href="https://ethresear.ch/t/binary-trie-format/7621">a switch to binary tries</a>, the theoretical maximum witness size not including code size (hence “most of the work” and not “all”) would decrease from <code class="language-plaintext highlighter-rouge">(12500000 gas limit) / (700 gas per BALANCE) * (800 witness bytes per BALANCE) ~= 14.3M bytes</code> to <code class="language-plaintext highlighter-rouge">12500000 / 2600 * 800 ~= 3.85M bytes</code>. Pricing for code access could be changed when code merklization is implemented.</p>
+<p>In the further future, there are similar benefits in the case of SNARK/STARK witnesses. Recent numbers from Starkware suggest that they are able to prove 10000 Rescue hashes per second on a consumer desktop; assuming 25 hashes per Merkle branch, and a block full of state accesses, at present this would imply a witness would take <code class="language-plaintext highlighter-rouge">12500000 / 700 * 25 / 10000 ~= 44.64</code> seconds to generate, but after this EIP that would reduce to <code class="language-plaintext highlighter-rouge">12500000 / 2500 * 25 / 10000 ~= 12.5</code> seconds, meaning that a single desktop computer would be able to generate witnesses on time under any conditions. Future gains in STARK proving could be spent on either (i) using a more expensive but robust hash function or (ii) reducing proving times further, reducing the delay and hence improving user experience of stateless clients that rely on such witnesses.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></td>
+<td>12244000</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">COLD_SLOAD_COST</code></td>
+<td>2100</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">COLD_ACCOUNT_ACCESS_COST</code></td>
+<td>2600</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">WARM_STORAGE_READ_COST</code></td>
+<td>100</td>
+</tr>
+</tbody>
+</table>
+<p>For blocks where <code class="language-plaintext highlighter-rouge">block.number &gt;= FORK_BLOCK</code>, the following changes apply.</p>
+<p>When executing a transaction, maintain a set <code class="language-plaintext highlighter-rouge">accessed_addresses: Set[Address]</code> and <code class="language-plaintext highlighter-rouge">accessed_storage_keys: Set[Tuple[Address, Bytes32]]</code> .</p>
+<p>The sets are transaction-context-wide, implemented identically to other transaction-scoped constructs such as the self-destruct-list and global <code class="language-plaintext highlighter-rouge">refund</code> counter. In particular, if a scope reverts, the access lists should be in the state they were in before that scope was entered.</p>
+<p>When a transaction execution begins,</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">accessed_storage_keys</code> is initialized to empty, and</li>
+<li><code class="language-plaintext highlighter-rouge">accessed_addresses</code> is initialized to include
+<ul>
+<li>the <code class="language-plaintext highlighter-rouge">tx.sender</code>, <code class="language-plaintext highlighter-rouge">tx.to</code> (or the address being created if it is a contract creation transaction)</li>
+<li>and the set of all precompiles.</li>
+</ul>
+</li>
+</ul>
+<h3 id="storage-read-changes">
+<a href="#storage-read-changes" class="anchor-link"></a> Storage read changes
+</h3>
+<p>When an address is either the target of a (<code class="language-plaintext highlighter-rouge">EXTCODESIZE</code> (<code class="language-plaintext highlighter-rouge">0x3B</code>), <code class="language-plaintext highlighter-rouge">EXTCODECOPY</code> (<code class="language-plaintext highlighter-rouge">0x3C</code>), <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code> (<code class="language-plaintext highlighter-rouge">0x3F</code>) or <code class="language-plaintext highlighter-rouge">BALANCE</code> (<code class="language-plaintext highlighter-rouge">0x31</code>)) opcode or the target of a (<code class="language-plaintext highlighter-rouge">CALL</code> (<code class="language-plaintext highlighter-rouge">0xF1</code>), <code class="language-plaintext highlighter-rouge">CALLCODE</code> (<code class="language-plaintext highlighter-rouge">0xF2</code>), <code class="language-plaintext highlighter-rouge">DELEGATECALL</code> (<code class="language-plaintext highlighter-rouge">0xF4</code>), <code class="language-plaintext highlighter-rouge">STATICCALL</code> (<code class="language-plaintext highlighter-rouge">0xFA</code>)) opcode, the gas costs are computed as follows:</p>
+<ul>
+<li>If the target is not in <code class="language-plaintext highlighter-rouge">accessed_addresses</code>, charge <code class="language-plaintext highlighter-rouge">COLD_ACCOUNT_ACCESS_COST</code> gas, and add the address to <code class="language-plaintext highlighter-rouge">accessed_addresses</code>.</li>
+<li>Otherwise, charge <code class="language-plaintext highlighter-rouge">WARM_STORAGE_READ_COST</code> gas.</li>
+</ul>
+<p>In all cases, the gas cost is charged and the map is updated at the time that the opcode is being called.
+When a <code class="language-plaintext highlighter-rouge">CREATE</code> or <code class="language-plaintext highlighter-rouge">CREATE2</code> opcode is called, immediately (ie. before checks are done to determine whether or not the address is unclaimed) add the address being created to <code class="language-plaintext highlighter-rouge">accessed_addresses</code>, but gas costs of <code class="language-plaintext highlighter-rouge">CREATE</code> and <code class="language-plaintext highlighter-rouge">CREATE2</code> are unchanged.
+Clarification: If a <code class="language-plaintext highlighter-rouge">CREATE</code>/<code class="language-plaintext highlighter-rouge">CREATE2</code> operation fails later on, e.g during the execution of <code class="language-plaintext highlighter-rouge">initcode</code> or has insufficient gas to store the code in the state, the <code class="language-plaintext highlighter-rouge">address</code> of the contract itself remains in <code class="language-plaintext highlighter-rouge">access_addresses</code> (but any additions made within the inner scope are reverted).</p>
+<p>For <code class="language-plaintext highlighter-rouge">SLOAD</code>, if the <code class="language-plaintext highlighter-rouge">(address, storage_key)</code> pair (where <code class="language-plaintext highlighter-rouge">address</code> is the address of the contract whose storage is being read) is not yet in <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code>, charge <code class="language-plaintext highlighter-rouge">COLD_SLOAD_COST</code> gas and add the pair to <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code>. If the pair is already in <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code>, charge <code class="language-plaintext highlighter-rouge">WARM_STORAGE_READ_COST</code> gas.</p>
+<p>Note: For call-variants, the <code class="language-plaintext highlighter-rouge">100</code>/<code class="language-plaintext highlighter-rouge">2600</code> cost is applied immediately (exactly like how <code class="language-plaintext highlighter-rouge">700</code> was charged before this EIP), i.e: before calculating the <code class="language-plaintext highlighter-rouge">63/64ths</code> available for entering the call.</p>
+<p>Note 2: There is currently no way to perform a ‘cold sload read/write’ on a ‘cold account’, simply because in order to read/write a <code class="language-plaintext highlighter-rouge">slot</code>, the execution must already be inside the <code class="language-plaintext highlighter-rouge">account</code>. Therefore, the behaviour of cold storage reads/writes on cold accounts is undefined as of this EIP. Any future EIP which
+proposes to add ‘remote read/write’ would need to define the pricing behaviour of that change.</p>
+<h3 id="sstore-changes">
+<a href="#sstore-changes" class="anchor-link"></a> SSTORE changes
+</h3>
+<p>When calling <code class="language-plaintext highlighter-rouge">SSTORE</code>, check if the <code class="language-plaintext highlighter-rouge">(address, storage_key)</code> pair is in <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code>. If it is not, charge an additional <code class="language-plaintext highlighter-rouge">COLD_SLOAD_COST</code> gas, and add the pair to <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code>. Additionally, modify the parameters defined in <a href="/EIPS/eip-2200">EIP-2200</a> as follows:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Old value</th>
+<th>New value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">SLOAD_GAS</code></td>
+<td>800</td>
+<td><code class="language-plaintext highlighter-rouge">= WARM_STORAGE_READ_COST</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">SSTORE_RESET_GAS</code></td>
+<td>5000</td>
+<td><code class="language-plaintext highlighter-rouge">5000 - COLD_SLOAD_COST</code></td>
+</tr>
+</tbody>
+</table>
+<p>The other parameters defined in EIP 2200 are unchanged.
+Note: The constant <code class="language-plaintext highlighter-rouge">SLOAD_GAS</code> is used in several places in EIP 2200, e.g <code class="language-plaintext highlighter-rouge">SSTORE_SET_GAS - SLOAD_GAS</code>. Implementations that are using composite definitions have to ensure to update those definitions too.</p>
+ <h3 id="selfdestruct-changes">
+<a href="#selfdestruct-changes" class="anchor-link"></a> SELFDESTRUCT changes
+</h3>
+<p>If the ETH recipient of a <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> is not in <code class="language-plaintext highlighter-rouge">accessed_addresses</code> (regardless of whether or not the amount sent is nonzero), charge an additional <code class="language-plaintext highlighter-rouge">COLD_ACCOUNT_ACCESS_COST</code> on top of the existing gas costs, and add the ETH recipient to the set.</p>
+<p>Note: <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> does not charge a <code class="language-plaintext highlighter-rouge">WARM_STORAGE_READ_COST</code> in case the recipient is already warm, which differs from how the other call-variants work. The reasoning behind this is to keep the changes small, a <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> already costs <code class="language-plaintext highlighter-rouge">5K</code> and is a no-op if invoked more than once.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="opcode-costs-vs-charging-per-byte-of-witness-data">
+<a href="#opcode-costs-vs-charging-per-byte-of-witness-data" class="anchor-link"></a> Opcode costs vs charging per byte of witness data
+</h3>
+<p>The natural alternative path to changing gas costs to reflect witness sizes is to charge per byte of witness data. However, that would take a longer time to implement, hampering the goal of providing short-term security relief. Furthermore, following that path faithfully would lead to extremely high gas costs to transactions that touch contract code, as one would need to charge for all 24576 contract code bytes; this would be an unacceptably high burden on developers. It is better to wait for <a href="https://medium.com/ewasm/evm-bytecode-merklization-2a8366ab0c90">code merklization</a> to start trying to properly account for gas costs of accessing individual chunks of code; from a short-term DoS prevention standpoint, accessing 24 kB from disk is not much more expensive than accessing 32 bytes from disk, so worrying about code size is not necessary.</p>
+<h3 id="adding-the-accessed_addresses--accessed_storage_keys-sets">
+<a href="#adding-the-accessed_addresses--accessed_storage_keys-sets" class="anchor-link"></a> Adding the accessed_addresses / accessed_storage_keys sets
+</h3>
+<p>The sets of already-accessed accounts and storage slots are added to avoid needlessly charging for things that can be cached (and in all performant implementations already are cached). Additionally, it removes the current undesirable status quo where it is needlessly unaffordable to do self-calls or call precompiles, and enables contract breakage mitigations that involve pre-fetching some storage key allowing a future execution to still take the expected amount of gas.</p>
+<h3 id="sstore-gas-cost-change">
+<a href="#sstore-gas-cost-change" class="anchor-link"></a> SSTORE gas cost change
+</h3>
+<p>The change to SSTORE is needed to avoid the possibility of a DoS attack that “pokes” a randomly chosen zero storage slot, changing it from 0 to 0 at a cost of 800 gas but requiring a de-facto storage load. The <code class="language-plaintext highlighter-rouge">SSTORE_RESET_GAS</code> reduction ensures that the total cost of SSTORE (which now requires paying the <code class="language-plaintext highlighter-rouge">COLD_SLOAD_COST</code>) remains unchanged. Additionally, note that applications that do <code class="language-plaintext highlighter-rouge">SLOAD</code> followed by <code class="language-plaintext highlighter-rouge">SSTORE</code> (eg. <code class="language-plaintext highlighter-rouge">storage_variable += x</code>) <em>would actually get cheaper</em>!</p>
+<h3 id="change-sstore-accounting-only-minimally">
+<a href="#change-sstore-accounting-only-minimally" class="anchor-link"></a> Change SSTORE accounting only minimally
+</h3>
+<p>The SSTORE gas costs continue to use Wei Tang’s original/current/new approach, instead of being redesigned to use a dirty map, because Wei Tang’s approach correctly accounts for the actual costs of changing storage, which only care about current vs final value and not intermediate values.</p>
+<h3 id="how-would-gas-consumption-of-average-applications-increase-under-this-proposal">
+<a href="#how-would-gas-consumption-of-average-applications-increase-under-this-proposal" class="anchor-link"></a> How would gas consumption of average applications increase under this proposal?
+</h3>
+<h4 id="rough-analysis-from-witness-sizes">
+<a href="#rough-analysis-from-witness-sizes" class="anchor-link"></a> Rough analysis from witness sizes
+</h4>
+<p>We can look at <a href="https://medium.com/@akhounov/data-from-the-ethereum-stateless-prototype-8c69479c8abc">Alexey Akhunov’s earlier work</a> for data on average-case blocks. In summary, average blocks have witness sizes of ~1000 kB, of which ~750 kB is Merkle proofs and not code. Assuming a conservative 2000 bytes per Merkle branch this implies ~375 accesses per block (SLOADs have a similar gas-increase-to-bytes ratio so there’s no need to analyze them separately).</p>
+<p>Data on <a href="https://etherscan.io/chart/tx">txs per day</a> and <a href="https://etherscan.io/chart/blocks">blocks per day</a> from Etherscan gives ~160 transactions per block (reference date: Jul 1), implying a large portion of those accesses are just the <code class="language-plaintext highlighter-rouge">tx.sender</code> and <code class="language-plaintext highlighter-rouge">tx.to</code> which are excluded from gas cost increases, though likely less than 320 due to duplicate addresses.</p>
+<p>Hence, this implies ~50-375 chargeable accesses per block, and each access suffers a gas cost increase of 1900; <code class="language-plaintext highlighter-rouge">50 * 1900 = 95000</code> and <code class="language-plaintext highlighter-rouge">375 * 1900 = 712500</code>, implying the gas limit would need to be raised by ~1-6% to compensate. However, this analysis may be complicated further in either direction by (i) accounts / storage keys being accessed in multiple transactions, which would appear once in the witness but twice in gas cost increases, and (ii) accounts / storage keys being accessed multiple times in the same transaction, which lead to gas cost <em>decreases</em>.</p>
+<h4 id="goerli-analysis">
+<a href="#goerli-analysis" class="anchor-link"></a> Goerli analysis
+</h4>
+<p>A more precise analysis can be found by scanning Goerli transactions, as done by Martin Swende here: https://github.com/holiman/gasreprice</p>
+<p>The conclusion is that on average gas costs increase by ~2.36%. One major contributing factor to reducing gas costs is that a large number of contracts inefficiently read the same storage slot multiple times, which leads to this EIP giving a few transactions gas cost <em>savings</em> of over 10%.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>These gas cost increases may potentially break contracts that depend on fixed gas costs; see the security considerations section for details and arguments for why we expect the total risks to be low and how if desired they can be reduced further.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Some test cases can be found here: https://gist.github.com/holiman/174548cad102096858583c6fbbb0649a</p>
+<p>Ideally we would test the following:</p>
+<ul>
+<li>SLOAD the same storage slot {1, 2, 3} times</li>
+<li>CALL the same address {1, 2, 3} times</li>
+<li>
+<table>
+<tbody>
+<tr>
+<td>(SLOAD</td>
+<td>CALL) in a sub-call, then revert, then (SLOAD</td>
+<td>CALL) the same (storage slot</td>
+<td>address) again</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>Sub-call, SLOAD, sub-call again, revert the inner sub-call, SLOAD the same storage slot</li>
+<li>SSTORE the same storage slot {1, 2, 3} times, using all combinations of zero/nonzero for original value and the value being set</li>
+<li>SSTORE then SLOAD the same storage slot</li>
+<li><code class="language-plaintext highlighter-rouge">OP_1</code> then <code class="language-plaintext highlighter-rouge">OP_2</code> to the same address where <code class="language-plaintext highlighter-rouge">OP_1</code> and <code class="language-plaintext highlighter-rouge">OP_2</code> are all combinations of (<code class="language-plaintext highlighter-rouge">*CALL</code>, <code class="language-plaintext highlighter-rouge">EXT*</code>, <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>)</li>
+<li>
+<table>
+<tbody>
+<tr>
+<td>Try to <code class="language-plaintext highlighter-rouge">CALL</code> an address but with all possible failure modes (not enough gas, not enough ETH…), then (<code class="language-plaintext highlighter-rouge">CALL</code></td>
+<td><code class="language-plaintext highlighter-rouge">EXT*</code>) that address again successfully</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>A WIP early-draft implementation for Geth can be found here: https://github.com/holiman/go-ethereum/tree/access_lists</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>As with any gas cost increasing EIP, there are three possible cases where it could cause applications to break:</p>
+<ol>
+<li>Fixed gas limits to sub-calls in contracts</li>
+<li>Applications relying on contract calls that consume close to the full gas limit</li>
+<li>The 2300 base limit given to the callee by ETH-transferring calls</li>
+</ol>
+<p>These risks have been studied before in the context of an earlier gas cost increase, EIP-1884. See <a href="https://github.com/holiman/eip-1884-security">Martin Swende’s earlier report</a> and <a href="https://gist.github.com/ritzdorf/1c6bd72955391e831f8a397d3152b4e0/">Hubert Ritzdorf’s analysis</a> focusing on (1) and (3). (2) has received less analysis, though one can argue that it is very unlikely both because applications tend to very rarely use close to the entire gas limit in a transaction, and because gas limits were very recently raised from 10 million to 12.5 million. EIP-1884 in practice <a href="https://www.coindesk.com/ethereums-istanbul-upgrade-will-break-680-smart-contracts-on-aragon">did lead to a small number of contracts breaking</a> for this reason.</p>
+<p>There are two ways to look at these risks. First, we can note that as of today developers have had years of warning; gas cost increases on storage-accessing opcodes have been <a href="https://ethereum-magicians.org/t/protocol-changes-to-bound-witness-size/3885">discussed for a long time</a>, with multiple statements made including to major dapp developers around the likelihood of such changes. EIP-1884 itself provided an important wake-up call. Hence, we can argue that risks this time will be significantly lower than EIP-1884.</p>
+<h3 id="contract-breakage-mitigations">
+<a href="#contract-breakage-mitigations" class="anchor-link"></a> Contract breakage mitigations
+</h3>
+<p>A second way to look at the risks is to explore mitigations. First of all, the existence of an <code class="language-plaintext highlighter-rouge">accessed_addresses</code> and <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code> map (present in this EIP, absent in EIP-1884) already makes some cases recoverable: in any case where a contract A needs to send funds to some address B, where that address accepts funds from any source but leaves a storage-dependent log, one can recover by first sending a separate call to B to pull it into the cache, and then call A, knowing that the execution of B triggered by A will only charge 100 gas per SLOAD. This fact does not fix all situations, but it does reduce risks significantly.</p>
+<p>But there are ways to further expand the usability of this pattern. One possibility is to add a <code class="language-plaintext highlighter-rouge">POKE</code> precompile, which would take an address and a storage key as input and allow transactions that attempt to “rescue” stuck contracts by pre-poking all of the storage slots that they will access. This works even if the address only accepts transactions from the contract, and works in many other contexts with present gas limits. The only case where this will not work would be the case where a transaction call <em>must</em> go from an EOA straight into a specific contract that then sub-calls another contract.</p>
+<p>Another option is <a href="/EIPS/eip-2930">EIP-2930</a>, which would have a similar effect to <code class="language-plaintext highlighter-rouge">POKE</code> but is more general: it also works for the EOA -&gt; contract -&gt; contract case, and generally should work for all known cases of breakage due to gas cost increases. This option is more complex, though it is arguably a stepping stone toward access lists being used for other use cases (regenesis, account abstraction, SSA all demand access lists).</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a>, "EIP-2929: Gas cost increases for state access opcodes," <em>Ethereum Improvement Proposals</em>, no. 2929, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2929.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2929: Gas cost increases for state access opcodes",
+    "author": "Vitalik Buterin (@vbuterin), Martin Swende (@holiman)",
+    "name": "EIP-2929: Gas cost increases for state access opcodes",
+    "dateCreated": "2020-09-01",
+    "datePublished": "2020-09-01",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2929-gas-cost-increases-for-state-access-opcodes/4558",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

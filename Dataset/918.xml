@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-918: Mineable Token Standard</title>
+<meta property="og:title" content="EIP-918: Mineable Token Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-918" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-918" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-918: Mineable Token Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-918.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#5c3630333b393035321c3d302931323572343d2e2a3d2e3872393829">Jay Logelin</a>, <a href="/cdn-cgi/l/email-protection#3253565f5b5c72024a505b46515d5b5c1c5d4055">Infernal_toast</a>, <a href="/cdn-cgi/l/email-protection#5c313b2f6f6f1c3f332e3239303072393829">Michael Seiler</a>, <a href="/cdn-cgi/l/email-protection#96f4f1a4a0a3a3d6f5f9fae3fbf4fff7b8f3f2e3">Brandon Grill</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-03-07</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#fields">Fields</a></li>
+<li><a href="#mining-operations">Mining Operations</a></li>
+<li><a href="#example-mining-function">Example mining function</a></li>
+<li><a href="#merged-mining-extension-optional">Merged Mining Extension (Optional)</a></li>
+<li><a href="#delegated-minting-extension-optional">Delegated Minting Extension (Optional)</a></li>
+<li><a href="#mineable-token-metadata-optional">Mineable Token Metadata (Optional)</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h3 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h3>
+<p>A specification for a standardized Mineable Token that uses a Proof of Work algorithm for distribution.</p>
+<h3 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h3>
+<p>This specification describes a method for initially locking tokens within a token contract and slowly dispensing them with a mint() function which acts like a faucet. This mint() function uses a Proof of Work algorithm in order to minimize gas fees and control the distribution rate. Additionally, standardization of mineable tokens will give rise to standardized CPU and GPU token mining software, token mining pools and other external tools in the token mining ecosystem.</p>
+<h3 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h3>
+<p>Token distribution via the ICO model and its derivatives is susceptible to illicit behavior by human actors. Furthermore, new token projects are centralized because a single entity must handle and control all of the initial coins and all of the raised ICO money. By distributing tokens via an ‘Initial Mining Offering’ (or IMO), the ownership of the token contract no longer belongs with the deployer at all and the deployer is ‘just another user.’ As a result, investor risk exposure utilizing a mined token distribution model is significantly diminished. This standard is intended to be standalone, allowing maximum interoperability with ERC20, ERC721, and others.</p>
+<h3 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h3>
+<h4 id="interface">
+<a href="#interface" class="anchor-link"></a> Interface
+</h4>
+<p>The general behavioral specification includes a primary function that defines the token minting operation, an optional merged minting operation for issuing multiple tokens, getters for challenge number, mining difficulty, mining target and current reward, and finally a Mint event, to be emitted upon successful solution validation and token issuance. At a minimum, contracts must adhere to this interface (save the optional merge operation). It is recommended that contracts interface with the more behaviorally defined Abstract Contract described below, in order to leverage a more defined construct, allowing for easier external implementations via overridden phased functions. (see ‘Abstract Contract’ below)</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">ERC918</span>  <span class="p">{</span>
+   
+   <span class="k">function</span> <span class="n">mint</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">nonce</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">success</span><span class="p">);</span>
+
+   <span class="k">function</span> <span class="n">getAdjustmentInterval</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+
+   <span class="k">function</span> <span class="n">getChallengeNumber</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+   <span class="k">function</span> <span class="n">getMiningDifficulty</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+
+   <span class="k">function</span> <span class="n">getMiningTarget</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+
+   <span class="k">function</span> <span class="n">getMiningReward</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+   
+   <span class="k">function</span> <span class="n">decimals</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint8</span><span class="p">);</span>
+
+   <span class="k">event</span> <span class="n">Mint</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">from</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">rewardAmount</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">epochCount</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">newChallengeNumber</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="abstract-contract-optional">
+<a href="#abstract-contract-optional" class="anchor-link"></a> Abstract Contract (Optional)
+</h4>
+<p>The Abstract Contract adheres to the EIP918 Interface and extends behavioral definition through the introduction of 4 internal phases of token mining and minting: hash, reward, epoch and adjust difficulty, all called during the mint() operation. This construct provides a balance between being too general for use while providing ample room for multiple mined implementation types.</p>
+<h3 id="fields">
+<a href="#fields" class="anchor-link"></a> Fields
+</h3>
+<h4 id="adjustmentinterval">
+<a href="#adjustmentinterval" class="anchor-link"></a> adjustmentInterval
+</h4>
+<p>The amount of time between difficulty adjustments in seconds.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">bytes32</span> <span class="k">public</span> <span class="n">adjustmentInterval</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="challengenumber">
+<a href="#challengenumber" class="anchor-link"></a> challengeNumber
+</h4>
+<p>The current challenge number. It is expected that a new challenge number is generated after a new reward is minted.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">bytes32</span> <span class="k">public</span> <span class="n">challengeNumber</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="difficulty">
+<a href="#difficulty" class="anchor-link"></a> difficulty
+</h4>
+<p>The current mining difficulty which should be adjusted via the _adjustDifficulty minting phase</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint</span> <span class="k">public</span> <span class="n">difficulty</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="tokensminted">
+<a href="#tokensminted" class="anchor-link"></a> tokensMinted
+</h4>
+<p>Cumulative counter of the total minted tokens, usually modified during the _reward phase</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint</span> <span class="k">public</span> <span class="n">tokensMinted</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="epochcount">
+<a href="#epochcount" class="anchor-link"></a> epochCount
+</h4>
+<p>Number of ‘blocks’ mined</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint</span> <span class="k">public</span> <span class="n">epochCount</span><span class="p">;</span>
+</code></pre></div></div>
+<h3 id="mining-operations">
+<a href="#mining-operations" class="anchor-link"></a> Mining Operations
+</h3>
+<h4 id="mint">
+<a href="#mint" class="anchor-link"></a> mint
+</h4>
+<p>Returns a flag indicating a successful hash digest verification, and reward allocation to msg.sender. In order to prevent MiTM attacks, it is recommended that the digest include a recent Ethereum block hash and msg.sender’s address. Once verified, the mint function calculates and delivers a mining reward to the sender and performs internal accounting operations on the contract’s supply.</p>
+<p>The mint operation exists as a public function that invokes 4 separate phases, represented as functions hash, _reward, _newEpoch, and _adjustDifficulty. In order to create the most flexible implementation while adhering to a necessary contract protocol, it is recommended that token implementors override the internal methods, allowing the base contract to handle their execution via mint.</p>
+<p>This externally facing function is called by miners to validate challenge digests, calculate reward,
+populate statistics, mutate epoch variables and adjust the solution difficulty as required. Once complete,
+a Mint event is emitted before returning a boolean success flag.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">contract</span> <span class="n">AbstractERC918</span> <span class="k">is</span> <span class="n">EIP918Interface</span> <span class="p">{</span>
+
+    <span class="c1">// the amount of time between difficulty adjustments
+</span>    <span class="kt">uint</span> <span class="k">public</span> <span class="n">adjustmentInterval</span><span class="p">;</span>
+     
+    <span class="c1">// generate a new challenge number after a new reward is minted
+</span>    <span class="kt">bytes32</span> <span class="k">public</span> <span class="n">challengeNumber</span><span class="p">;</span>
+    
+    <span class="c1">// the current mining target
+</span>    <span class="kt">uint</span> <span class="k">public</span> <span class="n">miningTarget</span><span class="p">;</span>
+
+    <span class="c1">// cumulative counter of the total minted tokens
+</span>    <span class="kt">uint</span> <span class="k">public</span> <span class="n">tokensMinted</span><span class="p">;</span>
+
+    <span class="c1">// number of blocks per difficulty readjustment
+</span>    <span class="kt">uint</span> <span class="k">public</span> <span class="n">blocksPerReadjustment</span><span class="p">;</span>
+
+    <span class="c1">//number of 'blocks' mined
+</span>    <span class="kt">uint</span> <span class="k">public</span> <span class="n">epochCount</span><span class="p">;</span>
+   
+    <span class="cm">/*
+     * Externally facing mint function that is called by miners to validate challenge digests, calculate reward,
+     * populate statistics, mutate epoch variables and adjust the solution difficulty as required. Once complete,
+     * a Mint event is emitted before returning a success indicator.
+     **/</span>
+    <span class="k">function</span> <span class="n">mint</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">nonce</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span> <span class="o">!=</span> <span class="kt">address</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+
+        <span class="c1">// perform the hash function validation
+</span>        <span class="n">hash</span><span class="p">(</span><span class="n">nonce</span><span class="p">);</span>
+        
+        <span class="c1">// calculate the current reward
+</span>        <span class="kt">uint</span> <span class="n">rewardAmount</span> <span class="o">=</span> <span class="n">_reward</span><span class="p">();</span>
+        
+        <span class="c1">// increment the minted tokens amount
+</span>        <span class="n">tokensMinted</span> <span class="o">+=</span> <span class="n">rewardAmount</span><span class="p">;</span>
+        
+        <span class="n">epochCount</span> <span class="o">=</span> <span class="n">_epoch</span><span class="p">();</span>
+
+        <span class="c1">//every so often, readjust difficulty. Don't readjust when deploying
+</span>        <span class="k">if</span><span class="p">(</span><span class="n">epochCount</span> <span class="o">%</span> <span class="n">blocksPerReadjustment</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+            <span class="n">_adjustDifficulty</span><span class="p">();</span>
+        <span class="p">}</span>
+       
+        <span class="c1">// send Mint event indicating a successful implementation
+</span>        <span class="k">emit</span> <span class="n">Mint</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">rewardAmount</span><span class="p">,</span> <span class="n">epochCount</span><span class="p">,</span> <span class="n">challengeNumber</span><span class="p">);</span>
+        
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h5 id="mint-event">
+<a href="#mint-event" class="anchor-link"></a> <em>Mint Event</em>
+</h5>
+<p>Upon successful verification and reward the mint method dispatches a Mint Event indicating the reward address, the reward amount, the epoch count and newest challenge number.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">Mint</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">from</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">reward_amount</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">epochCount</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">newChallengeNumber</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="hash">
+<a href="#hash" class="anchor-link"></a> hash
+</h4>
+<p>Public interface function hash, meant to be overridden in implementation to define hashing algorithm and validation. Returns the validated digest</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">hash</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">nonce</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span> <span class="n">digest</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="_reward">
+<a href="#_reward" class="anchor-link"></a> _reward
+</h4>
+<p>Internal interface function _reward, meant to be overridden in implementation to calculate and allocate the reward amount. The reward amount must be returned by this method.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">_reward</span><span class="p">()</span> <span class="k">internal</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="_newepoch">
+<a href="#_newepoch" class="anchor-link"></a> _newEpoch
+</h4>
+<p>Internal interface function _newEpoch, meant to be overridden in implementation to define a cutpoint for mutating mining variables in preparation for the next phase of mine.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">_newEpoch</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">nonce</span><span class="p">)</span> <span class="k">internal</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="_adjustdifficulty">
+<a href="#_adjustdifficulty" class="anchor-link"></a> _adjustDifficulty
+</h4>
+<p>Internal interface function _adjustDifficulty, meant to be overridden in implementation to adjust the difficulty (via field difficulty) of the mining as required</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">_adjustDifficulty</span><span class="p">()</span> <span class="k">internal</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="getadjustmentinterval">
+<a href="#getadjustmentinterval" class="anchor-link"></a> getAdjustmentInterval
+</h4>
+<p>The amount of time, in seconds, between difficulty adjustment operations.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getAdjustmentInterval</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="getchallengenumber">
+<a href="#getchallengenumber" class="anchor-link"></a> getChallengeNumber
+</h4>
+<p>Recent ethereum block hash, used to prevent pre-mining future blocks.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getChallengeNumber</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+</code></pre></div></div>
+<h4 id="getminingdifficulty">
+<a href="#getminingdifficulty" class="anchor-link"></a> getMiningDifficulty
+</h4>
+<p>The number of digits that the digest of the PoW solution requires which typically auto adjusts during reward generation.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getMiningDifficulty</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="getminingreward">
+<a href="#getminingreward" class="anchor-link"></a> getMiningReward
+</h4>
+<p>Return the current reward amount. Depending on the algorithm, typically rewards are divided every reward era as tokens are mined to provide scarcity.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">getMiningReward</span><span class="p">()</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="example-mining-function">
+<a href="#example-mining-function" class="anchor-link"></a> Example mining function
+</h3>
+<p>A general mining function written in python for finding a valid nonce for keccak256 mined token, is as follows:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">generate_nonce</span><span class="p">():</span>
+  <span class="n">myhex</span> <span class="o">=</span>  <span class="sa">b</span><span class="s">'%064x'</span> <span class="o">%</span> <span class="n">getrandbits</span><span class="p">(</span><span class="mi">32</span><span class="o">*</span><span class="mi">8</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">codecs</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">myhex</span><span class="p">,</span> <span class="s">'hex_codec'</span><span class="p">)</span>
+  
+<span class="k">def</span> <span class="nf">mine</span><span class="p">(</span><span class="n">challenge</span><span class="p">,</span> <span class="n">public_address</span><span class="p">,</span> <span class="n">difficulty</span><span class="p">):</span>
+  <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">nonce</span> <span class="o">=</span> <span class="n">generate_nonce</span><span class="p">()</span>
+    <span class="n">hash1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sha3</span><span class="p">.</span><span class="n">keccak_256</span><span class="p">(</span><span class="n">challenge</span><span class="o">+</span><span class="n">public_address</span><span class="o">+</span><span class="n">nonce</span><span class="p">).</span><span class="n">hexdigest</span><span class="p">(),</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hash1</span> <span class="o">&lt;</span> <span class="n">difficulty</span><span class="p">:</span>
+      <span class="k">return</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">hash1</span>
+</code></pre></div></div>
+<p>Once the nonce and hash1 are found, these are used to call the mint() function of the smart contract to receive a reward of tokens.</p>
+<h3 id="merged-mining-extension-optional">
+<a href="#merged-mining-extension-optional" class="anchor-link"></a> Merged Mining Extension (Optional)
+</h3>
+<p>In order to provide support for merge mining multiple tokens, an optional merged mining extension can be implemented as part of the ERC918 standard. It is important to note that the following function will only properly work if the base contracts use tx.origin instead of msg.sender when applying rewards. If not the rewarded tokens will be sent to the calling contract and not the end user.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * @title ERC-918 Mineable Token Standard, optional merged mining functionality
+ * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-918.md
+ * 
+ */</span>
+<span class="k">contract</span> <span class="n">ERC918Merged</span> <span class="k">is</span> <span class="n">AbstractERC918</span> <span class="p">{</span>
+    <span class="cm">/*
+     * @notice Externally facing merge function that is called by miners to validate challenge digests, calculate reward,
+     * populate statistics, mutate state variables and adjust the solution difficulty as required. Additionally, the
+     * merge function takes an array of target token addresses to be used in merged rewards. Once complete,
+     * a Mint event is emitted before returning a success indicator.
+     *
+     * @param _nonce the solution nonce
+     **/</span>
+    <span class="k">function</span> <span class="n">merge</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_nonce</span><span class="p">,</span> <span class="kt">address</span><span class="p">[]</span> <span class="n">_mineTokens</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_mineTokens</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">address</span> <span class="n">tokenAddress</span> <span class="o">=</span> <span class="n">_mineTokens</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="n">ERC918Interface</span><span class="p">(</span><span class="n">tokenAddress</span><span class="p">).</span><span class="n">mint</span><span class="p">(</span><span class="n">_nonce</span><span class="p">);</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="cm">/*
+     * @notice Externally facing merge function kept for backwards compatibility with previous definition
+     *
+     * @param _nonce the solution nonce
+     * @param _challenge_digest the keccak256 encoded challenge number + message sender + solution nonce
+     **/</span>
+     <span class="k">function</span> <span class="n">merge</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_nonce</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_challenge_digest</span><span class="p">,</span> <span class="kt">address</span><span class="p">[]</span> <span class="n">_mineTokens</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+       <span class="c1">//the challenge digest must match the expected
+</span>       <span class="kt">bytes32</span> <span class="n">digest</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span> <span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="n">challengeNumber</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">_nonce</span><span class="p">)</span> <span class="p">);</span>
+       <span class="nb">require</span><span class="p">(</span><span class="n">digest</span> <span class="o">==</span> <span class="n">_challenge_digest</span><span class="p">,</span> <span class="s">"Challenge digest does not match expected digest on token contract [ ERC918Merged.mint() ]"</span><span class="p">);</span>
+       <span class="k">return</span> <span class="n">merge</span><span class="p">(</span><span class="n">_nonce</span><span class="p">,</span> <span class="n">_mineTokens</span><span class="p">);</span>
+     <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="delegated-minting-extension-optional">
+<a href="#delegated-minting-extension-optional" class="anchor-link"></a> Delegated Minting Extension (Optional)
+</h3>
+<p>In order to facilitate a third party minting submission paradigm, such as the case of miners submitting solutions to a pool operator and/or system, a delegated minting extension can be used to allow pool accounts submit solutions on the behalf of a user, so the miner can avoid directly paying Ethereum transaction costs. This is performed by an off chain mining account packaging and signing a standardized mint solution packet and sending it to a pool or 3rd party to be submitted.</p>
+<p>The ERC918 Mineable Mint Packet Metadata should be prepared using following schema:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+    <span class="s">"title"</span><span class="o">:</span> <span class="s">"Mineable Mint Packet Metadata"</span><span class="p">,</span>
+    <span class="s">"type"</span><span class="o">:</span> <span class="s">"object"</span><span class="p">,</span>
+    <span class="s">"properties"</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s">"nonce"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the target solution nonce"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"origin"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the original user that mined the solution nonce"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"signature"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"The signed hash of tightly packed variables sha3('delegatedMintHashing(uint256,address)')+nonce+origin_account"</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The preparation of a mineable mint packet on a JavaScript client would appear as follows:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">prepareDelegatedMintTxn</span><span class="p">(</span><span class="n">nonce</span><span class="p">,</span> <span class="n">account</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">var</span> <span class="n">functionSig</span> <span class="o">=</span> <span class="n">web3</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="nb">sha3</span><span class="p">(</span><span class="s">"delegatedMintHashing(uint256,address)"</span><span class="p">).</span><span class="n">substring</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+  <span class="k">var</span> <span class="n">data</span> <span class="o">=</span> <span class="n">web3</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">soliditySha3</span><span class="p">(</span> <span class="n">functionSig</span><span class="p">,</span> <span class="n">nonce</span><span class="p">,</span> <span class="n">account</span><span class="p">.</span><span class="kt">address</span> <span class="p">)</span>
+  <span class="k">var</span> <span class="n">sig</span> <span class="o">=</span> <span class="n">web3</span><span class="p">.</span><span class="n">eth</span><span class="p">.</span><span class="n">accounts</span><span class="p">.</span><span class="n">sign</span><span class="p">(</span><span class="n">web3</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">toHex</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">account</span><span class="p">.</span><span class="n">privateKey</span> <span class="p">)</span>
+  <span class="c1">// prepare the mint packet
+</span>  <span class="k">var</span> <span class="n">packet</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="n">packet</span><span class="p">.</span><span class="n">nonce</span> <span class="o">=</span> <span class="n">nonce</span>
+  <span class="n">packet</span><span class="p">.</span><span class="n">origin</span> <span class="o">=</span> <span class="n">account</span><span class="p">.</span><span class="kt">address</span>
+  <span class="n">packet</span><span class="p">.</span><span class="n">signature</span> <span class="o">=</span> <span class="n">sig</span><span class="p">.</span><span class="n">signature</span>
+  <span class="c1">// deliver resulting JSON packet to pool or third party
+</span>  <span class="k">var</span> <span class="n">mineableMintPacket</span> <span class="o">=</span> <span class="n">JSON</span><span class="p">.</span><span class="n">stringify</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="kr">null</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+  <span class="cm">/* todo: send mineableMintPacket to submitter */</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Once the packet is prepared and formatted it can then be routed to a third party that will submit the transaction to the contract’s delegatedMint() function, thereby paying for the transaction gas and receiving the resulting tokens. The pool/third party must then manually payback the minted tokens minus fees to the original minter.</p>
+<p>The following code sample exemplifies third party packet relaying:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//received by minter
+</span><span class="k">var</span> <span class="n">mineableMintPacket</span> <span class="o">=</span> <span class="p">...</span>
+<span class="k">var</span> <span class="n">packet</span> <span class="o">=</span> <span class="n">JSON</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">mineableMintPacket</span><span class="p">)</span>
+<span class="n">erc918MineableToken</span><span class="p">.</span><span class="n">delegatedMint</span><span class="p">(</span><span class="n">packet</span><span class="p">.</span><span class="n">nonce</span><span class="p">,</span> <span class="n">packet</span><span class="p">.</span><span class="n">origin</span><span class="p">,</span> <span class="n">packet</span><span class="p">.</span><span class="n">signature</span><span class="p">)</span>
+</code></pre></div></div>
+<p>The Delegated Mint Extension expands upon ERC918 realized as a sub-contract:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="dl">'</span><span class="s1">openzeppelin-solidity/contracts/contracts/cryptography/ECDSA.sol</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">ERC918DelegatedMint</span> <span class="nx">is</span> <span class="nx">AbstractERC918</span><span class="p">,</span> <span class="nx">ECDSA</span> <span class="p">{</span>
+   <span class="cm">/**
+     * @notice Hash (keccak256) of the payload used by delegatedMint
+     * @param _nonce the golden nonce
+     * @param _origin the original minter
+     * @param _signature the original minter's elliptical curve signature
+     */</span>
+    <span class="kd">function</span> <span class="nx">delegatedMint</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_nonce</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_origin</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">_signature</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">bytes32</span> <span class="nx">hashedTx</span> <span class="o">=</span> <span class="nx">delegatedMintHashing</span><span class="p">(</span><span class="nx">_nonce</span><span class="p">,</span> <span class="nx">_origin</span><span class="p">);</span>
+        <span class="nx">address</span> <span class="nx">minter</span> <span class="o">=</span> <span class="nx">recover</span><span class="p">(</span><span class="nx">hashedTx</span><span class="p">,</span> <span class="nx">_signature</span><span class="p">);</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">minter</span> <span class="o">==</span> <span class="nx">_origin</span><span class="p">,</span> <span class="dl">"</span><span class="s2">Origin minter address does not match recovered signature address [ AbstractERC918.delegatedMint() ]</span><span class="dl">"</span><span class="p">);</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">minter</span> <span class="o">!=</span> <span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="dl">"</span><span class="s2">Invalid minter address recovered from signature [ ERC918DelegatedMint.delegatedMint() ]</span><span class="dl">"</span><span class="p">);</span>
+        <span class="nx">success</span> <span class="o">=</span> <span class="nx">mintInternal</span><span class="p">(</span><span class="nx">_nonce</span><span class="p">,</span> <span class="nx">minter</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**
+     * @notice Hash (keccak256) of the payload used by delegatedMint
+     * @param _nonce the golden nonce
+     * @param _origin the original minter
+     */</span>
+    <span class="kd">function</span> <span class="nx">delegatedMintHashing</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_nonce</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_origin</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">pure</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bytes32</span><span class="p">)</span> <span class="p">{</span>
+        <span class="cm">/* "0x7b36737a": delegatedMintHashing(uint256,address) */</span>
+        <span class="k">return</span> <span class="nx">toEthSignedMessageHash</span><span class="p">(</span><span class="nx">keccak256</span><span class="p">(</span><span class="nx">abi</span><span class="p">.</span><span class="nx">encodePacked</span><span class="p">(</span> <span class="nx">bytes4</span><span class="p">(</span><span class="mh">0x7b36737a</span><span class="p">),</span> <span class="nx">_nonce</span><span class="p">,</span> <span class="nx">_origin</span><span class="p">)));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="mineable-token-metadata-optional">
+<a href="#mineable-token-metadata-optional" class="anchor-link"></a> Mineable Token Metadata (Optional)
+</h3>
+<p>In order to provide for richer and potentially mutable metadata for a particular Mineable Token, it is more viable to offer an off-chain reference to said data. This requires the implementation of a single interface method ‘metadataURI()’ that returns a JSON string encoded with the string fields symbol, name, description, website, image, and type.</p>
+<p>Solidity interface for Mineable Token Metadata:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * @title ERC-918 Mineable Token Standard, optional metadata extension
+ * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-918.md
+ * 
+ */</span>
+<span class="k">interface</span> <span class="n">ERC918Metadata</span> <span class="k">is</span> <span class="n">AbstractERC918</span> <span class="p">{</span>
+    <span class="cm">/**
+     * @notice A distinct Uniform Resource Identifier (URI) for a mineable asset.
+     */</span>
+    <span class="k">function</span> <span class="n">metadataURI</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Mineable Token Metadata JSON schema definition:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+    <span class="s">"title"</span><span class="o">:</span> <span class="s">"Mineable Token Metadata"</span><span class="p">,</span>
+    <span class="s">"type"</span><span class="o">:</span> <span class="s">"object"</span><span class="p">,</span>
+    <span class="s">"properties"</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s">"symbol"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the Mineable Token's symbol"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"name"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the Mineable Token's name"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"description"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the Mineable Token's long description"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"website"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the Mineable Token's homepage URI"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"image"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the Mineable Token's image URI"</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s">"type"</span><span class="o">:</span> <span class="p">{</span>
+            <span class="s">"type"</span><span class="o">:</span> <span class="s">"string"</span><span class="p">,</span>
+            <span class="s">"description"</span><span class="o">:</span> <span class="s">"Identifies the Mineable Token's hash algorithm ( ie.keccak256 ) used to encode the solution"</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h3>
+<p>The solidity keccak256 algorithm does not have to be used, but it is recommended since it is a cost effective one-way algorithm to perform in the EVM and simple to perform in solidity. The nonce is the solution that miners try to find and so it is part of the hashing algorithm. A challengeNumber is also part of the hash so that future blocks cannot be mined since it acts like a random piece of data that is not revealed until a mining round starts. The msg.sender address is part of the hash so that a nonce solution is valid only for a particular Ethereum account and so the solution is not susceptible to man-in-the-middle attacks. This also allows pools to operate without being easily cheated by the miners since pools can force miners to mine using the pool’s address in the hash algorithm.</p>
+<p>The economics of transferring electricity and hardware into mined token assets offers a flourishing community of decentralized miners the option to be involved in the Ethereum token economy directly. By voting with hash power, an economically pegged asset to real-world resources, miners are incentivized to participate in early token trade to revamp initial costs, providing a bootstrapped stimulus mechanism between miners and early investors.</p>
+<p>One community concern for mined tokens has been around energy use without a function for securing a network. Although token mining does not secure a network, it serves the function of securing a community from corruption as it offers an alternative to centralized ICOs. Furthermore, an initial mining offering may last as little as a week, a day, or an hour at which point all of the tokens would have been minted.</p>
+<h3 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h3>
+<p>Earlier versions of this standard incorporated a redundant ‘challenge_digest’ parameter on the mint() function that hash-encoded the packed variables challengeNumber, msg.sender and nonce. It was decided that this could be removed from the standard to help minimize processing and thereby gas usage during mint operations. However, in the name of interoperability with existing mining programs and pool software the following contract can be added to the inheritance tree:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+ * @title ERC-918 Mineable Token Standard, optional backwards compatibility function
+ * @dev See https://github.com/ethereum/EIPs/blob/master/EIPS/eip-918.md
+ * 
+ */</span>
+<span class="k">contract</span> <span class="n">ERC918BackwardsCompatible</span> <span class="k">is</span> <span class="n">AbstractERC918</span> <span class="p">{</span>
+
+    <span class="cm">/*
+     * @notice Externally facing mint function kept for backwards compatibility with previous mint() definition
+     * @param _nonce the solution nonce
+     * @param _challenge_digest the keccak256 encoded challenge number + message sender + solution nonce
+     **/</span>
+    <span class="k">function</span> <span class="n">mint</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_nonce</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_challenge_digest</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">//the challenge digest must match the expected
+</span>        <span class="kt">bytes32</span> <span class="n">digest</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span> <span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="n">challengeNumber</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">_nonce</span><span class="p">)</span> <span class="p">);</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">digest</span> <span class="o">==</span> <span class="n">_challenge_digest</span><span class="p">,</span> <span class="s">"Challenge digest does not match expected digest on token contract [ AbstractERC918.mint() ]"</span><span class="p">);</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">mint</span><span class="p">(</span><span class="n">_nonce</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h3>
+<p>(Test cases for an implementation are mandatory for EIPs that are affecting consensus changes. Other EIPs can choose to include links to test cases if applicable.)</p>
+<h3 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h3>
+<p>Simple Example:
+https://github.com/0xbitcoin/EIP918-Mineable-Token/blob/master/contracts/SimpleERC918.sol</p>
+<p>Complex Examples:</p>
+<p>https://github.com/0xbitcoin/EIP918-Mineable-Token/blob/master/contracts/0xdogeExample.sol
+https://github.com/0xbitcoin/EIP918-Mineable-Token/blob/master/contracts/0xdogeExample2.sol
+https://github.com/0xbitcoin/EIP918-Mineable-Token/blob/master/contracts/0xBitcoinBase.sol</p>
+<p>0xBitcoin Token Contract:
+https://etherscan.io/address/0xb6ed7644c69416d67b522e20bc294a9a9b405b31</p>
+<p>MVI OpenCL Token Miner
+https://github.com/mining-visualizer/MVis-tokenminer/releases</p>
+<p>PoWAdv Token Contract:
+https://etherscan.io/address/0x1a136ae98b49b92841562b6574d1f3f5b0044e4c</p>
+<h3 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h3>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#dab0b6b5bdbfb6b3b49abbb6afb7b4b3f4b2bba8acbba8bef4bfbeaf">Jay Logelin</a>, <a href="/cdn-cgi/l/email-protection#4c2d282125220c7c342e25382f23252262233e2b">Infernal_toast</a>, <a href="/cdn-cgi/l/email-protection#375a504404047754584559525b5b19525342">Michael Seiler</a>, <a href="/cdn-cgi/l/email-protection#a1c3c693979494e1c2cecdd4ccc3c8c08fc4c5d4">Brandon Grill</a>, "EIP-918: Mineable Token Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 918, March 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-918.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-918: Mineable Token Standard [DRAFT]",
+    "author": "Jay Logelin <jlogelin@alumni.harvard.edu>, Infernal_toast <admin@0xbitcoin.org>, Michael Seiler <mgs33@cornell.edu>, Brandon Grill <bg2655@columbia.edu>",
+    "name": "EIP-918: Mineable Token Standard [DRAFT]",
+    "dateCreated": "2018-03-07",
+    "datePublished": "2018-03-07",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+ <div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

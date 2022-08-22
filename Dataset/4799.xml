@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4799: Non-Fungible Token Ownership Designation Standard</title>
+<meta property="og:title" content="EIP-4799: Non-Fungible Token Ownership Designation Standard" />
+<meta name="description" content="A standardized interface for designating ownership of an NFT" />
+<meta property="og:description" content="A standardized interface for designating ownership of an NFT" />
+<meta name="twitter:description" content="A standardized interface for designating ownership of an NFT" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4799" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4799" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4799: Non-Fungible Token Ownership Designation Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4799.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A standardized interface for designating ownership of an NFT</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/davidbuckman">David Buckman</a>, <a href="https://github.com/isaacbuckman">Isaac Buckman</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-4799-non-fungible-token-wrapping-standard/8396">https://ethereum-magicians.org/t/erc-4799-non-fungible-token-wrapping-standard/8396</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-02-13</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#longcyclical-chains-of-ownership">Long/Cyclical Chains of Ownership</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following defines a standard interface for designating ownership of an NFT to someone while the NFT is held in escrow by a smart contract. The standard allows for the construction of a directed acyclic graph of NFTs, where the designated owner of every NFT in a given chain is the terminal address of that chain. This enables the introduction of additional functionality to pre-existing NFTs, without having to give up the authenticity of the original. In effect, this means that all NFTs are composable and can be rented, used as collateral, fractionalized, and more.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Many NFTs aim to provide their holders with some utility - utility that can come in many forms. This can be the right to inhabit an apartment, access to tickets to an event, an airdrop of tokens, or one of the infinitely many other potential applications. However, in their current form, NFTs are limited by the fact that the only verifiable wallet associated with an NFT is the owner, so clients that want to distribute utility are forced to do so to an NFT’s listed owner. This means that any complex ownership agreements must be encoded into the original NFT contract - there is no mechanism by which an owner can link the authenticity of their original NFT to any external contract.</p>
+<p>The goal of this standard is to allow users and developers the ability to define arbitrarily complex ownership agreements on NFTs that have already been minted. This way, new contracts with innovative ownership structures can be deployed, but they can still leverage the authenticity afforded by established NFT contracts - in the past a wrapping contract meant brand new NFTs with no established authenticity.</p>
+<p>Prior to this standard, wrapping an NFT inside another contract was the only way to add functionality after the NFT contract had been deployed, but this meant losing access to the utility of holding the original NFT. Any application querying for the owner of that NFT would determine the wrapping smart contract to be the owner. Using this standard, applications will have a standardized method of interacting with wrapping contracts so that they can continue to direct their utility to users even when the NFT has been wrapped.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="s">"@openzeppelin/contracts/utils/introspection/IERC165.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4799NFT</span> <span class="k">is</span> <span class="n">IERC165</span> <span class="p">{</span>
+    <span class="c1">/// @dev This emits when ownership of any NFT changes by any mechanism.
+</span>    <span class="c1">///  This event emits when NFTs are created (`from` == 0) and destroyed
+</span>    <span class="c1">///  (`to` == 0). Exception: during contract creation, any number of NFTs
+</span>    <span class="c1">///  may be created and assigned without emitting Transfer. At the time of
+</span>    <span class="c1">///  any transfer, the approved address for that NFT (if any) is reset to none.
+</span>    <span class="k">event</span> <span class="n">Transfer</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">from</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">to</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span>
+    <span class="p">);</span>
+
+    <span class="c1">/// @notice Find the owner of an NFT
+</span>    <span class="c1">/// @dev NFTs assigned to zero address are considered invalid, and queries
+</span>    <span class="c1">///  about them throw
+</span>    <span class="c1">/// @param tokenId The identifier for an NFT
+</span>    <span class="c1">/// @return The address of the owner of the NFT
+</span>    <span class="k">function</span> <span class="n">ownerOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// @title ERC-4799 Non-Fungible Token Ownership Designation Standard
+/// @dev See https://eips.ethereum.org/EIPS/eip-4799
+/// Note: the ERC-165 identifier for this interface is [TODO].
+</span>
+<span class="k">import</span> <span class="s">"@openzeppelin/contracts/utils/introspection/IERC165.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IERC4799NFT.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC4799</span> <span class="k">is</span> <span class="n">IERC165</span> <span class="p">{</span>
+    <span class="c1">/// @dev Emitted when a source token designates its ownership to the owner of the target token
+</span>    <span class="k">event</span> <span class="n">OwnershipDesignation</span><span class="p">(</span>
+        <span class="n">IERC4799NFT</span> <span class="k">indexed</span> <span class="n">sourceContract</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">sourceTokenId</span><span class="p">,</span>
+        <span class="n">IERC4799NFT</span> <span class="k">indexed</span> <span class="n">targetContract</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">targetTokenId</span>
+    <span class="p">);</span>
+
+    <span class="c1">/// @notice Find the designated NFT
+</span>    <span class="c1">/// @param sourceContract The contract address of the source NFT
+</span>    <span class="c1">/// @param sourceTokenId The tokenId of the source NFT
+</span>    <span class="c1">/// @return (targetContract, targetTokenId) contract address and tokenId of the parent NFT
+</span>    <span class="k">function</span> <span class="n">designatedTokenOf</span><span class="p">(</span><span class="n">IERC4799NFT</span> <span class="n">sourceContract</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">sourceTokenId</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">view</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="n">IERC4799NFT</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The authenticity of designated ownership of an NFT is conferred by the designating ERC-4799 contract’s ownership of the original NFT according to the source contract. This MUST be verified by clients by querying the source contract.</p>
+<p>Clients respecting this specification SHALL NOT distribute any utility to the address of the ERC-4799 contract. Instead, they MUST distribute it to the owner of the designated token that the ERC-4799 contract points them to.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>To maximize the future compatibility of the wrapping contract, we first defined a canonical NFT interface. We created <code class="language-plaintext highlighter-rouge">IERC4799NFT</code>, an interface implicitly implemented by virtually all popular NFT contracts, including all deployed contracts that are <a href="/EIPS/eip-721">ERC-721</a> compliant. This interface represents the essence of an NFT: a mapping from a token identifier to the address of a singular owner, represented by the function <code class="language-plaintext highlighter-rouge">ownerOf</code>.</p>
+<p>The core of our proposal is the <code class="language-plaintext highlighter-rouge">IERC4799</code> interface, an interface for a standard NFT ownership designation contract (ODC). ERC4799 requires the implementation of a <code class="language-plaintext highlighter-rouge">designatedTokenOf</code> function, which maps a source NFT to exactly one target NFT. Through this function, the ODC expresses its belief of designated ownership. This designated ownership is only authentic if the ODC is listed as the owner of the original NFT, thus maintaining the invariant that every NFT has exactly one designated owner.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">IERC4799NFT</code> interface is backwards compatible with <code class="language-plaintext highlighter-rouge">IERC721</code>, as <code class="language-plaintext highlighter-rouge">IERC721</code> implicitly extends <code class="language-plaintext highlighter-rouge">IERC4799NFT</code>. This means that the ERC-4799 standard, which wraps NFTs that implement <code class="language-plaintext highlighter-rouge">ERC4799NFT</code>, is fully backwards compatible with ERC-721.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4799.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IERC4799NFT.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./ERC721.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol"</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">ERC721Composable</span> <span class="k">is</span> <span class="n">IERC4799</span><span class="p">,</span> <span class="n">IERC721Receiver</span> <span class="p">{</span>
+    <span class="k">mapping</span><span class="p">(</span><span class="n">IERC4799NFT</span> <span class="o">=&gt;</span> <span class="k">mapping</span><span class="p">(</span><span class="kt">uint256</span> <span class="o">=&gt;</span> <span class="n">IERC4799NFT</span><span class="p">))</span> <span class="k">private</span> <span class="n">_targetContracts</span><span class="p">;</span>
+    <span class="k">mapping</span><span class="p">(</span><span class="n">IERC4799NFT</span> <span class="o">=&gt;</span> <span class="k">mapping</span><span class="p">(</span><span class="kt">uint256</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">))</span> <span class="k">private</span> <span class="n">_targetTokenIds</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="n">designatedTokenOf</span><span class="p">(</span><span class="n">IERC4799NFT</span> <span class="n">sourceContract</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">sourceTokenId</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">view</span>
+        <span class="k">override</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="n">IERC4799NFT</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">IERC4799NFT</span><span class="p">(</span><span class="n">_targetContracts</span><span class="p">[</span><span class="n">sourceContract</span><span class="p">][</span><span class="n">sourceTokenId</span><span class="p">]),</span>
+            <span class="n">_targetTokenIds</span><span class="p">[</span><span class="n">sourceContract</span><span class="p">][</span><span class="n">sourceTokenId</span><span class="p">]</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">designateToken</span><span class="p">(</span>
+        <span class="n">IERC4799NFT</span> <span class="n">sourceContract</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">sourceTokenId</span><span class="p">,</span>
+        <span class="n">IERC4799NFT</span> <span class="n">targetContract</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">targetTokenId</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span>
+            <span class="n">ERC721</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="n">sourceContract</span><span class="p">)).</span><span class="n">ownerOf</span><span class="p">(</span><span class="n">sourceTokenId</span><span class="p">)</span> <span class="o">==</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span> <span class="o">||</span>
+            <span class="n">ERC721</span><span class="p">(</span><span class="kt">address</span><span class="p">(</span><span class="n">sourceContract</span><span class="p">)).</span><span class="n">getApproved</span><span class="p">(</span><span class="n">sourceTokenId</span><span class="p">)</span> <span class="o">==</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> 
+            <span class="s">"ERC721Composable: Only owner or approved address can set a designate ownership"</span><span class="p">);</span>
+        <span class="n">_targetContracts</span><span class="p">[</span><span class="n">sourceContract</span><span class="p">][</span><span class="n">sourceTokenId</span><span class="p">]</span> <span class="o">=</span> <span class="n">targetContract</span><span class="p">;</span>
+        <span class="n">_targetTokenIds</span><span class="p">[</span><span class="n">sourceContract</span><span class="p">][</span><span class="n">sourceTokenId</span><span class="p">]</span> <span class="o">=</span> <span class="n">targetTokenId</span><span class="p">;</span>
+        <span class="k">emit</span> <span class="n">OwnershipDesignation</span><span class="p">(</span>
+            <span class="n">sourceContract</span><span class="p">,</span> 
+            <span class="n">sourceTokenId</span><span class="p">,</span>  
+            <span class="n">targetContract</span><span class="p">,</span>
+            <span class="n">targetTokenId</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">onERC721Received</span><span class="p">(</span>
+        <span class="kt">address</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">from</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">sourceTokenId</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">calldata</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">override</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes4</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">ERC721</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">).</span><span class="n">approve</span><span class="p">(</span><span class="n">from</span><span class="p">,</span> <span class="n">sourceTokenId</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">IERC721Receiver</span><span class="p">.</span><span class="n">onERC721Received</span><span class="p">.</span><span class="nb">selector</span><span class="p">;</span>
+    <span class="p">}</span>
+
+        <span class="k">function</span> <span class="n">supportsInterface</span><span class="p">(</span><span class="kt">bytes4</span> <span class="n">interfaceId</span><span class="p">)</span>
+        <span class="k">public</span>
+        <span class="k">view</span>
+        <span class="k">virtual</span>
+        <span class="k">override</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span>
+            <span class="p">(</span><span class="n">interfaceId</span> <span class="o">==</span> <span class="k">type</span><span class="p">(</span><span class="n">IERC4799</span><span class="p">).</span><span class="n">interfaceId</span> <span class="o">||</span>
+            <span class="n">interfaceId</span> <span class="o">==</span> <span class="k">type</span><span class="p">(</span><span class="n">IERC721Receiver</span><span class="p">).</span><span class="n">interfaceId</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./IERC4799.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IERC4799NFT.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"@openzeppelin/contracts/utils/introspection/ERC165Checker.sol"</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">DesignatedOwner</span> <span class="p">{</span>
+    <span class="k">function</span> <span class="n">designatedOwnerOf</span><span class="p">(</span>
+        <span class="n">IERC4799NFT</span> <span class="n">tokenContract</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">maxDepth</span>
+    <span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span> <span class="n">owner</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">owner</span> <span class="o">=</span> <span class="n">tokenContract</span><span class="p">.</span><span class="n">ownerOf</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">ERC165Checker</span><span class="p">.</span><span class="n">supportsInterface</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="k">type</span><span class="p">(</span><span class="n">IERC4799</span><span class="p">).</span><span class="n">interfaceId</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nb">require</span><span class="p">(</span><span class="n">maxDepth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"designatedOwnerOf: depth limit exceeded"</span><span class="p">);</span>
+            <span class="p">(</span><span class="n">tokenContract</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">)</span> <span class="o">=</span> <span class="n">IERC4799</span><span class="p">(</span><span class="n">owner</span><span class="p">).</span><span class="n">designatedTokenOf</span><span class="p">(</span>
+                <span class="n">tokenContract</span><span class="p">,</span>
+                <span class="n">tokenId</span>
+            <span class="p">);</span>
+            <span class="k">return</span> <span class="n">designatedOwnerOf</span><span class="p">(</span><span class="n">tokenContract</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">,</span> <span class="n">maxDepth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="longcyclical-chains-of-ownership">
+<a href="#longcyclical-chains-of-ownership" class="anchor-link"></a> Long/Cyclical Chains of Ownership
+</h3>
+<p>The primary security concern is that of malicious actors creating excessively long or cyclical chains of ownership, leading applications that attempt to query for the designated owner of a given token to run out of gas and be unable to function. To address this, clients are expected to always query considering a <code class="language-plaintext highlighter-rouge">maxDepth</code> parameter, cutting off computation after a certain number of chain traversals.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/davidbuckman">David Buckman</a>, <a href="https://github.com/isaacbuckman">Isaac Buckman</a>, "EIP-4799: Non-Fungible Token Ownership Designation Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4799, February 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4799.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4799: Non-Fungible Token Ownership Designation Standard [DRAFT]",
+    "author": "David Buckman (@davidbuckman), Isaac Buckman (@isaacbuckman)",
+    "name": "EIP-4799: Non-Fungible Token Ownership Designation Standard [DRAFT]",
+    "dateCreated": "2022-02-13",
+    "datePublished": "2022-02-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-4799-non-fungible-token-wrapping-standard/8396",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

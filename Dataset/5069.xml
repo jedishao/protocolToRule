@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5069: EIP Editor Handbook</title>
+<meta property="og:title" content="EIP-5069: EIP Editor Handbook" />
+<meta name="description" content="Handy reference for EIP editors and those who want to become one" />
+<meta property="og:description" content="Handy reference for EIP editors and those who want to become one" />
+<meta name="twitter:description" content="Handy reference for EIP editors and those who want to become one" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5069" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5069" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-5069: EIP Editor Handbook
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5069.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Handy reference for EIP editors and those who want to become one</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/poojaranjan">Pooja Ranjan</a>, <a href="https://github.com/Pandapip1">Pandapip1</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/pr-5069-eip-editor-handbook/9137">https://ethereum-magicians.org/t/pr-5069-eip-editor-handbook/9137</a></td></tr>
+<tr><th>Status</th><td>Living
+</td></tr>
+<tr><th>Type</th><td>Informational</td></tr>
+<tr><th>Created</th><td>2022-05-02</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-1">1</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#application-and-onboarding-process">Application and Onboarding Process</a></li>
+<li><a href="#special-merging-rules-for-this-eip">Special Merging Rules for this EIP</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>An Ethereum Improvement Proposal (EIP) is a design document providing information to the Ethereum community, or describing a new feature for Ethereum or its processes or environment. The EIP standardization process is a mechanism for proposing new features, for collecting community technical input on an issue, and for documenting the design decisions that have gone into Ethereum. Because improvement proposals are key components of Ethereum blockchain, it is important that they are well reviewed before reaching <code class="language-plaintext highlighter-rouge">Final</code> status. EIPs are stored in text files in a versioned repository which is monitored by the EIP editors.</p>
+<p>This EIP describes the recommended process for becoming an EIP editor.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="application-and-onboarding-process">
+<a href="#application-and-onboarding-process" class="anchor-link"></a> Application and Onboarding Process
+</h3>
+<p>Anyone having a good understanding of the EIP standardization and network upgrade process, intermediate level experience on the core and/or application side of the Ethereum blockchain, and willingness to contribute to the process management MAY apply to become an EIP editor. Potential EIP editors SHOULD have the following skills:</p>
+<ul>
+<li>Good communication skills</li>
+<li>Ability to handle contentious discourse</li>
+<li>1-5 spare hours per week</li>
+</ul>
+<p>The best available resource to understand the EIP process is <a href="/EIPS/eip-1">EIP-1</a>. Anyone desirous of becoming an EIP editor MUST understand this document. Afterwards, participating in the EIP process by commenting on and suggesting improvements to PRs and issues will familliarize the procedure, and is RECOMMENDED. The contributions of newer editors SHALL be monitored by other EIP editors.</p>
+<p>Anyone meeting the above requirements MAY make a pull request adding themselves as an EIP editor and adding themselves to the editor list in <a href="/EIPS/eip-1">EIP-1</a>. If the existing EIP editors approve, the author SHALL become a full EIP editor. This SHALL notify the editor of relevant new proposals submitted in the EIPs repository, and they SHALL review and merge pull requests:</p>
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gh">diff --git a/EIPS/eip-1.md b/EIPS/eip-1.md
+index 79558a3..079b196 100644
+</span><span class="gd">--- a/EIPS/eip-1.md
+</span><span class="gi">+++ b/EIPS/eip-1.md
+</span><span class="p">@@ -207,6 +211,7 @@</span> The current EIP editors are
+ - Matt Garnett (@lightclient)
+ - Micah Zoltu (@MicahZoltu)
+ - Greg Colvin (@gcolvin)
+<span class="gi">+- Sam Wilson (@SamWilsn)
+</span> 
+ Emeritus EIP editors are 
+ 
+<span class="gh">diff --git a/.github/workflows/auto-review-bot.yml b/.github/workflows/auto-review-bot.yml
+index 5730343..3d162ea 100644
+</span><span class="gd">--- a/.github/workflows/auto-review-bot.yml
+</span><span class="gi">+++ b/.github/workflows/auto-review-bot.yml
+</span><span class="p">@@ -17,12 +17,12 @@</span> jobs:
+         id: auto-merge-bot
+         with:
+           GITHUB-TOKEN: $ 
+<span class="gd">-          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin"
+-          ERC_EDITORS: "@lightclient,@axic"
+-          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic"
+-          INTERFACE_EDITORS: "@lightclient,@axic"
+-          META_EDITORS: "@lightclient,@axic,@gcolvin"
+-          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin"
+</span><span class="gi">+          CORE_EDITORS: "@MicahZoltu,@lightclient,@axic,@gcolvin,@SamWilsn"
++          ERC_EDITORS: "@lightclient,@axic,@SamWilsn"
++          NETWORKING_EDITORS: "@MicahZoltu,@lightclient,@axic,@SamWilsn"
++          INTERFACE_EDITORS: "@lightclient,@axic,@SamWilsn"
++          META_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
++          INFORMATIONAL_EDITORS: "@lightclient,@axic,@gcolvin,@SamWilsn"
+</span>           MAINTAINERS: "@alita-moore,@mryalamanchi"
+</code></pre></div></div>
+<h3 id="special-merging-rules-for-this-eip">
+<a href="#special-merging-rules-for-this-eip" class="anchor-link"></a> Special Merging Rules for this EIP
+</h3>
+<p>This EIP MUST have the same rules regarding changes as <a href="/EIPS/eip-1">EIP-1</a>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<ul>
+<li>“6 months” was chosen as the cutoff for denoting <code class="language-plaintext highlighter-rouge">Stagnant</code> EIPs terminally-<code class="language-plaintext highlighter-rouge">Stagnant</code> arbitrarily.</li>
+<li>This EIP requires special merging rules for the same reason <a href="/EIPS/eip-1">EIP-1</a> does.</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/poojaranjan">Pooja Ranjan</a>, <a href="https://github.com/Pandapip1">Pandapip1</a>, "EIP-5069: EIP Editor Handbook," <em>Ethereum Improvement Proposals</em>, no. 5069, May 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5069.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5069: EIP Editor Handbook",
+    "author": "Pooja Ranjan (@poojaranjan), Pandapip1 (@Pandapip1)",
+    "name": "EIP-5069: EIP Editor Handbook",
+    "dateCreated": "2022-05-02",
+    "datePublished": "2022-05-02",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/pr-5069-eip-editor-handbook/9137",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

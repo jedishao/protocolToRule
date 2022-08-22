@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2566: Human Readable Parameters for Contract Function Execution</title>
+<meta property="og:title" content="EIP-2566: Human Readable Parameters for Contract Function Execution" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2566" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2566" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2566: Human Readable Parameters for Contract Function Execution
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2566.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/jstoxrocky">Joseph Stockermans</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/human-readable-parameters-for-contract-function-execution/4154">https://ethereum-magicians.org/t/human-readable-parameters-for-contract-function-execution/4154</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-03-23</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#providerwallet-definition">ProviderWallet Definition</a></li>
+<li><a href="#existing-solutions">Existing Solutions</a></li>
+<li><a href="#background">Background</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>New Ethereum RPC method <code class="language-plaintext highlighter-rouge">eth_sendTransactionToContractFunction</code> that parallels <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code> but allows for human-readable contract function execution data to be displayed to users.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>When a dapp prompts a user to execute a smart contract function via a ProviderWallet, confirmation screens displayed in the ProviderWallet layer cannot display the human readable details of the function to be called and the arguments to be passed. This is because the Ethereum RPC method used for contract function execution (<code class="language-plaintext highlighter-rouge">eth_sendTransaction</code>) accepts information about what function to call in a non-human readable (and non-recoverable) format. As such, when a ProviderWallet receives this non-human readable information from a dapp, they are unable to display a human readable version since they never received one and cannot recover one from the data.</p>
+<p>This creates a poor and potentially dangerous user experience. For example, a malicious dapp could swap out the <code class="language-plaintext highlighter-rouge">address</code> argument in a token contract’s <code class="language-plaintext highlighter-rouge">transfer(address,uint256)</code> function and reroute the tokens intended for someone else to themselves. This sleight-of-hand would be quiet and unlikely to be picked up by a casual user glancing over the non-human readable data. By adding a new Ethereum RPC method (<code class="language-plaintext highlighter-rouge">eth_sendTransactionToContractFunction</code>) that accepts the function ABI, ProviderWallets can recreate and display the human readable details of contract function execution to users.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<h3 id="providerwallet-definition">
+<a href="#providerwallet-definition" class="anchor-link"></a> ProviderWallet Definition
+</h3>
+<p>ProviderWallets like Metamask and Geth are hybrid software that combine an Ethereum API provider with an Ethereum wallet. This allows them to sign transactions on behalf of their users and also broadcast those signed transactions to the Ethereum network. ProviderWallets are used for both convenience and for the protection they give users through human readable confirmation prompts.</p>
+<h3 id="existing-solutions">
+<a href="#existing-solutions" class="anchor-link"></a> Existing Solutions
+</h3>
+<p>Much discussion has been made in the past few years on the topic of human readable Ethereum transaction data. Aragon’s <a href="https://github.com/aragon/radspec">Radspec</a> addresses this issue by requiring contract developers to amend their contract functions with human readable comments. ProviderWallets can then use Aragon’s Radspec software to parse these comments from the contract code and display them to the end user - substituting in argument values where necessary. Unfortunately, this approach cannot work with contracts that do not have Radspec comments (and may require integration with IPFS).</p>
+<p><a href="https://github.com/ethereum/EIPs/issues/1138">EIP 1138</a> also addresses this issue directly but contains serious security issues - allowing untrusted dapps to generate the human readable message displayed to users. In a similar train of thought, <a href="https://github.com/ethereum/go-ethereum/pull/2940">Geth’s #2940 PR</a> and <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-191.md">EIPs 191</a>, <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md">712</a> all highlight the Ethereum community’s desire for ProviderWallets to better inform users about what data they are actually acting upon.</p>
+<p>Finally, the ProviderWallet Metamask already includes some built-in magic for interactions with ERC20 contracts that allows confirmation prompts to display the intended <em>token</em> recipient and <em>token</em> value. Although this is accomplished in an ad hoc fashion for ERC20-like contracts only, the motivation is the same: users deserve better information about the execution of contract functions they are relying on ProviderWallets to perform.</p>
+<h3 id="background">
+<a href="#background" class="anchor-link"></a> Background
+</h3>
+<p>At one point or another, a dapp will ask a user to interact with a contract. The interaction between dapps and contracts is a large part of the Ethereum ecosystem and is most commonly brokered by a ProviderWallet. When a dapp asks a user to interact with a contract, it will do so by sending the <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code> method name to the Ethereum API exposed by a ProviderWallet along with the relevant transaction data. The <code class="language-plaintext highlighter-rouge">data</code> field of the transaction data contains the information necessary for the Ethereum virtual machine to identify and execute the contract’s function. This field has a specific formatting that is both non-human readable and non-recoverable to its human readable state.</p>
+<p>The accepted format for <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code>’s <code class="language-plaintext highlighter-rouge">data</code> field is the hexadecimal encoding of the first four bytes of the keccak256 digest of the function signature. This abbreviated hash is then concatenated with the ABI encoded arguments to the function. Since the keccak256 digest of the function signature cannot be converted back into the function signature, the <code class="language-plaintext highlighter-rouge">data</code> field is not only non-human readable, its non-recoverable as well. On top of this, additional insight into the concatenated argument values is further obfuscated as information about their data types are held in the function signature preimage.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>This EIP proposes increasing the set of Ethereum RPC methods to include a new method - <code class="language-plaintext highlighter-rouge">eth_sendTransactionToContractFunction</code>. This method parallels <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code> with the only difference being the inclusion of the contract function’s <code class="language-plaintext highlighter-rouge">abi</code> field.</p>
+<p>Parameters</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">Object</code> - The transaction object
+<ul>
+<li><code class="language-plaintext highlighter-rouge">from</code>: <code class="language-plaintext highlighter-rouge">DATA</code>, 20 Bytes - The address the transaction is sent from.</li>
+<li><code class="language-plaintext highlighter-rouge">to</code>: <code class="language-plaintext highlighter-rouge">DATA</code>, 20 Bytes - (optional when creating new contract) The address the transaction is directed to.</li>
+<li><code class="language-plaintext highlighter-rouge">gas</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - (optional, default: 90000) Integer of the gas provided for the transaction execution. It will return unused gas.</li>
+<li><code class="language-plaintext highlighter-rouge">gasPrice</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - (optional, default: To-Be-Determined) Integer of the gasPrice used for each paid gas</li>
+<li><code class="language-plaintext highlighter-rouge">value</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - (optional) Integer of the value sent with this transaction</li>
+<li><code class="language-plaintext highlighter-rouge">data</code>: <code class="language-plaintext highlighter-rouge">DATA</code> - The hash of the invoked method signature and encoded parameters</li>
+<li><code class="language-plaintext highlighter-rouge">abi</code>: <code class="language-plaintext highlighter-rouge">DATA</code> - The function ABI</li>
+<li><code class="language-plaintext highlighter-rouge">nonce</code>: <code class="language-plaintext highlighter-rouge">QUANTITY</code> - (optional) Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.</li>
+</ul>
+</li>
+</ol>
+<p>Example Parameters</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  params: [{
+    "from": "0x69e6F1b01f34A702Ce63bA6EF83c64fAEC37a227",
+    "to": "0xe44127f6fA8A00ee0228730a630fc1F3162C4d52",
+    "gas": "0x76c0", // 30400
+    "gasPrice": "0x9184e72a000", // 10000000000000
+    "value": "0x9184e72a", // 2441406250
+    "abi": "{
+      "inputs": [{
+        "name": "_address",
+        "type": "address"
+      }, {
+        "name": "_value",
+        "type": "uint256"
+      }],
+      "name": "transferTokens",
+      "outputs": [{
+        "name": "success",
+        "type": "bool"
+      }],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }",
+   "data": "0xbec3fa170000000000000000000000006Aa89e52c9a826496A8f311c1a9db62fd477E256000000000000000000000000000000000000000000000000000000174876E800"               
+  }]
+</code></pre></div></div>
+<p>Returns
+DATA, 32 Bytes - the transaction hash, or the zero hash if the transaction is not yet available.</p>
+<p>Example
+// Request
+curl -X POST –data ‘{“jsonrpc”:”2.0”,”method”:”eth_sendTransactionToContractFunction”,”params”:[{see above}],”id”:1}’</p>
+<p>// Result
+{
+“id”:1,
+“jsonrpc”: “2.0”,
+“result”: “0xe670ec64341771606e55d6b4ca35a1a6b75ee3d5145a99d05921026d1527331”
+}</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP’s proposed <code class="language-plaintext highlighter-rouge">eth_sendTransactionToContractFunction</code> method is intended to parallel <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code> as much as possible since both methods result in the same behaviour when executing a contract function. The newly introduced <code class="language-plaintext highlighter-rouge">abi</code> field is an element of the contract’s ABI that corresponds to the intended function. The <code class="language-plaintext highlighter-rouge">data</code> field is the same <code class="language-plaintext highlighter-rouge">data</code> field from <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code>. The <code class="language-plaintext highlighter-rouge">abi</code> field can be combined with values parsed from the <code class="language-plaintext highlighter-rouge">data</code> field to recreate human readable contract function execution information.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">data</code> field in <code class="language-plaintext highlighter-rouge">eth_sendTransactionToContractFunction</code> is the same as that required for <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code> allowing the transaction to be completed via the existing mechanisms used for <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code>. The input argument values can be parsed from the <code class="language-plaintext highlighter-rouge">data</code> field and since we know their types from the <code class="language-plaintext highlighter-rouge">abi</code> field, the provider wallet can use this info to encode and display the values in an appropriate human readable format. Furthermore, the hashed and truncated function signature in the <code class="language-plaintext highlighter-rouge">data</code> field can be reconstructed using the information provided in the <code class="language-plaintext highlighter-rouge">abi</code> field providing an additional check to ensure that the supplied ABI matches the <code class="language-plaintext highlighter-rouge">data</code> field.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>With backwards compatibility in mind, this EIP proposes augmenting the set of Ethereum RPC methods with an additional method instead of mutating the existing method. Precedent for adding a new RPC method comes from <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md">EIP 712</a> in which adding the method <code class="language-plaintext highlighter-rouge">eth_signTypedData</code> is proposed for confirmation prompt security. As an alternate approach, the <code class="language-plaintext highlighter-rouge">eth_sendTransaction</code> method could be changed to accept an additional <code class="language-plaintext highlighter-rouge">abi</code> argument, but this would break all existing code attempting to execute a contract function.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Displaying the contract address, function name, and argument values can provide additional security to users, but it is not a guarantee that a function will execute as the user expects. A poorly implemented contract can still name its function <code class="language-plaintext highlighter-rouge">transfer</code> and accept <code class="language-plaintext highlighter-rouge">address</code> and <code class="language-plaintext highlighter-rouge">uint256</code> arguments - but there is nothing short of contract examination that will let a user know that this contract is indeed a valid ERC20 contract. This EIP does not intend to solve the larger problem around trust in a contract’s code, but instead intends to give users better tools to understand exactly what is contained within the data they are broadcasting to the Ethereum network.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/jstoxrocky">Joseph Stockermans</a>, "EIP-2566: Human Readable Parameters for Contract Function Execution [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2566, March 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2566.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2566: Human Readable Parameters for Contract Function Execution [DRAFT]",
+    "author": "Joseph Stockermans (@jstoxrocky)",
+    "name": "EIP-2566: Human Readable Parameters for Contract Function Execution [DRAFT]",
+    "dateCreated": "2020-03-23",
+    "datePublished": "2020-03-23",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/human-readable-parameters-for-contract-function-execution/4154",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

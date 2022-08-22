@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3534: Restricted Chain Context Type Transactions</title>
+<meta property="og:title" content="EIP-3534: Restricted Chain Context Type Transactions" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3534" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3534" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3534: Restricted Chain Context Type Transactions
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3534.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/whilei">Isaac Ardis</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3534-restricted-chain-context-transaction-type/6112">https://ethereum-magicians.org/t/eip-3534-restricted-chain-context-transaction-type/6112</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-04-20</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2718">2718</a>,
+<a href="eip-2930">2930</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#subclass-combination">Subclass Combination</a></li>
+<li><a href="#subclasses">Subclasses</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#subclasses-1">Subclasses</a></li>
+<li><a href="#subclass-combination-1">Subclass Combination</a></li>
+<li><a href="#eip-2930-inheritance">EIP-2930 Inheritance</a></li>
+<li><a href="#signature-target">Signature target</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#why-4-bytes-of-a-block-hash-is-safe-enough-for-the-ancestorid">Why 4 bytes of a block hash is “safe enough” for the ancestorId</a></li>
+<li><a href="#eligibleminerlist-2">eligibleMinerList</a></li>
+<li><a href="#ineligibleminerlist-2">ineligibleMinerList</a></li>
+<li><a href="#validation-costs">Validation costs</a></li>
+<li><a href="#transaction-size-increase">Transaction size increase</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Defines a new transaction type with constraints on ancestor block hash, block author, and/or block timestamp.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>We introduce a new EIP-2718 transaction type with the format <code class="language-plaintext highlighter-rouge">0x4 || rlp([chainId, chainContext, nonce, gasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])</code>.</p>
+<p>This proposed <code class="language-plaintext highlighter-rouge">chainContext</code> element adds a constraint on the validity of a transaction to a chain segment meeting the referenced value(s). Four contexts are defined as subclasses of this type:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">segmentId</code></li>
+<li><code class="language-plaintext highlighter-rouge">eligibleMinerList</code></li>
+<li><code class="language-plaintext highlighter-rouge">ineligibleMinerList</code></li>
+<li><code class="language-plaintext highlighter-rouge">expiry</code></li>
+</ul>
+<p>These contexts can be used in arbitrary combinations. Annotated context value combinations are referenced by a composite integer prefix on the annotation.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Establish a protocol-based mechanism with which transactions are able to articulate constraints on eligible chain contexts.
+Generally, these constraints give the consumer (the transactor) an ability to express requirements about the transaction’s relationship to blockchain data and its provenance.</p>
+<ul>
+<li>Restrict transaction applicability to a chain context that is currently available and reasoned about under some subjective view.
+<ul>
+<li>Introduces a way for transactions to describe a dependency on their current view of a chain.</li>
+</ul>
+</li>
+<li>Restrict transaction applicability to a chain context following some foregoing block (and its transactions).
+<ul>
+<li>Introduces a way for transactions to describe ancestral dependencies at a “macro” (block) level.
+Indirectly, this offers a way for a transaction to depend on the presence of another, so long as the dependent transaction is in a different block.</li>
+</ul>
+</li>
+<li>Restrict transaction applicability to blocks benefitting, or <em>not</em> benefitting, a preferred/spurned miner address or addresses.
+<ul>
+<li>Introduces an opportunity/market for miners to compete for consumers’ transactions; under the status quo, the current miner-transaction processing service is almost perfectly homogeneous from the consumer perspective.</li>
+</ul>
+</li>
+<li>Restrict transaction applicability time span.
+<ul>
+<li>Introduces an alternative (to the status quo) way for consumers/transactors to have transactions invalidated/ejected from the transaction pool.</li>
+</ul>
+</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code> <code class="language-plaintext highlighter-rouge">TBD</code></li>
+<li><code class="language-plaintext highlighter-rouge">TRANSACTION_TYPE_NUMBER</code> <code class="language-plaintext highlighter-rouge">0x4</code>. See EIP-2718.</li>
+</ul>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, a new EIP-2718 transaction is introduced with <code class="language-plaintext highlighter-rouge">TransactionType</code> <code class="language-plaintext highlighter-rouge">TRANSACTION_TYPE_NUMBER</code>.</p>
+<p>The EIP-2718 <code class="language-plaintext highlighter-rouge">TransactionPayload</code> for this transaction is <code class="language-plaintext highlighter-rouge">rlp([chainId, chainContext, nonce, gasPrice, gasLimit, to, value, data, access_list, yParity, senderR, senderS])</code>.</p>
+<p>The EIP-2718 <code class="language-plaintext highlighter-rouge">ReceiptPayload</code> for this transaction is <code class="language-plaintext highlighter-rouge">rlp([status, cumulativeGasUsed, logsBloom, logs])</code>.</p>
+<h3 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">chainContext</code>. The transaction is only valid for blockchain data satisfying ALL OF the annotations.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_COMPOSITE_PREFIX</code>. A positive integer between <code class="language-plaintext highlighter-rouge">1</code> and <code class="language-plaintext highlighter-rouge">0xff</code> that represents the set of subclass annotations in the <code class="language-plaintext highlighter-rouge">chainContext</code> (<em>ie.</em> <em>which</em> chain context subclasses should the provided values be applied to). This value should be the sum of the subclass’ <code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code>s.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code>s are defined for Subclasses as octal-derived positive integers, limited to the set <code class="language-plaintext highlighter-rouge">2^0,2^1,2^2,2^3,2^4,2^5,2^6,2^7</code>.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">chainContext</code> value should be of the form <code class="language-plaintext highlighter-rouge">ANNOTATION_COMPOSITE_PREFIX || [{subclass value}...]</code>, where</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">...</code> means “zero or more of the things to the left,” and</li>
+<li><code class="language-plaintext highlighter-rouge">||</code> denotes the byte/byte-array concatenation operator.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">chainContext</code> value should be encoded as <code class="language-plaintext highlighter-rouge">ANNOTATION_COMPOSITE_PREFIX || rlp[{subclass value}...]</code>.</p>
+<h3 id="validation">
+<a href="#validation" class="anchor-link"></a> Validation
+</h3>
+<p>The values defined as subclasses below acts as constraints on transaction validity for specific chain contexts.
+Transactions defining constraints which are not satisfied by their chain context should be rejected as invalid.
+Blocks containing invalid transactions should be rejected as invalid themselves, per the <em>status quo</em>.</p>
+<h3 id="subclass-combination">
+<a href="#subclass-combination" class="anchor-link"></a> Subclass Combination
+</h3>
+<p><code class="language-plaintext highlighter-rouge">chainContext</code> values annotating more than one subclass reference should provide those values in the following sequential order:</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">ANCESTOR_ID</code></li>
+<li><code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code></li>
+<li><code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code></li>
+<li><code class="language-plaintext highlighter-rouge">EXPIRY</code></li>
+</ol>
+<p>As above, the <code class="language-plaintext highlighter-rouge">ANNOTATION_COMPOSITE_PREFIX</code> should be the sum of the designated subclass’ <code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code>s.</p>
+<h3 id="subclasses">
+<a href="#subclasses" class="anchor-link"></a> Subclasses
+</h3>
+<ul>
+<li>An <code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> value is used to represent each of the available context subclasses.</li>
+</ul>
+<h4 id="ancestorid">
+<a href="#ancestorid" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ancestorId</code>
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANCESTOR_ID</code> <code class="language-plaintext highlighter-rouge">bytes</code>. A byte array between 4 and 12 bytes in length.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">ANCESTOR_ID</code> is a reference to a specific block by concatenating the byte representation of a block number and the first 4 bytes of its hash.
+The block number’s should be encoded as a big endian value and should have left-padding 0’s removed.
+The block number value may be omitted in case of reference to the genesis block.</p>
+<p>The <code class="language-plaintext highlighter-rouge">ANCESTOR_ID</code> value should be RLP encoded as a byte array for hashing and transmission.</p>
+<h4 id="eligibleminerlist">
+<a href="#eligibleminerlist" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">eligibleMinerList</code>
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">2</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code> <code class="language-plaintext highlighter-rouge">[address...]</code>. A list of addresses.</li>
+<li><code class="language-plaintext highlighter-rouge">MAX_ELEMENTS</code> <code class="language-plaintext highlighter-rouge">3</code>. The maximum number of addresses that can be provided.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code> value is an array of unique, valid addresses.
+Any block containing a transaction using this value must have a block beneficiary included in this set.</p>
+<p>The <code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code> value should be of the type <code class="language-plaintext highlighter-rouge">[{20 bytes}+]</code>, where <code class="language-plaintext highlighter-rouge">+</code> means “one or more of the thing to the left.”
+Non-unique values are not permitted.</p>
+<p>The <code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code> value should be RLP encoded for hashing and transmission.</p>
+<p>An <code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code> value may NOT be provided adjacent to an <code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code> value.</p>
+<h4 id="ineligibleminerlist">
+<a href="#ineligibleminerlist" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">4</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code> <code class="language-plaintext highlighter-rouge">[address...]</code>. A list of addresses.</li>
+<li><code class="language-plaintext highlighter-rouge">MAX_ELEMENTS</code> <code class="language-plaintext highlighter-rouge">3</code>. The maximum number of addresses that can be provided.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code> value is an array of unique, valid addresses.
+Any block containing a transaction using this value must not have a block beneficiary included in this set.</p>
+<p>The <code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code> value should be of the type <code class="language-plaintext highlighter-rouge">[{20 bytes}+]</code>, where <code class="language-plaintext highlighter-rouge">+</code> means “one or more of the thing to the left.”
+Non-unique values are not permitted.</p>
+<p>The <code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code> value should be RLP encoded for hashing and transmission.</p>
+<p>An <code class="language-plaintext highlighter-rouge">INELIGIBLE_MINER_LIST</code> value may NOT be provided adjacent to an <code class="language-plaintext highlighter-rouge">ELIGIBLE_MINER_LIST</code> value.</p>
+<h4 id="expiry">
+<a href="#expiry" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">expiry</code>
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">8</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">EXPIRY</code> <code class="language-plaintext highlighter-rouge">integer</code>. A positive, unsigned scalar.</li>
+</ul>
+<p>The <code class="language-plaintext highlighter-rouge">EXPIRY</code> value is a scalar equal to the maximum valid block <code class="language-plaintext highlighter-rouge">timestamp</code> for a block including this transaction.</p>
+<p>The <code class="language-plaintext highlighter-rouge">EXPIRY</code> value should be RLP encoded as an integer for hashing and transmission.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="subclasses-1">
+<a href="#subclasses-1" class="anchor-link"></a> Subclasses
+</h3>
+<p>Subclasses are defined with a high level of conceptual independence, and can be modified and/or extended independently from this EIP.
+Their specification definitions allow arbitrary mutual (<code class="language-plaintext highlighter-rouge">AND</code>) combinations.</p>
+<p>This design is intended to form a proposal which offers a concrete set of specifics while doing so with enough flexibility for extension or modification later.</p>
+<h4 id="annotation_prefix">
+<a href="#annotation_prefix" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code>
+</h4>
+<p><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> values’ use of octal-derived values, ie. <code class="language-plaintext highlighter-rouge">1, 2, 4, 8, 16, 32, 64, 128</code>, follows a conventional pattern of representing combinations from a limited set uniquely and succinctly, eg. Unix-style file permissions.
+This EIP defines four of the eight possible context subclasses; this seems to leave plenty of room for future growth in this direction if required.
+If this limit is met or exceeded, doing so will require a hard fork <em>de facto</em> (by virtue of making consensus protocol facing changes to transaction validation schemes), so revising this scheme as needed should be only incidental and trivial.</p>
+<h4 id="ancestorid-1">
+<a href="#ancestorid-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ancestorId</code>
+</h4>
+<p>Constrains the validity of a transaction by referencing a prior canonical block by number and hash.
+The transaction is only valid when included in a block which has the annotated block as an ancestor.</p>
+<p>Practically, the “designated allowable chain segment” can be understood as the segment of blocks from <code class="language-plaintext highlighter-rouge">0..ancestorId</code> inclusive.</p>
+<h5 id="redundancy-to-chainid">
+<a href="#redundancy-to-chainid" class="anchor-link"></a> Redundancy to <code class="language-plaintext highlighter-rouge">chainId</code>
+</h5>
+<p>This pattern can be understood as a correlate of <a href="./eip-155">EIP-155</a>’s <code class="language-plaintext highlighter-rouge">chainId</code> specification.
+EIP155 defines the restriction of transactions between chains; limiting the applicability of any EIP-155 transaction to a chain with the annotated ChainID.
+<code class="language-plaintext highlighter-rouge">ancestorId</code> further restricts transaction application to one subsection (“segment”) of one chain.</p>
+<p>From this constraint hierarchy, we note that an implementation of <code class="language-plaintext highlighter-rouge">ancestorId</code> can make <code class="language-plaintext highlighter-rouge">chainId</code> conceptually redundant.</p>
+<h5 id="so-why-keep-chainid">
+<a href="#so-why-keep-chainid" class="anchor-link"></a> So why keep <code class="language-plaintext highlighter-rouge">chainId</code>?
+</h5>
+<p><code class="language-plaintext highlighter-rouge">chainId</code> is maintained as an invariant because:</p>
+<ul>
+<li>The use of the transaction type proposed by this EIP is optional, implying the continued necessity of <code class="language-plaintext highlighter-rouge">chainId</code> in the protocol infrastructure and tooling for legacy and other transaction types.</li>
+<li>The presence of <code class="language-plaintext highlighter-rouge">ancestorId</code> in the transaction type proposed by this EIP is optional. If the value is not filled by an RCC transaction, the demand for <code class="language-plaintext highlighter-rouge">chainId</code> remains.</li>
+<li>A <code class="language-plaintext highlighter-rouge">chainId</code> value is not necessarily redundant to <code class="language-plaintext highlighter-rouge">ancestorId</code>, namely in cases where forks result in living chains. For example, an <code class="language-plaintext highlighter-rouge">ancestorId</code> reference to block <code class="language-plaintext highlighter-rouge">1_919_999</code> would be ambiguous between Ethereum and Ethereum Classic.</li>
+<li>It would be possible to specify the omission of <code class="language-plaintext highlighter-rouge">chainId</code> in case of <code class="language-plaintext highlighter-rouge">ancestorId</code>’s use. This would add infrastructural complexity for the sake of removing the few bytes <code class="language-plaintext highlighter-rouge">chainId</code> typically requires; we do not consider this trade-off worth making.
+<ul>
+<li><code class="language-plaintext highlighter-rouge">chainId</code> is used as the <code class="language-plaintext highlighter-rouge">v</code> value (of <code class="language-plaintext highlighter-rouge">v,r,s</code>) in the transaction signing scheme; removing or modifying this incurs complexity at a level below encoded transaction fields, demanding additional infrastructural complexity for implementation.</li>
+</ul>
+</li>
+<li>The proposed design for <code class="language-plaintext highlighter-rouge">ancestorId</code> does not provide perfect precision (at the benefit of byte-size savings).
+In the small chance that the value is ambiguous, the <code class="language-plaintext highlighter-rouge">chainId</code> maintains an infallible guarantee for a transaction’s chain specificity.</li>
+</ul>
+<h4 id="eligibleminerlist-1">
+<a href="#eligibleminerlist-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">eligibleMinerList</code>
+</h4>
+<p>The transaction is only valid when included in a block having an <code class="language-plaintext highlighter-rouge">etherbase</code> contained in the annotated list of addresses.
+The use of “whitelist” (<code class="language-plaintext highlighter-rouge">eligibleMinerList</code>) in conjunction with a “blacklist” (<code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>) is logically inconsistent; their conjunction is not allowed.</p>
+<p>A <code class="language-plaintext highlighter-rouge">MAX_ELEMENTS</code> limit of <code class="language-plaintext highlighter-rouge">3</code> is chosen to balance the interests of limiting the potential size of transactions, and to provide a sufficient level of articulation for the user. At the time of writing, the top 3 miners of Ethereum (by block, measured by known public addresses) account for 52% of all blocks produced.</p>
+<h4 id="ineligibleminerlist-1">
+<a href="#ineligibleminerlist-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>
+</h4>
+<p>The transaction is only valid when included in a block having an <code class="language-plaintext highlighter-rouge">etherbase</code> <em>not</em> contained in the annotated list of addresses.
+The use of “blacklist” (<code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>) in conjunction with a “whitelist” (<code class="language-plaintext highlighter-rouge">eligibleMinerList</code>) is logically inconsistent; their conjunction is not allowed.</p>
+<p>A <code class="language-plaintext highlighter-rouge">MAX_ELEMENTS</code> limit of <code class="language-plaintext highlighter-rouge">3</code> is chosen to balance the interests of limiting the potential size of transactions, and to provide a sufficient level of articulation for the user. At the time of writing, the top 3 miners of Ethereum (by block, measured by known public addresses) account for 52% of all blocks produced.</p>
+<h4 id="expiry-1">
+<a href="#expiry-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">expiry</code>
+</h4>
+<p>The transaction is only valid when included in a block having a <code class="language-plaintext highlighter-rouge">timestamp</code> less than the value annotated.
+A positive integer is used because that corresponds to the specified type of block <code class="language-plaintext highlighter-rouge">timestamp</code> header values.</p>
+<h3 id="subclass-combination-1">
+<a href="#subclass-combination-1" class="anchor-link"></a> Subclass Combination
+</h3>
+<p>Since subclasses use octal-based values for <code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code>, they can be distinguishably combined as sums, provided as we assume annotation cardinality (ie ordering).
+For example:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1</code> signals <code class="language-plaintext highlighter-rouge">ancestorId</code> exclusively.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">2</code> signals <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> exclusively.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">4</code> signals <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code> exclusively.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">8</code> signals <code class="language-plaintext highlighter-rouge">expiry</code> exclusively.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1+2=3</code> combines <code class="language-plaintext highlighter-rouge">ancestorId</code> and <code class="language-plaintext highlighter-rouge">eligibleMinerList</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1+4=5</code> combines <code class="language-plaintext highlighter-rouge">ancestorId</code> and <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1+8=9</code> combines <code class="language-plaintext highlighter-rouge">ancestorId</code> and <code class="language-plaintext highlighter-rouge">expiry</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1+2+8=11</code> combines <code class="language-plaintext highlighter-rouge">ancestorId</code> and <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> and <code class="language-plaintext highlighter-rouge">expiry</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1+4+8=13</code> combines <code class="language-plaintext highlighter-rouge">ancestorId</code> and <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code> and <code class="language-plaintext highlighter-rouge">expiry</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">2+4=6</code> is NOT PERMITTED. It would combine <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> and <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">ANNOTATION_PREFIX</code> <code class="language-plaintext highlighter-rouge">1+2+4+8=15</code> is NOT PERMITTED. It would combine <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> and <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code> (and <code class="language-plaintext highlighter-rouge">ancestorId</code> and <code class="language-plaintext highlighter-rouge">expiry</code>).</li>
+</ul>
+<p>Since ordering is defined and demanded for multiple values, annotated references remain distinguishable. For example:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">chainContext</code> <code class="language-plaintext highlighter-rouge">3[e4e1c0e78b1ec3,[Df7D7e053933b5cC24372f878c90E62dADAD5d42]]</code> - Transaction can only be included in a block having a canonical ancestor block numbered <code class="language-plaintext highlighter-rouge">15_000_000</code> and with a hash prefixed with the bytes <code class="language-plaintext highlighter-rouge">e78b1ec3</code>, and if the containing block uses <code class="language-plaintext highlighter-rouge">Df7D7e053933b5cC24372f878c90E62dADAD5d42</code> as the beneficiary.</li>
+<li><code class="language-plaintext highlighter-rouge">chainContext</code> <code class="language-plaintext highlighter-rouge">10[[Df7D7e053933b5cC24372f878c90E62dADAD5d42],1619008030]</code> - Transaction can only be included in a block naming <code class="language-plaintext highlighter-rouge">Df7D7e053933b5cC24372f878c90E62dADAD5d42</code> as the <code class="language-plaintext highlighter-rouge">etherbase</code> beneficiary, and which has a timestamp greater than <code class="language-plaintext highlighter-rouge">1619008030</code> (Wed Apr 21 07:27:10 CDT 2021).</li>
+</ul>
+<h3 id="eip-2930-inheritance">
+<a href="#eip-2930-inheritance" class="anchor-link"></a> EIP-2930 Inheritance
+</h3>
+<p>The <a href="https://eips.ethereum.org/EIPS/eip-2930">EIP-2930 Optional Access List Type Transaction</a> is used as an assumed “base” transaction type for this proposal.
+However, this is NOT a conceptual dependency; the included <code class="language-plaintext highlighter-rouge">accessList</code> portion of this proposal (the only differential from post-EIP-155 legacy transaction fields) can readily be removed.
+Standing on the shoulders of EIP-2930 is only intended to support and further the adoption of next-generation transactions.</p>
+<h3 id="signature-target">
+<a href="#signature-target" class="anchor-link"></a> Signature target
+</h3>
+<p>The signature signs over the transaction type as well as the transaction data.
+This is done to ensure that the transaction cannot be “re-interpreted” as a transaction of a different type.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>There are no known backward compatibility issues.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<table>
+<thead>
+<tr>
+<th>Segment ID</th>
+<th>Block Number</th>
+<th>Canonical Block Hash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">e78b1ec3</code></td>
+<td><code class="language-plaintext highlighter-rouge">0</code></td>
+<td><code class="language-plaintext highlighter-rouge">0xe78b1ec31bcb535548ce4b6ef384deccad1e7dc599817b65ab5124eeaaee3e58</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">01e78b1ec3</code></td>
+<td><code class="language-plaintext highlighter-rouge">1</code></td>
+<td><code class="language-plaintext highlighter-rouge">0xe78b1ec31bcb535548ce4b6ef384deccad1e7dc599817b65ab5124eeaaee3e58</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">e4e1c0e78b1ec3</code></td>
+<td><code class="language-plaintext highlighter-rouge">15_000_000</code></td>
+<td><code class="language-plaintext highlighter-rouge">0xe78b1ec31bcb535548ce4b6ef384deccad1e7dc599817b65ab5124eeaaee3e58</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">e8d4a50fffe78b1ec3</code></td>
+<td><code class="language-plaintext highlighter-rouge">999_999_999_999</code></td>
+<td><code class="language-plaintext highlighter-rouge">0xe78b1ec31bcb535548ce4b6ef384deccad1e7dc599817b65ab5124eeaaee3e58</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">7fffffffffffffffe78b1ec3</code></td>
+<td><code class="language-plaintext highlighter-rouge">9223372036854775807</code></td>
+<td><code class="language-plaintext highlighter-rouge">0xe78b1ec31bcb535548ce4b6ef384deccad1e7dc599817b65ab5124eeaaee3e58</code></td>
+</tr>
+</tbody>
+</table>
+<p>Further test cases, TODO.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="why-4-bytes-of-a-block-hash-is-safe-enough-for-the-ancestorid">
+<a href="#why-4-bytes-of-a-block-hash-is-safe-enough-for-the-ancestorid" class="anchor-link"></a> Why 4 bytes of a block hash is “safe enough” for the <code class="language-plaintext highlighter-rouge">ancestorId</code>
+</h3>
+<p><strong>TL;DR</strong>: The chance of an ineffectual <code class="language-plaintext highlighter-rouge">ancestorId</code> is about 1 in between ~4 billion and ~40 billion, with the greater chance for intentional duplication scenarios, eg. malicious reorgs.</p>
+<p><strong>If a collision <em>does</em> happen</strong>, that means the transaction will be valid on both segments (as is the case under the status quo).</p>
+<p>Four bytes, instead of the whole hash (32 bytes), was chosen only to reduce the amount of information required to cross the wire to implement this value.
+Using the whole hash would result in a “perfectly safe” implementation, and every additional byte reduces the chance of collision exponentially.</p>
+<p>The goal of the <code class="language-plaintext highlighter-rouge">ancestorId</code> is to disambiguate one chain segment from another, and in doing so, enable a transaction to define with adequate precision which chain it needs to be on.
+When a transaction’s <code class="language-plaintext highlighter-rouge">ancestorId</code> references a block, we want to be pretty sure that that reference won’t get confused with a different block than the one the author of the transaction had in mind.</p>
+<p>We assume the trait of collision resistance is uniformly applicable to all possible subsets of the block hash value, so our preference of using the <em>first</em> 4 bytes is arbitrary and functionally equivalent to any other subset of equal length.</p>
+<p>For the sake of legibility and accessibility, the following arguments will reference the hex representation of 4 bytes, which is 8 characters in length, eg. <code class="language-plaintext highlighter-rouge">e78b1ec3</code>.</p>
+<p>The chance of a colliding <code class="language-plaintext highlighter-rouge">ancestorId</code> is <code class="language-plaintext highlighter-rouge">1/(16^8=4_294_967_296)</code> times whatever we take the chance of the existence of an equivalently-numbered block (on an alternative chain) to be. Assuming a generous ballpark chance of 10% (<code class="language-plaintext highlighter-rouge">1/10</code>) for any given block having a public uncle, this yields <code class="language-plaintext highlighter-rouge">(1/(16^8=4_294_967_296) * 1/10</code>. Note that this ballpark assumes “normal” chain and network behavior. In the case of an enduring competing chain segment, this value rises to 100% (<code class="language-plaintext highlighter-rouge">1</code>).</p>
+<h3 id="eligibleminerlist-2">
+<a href="#eligibleminerlist-2" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">eligibleMinerList</code>
+</h3>
+<p>Miners who do not find themselves listed in an annotated <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> should be expected to immediately remove the transaction from their transaction pool.</p>
+<p>In a pessimistic outlook, we should also expect that these ineligible nodes would not offer rebroadcasts of these transactions, potentially impacting the distribution (and availability) of the transactions to their intended miners. On the other hand, miners are incentivized to make themselves available for reception of such transactions, and there are many ways this is feasible both on-network and off-.</p>
+<p>The author of a transaction using the <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> must assume that the “general availability” of the blockchain state database for such a transaction will be lower than a nonrestrictive transaction (since only a subset of miners will be able to process the transaction).</p>
+<p>A final consideration is the economics of a whitelisted miner concerning the processing order of transactions in which they are whitelisted and those without whitelists.
+Transactions without whitelists would appear at first glean to be more competitive, and thus should be processed with priority.
+However, miners following such a strategy may find their reputation diminished, and, in the worst case, see the assertive preferences of transaction authors shift to their competitors and beyond their reach.</p>
+<h3 id="ineligibleminerlist-2">
+<a href="#ineligibleminerlist-2" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>
+</h3>
+<p>In addition to the concerns and arguments presented by <code class="language-plaintext highlighter-rouge">eligibleMinerList</code> above, there is a unique concern for <code class="language-plaintext highlighter-rouge">ineligibleMinerList</code>: in order for a miner entity to avoid ineligibility by a blacklist, they only need to use an alternative adhoc address as the block beneficiary.
+In principle, this is ineluctable.</p>
+<p>However, there are associated costs to the “dodging” miner that should be considered.</p>
+<ul>
+<li>The creation of an account requires time and energy. But indeed, this work can be done at any convenient time and circumstance. Probably marginal, but non-zero.</li>
+<li>The transfer of funds from multiple accounts requires a commensurate number of transactions. Block rewards are applied after transactions are processed, so the miner is unable to simultaneously shift funds from an adhoc account to a target account in the same block they mine (which would otherwise be a “free” transaction).</li>
+<li>In using an adhoc address to dodge a blacklist, the miner may also cause their ineligibility from contemporary whitelist transactions.</li>
+</ul>
+<h3 id="validation-costs">
+<a href="#validation-costs" class="anchor-link"></a> Validation costs
+</h3>
+<p>Miner lists and expiry depend on easily cached and contextually available conditions (ie. the containing block header). The infrastructural overhead costs for enforcing these validations are expected to be nominal.</p>
+<p>Validation of <code class="language-plaintext highlighter-rouge">ancestorId</code> demands the assertion of a positive database hit by block number (thereby cross-referencing a stored block’s hash).
+This necessary lookup can be (and maybe already is) cached, but we must expect less than 100% hits on cached values, since the lookup value is arbitrary.
+With that in mind, however, the value provided to a transaction using a deep <code class="language-plaintext highlighter-rouge">ancestorId</code> is increasingly marginal, so we should expect
+most transactions using this field to use a relatively small set of common, shallow, cache-friendly values.</p>
+<h3 id="transaction-size-increase">
+<a href="#transaction-size-increase" class="anchor-link"></a> Transaction size increase
+</h3>
+<p>The proposed additional fields potentially increase transaction size.
+The proposed fields are not associated with any gas costs, establishing no protocol-defined economic mitigation for potential spam.
+However, transactions which are considered by a miner to be undesirable can be simply dropped from the transaction pool and ignored.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waved via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/whilei">Isaac Ardis</a>, "EIP-3534: Restricted Chain Context Type Transactions [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3534, April 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3534.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3534: Restricted Chain Context Type Transactions [DRAFT]",
+    "author": "Isaac Ardis (@whilei)",
+    "name": "EIP-3534: Restricted Chain Context Type Transactions [DRAFT]",
+    "dateCreated": "2021-04-20",
+    "datePublished": "2021-04-20",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3534-restricted-chain-context-transaction-type/6112",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1682: Storage Rent</title>
+<meta property="og:title" content="EIP-1682: Storage Rent" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1682" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1682" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="withdrawn">
+🛑 This EIP has been withdrawn.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1682: Storage Rent
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1682.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/fjl">Felix J Lange</a>, <a href="https://github.com/holiman">Martin Holst Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/storage-rent-eip/2357">https://ethereum-magicians.org/t/storage-rent-eip/2357</a></td></tr>
+<tr><th>Status</th><td>Withdrawn
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+ <tr><th>Created</th><td>2018-11-10</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#changes-to-state">Changes To State</a></li>
+<li><a href="#charging-rent">Charging Rent</a></li>
+<li><a href="#new-evm-opcodes">New EVM Opcodes</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#why-do-we-need-a-separate-rent-balance">Why do we need a separate rent balance?</a></li>
+<li><a href="#why-restoration">Why restoration?</a></li>
+<li><a href="#implementation-impact">Implementation Impact</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP describes a scheme to charge for data in state, and ‘archive’ data which is no longer being paid for. It also describes how resurrection of ‘archived’ data happens.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The Ethereum blockchain in its current form is not sustainable because it grows
+indefinitely. This is true of any blockchain, but Ethereum grows faster than most chains.
+Many implementation strategies to slow down growth exist. A common strategy is ‘state
+pruning’ which discards historical state, keeping only the active copy of contract data
+and a few recent versions to deal with short-range chain reorganizations. Several
+implementations also employ compression techniques to keep the active copy of the state as
+small as possible.</p>
+<p>A full node participating in consensus today requires storing large amounts of data even
+with advanced storage optimizations applied. Future storage requirements are unbounded
+because any data stored in a contract must be retained forever as dictated by the
+protocol. This EIP attempts to correct this by adding new consensus rules that put an
+upper bound on the size of the Ethereum state.</p>
+<p>Adding these new rules changes fundamental guarantees of the system and requires a hard
+fork. Users of Ethereum already pay for the creation and modification of accounts and
+their storage entries. Under the rules introduced in this EIP, users must also pay to keep
+accounts accessible. A similar rent scheme was proposed in <a href="https://github.com/ethereum/EIPs/issues/35">EIP-103</a> but rejected
+even back then because the proposal would’ve upset peoples expectations. As implementers
+of Ethereum, we still feel that state rent is the right path to long-term sustainability
+of the Ethereum blockchain and that its undesirable implications can be overcome with
+off-protocol tooling and careful design.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The cost of storing an account over time is called <code class="language-plaintext highlighter-rouge">rent</code>. The amount of <code class="language-plaintext highlighter-rouge">rent</code> due depends
+on the size of the account. The <code class="language-plaintext highlighter-rouge">ether</code> that is paid for <code class="language-plaintext highlighter-rouge">rent</code> is destroyed. The <code class="language-plaintext highlighter-rouge">rent</code> is deducted whenever an account is touched.</p>
+<p><code class="language-plaintext highlighter-rouge">rent</code> can be paid from the account’s regular <code class="language-plaintext highlighter-rouge">balance</code> or from its ‘rent balance’. Accounts
+can be endowed with <code class="language-plaintext highlighter-rouge">rent balance</code> through a new EVM opcode. When <code class="language-plaintext highlighter-rouge">rent</code> is charged, it is
+first taken from the <code class="language-plaintext highlighter-rouge">rent balance</code>. When <code class="language-plaintext highlighter-rouge">rent balance</code> is zero, it is instead charged from the account’s regular <code class="language-plaintext highlighter-rouge">balance</code> instead.</p>
+<p>The reason to separate <code class="language-plaintext highlighter-rouge">balance</code> and <code class="language-plaintext highlighter-rouge">rent balance</code> is that certain contracts do not accept <code class="language-plaintext highlighter-rouge">ether</code> sends, or always send the entire balance off to some other destination. For these cases, a separate<code class="language-plaintext highlighter-rouge">rent balance</code> is required.</p>
+<p>When an account’s <code class="language-plaintext highlighter-rouge">balance</code> is insufficient to pay rent, the account becomes <code class="language-plaintext highlighter-rouge">inactive</code>. Its
+storage and contract code are removed. Inactive accounts cannot be interacted with, i.e.
+it behaves as if it has no contract code.</p>
+<p>Inactive accounts can be restored by re-uploading their storage. To restore an inactive
+account <code class="language-plaintext highlighter-rouge">A</code>, a new account <code class="language-plaintext highlighter-rouge">B</code> is created with arbitrary code and its storage modified
+with <code class="language-plaintext highlighter-rouge">SSTORE</code> operations until it matches the storage root of <code class="language-plaintext highlighter-rouge">A</code>. Account <code class="language-plaintext highlighter-rouge">B</code> can restore
+<code class="language-plaintext highlighter-rouge">A</code> through the <code class="language-plaintext highlighter-rouge">RESTORETO</code> opcode. This means the cost of restoring an account is
+equivalent to recreating it via successive <code class="language-plaintext highlighter-rouge">SSTORE</code> operations.</p>
+<h3 id="changes-to-state">
+<a href="#changes-to-state" class="anchor-link"></a> Changes To State
+</h3>
+<p>At the top level, a new key <code class="language-plaintext highlighter-rouge">size</code> is added to the accounts trie. This key tracks the
+total number of trie nodes across all accounts, including storage trie nodes. To track
+rent, the structure of account entries is changed as well.</p>
+<p>Before processing the block in which this EIP becomes active, clients iterate the whole
+state once to count the number of trie nodes and to change the representation of all
+accounts to the new format.</p>
+<h4 id="account-representation">
+<a href="#account-representation" class="anchor-link"></a> Account Representation
+</h4>
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>account = [nonce, balance, storageroot, codehash, rentbalance, rentblock, storagesize]
+</code></pre></div></div>
+<p>Each account gets three additional properties: <code class="language-plaintext highlighter-rouge">rentbalance</code>, <code class="language-plaintext highlighter-rouge">rentblock</code> and
+<code class="language-plaintext highlighter-rouge">storagesize</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">rentbalace</code> field tracks the amount of <code class="language-plaintext highlighter-rouge">rent balance</code> available to the account. Upon
+self-destruction any remaining <code class="language-plaintext highlighter-rouge">rent balance</code> is transferred to the beneficiary. Any
+modification of the account recomputes its current <code class="language-plaintext highlighter-rouge">rent balance</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">rentblock</code> field tracks the block number in which the <code class="language-plaintext highlighter-rouge">rent balance</code> was last
+recomputed. Upon creation, this field is initialized with the current block number.
+<code class="language-plaintext highlighter-rouge">rentblock</code> is also updated with the current block number whenever the account is
+modified.</p>
+<p>The <code class="language-plaintext highlighter-rouge">storagesize</code> field tracks the amount of storage related to the account. It is a
+number containing the number of storage slots currently set. The <code class="language-plaintext highlighter-rouge">storagesize</code> of an
+inactive account is zero.</p>
+<h3 id="charging-rent">
+<a href="#charging-rent" class="anchor-link"></a> Charging Rent
+</h3>
+<p>There is a new protocol constant <code class="language-plaintext highlighter-rouge">MAX_STORAGE_SIZE</code> that specifies the upper bound on the
+number of state tree nodes:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">MAX_STORAGE_SIZE</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">32</span> <span class="c1"># ~160GB of state
+</span></code></pre></div></div>
+<p>A ‘storage fee factor’ for each block is derived from this constant such that fees
+increase as the limit is approached.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">storagefee_factor</span><span class="p">(</span><span class="n">block</span><span class="p">):</span>
+    <span class="n">ramp</span> <span class="o">=</span> <span class="n">MAX_STORAGE_SIZE</span> <span class="o">/</span> <span class="p">(</span><span class="n">MAX_STORAGE_SIZE</span> <span class="o">-</span> <span class="n">total_storage_size</span><span class="p">(</span><span class="n">block</span><span class="p">))</span>
+    <span class="k">return</span> <span class="mi">2</span><span class="o">**</span><span class="mi">22</span> <span class="o">*</span> <span class="n">ramp</span>
+</code></pre></div></div>
+<p>When a block is processed, <code class="language-plaintext highlighter-rouge">rent</code> is deducted from all accounts modified by transactions in
+the block after the transactions have been processed. The amount due for each account is
+based on the account’s storage size.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">rent</span><span class="p">(</span><span class="n">prestate</span><span class="p">,</span> <span class="n">poststate</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">currentblock</span><span class="p">):</span>
+    <span class="n">fee</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">prestate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">rentblock</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">currentblock</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">fee</span> <span class="o">+=</span> <span class="n">storagefee_factor</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">prestate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">storagesize</span>
+    <span class="k">return</span> <span class="n">fee</span> <span class="o">+</span> <span class="n">storagefee_factor</span><span class="p">(</span><span class="n">currentblock</span><span class="p">)</span> <span class="o">*</span> <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">storagesize</span>
+
+<span class="k">def</span> <span class="nf">charge_rent</span><span class="p">(</span><span class="n">prestate</span><span class="p">,</span> <span class="n">poststate</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">currentblock</span><span class="p">):</span>
+    <span class="n">fee</span> <span class="o">=</span> <span class="n">rent</span><span class="p">(</span><span class="n">prestate</span><span class="p">,</span> <span class="n">poststate</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">currentblock</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fee</span> <span class="o">&lt;=</span> <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">rentbalance</span><span class="p">:</span>
+        <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">rentbalance</span> <span class="o">-=</span> <span class="n">fee</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fee</span> <span class="o">-=</span> <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">rentbalance</span>
+        <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">rentbalance</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">balance</span> <span class="o">-=</span> <span class="nb">min</span><span class="p">(</span><span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">balance</span><span class="p">,</span> <span class="n">fee</span><span class="p">)</span>
+    <span class="n">poststate</span><span class="p">[</span><span class="n">addr</span><span class="p">].</span><span class="n">rentblock</span> <span class="o">=</span> <span class="n">currentblock</span>
+</code></pre></div></div>
+<h3 id="new-evm-opcodes">
+<a href="#new-evm-opcodes" class="anchor-link"></a> New EVM Opcodes
+</h3>
+<h4 id="payrent-amount-addr">
+<a href="#payrent-amount-addr" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">PAYRENT &lt;amount&gt; &lt;addr&gt;</code>
+</h4>
+<p>At any time, the <code class="language-plaintext highlighter-rouge">rent balance</code> of an account may be topped up by the <code class="language-plaintext highlighter-rouge">PAYRENT</code> opcode.
+<code class="language-plaintext highlighter-rouge">PAYRENT</code> deducts the given amount of <code class="language-plaintext highlighter-rouge">ether</code> from the account executing the opcode and adds
+it to the <code class="language-plaintext highlighter-rouge">rent balance</code> of the address specified as beneficiary.</p>
+<p>Any participant can pay the rent for any other participant.</p>
+<p>Gas cost: TBD</p>
+<h4 id="rentbalance-addr">
+<a href="#rentbalance-addr" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">RENTBALANCE &lt;addr&gt;</code>
+</h4>
+<p>The <code class="language-plaintext highlighter-rouge">rent balance</code> of an account may be queried through the <code class="language-plaintext highlighter-rouge">RENTBALANCE</code> opcode. It pushes the
+<code class="language-plaintext highlighter-rouge">rentbalance</code> field of the given address to the stack.</p>
+<p>Gas cost: like <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code>.</p>
+<h4 id="ssize-addr">
+<a href="#ssize-addr" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">SSIZE &lt;addr&gt;</code>
+</h4>
+<p>This opcode pushes the <code class="language-plaintext highlighter-rouge">storagesize</code> field of the given account to the stack.</p>
+<p>Gas cost: like <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code>.</p>
+<h4 id="restoreto-addr-codeaddr">
+<a href="#restoreto-addr-codeaddr" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">RESTORETO &lt;addr&gt; &lt;codeaddr&gt;</code>
+</h4>
+<p>This opcode restores the inactive account at the given address. This is a bit like
+<code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> but has more specific semantics.</p>
+<p>The account at <code class="language-plaintext highlighter-rouge">addr</code> must be <code class="language-plaintext highlighter-rouge">inactive</code> (i.e. have <code class="language-plaintext highlighter-rouge">storagesize</code> zero) and its
+<code class="language-plaintext highlighter-rouge">storageroot</code> must match the <code class="language-plaintext highlighter-rouge">storageroot</code> of the contract executing <code class="language-plaintext highlighter-rouge">RESTORETO</code>. The
+<code class="language-plaintext highlighter-rouge">codeaddr</code> specifies the address of a contract from which code is taken. The code of the
+<code class="language-plaintext highlighter-rouge">codeaddr</code> account must match the <code class="language-plaintext highlighter-rouge">codehash</code> of <code class="language-plaintext highlighter-rouge">addr</code>.</p>
+<p>If all these preconditions are met, <code class="language-plaintext highlighter-rouge">RESTORETO</code> transfers the storage of the account
+executing the opcode to <code class="language-plaintext highlighter-rouge">addr</code> and resets its <code class="language-plaintext highlighter-rouge">storagesize</code> to the full size of the
+storage. The code of <code class="language-plaintext highlighter-rouge">addr</code> is restored as well. <code class="language-plaintext highlighter-rouge">RESTORETO</code> also transfers any remaining
+balance and rent balance to <code class="language-plaintext highlighter-rouge">addr</code>. The contract executing <code class="language-plaintext highlighter-rouge">RESTORETO</code> is deleted.</p>
+<p>Gas cost: TBD</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="why-do-we-need-a-separate-rent-balance">
+<a href="#why-do-we-need-a-separate-rent-balance" class="anchor-link"></a> Why do we need a separate rent balance?
+</h3>
+<p>Accounts need a separate rent balance because some contracts are non-payable, i.e. they
+reject regular value transfers. Such contracts might not be able to keep themselves alive,
+but users of those contracts can keep them alive by paying rent for them.</p>
+<p>Having the additional balance also makes things easier for contracts that hold balance on
+behalf of a user. Consider the canonical crowdfunding example, a contract which changes
+behavior once a certain balance is reached and which tracks individual user’s balances.
+Deducting rent from the main balance of the contract would mess up the contract’s
+accounting, leaving it unable to pay back users accurately if the threshold balance isn’t
+reached.</p>
+<h3 id="why-restoration">
+<a href="#why-restoration" class="anchor-link"></a> Why restoration?
+</h3>
+<p>One of the fundamental guarantees provided by Ethereum is that changes to contract storage
+can only be made by the contract itself and storage will persist forever. If you hold a
+token balance in a contract, you’ll have those tokens forever. By adding restoration, we
+can maintain this guarantee to a certain extent.</p>
+<h3 id="implementation-impact">
+<a href="#implementation-impact" class="anchor-link"></a> Implementation Impact
+</h3>
+<p>The proposed changes tries to fit within the existing state transition model. Note that
+there is no mechanism for deactivating accounts the moment they can’t pay rent. Users must
+touch accounts to ensure their storage is removed because we’d need to track all accounts
+and their rent requirements in an auxlilary data structure otherwise.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>TBA</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TBA</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>TBA</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/fjl">Felix J Lange</a>, <a href="https://github.com/holiman">Martin Holst Swende</a>, "EIP-1682: Storage Rent [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1682, November 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1682.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1682: Storage Rent [DRAFT]",
+    "author": "Felix J Lange (@fjl), Martin Holst Swende (@holiman)",
+    "name": "EIP-1682: Storage Rent [DRAFT]",
+    "dateCreated": "2018-11-10",
+    "datePublished": "2018-11-10",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/storage-rent-eip/2357",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3076: Slashing Protection Interchange Format</title>
+<meta property="og:title" content="EIP-3076: Slashing Protection Interchange Format" />
+<meta name="description" content="A JSON interchange format for proof of stake validators to migrate slashing protection data between clients." />
+<meta property="og:description" content="A JSON interchange format for proof of stake validators to migrate slashing protection data between clients." />
+<meta name="twitter:description" content="A JSON interchange format for proof of stake validators to migrate slashing protection data between clients." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3076" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3076" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3076: Slashing Protection Interchange Format
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3076.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A JSON interchange format for proof of stake validators to migrate slashing protection data between clients.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/michaelsproul">Michael Sproul</a>, <a href="https://github.com/sachayves">Sacha Saint-Leger</a>, <a href="https://github.com/djrtwo">Danny Ryan</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3076-validator-client-interchange-format-slashing-protection/">https://ethereum-magicians.org/t/eip-3076-validator-client-interchange-format-slashing-protection/</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2021-11-03</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-10-27</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#json-schema">JSON Schema</a></li>
+<li><a href="#example-json-instance">Example JSON Instance</a></li>
+<li><a href="#conditions">Conditions</a></li>
+<li><a href="#additional-information">Additional Information</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#supporting-different-strategies">Supporting Different Strategies</a></li>
+<li><a href="#integer-representation">Integer Representation</a></li>
+<li><a href="#versioning">Versioning</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#advice-for-complete-databases">Advice for Complete Databases</a></li>
+<li><a href="#advice-for-minimal-databases">Advice for Minimal Databases</a></li>
+<li><a href="#general-recommendations">General Recommendations</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>A standard format for transferring a key’s signing history allows validators to easily switch between clients without the risk of signing conflicting messages. While a <a href="https://eips.ethereum.org/EIPS/eip-2335">common keystore format</a> provides part of the solution, it does not contain any information about a key’s signing history. For a validator moving their keys from client A to client B, this could lead to scenarios in which client B inadvertently signs a message that conflicts with an earlier message signed with client A. The interchange format described here provides a solution to this problem.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The proof of stake (PoS) protocol penalises validators for voting in ways that could result in two different versions of the chain being finalised. These types of penalties are called slashings.</p>
+<p>For a validator following the protocol correctly, there is, in principle, no risk of being slashed. However, changing clients (from client A to client B, say) can result in a slashing risk if client B is unaware of the blocks and attestations that were signed with client A.</p>
+<p>This can can occur if client A and client B do not agree on what the present time is. For example, say client A’s time is accidentally set to a day in the future (225 epochs), and a validator switches from client A to client B without giving B a record of the blocks and attestations signed with A. The validator in question now runs the risk of attesting to two different blocks in the same epoch (a slashable offence) for the next 225 epochs (since they’ve already voted on these epochs with client A, and now stand to vote on them again with client B). Such time-skew bugs have been observed in the wild.</p>
+<p>Another situation in which slashing protection is critical is in the case of re-orgs. During a re-org it is possible for a validator to be assigned new attestation duties for an epoch in which it has already signed an attestation. In this case it is essential that the record of the previous attestation is available, even if the validator just moved from one client to another in the space of a single epoch.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="json-schema">
+<a href="#json-schema" class="anchor-link"></a> JSON Schema
+</h3>
+<p>A valid interchange file is one that adheres to the following JSON schema, and is interpreted according to the <a href="#conditions">Conditions</a>.</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Signing history"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"This schema provides a record of the blocks and attestations signed by a set of validators"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"interchange_format_version"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The version of the interchange format that this document adheres to"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"genesis_validators_root"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Calculated at Genesis time; serves to uniquely identify the chain"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"interchange_format_version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"genesis_validators_root"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"pubkey"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The BLS public key of the validator (encoded as a 0x-prefixed hex string)"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"signed_blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="p">{</span><span class="w">
+                  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="nl">"slot"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+                      </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The slot number of the block that was signed"</span><span class="w">
+                    </span><span class="p">},</span><span class="w">
+                    </span><span class="nl">"signing_root"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+                      </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The output of compute_signing_root(block, domain)"</span><span class="w">
+                    </span><span class="p">}</span><span class="w">
+                  </span><span class="p">},</span><span class="w">
+                  </span><span class="nl">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                    </span><span class="s2">"slot"</span><span class="w">
+                  </span><span class="p">]</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+              </span><span class="p">]</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"signed_attestations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="p">{</span><span class="w">
+                  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+                  </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="nl">"source_epoch"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+                      </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The attestation.data.source.epoch of the signed attestation"</span><span class="w">
+                    </span><span class="p">},</span><span class="w">
+                    </span><span class="nl">"target_epoch"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+                      </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The attestation.data.target.epoch of the signed attestation"</span><span class="w">
+                    </span><span class="p">},</span><span class="w">
+                    </span><span class="nl">"signing_root"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                      </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+                      </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The output of compute_signing_root(attestation, domain)"</span><span class="w">
+                    </span><span class="p">}</span><span class="w">
+                  </span><span class="p">},</span><span class="w">
+                  </span><span class="nl">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                    </span><span class="s2">"source_epoch"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"target_epoch"</span><span class="w">
+                  </span><span class="p">]</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+              </span><span class="p">]</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+          </span><span class="p">},</span><span class="w">
+          </span><span class="nl">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="s2">"pubkey"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"signed_blocks"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"signed_attestations"</span><span class="w">
+          </span><span class="p">]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"metadata"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"data"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h3 id="example-json-instance">
+<a href="#example-json-instance" class="anchor-link"></a> Example JSON Instance
+</h3>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"interchange_format_version"</span><span class="p">:</span><span class="w"> </span><span class="s2">"5"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"genesis_validators_root"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x04700007fabc8282644aed6d1c7c9e21d38a03a0c4ba193f3afe428824b3a673"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"pubkey"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xb845089a1457f811bfc000588fbb4e713669be8ce060ea6be3c6ece09afc3794106c91ca73acda5e5457122d58723bed"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"signed_blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"slot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"81952"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"signing_root"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x4ff6f743a43f3b4f95350831aeaf0a122a1a392922c45d804280284a69eb850b"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"slot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"81951"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"signed_attestations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"source_epoch"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2290"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"target_epoch"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3007"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"signing_root"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x587d6a4f59a58fe24f406e0502413e77fe1babddee641fda30034ed37ecc884d"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"source_epoch"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2290"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"target_epoch"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3008"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h3 id="conditions">
+<a href="#conditions" class="anchor-link"></a> Conditions
+</h3>
+<p>After importing an interchange file with data field <code class="language-plaintext highlighter-rouge">data</code>, a signer must respect the following conditions:</p>
+<ol>
+<li>
+<p>Refuse to sign any block that is slashable with respect to the blocks contained in <code class="language-plaintext highlighter-rouge">data.signed_blocks</code>. For details of what constitutes a slashable block, see <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#proposer-slashings">process_proposer_slashing</a>. If the <code class="language-plaintext highlighter-rouge">signing_root</code> is absent from a block, a signer must assume that any new block with the same <code class="language-plaintext highlighter-rouge">slot</code> is slashable with respect to the imported block.</p>
+</li>
+<li>
+<p>Refuse to sign any block with <code class="language-plaintext highlighter-rouge">slot &lt;= min(b.slot for b in data.signed_blocks if b.pubkey == proposer_pubkey)</code>, except if it is a repeat signing as determined by the <code class="language-plaintext highlighter-rouge">signing_root</code>.</p>
+</li>
+<li>Refuse to sign any attestation that is slashable with respect to the attestations contained in <code class="language-plaintext highlighter-rouge">data.signed_attestations</code>. For details of what constitutes a slashable attestation, see <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#is_slashable_attestation_data">is_slashable_attestation_data</a>.</li>
+<li>Refuse to sign any attestation with source epoch less than the minimum source epoch present in that signer’s attestations (as seen in <code class="language-plaintext highlighter-rouge">data.signed_attestations</code>). In pseudocode:
+<pre><code class="language-python3">source.epoch &lt;
+ min(att.source_epoch
+     for att in data.signed_attestations
+     if att.pubkey == attester_pubkey)
+</code></pre>
+</li>
+<li>Refuse to sign any attestation with target epoch less than or equal to the minimum target epoch present in that signer’s attestations (as seen in <code class="language-plaintext highlighter-rouge">data.signed_attestations</code>). In pseudocode:</li>
+</ol>
+<pre><code class="language-python3">target_epoch &lt;=
+    min(att.target_epoch
+        for att in data.signed_attestations
+        if att.pubkey == attester_pubkey)
+</code></pre>
+<h3 id="additional-information">
+<a href="#additional-information" class="anchor-link"></a> Additional Information
+</h3>
+<ul>
+<li>
+<p>The <code class="language-plaintext highlighter-rouge">interchange_format_version</code> version is set to 5.</p>
+</li>
+<li>
+<p>A signed block or attestation’s <code class="language-plaintext highlighter-rouge">signing_root</code> refers to the message data (hash tree root) that gets signed with a BLS signature. It allows validators to re-sign and re-broadcast blocks or attestations if asked.</p>
+</li>
+<li>
+<p>The <code class="language-plaintext highlighter-rouge">signed_blocks</code> <code class="language-plaintext highlighter-rouge">signing_root</code>s are calculated using <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#compute_signing_root"><code class="language-plaintext highlighter-rouge">compute_signing_root(block, domain)</code></a>: where <code class="language-plaintext highlighter-rouge">block</code> is the block (of type <code class="language-plaintext highlighter-rouge">BeaconBlock</code> or <code class="language-plaintext highlighter-rouge">BeaconBlockHeader</code>) that was signed, and <code class="language-plaintext highlighter-rouge">domain</code> is equal to <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#compute_domain"><code class="language-plaintext highlighter-rouge">compute_domain(DOMAIN_BEACON_PROPOSER, fork, metadata.genesis_validators_root)</code></a>.</p>
+</li>
+<li>
+<p>The <code class="language-plaintext highlighter-rouge">signed_attestations</code> <code class="language-plaintext highlighter-rouge">signing_root</code>s are calculated using <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#compute_signing_root"><code class="language-plaintext highlighter-rouge">compute_signing_root(attestation, domain)</code></a>: where <code class="language-plaintext highlighter-rouge">attestation</code> is the attestation (of type <code class="language-plaintext highlighter-rouge">AttestationData</code>) that was signed, and <code class="language-plaintext highlighter-rouge">domain</code> is equal to <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#compute_domain"><code class="language-plaintext highlighter-rouge">compute_domain(DOMAIN_BEACON_ATTESTER, fork, metadata.genesis_validators_root)</code></a>.</p>
+</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="supporting-different-strategies">
+<a href="#supporting-different-strategies" class="anchor-link"></a> Supporting Different Strategies
+</h3>
+<p>The interchange format is designed to be flexible enough to support the full variety of slashing protection strategies that clients may implement, which may be categorised into two main types:</p>
+<ol>
+<li><strong>Complete</strong>: a database containing every message signed by each validator.</li>
+<li><strong>Minimal</strong>: a database containing only the latest messages signed by each validator.</li>
+</ol>
+<p>The advantage of the minimal strategy is its simplicity and succinctness. Using only the latest messages for each validator, safe slashing protection can be achieved by refusing to sign messages for slots or epochs prior.</p>
+<p>On the other hand, the complete strategy can provide safe slashing protection while also avoiding false positives (meaning that it only prevents a validator from signing if doing so would guarantee a slashing).</p>
+<p>The two strategies are unified in the interchange format through the inclusion of <a href="#conditions">conditions</a> (2), (4) and (5). This allows the interchange to transfer detailed or succinct information, as desired.</p>
+<h3 id="integer-representation">
+<a href="#integer-representation" class="anchor-link"></a> Integer Representation
+</h3>
+<p>Most fields in the JSON schema are strings. For fields in which it is possible to encode the value as either a string or an integer, strings were chosen. This choice was made in order to avoid issues with different languages supporting different ranges of integers (specifically JavaScript, where the <code class="language-plaintext highlighter-rouge">number</code> type is a 64-bit float). If a validator is yet to sign a block or attestation, the relevant list is simply left empty.</p>
+<h3 id="versioning">
+<a href="#versioning" class="anchor-link"></a> Versioning
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">interchange_format_version</code> is set to 5 because the specification went through several breaking changes during its design, incorporating feedback from implementers.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This specification is not backwards-compatible with previous draft versions that used version numbers less than 5.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>In order to minimise risk and complexity, the format has been designed to map cleanly onto the internal database formats used by implementers. Nevertheless, there are a few pitfalls worth illuminating.</p>
+<h3 id="advice-for-complete-databases">
+<a href="#advice-for-complete-databases" class="anchor-link"></a> Advice for Complete Databases
+</h3>
+<p>For implementers who use a complete record of signed messages to implement their slashing protection database, we make the following recommendations:</p>
+<ul>
+<li>You MUST ensure that, in addition to importing all of the messages from an interchange, all the <a href="#conditions">conditions</a> are enforced. In particular, conditions (2), (4) and (5) may not have been enforced by your implementation before adopting the interchange format. Our recommendation is to enforce these rules at all times, to keep the implementation clean and minimise the attack surface. For example: your slashing protection mechanism should not sign a block with a slot number less than, or equal to, the minimum slot number of a previously signed block, <em>irrespective</em> of whether that minimum-slot block was imported from an interchange file, or inserted as part of your database’s regular operation.</li>
+<li>If your database records the signing roots of messages in addition to their slot/epochs, you should ensure that imported messages without signing roots are assigned a suitable dummy signing root internally. We suggest using a special “null” value which is distinct from all other signing roots, although a value like <code class="language-plaintext highlighter-rouge">0x0</code> may be used instead (as it is extremely unlikely to collide with any real signing root).</li>
+<li>Care must be taken to avoid signing messages within a gap in the database (an area of unknown signing activity). This could occur if two interchanges were imported with a large gap between the last entry of the first and the first entry of the second. Signing in this gap is not safe, and would violate conditions (2), (4) and (5). It can be avoided by storing an explicit low watermark in addition to the actual messages of the slashing protection database, or by pruning on import so that the oldest messages from the interchange become the oldest messages in the database.</li>
+</ul>
+<h3 id="advice-for-minimal-databases">
+<a href="#advice-for-minimal-databases" class="anchor-link"></a> Advice for Minimal Databases
+</h3>
+<p>For implementers who wish to implement their slashing protection database by storing only the latest block and attestation for each validator, we make the following recommendations:</p>
+<ul>
+<li>During import, make sure you take the <em>maximum</em> slot block and <em>maximum</em> source and target attestations for each validator. Although the <a href="#conditions">conditions</a> require the minimums to be enforced, taking the maximums from an interchange file and merging them with any existing values in the database is the recommended approach. For example, if the interchange file includes blocks for validator <code class="language-plaintext highlighter-rouge">V</code> at slots 4, 98 and 243, then the latest signed block for validator <code class="language-plaintext highlighter-rouge">V</code> should be updated to the one from slot 243. However, if the database has already included a block for this validator at a slot greater than 243, for example, slot 351, then the database’s existing value should remain unchanged.</li>
+</ul>
+<h3 id="general-recommendations">
+<a href="#general-recommendations" class="anchor-link"></a> General Recommendations
+</h3>
+<ul>
+<li>To avoid exporting an outdated interchange file – an action which creates a slashing risk – your implementation should only allow the slashing protection database to be exported when the validator client or signer is <em>stopped</em> – in other words, when the client or signer is no longer adding new messages to the database.</li>
+<li>Similarly, your implementation should only allow an interchange file to be imported when the validator client is stopped.</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/michaelsproul">Michael Sproul</a>, <a href="https://github.com/sachayves">Sacha Saint-Leger</a>, <a href="https://github.com/djrtwo">Danny Ryan</a>, "EIP-3076: Slashing Protection Interchange Format [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3076, October 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3076.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3076: Slashing Protection Interchange Format [DRAFT]",
+    "author": "Michael Sproul (@michaelsproul), Sacha Saint-Leger (@sachayves), Danny Ryan (@djrtwo)",
+    "name": "EIP-3076: Slashing Protection Interchange Format [DRAFT]",
+    "dateCreated": "2020-10-27",
+    "datePublished": "2020-10-27",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3076-validator-client-interchange-format-slashing-protection/",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

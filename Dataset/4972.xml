@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4972: Name-Owned Account</title>
+<meta property="og:title" content="EIP-4972: Name-Owned Account" />
+<meta name="description" content="Name-Owned Account for Social Identity" />
+<meta property="og:description" content="Name-Owned Account for Social Identity" />
+<meta name="twitter:description" content="Name-Owned Account for Social Identity" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4972" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4972" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4972: Name-Owned Account
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4972.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Name-Owned Account for Social Identity</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/qizhou">Qi Zhou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4972-name-owned-account/8822">https://ethereum-magicians.org/t/eip-4972-name-owned-account/8822</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-04-04</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-20">20</a>,
+<a href="eip-721">721</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#name-owned-account">Name-Owned Account</a></li>
+<li><a href="#name-representation">Name Representation</a></li>
+<li><a href="#interface">Interface</a></li>
+<li><a href="#authentication">Authentication</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a>
+<ul>
+<li><a href="#name-format">Name Format</a></li>
+<li><a href="#name-derived-address-inameownedaccountaddressofname">Name Derived Address (INameOwnedAccount.addressOfName())</a></li>
+<li><a href="#ownership-of-a-name-inameownedaccountisnameowner">Ownership of a Name (INameOwnedAccount.isNameOwner())</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This ERC proposes a new type of account - name-owned account (NOA) that is controlled by the owner of the name besides existing externally-owned account (EOA) and contract account (CA). With the new account type, users will be able to transfer/receive tokens using the name-derived address directly instead of the address of the name owner. A NOA can be as a social identity with all states on-chain even under 3rd-party or self custody. It also simplifies porting the social identity from one custody to another.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>A popular way to onboard Web2 users to the Web3 world is custody. However, current custody models have severe drawbacks. Considering the following widely adopted custody models:</p>
+<ol>
+<li>The custodian uses one EOA/CA to hold the assets of all users. This is not compatible with on-chain social protocols since all user activities are off-chain.</li>
+<li>One EOA per user. The social identity is not portable, which means there is no way for users to migrate their social identity across different custody platforms.</li>
+<li>One CA (e.g. Gnosis Safe) per user. The one time deployment cost is super high and the user experience is not good.</li>
+</ol>
+<p>To solve all these problems, this ERC proposes a new type of account - name-owned account (NOA). Using NOA as social identity instead of EOA/CA brings huge benefits for users:</p>
+<ul>
+<li><strong>Easy Web2 user onboarding</strong>. We are providing standard Web2 user experiences with human readable names and 3rd-party custody. Every user of a centralized platform can immediately have a NOA by using the username as the name of NOA custodied by the platform.</li>
+<li><strong>On-chain states</strong>. All user states are on-chain even under custody so it’s 100% compatible with social protocols.</li>
+<li><strong>Portable Account</strong>. A NOA can be easily ported to different custody platforms by changing the owner.</li>
+<li><strong>Flexible Account Management</strong>. We can use one EOA/CA to control any number of NOAs.</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="name-owned-account">
+<a href="#name-owned-account" class="anchor-link"></a> Name-Owned Account
+</h3>
+<p>An NOA has</p>
+<ol>
+<li>a name for social identity; and</li>
+<li>an address derived from the name to receive tokens; and</li>
+<li>owner(s) of the name that can transfer the token.</li>
+</ol>
+<p>The name should be human-readable and can be easily recognized socially. An example is the username of a centralized platform such as FB, Twitter. The name-derived address (NDA) is a normal Ethereum address that should not collide with the existing addresses of EOA/CA. Since we cannot use NDA as msg.sender, the right to transfer the tokens of the NDA is controlled by the owner/owners of the name. The name to owner/owners mapping is managed by an on-chain name service, and the owner/owners are EOA/CA, which can be the addresses of 3-rd custodians (e.g. FB) or self-custodian. By changing the owner of the name to the EOA of the user (can be done by requesting the custodian), the NDA becomes self-custodian, and no one should be able to transfer the assets unless the approved by the self-custodian user.</p>
+<h3 id="name-representation">
+<a href="#name-representation" class="anchor-link"></a> Name Representation
+</h3>
+<p>A name is represented by a bytes array which is ABI encoded. It <strong>MAY</strong> contain metadata of the name such as the name service the name belongs to. Examples of the name are “vitalik.eth”, “<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="92e4fbe6f3fefbf9d2a2eaa2a2a2a2a2a2a2a2a2a2a2d1a0d7a2a5a6f7d1a4abd3a2f6d4f0a0ababa5d0d3a4d1a5f6a0f7a3f7">[email&#160;protected]</a>”, or “qizhou.fb”.</p>
+<h3 id="interface">
+<a href="#interface" class="anchor-link"></a> Interface
+</h3>
+<h4 id="inameownedaccount">
+<a href="#inameownedaccount" class="anchor-link"></a> INameOwnedAccount
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>interface INameOwnedAccount {
+    /// @notice This function resolves the _name to its derived address
+    /// @dev The implementation SHOULD avoid collision between name 
+    /// derived address and EOA/CA
+    function addressOfName(bytes memory _name) public view returns(address);
+
+    /// @notice This function returns true if and only if the operator is the owner of the _name
+    /// @dev The ownership MAY be defined by a name service such as ENS
+    function isNameOwner(bytes memory _from, address operator) public view returns(bool);
+}
+</code></pre></div></div>
+<h4 id="ierc721noa">
+<a href="#ierc721noa" class="anchor-link"></a> IERC721NOA
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>interface IERC721NOA is IERC721, INameOwnedAccount  {
+    /// @notice Transfers the ownership of an NFT from a name to an address
+    /// @dev Throws unless `msg.sender` is the owner of _from. Throw if _from is
+    ///  not the current owner. Throws if `_to` is the zero address. Throws if
+    ///  `_tokenId` is not a valid NFT. When transfer is complete, this function
+    ///  checks if `_to` is a smart contract (code size &gt; 0). If so, it calls
+    ///  `onERC721Received` on `_to` and throws if the return value is not
+    ///  `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
+    function safeTransferFromName(bytes memory _from, address _to, uint256 _tokenId, bytes _data) public returns(bool);
+
+   /// @notice Transfers the ownership of an NFT from a name to another address
+    /// @dev This works identically to the other function with an extra data parameter,
+    ///  except this function just sets data to "".
+    function safeTransferFromName(bytes memory _from, address _to, uint256 _tokenId) public returns(bool);
+
+    /// @notice Change or reaffirm the approved address for an NFT
+    /// @dev The zero address indicates there is no approved address.
+    ///  Throws unless `msg.sender` is the owner of _owner. Throw if _owner is not
+    ///  the current owner.
+    function approveFromName(bytes memory _owner, address _operator, uint256 _tokenId) public returns(bool);
+
+    /// @notice Enable or disable approval for a third party ("operator") to manage
+    ///  all of _owner’s assets
+    /// @dev Throws unless `msg.sender` is the owner of _owner. Throw if _owner is not
+    ///  the current owner. Emits the ApprovalForAll event. The contract MUST allow
+    ///  multiple operators per owner.
+    function setApprovalForAllFromName(bytes memory _owner, address _operator, bool _approved) public returns(bool);
+    
+    /// @notice This function returns true if interfaceId is the id of IERC721NOA
+    /// @dev see {IERC165-supportsInterface}
+    function supportsInterface(bytes4 interfaceId) external view returns(bool);
+}
+</code></pre></div></div>
+<h4 id="ierc20noa">
+<a href="#ierc20noa" class="anchor-link"></a> IERC20NOA
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>interface IERC20NOA is IERC20, INameOwnedAccount {
+    /// @notice Transfers _value amount of tokens from name  _from to address _to, 
+    /// @dev Throws unless `msg.sender` is the owner of _owner. Throw if _owner is not
+    ///  the current owner. Throw if the balance of _from does not have enough tokens to 
+    ///  spend. Emits the Transfer event.  
+    function transferFromName(bytes memory _from, address _to, uint256 _value) public returns(bool);
+
+    /// @notice Allows _spender to withdraw from _owner multiple times, up to
+    ///  the _value amount.
+    ///  @dev Throws unless `msg.sender` is the owner of _owner. Throw if _owner is 
+    ///  not the current owner. If this function is called again it overwrites the current
+    ///  allowance with _value.
+    function approveFromName(bytes memory _owner, address _spender, uint256 _value) public returns(bool);
+    
+    /// @notice This function returns true if interfaceId is the id of IERC721NOA
+    /// @dev see {IERC165-supportsInterface}
+    function supportsInterface(bytes4 interfaceId) external view returns(bool);
+}
+</code></pre></div></div>
+<h3 id="authentication">
+<a href="#authentication" class="anchor-link"></a> Authentication
+</h3>
+<p>The transfer and approve function is authenticated if and only if the message sender is the owner of the name.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>We use bytes array to represent a name to ensure it’s flexible enough to deal with different use cases. E.g. one can encode the name service contract address the name belongs to into the bytes array. One can also encode extra authentication data, such as zero knowledge proofs, into the bytes array. In the future, we may propose a standard to formalize the name for wider adoption.</p>
+<p>The isNameOwner function is sufficient for authenticating the message sender. One can verify the owner by looking up the name owner from a name service, or check zero knowledge proofs encoded in name to prove the ownership directly without looking up anything.</p>
+<p>The addressOfName interface decouples the implementation from specific hashing algorithms, as long as the generated address doesn’t collide with EOA/CA address space.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The new account type is compatible with existing ERC token standards.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<h3 id="name-format">
+<a href="#name-format" class="anchor-link"></a> Name Format
+</h3>
+<p>The decoded format of bytes name is not defined at this standard. One straightforward implementation would be:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bytes memory name = abi.encode((string, ‘address’), (username, nameService))
+</code></pre></div></div>
+<p>where the username is the string representation of the username and nameService is the name service contract address. This will decouple the implementation from specific name services such as ENS.</p>
+<h3 id="name-derived-address-inameownedaccountaddressofname">
+<a href="#name-derived-address-inameownedaccountaddressofname" class="anchor-link"></a> Name Derived Address (INameOwnedAccount.addressOfName())
+</h3>
+<p>With the bytes format mentioned above, we can follow the similar rule of CREATE2 opcode to compute the NOA address from nameService and hash of the username as <code class="language-plaintext highlighter-rouge">address(keccak256(0xff, keccak256(“eip-4972.addressOfName”), nameService, keccak256(username)))</code>. This can ensure it won’t collide with existing smart contract account addresses.</p>
+<h3 id="ownership-of-a-name-inameownedaccountisnameowner">
+<a href="#ownership-of-a-name-inameownedaccountisnameowner" class="anchor-link"></a> Ownership of a Name (INameOwnedAccount.isNameOwner())
+</h3>
+<p>Normally we can get the owner from the name service and compare it with the message sender. We recommend the name service to define an owner function in the same format as ENS.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>No security considerations were found.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/qizhou">Qi Zhou</a>, "EIP-4972: Name-Owned Account [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4972, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4972.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4972: Name-Owned Account [DRAFT]",
+    "author": "Qi Zhou (@qizhou)",
+    "name": "EIP-4972: Name-Owned Account [DRAFT]",
+    "dateCreated": "2022-04-04",
+    "datePublished": "2022-04-04",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4972-name-owned-account/8822",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

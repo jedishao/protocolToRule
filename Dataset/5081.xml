@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5081: Expirable Trainsaction</title>
+<meta property="og:title" content="EIP-5081: Expirable Trainsaction" />
+<meta name="description" content="This EIP adds a new transaction type of that includes expiration with a blocknum" />
+<meta property="og:description" content="This EIP adds a new transaction type of that includes expiration with a blocknum" />
+<meta name="twitter:description" content="This EIP adds a new transaction type of that includes expiration with a blocknum" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5081" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5081" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5081: Expirable Trainsaction
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5081.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>This EIP adds a new transaction type of that includes expiration with a blocknum</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a>, <a href="https://github.com/Arachnid">Nick Johnson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-5081-expirable-transaction/9208">https://ethereum-magicians.org/t/eip-5081-expirable-transaction/9208</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2022-05-06</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-155">155</a>,
+<a href="eip-1559">1559</a>,
+<a href="eip-2718">2718</a>,
+<a href="eip-2929">2929</a>,
+<a href="eip-2930">2930</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP adds a new transaction type of that includes expiration with a blocknum.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>When a user sends a transaction <code class="language-plaintext highlighter-rouge">tx0</code> with a low gas price, sometimes it might not be high enough to be executed.
+A common resolution is for the user to submit the transaction again with the same nonce and higher gas price.</p>
+<p>That previous <code class="language-plaintext highlighter-rouge">tx0</code> can theoretically be included in any time in the future unless a <code class="language-plaintext highlighter-rouge">tx</code> with the exact same nonce is already executed.</p>
+<p>When network is congested, gas price are high, for critical transactions user might try gas price that is much higher than an average day.
+This cause the <code class="language-plaintext highlighter-rouge">tx0</code> choose might be very easy to executed in the average day.</p>
+<p>If user already uses a <code class="language-plaintext highlighter-rouge">tx1</code> with different nonce or from another account to execute the intended transaction,
+there is currently no clean way to cancel it,
+except for signing a new <code class="language-plaintext highlighter-rouge">tx0'</code> that shares the same nonce but with higher gas fee hoping that it will execute to <em>preempt</em>- than <code class="language-plaintext highlighter-rouge">tx0</code>.</p>
+<p>Given <code class="language-plaintext highlighter-rouge">tx0</code> was already high gas price, the current way of <em>preempting</em> <code class="language-plaintext highlighter-rouge">tx0</code> could be both unreliable and very costly.</p>
+<p>TODO(@xinbenlv): to include in the motivation:</p>
+<ul>
+<li>
+<p>Expiring transactions are transactions that have low time preference, but can easily become invalid in the future. For example, you may want to do a swap on an AMM but you don’t want to pay a very high fee for it so you set the max fee to a low number. However, your transaction will almost certainly fail if it takes longer than a couple minutes to be mined. In this scenario, you would rather fail cheaply if your transaction doesn’t get included quickly.</p>
+</li>
+<li>
+<p>Similarly, there are situations where there is a limited window of availability of some asset and if your transaction doesn’t mine within that period you know with certainty that it will fail. In these cases, it would be nice to be able to express that to the system and not waste unnecessary resources just to have the transaction fail.</p>
+</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">FORK_BLKNUM</code> = <code class="language-plaintext highlighter-rouge">TBD</code></li>
+<li><code class="language-plaintext highlighter-rouge">CHAIN_ID</code> = <code class="language-plaintext highlighter-rouge">TBD</code></li>
+<li><code class="language-plaintext highlighter-rouge">TX_TYPE</code> = TBD, &gt; 0x02 (EIP-1559)</li>
+</ul>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, a new <a href="/EIPS/eip-2718">EIP-2718</a> transaction is introduced with <code class="language-plaintext highlighter-rouge">TransactionType</code> = <code class="language-plaintext highlighter-rouge">TX_TYPE(TBD)</code>.</p>
+<p>The intrinsic cost of the new transaction is inherited from <a href="/EIPS/eip-2930">EIP-2930</a>, specifically <code class="language-plaintext highlighter-rouge">21000 + 16 * non-zero calldata bytes + 4 * zero calldata bytes + 1900 * access list storage key count + 2400 * access list address count</code>.</p>
+<p>The <a href="/EIPS/eip-2718">EIP-2718</a> <code class="language-plaintext highlighter-rouge">TransactionPayload</code> for this transaction is</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rlp([chain_id, expire_by, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, destination, amount, data, access_list, signature_y_parity, signature_r, signature_s])
+</code></pre></div></div>
+<p>The definition of <code class="language-plaintext highlighter-rouge">expire_by</code> is a block number the latest possible block to
+execute this transaction. Any block with a block number <code class="language-plaintext highlighter-rouge">block_num &gt; expire_by</code> MUST NOT execute this transaction.</p>
+<p>The definitions of all other fields share the same meaning with <a href="https://eips.ethereum.org/EIPS/eip-1559">EIP-1559</a></p>
+<p>The <code class="language-plaintext highlighter-rouge">signature_y_parity, signature_r, signature_s</code> elements of this transaction represent a secp256k1 signature over <code class="language-plaintext highlighter-rouge">keccak256(0x02 || rlp([chain_id, expire_by, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, destination, amount, data, access_list]))</code>.</p>
+<p>The <a href="/EIPS/eip-2718">EIP-2718</a> <code class="language-plaintext highlighter-rouge">ReceiptPayload</code> for this transaction is <code class="language-plaintext highlighter-rouge">rlp([status, cumulative_transaction_gas_used, logs_bloom, logs])</code>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>TODO</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>TODO</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<ol>
+<li>
+<p>If <code class="language-plaintext highlighter-rouge">current_block_num</code> is available, client MUST drop and stop propagating/broadcasting any transactions that has a
+<code class="language-plaintext highlighter-rouge">transacton_type == TX_TYPE</code> AND <code class="language-plaintext highlighter-rouge">current_block_num &gt; expire_by</code></p>
+</li>
+<li>
+<p>It is suggested but not required that a <code class="language-plaintext highlighter-rouge">currentBlockNum</code> SHOULD be made available to client. Any client doing PoW calculation on blocks expire tx or propagating such are essentially penalized for wasting of work, mitigating possible denial of service attack.</p>
+</li>
+<li>
+<p>It is suggested but not required that client SHOULD introduce a
+<code class="language-plaintext highlighter-rouge">gossip_ttl</code> in unit of block_num as a safe net so that it only propagate
+a tx if <code class="language-plaintext highlighter-rouge">current_block_num + gossip_ttl &lt;= expire_by</code>. Backward compatibility:
+for nodes that doesn’t have <code class="language-plaintext highlighter-rouge">current_block_num</code> or <code class="language-plaintext highlighter-rouge">gossip_ttl</code> available,
+they should be presume to be <code class="language-plaintext highlighter-rouge">0</code>.</p>
+</li>
+<li>
+<p>It is suggested by not required that any propagating client SHOULD properly deduct the <code class="language-plaintext highlighter-rouge">gossip_ttl</code>
+based on the network environment it sees fit.</p>
+</li>
+</ol>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a>, <a href="https://github.com/Arachnid">Nick Johnson</a>, "EIP-5081: Expirable Trainsaction [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5081, May 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5081.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5081: Expirable Trainsaction [DRAFT]",
+    "author": "Zainan Victor Zhou (@xinbenlv), Nick Johnson (@Arachnid)",
+    "name": "EIP-5081: Expirable Trainsaction [DRAFT]",
+    "dateCreated": "2022-05-06",
+    "datePublished": "2022-05-06",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-5081-expirable-transaction/9208",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1444: Localized Messaging with Signal-to-Text</title>
+<meta property="og:title" content="EIP-1444: Localized Messaging with Signal-to-Text" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1444" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1444" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1444: Localized Messaging with Signal-to-Text
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1444.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/expede">Brooklyn Zelenka</a>, <a href="https://github.com/jenncoop">Jennifer Cooper</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-1444-localized-messaging-with-signal-to-text/">https://ethereum-magicians.org/t/eip-1444-localized-messaging-with-signal-to-text/</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-09-23</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#contract-architecture">Contract Architecture</a></li>
+<li><a href="#localization">Localization</a></li>
+<li><a href="#localizationpreferences">LocalizationPreferences</a></li>
+<li><a href="#string-format">String Format</a></li>
+<li><a href="#templates">Templates</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#bytes32-keys">bytes32 Keys</a></li>
+<li><a href="#local-vs-globals-and-singletons">Local vs Globals and Singletons</a></li>
+<li><a href="#off-chain-storage">Off Chain Storage</a></li>
+<li><a href="#ascii-vs-utf-8-vs-utf-16">ASCII vs UTF-8 vs UTF-16</a></li>
+<li><a href="#when-no-text-is-found">When No Text is Found</a></li>
+<li><a href="#decentralized-text-crowdsourcing">Decentralized Text Crowdsourcing</a></li>
+<li><a href="#printf-style-format-strings">printf-style Format Strings</a></li>
+<li><a href="#interpolation-strategy">Interpolation Strategy</a></li>
+<li><a href="#unspecified-behaviour">Unspecified Behaviour</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A method of converting machine codes to human-readable text in any language and phrasing.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>An on-chain system for providing user feedback by converting machine-efficient codes into human-readable strings in any language or phrasing. The system does not impose a list of languages, but rather lets users create, share, and use the localizated text of their choice.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There are many cases where an end user needs feedback or instruction from a smart contact. Directly exposing numeric codes does not make for good UX or DX. If Ethereum is to be a truly global system usable by experts and lay persons alike, systems to provide feedback on what happened during a transaction are needed in as many languages as possible.</p>
+<p>Returning a hard-coded string (typically in English) only serves a small segment of the global population. This standard proposes a method to allow users to create, register, share, and use a decentralized collection of translations, enabling richer messaging that is more culturally and linguistically diverse.</p>
+<p>There are several machine efficient ways of representing intent, status, state transition, and other semantic signals including booleans, enums and <a href="/EIPS/eip-1066">ERC-1066 codes</a>. By providing human-readable messages for these signals, the developer experience is enhanced by returning easier to consume information with more context (ex. <code class="language-plaintext highlighter-rouge">revert</code>). End user experience is enhanced by providing text that can be propagated up to the UI.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="contract-architecture">
+<a href="#contract-architecture" class="anchor-link"></a> Contract Architecture
+</h3>
+<p>Two types of contract: <code class="language-plaintext highlighter-rouge">LocalizationPreferences</code>, and <code class="language-plaintext highlighter-rouge">Localization</code>s.</p>
+<p>The <code class="language-plaintext highlighter-rouge">LocalizationPreferences</code> contract functions as a proxy for <code class="language-plaintext highlighter-rouge">tx.origin</code>.</p>
+<pre><code class="language-diagram">                                                                   +--------------+
+                                                                   |              |
+                                                          +------&gt; | Localization |
+                                                          |        |              |
+                                                          |        +--------------+
+                                                          |
+                                                          |
++-----------+          +-------------------------+        |        +--------------+
+|           |          |                         | &lt;------+        |              |
+| Requestor | &lt;------&gt; | LocalizationPreferences | &lt;-------------&gt; | Localization |
+|           |          |                         | &lt;------+        |              |
++-----------+          +-------------------------+        |        +--------------+
+                                                          |
+                                                          |
+                                                          |        +--------------+
+                                                          |        |              |
+                                                          +------&gt; | Localization |
+                                                                   |              |
+                                                                   +--------------+
+</code></pre>
+<h3 id="localization">
+<a href="#localization" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">Localization</code>
+</h3>
+<p>A contract that holds a simple mapping of codes to their text representations.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">Localization</span> <span class="p">{</span>
+  <span class="k">function</span> <span class="n">textFor</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="n">_text</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="textfor">
+<a href="#textfor" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">textFor</code>
+</h4>
+<p>Fetches the localized text representation.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">textFor</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="n">_text</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="localizationpreferences">
+<a href="#localizationpreferences" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">LocalizationPreferences</code>
+</h3>
+<p>A proxy contract that allows users to set their preferred <code class="language-plaintext highlighter-rouge">Localization</code>. Text lookup is delegated to the user’s preferred contract.</p>
+<p>A fallback <code class="language-plaintext highlighter-rouge">Localization</code> with all keys filled MUST be available. If the user-specified <code class="language-plaintext highlighter-rouge">Localization</code> has not explicitly set a loalization (ie. <code class="language-plaintext highlighter-rouge">textFor</code> returns <code class="language-plaintext highlighter-rouge">""</code>), the <code class="language-plaintext highlighter-rouge">LocalizationPreferences</code> MUST redelegate to the fallback <code class="language-plaintext highlighter-rouge">Localization</code>.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">LocalizationPreferences</span> <span class="p">{</span>
+  <span class="k">function</span> <span class="n">set</span><span class="p">(</span><span class="n">Localization</span> <span class="n">_localization</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+  <span class="k">function</span> <span class="n">textFor</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">_wasFound</span><span class="p">,</span> <span class="kt">string</span> <span class="n">_text</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h4 id="set">
+<a href="#set" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">set</code>
+</h4>
+<p>Registers a user’s preferred <code class="language-plaintext highlighter-rouge">Localization</code>. The registering user SHOULD be considered <code class="language-plaintext highlighter-rouge">tx.origin</code>.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">set</span><span class="p">(</span><span class="n">Localization</span> <span class="n">_localization</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+</code></pre></div></div>
+<h4 id="textfor-1">
+<a href="#textfor-1" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">textFor</code>
+</h4>
+<p>Retrieve text for a code found at the user’s preferred <code class="language-plaintext highlighter-rouge">Localization</code> contract.</p>
+<p>The first return value (<code class="language-plaintext highlighter-rouge">bool _wasFound</code>) represents if the text is available from that <code class="language-plaintext highlighter-rouge">Localization</code>, or if a fallback was used. If the fallback was used in this context, the <code class="language-plaintext highlighter-rouge">textFor</code>’s first return value MUST be set to <code class="language-plaintext highlighter-rouge">false</code>, and is <code class="language-plaintext highlighter-rouge">true</code> otherwise.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">textFor</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">_wasFound</span><span class="p">,</span> <span class="kt">string</span> <span class="n">_text</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="string-format">
+<a href="#string-format" class="anchor-link"></a> String Format
+</h3>
+<p>All strings MUST be encoded as <a href="https://www.ietf.org/rfc/rfc3629.txt">UTF-8</a>.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"Špeĉiäl chârãçtérs are permitted"</span>
+<span class="s">"As are non-Latin characters: アルミ缶の上にあるみかん。"</span>
+<span class="s">"Emoji are legal: 🙈🙉🙊🎉"</span>
+<span class="s">"Feel free to be creative: (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧"</span>
+</code></pre></div></div>
+<h3 id="templates">
+<a href="#templates" class="anchor-link"></a> Templates
+</h3>
+<p>Template strings are allowed, and MUST follow the <a href="https://pubs.opengroup.org/onlinepubs/009696799/utilities/printf.html">ANSI C <code class="language-plaintext highlighter-rouge">printf</code></a> conventions.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"Satoshi's true identity is %s"</span>
+</code></pre></div></div>
+<p>Text with 2 or more arguments SHOULD use the POSIX parameter field extension.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"Knock knock. Who's there? %1$s. %1$s who? %2$s!"</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="bytes32-keys">
+<a href="#bytes32-keys" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">bytes32</code> Keys
+</h3>
+<p><code class="language-plaintext highlighter-rouge">bytes32</code> is very efficient since it is the EVM’s base word size. Given the enormous number of elements (card(A) &gt; 1.1579 × 10<sup>77</sup>), it can embed nearly any practical signal, enum, or state. In cases where an application’s key is longer than <code class="language-plaintext highlighter-rouge">bytes32</code>, hashing that long key can map that value into the correct width.</p>
+<p>Designs that use datatypes with small widths than <code class="language-plaintext highlighter-rouge">bytes32</code> (such as <code class="language-plaintext highlighter-rouge">bytes1</code> in <a href="/EIPS/eip-1066">ERC-1066</a>) can be directly embedded into the larger width. This is a trivial one-to-one mapping of the smaller set into the the larger one.</p>
+<h3 id="local-vs-globals-and-singletons">
+<a href="#local-vs-globals-and-singletons" class="anchor-link"></a> Local vs Globals and Singletons
+</h3>
+<p>This spec has opted to not <em>force</em> a single global registry, and rather allow any contract and use case deploy their own system. This allows for more flexibility, and does not restrict the community for opting to use singleton <code class="language-plaintext highlighter-rouge">LocalizationPreference</code> contracts for common use cases, share <code class="language-plaintext highlighter-rouge">Localization</code>s between different proxys, delegate translations between <code class="language-plaintext highlighter-rouge">Localization</code>s, and so on.</p>
+<p>There are many practical uses of agreed upon singletons. For instance, translating codes that aim to be fairly universal and integrated directly into the broader ecosystem (wallets, frameworks, debuggers, and the like) will want to have a single <code class="language-plaintext highlighter-rouge">LocalizationPreference</code>.</p>
+<p>Rather the dispersing several <code class="language-plaintext highlighter-rouge">LocalizationPreference</code>s for different use cases and codes, one could imagine a global “registry of registries”. While this approach allows for a unified lookups of all translations in all use cases, it is antithetical to the spirit of decentralization and freedom. Such a system also increases the lookup complexity, places an onus on getting the code right the first time (or adding the overhead of an upgradable contract), and need to account for use case conflicts with a “unified” or centralized numbering system. Further, lookups should be lightweight (especially in cases like looking up revert text).</p>
+<p>For these reasons, this spec chooses the more decentralized, lightweight, free approach, at the cost of on-chain discoverability. A registry could still be compiled, but would be difficult to enforce, and is out of scope of this spec.</p>
+<h3 id="off-chain-storage">
+<a href="#off-chain-storage" class="anchor-link"></a> Off Chain Storage
+</h3>
+<p>A very viable alternative is to store text off chain, with a pointer to the translations on-chain, and emit or return a <code class="language-plaintext highlighter-rouge">bytes32</code> code for another party to do the lookup. It is difficult to guarantee that off-chain resources will be available, and requires coordination from some other system like a web server to do the code-to-text matching. This is also not compatible with <code class="language-plaintext highlighter-rouge">revert</code> messages.</p>
+<h3 id="ascii-vs-utf-8-vs-utf-16">
+<a href="#ascii-vs-utf-8-vs-utf-16" class="anchor-link"></a> ASCII vs UTF-8 vs UTF-16
+</h3>
+<p>UTF-8 is the most widely used encoding at time of writing. It contains a direct embedding of ASCII, while providing characters for most natural languages, emoji, and special characters.</p>
+<p>Please see the <a href="https://utf8everywhere.org/">UTF-8 Everywhere Manifesto</a> for more information.</p>
+<h3 id="when-no-text-is-found">
+<a href="#when-no-text-is-found" class="anchor-link"></a> When No Text is Found
+</h3>
+<p>Returning a blank string to the requestor fully defeats the purpose of a localization system. The two options for handling missing text are:</p>
+<ol>
+<li>A generic “text not found” message in the preferred language</li>
+<li>The actual message, in a different language</li>
+</ol>
+<h4 id="generic-option">
+<a href="#generic-option" class="anchor-link"></a> Generic Option
+</h4>
+<p>This designed opted to not use generic fallback text. It does not provide any useful information to the user other than to potentially contact the <code class="language-plaintext highlighter-rouge">Localization</code> maintainer (if one even exists and updating is even possible).</p>
+<h4 id="fallback-option">
+<a href="#fallback-option" class="anchor-link"></a> Fallback Option
+</h4>
+<p>The design outlined in this proposal is to providing text in a commonly used language (ex. English or Mandarin). First, this is the language that will be routed to if the user has yet to set a preference. Second, there is a good chance that a user may have <em>some</em> proficiency with the language, or at least be able to use an automated translation service.</p>
+<p>Knowing that the text fell back via <code class="language-plaintext highlighter-rouge">textFor</code>s first return field boolean is <em>much</em> simpler than attempting language detection after the fact. This information is useful for certain UI cases. for example where there may be a desire to explain why localization fell back.</p>
+<h3 id="decentralized-text-crowdsourcing">
+<a href="#decentralized-text-crowdsourcing" class="anchor-link"></a> Decentralized Text Crowdsourcing
+</h3>
+<p>In order for Ethereum to gain mass adoption, users must be able to interact with it in the language, phrasing, and level of detail that they are most comfortable with. Rather than imposing a fixed set of translations as in a traditional, centralized application, this EIP provides a way for anyone to create, curate, and use translations. This empowers the crowd to supply culturally and linguistically diverse messaging, leading to broader and more distributed access to information.</p>
+<h3 id="printf-style-format-strings">
+<a href="#printf-style-format-strings" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">printf</code>-style Format Strings
+</h3>
+<p>C-style <code class="language-plaintext highlighter-rouge">printf</code> templates have been the de facto standard for some time. They have wide compatibility across most languages (either in standard or third-party libraries). This makes it much easier for the consuming program to interpolate strings with low developer overhead.</p>
+<h4 id="parameter-fields">
+<a href="#parameter-fields" class="anchor-link"></a> Parameter Fields
+</h4>
+<p>The POSIX parameter field extension is important since languages do not share a common word order. Parameter fields enable the reuse and rearrangement of arguments in different localizations.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="s">"%1$s is an element with the atomic number %2$d!"</span><span class="p">,</span> <span class="s">"Mercury"</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+<span class="c1">// =&gt; "Mercury is an element with the atomic number 80!"
+</span></code></pre></div></div>
+<h4 id="simplified-localizations">
+<a href="#simplified-localizations" class="anchor-link"></a> Simplified Localizations
+</h4>
+<p>Localization text does not require use of all parameters, and may simply ignore values. This can be useful for not exposing more technical information to users that would otherwise find it confusing.</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env ruby</span>
+
+<span class="nb">sprintf</span><span class="p">(</span><span class="s2">"%1$s é um elemento"</span><span class="p">,</span> <span class="s2">"Mercurio"</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+<span class="c1"># =&gt; "Mercurio é um elemento"</span>
+</code></pre></div></div>
+<div class="language-clojure highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">#</span><span class="n">!/usr/bin/env</span><span class="w"> </span><span class="n">clojure</span><span class="w">
+
+</span><span class="p">(</span><span class="nf">format</span><span class="w"> </span><span class="s">"Element #%2$s"</span><span class="w"> </span><span class="s">"Mercury"</span><span class="w"> </span><span class="mi">80</span><span class="p">)</span><span class="w">
+</span><span class="c1">;; =&gt; Element #80</span><span class="w">
+</span></code></pre></div></div>
+<h3 id="interpolation-strategy">
+<a href="#interpolation-strategy" class="anchor-link"></a> Interpolation Strategy
+</h3>
+<p>Please note that it is highly advisable to return the template string <em>as is</em>, with arguments as multiple return values or fields in an <code class="language-plaintext highlighter-rouge">event</code>, leaving the actual interpolation to be done off chain.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">AtomMessage</span> <span class="p">{</span>
+  <span class="kt">bytes32</span> <span class="n">templateCode</span><span class="p">;</span>
+  <span class="kt">bytes32</span> <span class="n">atomCode</span><span class="p">;</span>
+  <span class="kt">uint256</span> <span class="n">atomicNumber</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#!/usr/bin/env node
+</span>
+<span class="kd">var</span> <span class="nx">printf</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="dl">'</span><span class="s1">printf</span><span class="dl">'</span><span class="p">);</span>
+
+<span class="kd">const</span> <span class="p">{</span> <span class="na">returnValues</span><span class="p">:</span> <span class="p">{</span> <span class="nx">templateCode</span><span class="p">,</span> <span class="nx">atomCode</span><span class="p">,</span> <span class="nx">atomicNumber</span> <span class="p">}</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">eventResponse</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">template</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">AppText</span><span class="p">.</span><span class="nx">textFor</span><span class="p">(</span><span class="nx">templateCode</span><span class="p">);</span>
+<span class="c1">// =&gt; "%1$s ist ein Element mit der Ordnungszahl %2$d!"</span>
+
+<span class="kd">const</span> <span class="nx">atomName</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">PeriodicTableText</span><span class="p">.</span><span class="nx">textFor</span><span class="p">(</span><span class="nx">atomCode</span><span class="p">);</span>
+<span class="c1">// =&gt; "Merkur"</span>
+
+<span class="nx">printf</span><span class="p">(</span><span class="nx">template</span><span class="p">,</span> <span class="nx">atomName</span><span class="p">,</span> <span class="mi">80</span><span class="p">);</span>
+<span class="c1">// =&gt; "Merkur ist ein Element mit der Ordnungszahl 80!"</span>
+</code></pre></div></div>
+<h3 id="unspecified-behaviour">
+<a href="#unspecified-behaviour" class="anchor-link"></a> Unspecified Behaviour
+</h3>
+<p>This spec does not specify:</p>
+<ul>
+<li>Public or private access to the default <code class="language-plaintext highlighter-rouge">Localization</code></li>
+<li>Who may set text
+<ul>
+<li>Deployer</li>
+<li><code class="language-plaintext highlighter-rouge">onlyOwner</code></li>
+<li>Anyone</li>
+<li>Whitelisted users</li>
+<li>and so on</li>
+</ul>
+</li>
+<li>When text is set
+<ul>
+<li><code class="language-plaintext highlighter-rouge">constructor</code></li>
+<li>Any time</li>
+<li>Write to empty slots, but not overwrite existing text</li>
+<li>and so on</li>
+</ul>
+</li>
+</ul>
+<p>These are intentionally left open. There are many cases for each of these, and restricting any is fully beyond the scope of this proposal.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">25</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">Localization</span> <span class="p">{</span>
+  <span class="k">mapping</span><span class="p">(</span><span class="kt">bytes32</span> <span class="o">=&gt;</span> <span class="kt">string</span><span class="p">)</span> <span class="k">private</span> <span class="n">dictionary_</span><span class="p">;</span>
+
+  <span class="k">constructor</span><span class="p">()</span> <span class="k">public</span> <span class="p">{}</span>
+
+  <span class="c1">// Currently overwrites anything
+</span>  <span class="k">function</span> <span class="n">set</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">,</span> <span class="kt">string</span> <span class="n">_message</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+    <span class="n">dictionary_</span><span class="p">[</span><span class="n">_code</span><span class="p">]</span> <span class="o">=</span> <span class="n">_message</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">function</span> <span class="n">textFor</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="n">_message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">dictionary_</span><span class="p">[</span><span class="n">_code</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">contract</span> <span class="n">LocalizationPreference</span> <span class="p">{</span>
+  <span class="k">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="n">Localization</span><span class="p">)</span> <span class="k">private</span> <span class="n">registry_</span><span class="p">;</span>
+  <span class="n">Localization</span> <span class="k">public</span> <span class="n">defaultLocalization</span><span class="p">;</span>
+
+  <span class="kt">bytes32</span> <span class="k">private</span> <span class="n">empty_</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="s">""</span><span class="p">));</span>
+
+  <span class="k">constructor</span><span class="p">(</span><span class="n">Localization</span> <span class="n">_defaultLocalization</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="n">defaultLocalization</span> <span class="o">=</span> <span class="n">_defaultLocalization</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">function</span> <span class="n">set</span><span class="p">(</span><span class="n">Localization</span> <span class="n">_localization</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">registry_</span><span class="p">[</span><span class="n">tx</span><span class="p">.</span><span class="n">origin</span><span class="p">]</span> <span class="o">=</span> <span class="n">_localization</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">function</span> <span class="n">get</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">get</span><span class="p">(</span><span class="n">_code</span><span class="p">,</span> <span class="n">tx</span><span class="p">.</span><span class="n">origin</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Primarily for testing
+</span>  <span class="k">function</span> <span class="n">get</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_code</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_who</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">,</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">string</span> <span class="k">memory</span> <span class="n">text</span> <span class="o">=</span> <span class="n">getLocalizationFor</span><span class="p">(</span><span class="n">_who</span><span class="p">).</span><span class="n">textFor</span><span class="p">(</span><span class="n">_code</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">keccak256</span><span class="p">(</span><span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="n">text</span><span class="p">))</span> <span class="o">!=</span> <span class="n">empty_</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">(</span><span class="nb">true</span><span class="p">,</span> <span class="n">text</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="p">(</span><span class="nb">false</span><span class="p">,</span> <span class="n">defaultLocalization</span><span class="p">.</span><span class="n">textFor</span><span class="p">(</span><span class="n">_code</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">function</span> <span class="n">getLocalizationFor</span><span class="p">(</span><span class="kt">address</span> <span class="n">_who</span><span class="p">)</span> <span class="k">internal</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Localization</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">Localization</span><span class="p">(</span><span class="n">registry_</span><span class="p">[</span><span class="n">_who</span><span class="p">])</span> <span class="o">==</span> <span class="n">Localization</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">Localization</span><span class="p">(</span><span class="n">defaultLocalization</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">Localization</span><span class="p">(</span><span class="n">registry_</span><span class="p">[</span><span class="n">tx</span><span class="p">.</span><span class="n">origin</span><span class="p">]);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/expede">Brooklyn Zelenka</a>, <a href="https://github.com/jenncoop">Jennifer Cooper</a>, "EIP-1444: Localized Messaging with Signal-to-Text [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1444, September 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1444.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1444: Localized Messaging with Signal-to-Text [DRAFT]",
+    "author": "Brooklyn Zelenka (@expede), Jennifer Cooper (@jenncoop)",
+    "name": "EIP-1444: Localized Messaging with Signal-to-Text [DRAFT]",
+    "dateCreated": "2018-09-23",
+    "datePublished": "2018-09-23",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-1444-localized-messaging-with-signal-to-text/",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

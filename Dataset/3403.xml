@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3403: Partial removal of refunds</title>
+<meta property="og:title" content="EIP-3403: Partial removal of refunds" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3403" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3403" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3403: Partial removal of refunds
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3403.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430">https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-03-16</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#the-mutex-usecase">The mutex usecase</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a>
+<ul>
+<li><a href="#2929-gas-costs">2929 Gas Costs</a></li>
+<li><a href="#with-eip-3403-partial-refunds">With EIP-3403 partial refunds</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Remove gas refunds for SELFDESTRUCT, and restrict gas refunds for SSTORE to one specific case.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Gas refunds for SSTORE and SELFDESTRUCT were originally introduced to motivate application developers to write applications that practice “good state hygiene”, clearing storage slots and contracts that are no longer needed. However, they are not widely used for this, and poor state hygiene continues to be the norm. It is now widely accepted that the only solution to state growth is some form of statelessness or state expiry, and if such a solution is implemented, then disused storage slots and contracts would start to be ignored automatically.</p>
+<p>Gas refunds additionally have multiple harmful consequences:</p>
+<ul>
+<li>Refunds give rise to GasToken. GasToken has benefits in moving gas space from low-fee periods to high-fee periods, but it also has downsides to the network, particularly in exacerbating state size (as state slots are effectively used as a “battery” to save up gas) and inefficiently clogging blockchain gas usage</li>
+<li>Refunds increase block size variance. The theoretical maximum amount of actual gas consumed in a block is nearly twice the on-paper gas limit (as refunds add gas space for subsequent transactions in a block, though refunds are capped at 50% of a transaction’s gas used). This is not fatal, but is still undesirable, especially given that refunds can be used to maintain 2x usage spikes for far longer than EIP 1559 can.</li>
+</ul>
+<h3 id="the-mutex-usecase">
+<a href="#the-mutex-usecase" class="anchor-link"></a> The mutex usecase
+</h3>
+<p>There are two typical ways to implement mutexes: ‘0-1-0’ and ‘1-2-1. Let’s see how they differ</p>
+<ul>
+<li>‘0-1-0’:
+<ul>
+<li>Istanbul: 1612</li>
+<li>Berlin: 212</li>
+<li>NoRefund: 20112</li>
+<li>EIP-3403: 1112</li>
+</ul>
+</li>
+<li>‘1-2-1’:
+<ul>
+<li>Istanbul: 1612</li>
+<li>Berlin: 212</li>
+<li>NoRefund: 3012</li>
+<li>EIP-3403: 3012</li>
+</ul>
+</li>
+</ul>
+<p><strong>Note</strong>: In reality, there are never a negative gas cost, since the refund is capped at 0.5 * gasUsed.
+However, these tables show the negative values, since a more real-world scenario would likely spend the
+extra gas on other operations.’</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></td>
+<td>TBD</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">SSTORE_REFUND_GAS</code></td>
+<td>19000</td>
+</tr>
+</tbody>
+</table>
+<p>For blocks where <code class="language-plaintext highlighter-rouge">block.number &gt;= FORK_BLOCK</code>, the following changes apply.</p>
+<ol>
+<li>Remove the <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> refund.</li>
+<li>Remove the <code class="language-plaintext highlighter-rouge">SSTORE</code> refund in all cases except for one specific case: if the <em>new value</em> and <em>original value</em> of the storage slot both equal 0 but the <em>current value</em> does not (those terms being defined as in <a href="https://eips.ethereum.org/EIPS/eip-1283">EIP-1283</a>), refund <code class="language-plaintext highlighter-rouge">SSTORE_REFUND_GAS</code> gas.</li>
+</ol>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Preserving refunds in the <code class="language-plaintext highlighter-rouge">new = original = 0 != current</code> case ensures that a few key use cases that deserve favorable gas cost treatment continue to receive favorable gas cost treatment, particularly:</p>
+<ul>
+<li>Anti-reentrancy locks (typically flipped from 0 to 1 right before a child call begins, and then flipped back to 0 when the child call ends)</li>
+<li>ERC20 approve-and-send (the “approved value” goes from zero to nonzero when the token transfer is approved, and then back to zero when the token transfer processes)</li>
+</ul>
+<p>It also preserves two key goals of EIP 3298:</p>
+<ol>
+<li>Gas tokens continue to be non-viable, because each 19000 refund is only possible because of 19000 extra gas that was paid for flipping that storage slot from zero to nonzero earlier in the same transaction, so you can’t clear some storage slots and use that saved gas to fill others.</li>
+<li>The total amount of gas <em>spent on execution</em> is capped at the gas limit. Every 19000 refund for flipping a storage slot non from zero -&gt; zero is only possible because of 19000 extra gas paid for flipping that slot from zero -&gt; nonzero earlier in the same transaction; that gas paid for a storage write and expansion that were both reverted and so do not actually need to be applied to the Merkle tree. Hence, this extra gas does not contribute to risk.</li>
+</ol>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Refunds are currently only applied <em>after</em> transaction execution, so they cannot affect how much gas is available to any particular call frame during execution. Hence, removing them will not break the ability of any code to execute, though it will render some applications economically nonviable.</p>
+<p>Gas tokens in particular will become valueless. DeFi arbitrage bots, which today frequently use either established gas token schemes or a custom alternative to reduce on-chain costs, would benefit from rewriting their code to remove calls to these no-longer-functional gas storage mechanisms.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h3 id="2929-gas-costs">
+<a href="#2929-gas-costs" class="anchor-link"></a> 2929 Gas Costs
+</h3>
+<p>Note, there is a difference between ‘hot’ and ‘cold’ slots. This table shows the values as of <a href="/EIPS/eip-2929">EIP-2929</a> assuming that all touched storage slots were already ‘hot’ (the difference being a one-time cost of <code class="language-plaintext highlighter-rouge">2100</code> gas).</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Used Gas</th>
+<th>Refund</th>
+<th>Original</th>
+<th>1st</th>
+<th>2nd</th>
+<th>3rd</th>
+<th>Effective gas (after refund)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556000600055</code></td>
+<td>212</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556001600055</code></td>
+<td>20112</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td> </td>
+<td>20112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556000600055</code></td>
+<td>20112</td>
+<td>19900</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556002600055</code></td>
+<td>20112</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td> </td>
+<td>20112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556001600055</code></td>
+<td>20112</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td> </td>
+<td>20112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556000600055</code></td>
+<td>3012</td>
+<td>15000</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td> </td>
+<td>-11988</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556001600055</code></td>
+<td>3012</td>
+<td>2800</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556002600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>2</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556000600055</code></td>
+<td>3012</td>
+<td>15000</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td> </td>
+<td>-11988</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556003600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556001600055</code></td>
+<td>3012</td>
+<td>2800</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556002600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556000600055</code></td>
+<td>3012</td>
+<td>15000</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td> </td>
+<td>-11988</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556002600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556001600055</code></td>
+<td>212</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x600160005560006000556001600055</code></td>
+<td>40118</td>
+<td>19900</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>20218</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x600060005560016000556000600055</code></td>
+<td>5918</td>
+<td>17800</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>-11882</td>
+</tr>
+</tbody>
+</table>
+<h3 id="with-eip-3403-partial-refunds">
+<a href="#with-eip-3403-partial-refunds" class="anchor-link"></a> With EIP-3403 partial refunds
+</h3>
+<p>If refunds were to be partially removed, as specified <a href="https://github.com/ethereum/EIPs/pull/3403/">here</a>, this would be the comparative table. <strong>This table also assumes touched storage slots were already ‘hot’</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Used Gas</th>
+<th>Refund</th>
+<th>Original</th>
+<th>1st</th>
+<th>2nd</th>
+<th>3rd</th>
+<th>Effective gas (after refund)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556000600055</code></td>
+<td>212</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556001600055</code></td>
+<td>20112</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td> </td>
+<td>20112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556000600055</code></td>
+<td>20112</td>
+<td>19000</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td> </td>
+<td>1112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556002600055</code></td>
+<td>20112</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td> </td>
+<td>20112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556001600055</code></td>
+<td>20112</td>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td> </td>
+<td>20112</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556000600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556001600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60006000556002600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>2</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556000600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556003600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556001600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60026000556002600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556000600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556002600055</code></td>
+<td>3012</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td> </td>
+<td>3012</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x60016000556001600055</code></td>
+<td>212</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td> </td>
+<td>212</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x600160005560006000556001600055</code></td>
+<td>40118</td>
+<td>19000</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>21118</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x600060005560016000556000600055</code></td>
+<td>5918</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+<td>5918</td>
+</tr>
+</tbody>
+</table>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Refunds are not visible to transaction execution, so this should not have any impact on transaction execution logic.</p>
+<p>The maximum amount of gas that can be spent on execution in a block is limited to the gas limit, if we do not count zero-to-nonzero SSTOREs that were later reset back to zero. It is okay to not count those, because if such an SSTORE is reset, storage is not expanded and the client does not need to actually adjust the Merke tree; the gas consumption is refunded, but the effort normally required by the client to process those opcodes is also cancelled. <strong>Clients should make sure to not do a storage write if <code class="language-plaintext highlighter-rouge">new_value = original_value</code>; this was a prudent optimization since the beginning of Ethereum but it becomes more important now.</strong></p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a>, "EIP-3403: Partial removal of refunds [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3403, March 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3403.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3403: Partial removal of refunds [DRAFT]",
+    "author": "Vitalik Buterin (@vbuterin), Martin Swende (@holiman)",
+    "name": "EIP-3403: Partial removal of refunds [DRAFT]",
+    "dateCreated": "2021-03-16",
+    "datePublished": "2021-03-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3298-removal-of-refunds/5430",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

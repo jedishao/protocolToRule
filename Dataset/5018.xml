@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5018: Filesystem-like Interface for Smart Contracts</title>
+<meta property="og:title" content="EIP-5018: Filesystem-like Interface for Smart Contracts" />
+<meta name="description" content="An interface to provide access to binary objects similar to filesystems." />
+<meta property="og:description" content="An interface to provide access to binary objects similar to filesystems." />
+<meta name="twitter:description" content="An interface to provide access to binary objects similar to filesystems." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5018" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5018" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5018: Filesystem-like Interface for Smart Contracts
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5018.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An interface to provide access to binary objects similar to filesystems.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/qizhou">Qi Zhou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-5018-directory-standard/8958">https://ethereum-magicians.org/t/eip-5018-directory-standard/8958</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-04-18</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#directory">Directory</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#interactions-between-unchunkedchunked-functions">Interactions Between Unchunked/Chunked Functions</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following standardizes an API for directories and files within smart contracts, similar to traditional filesystems.
+This standard provides basic functionality to read/write binary objects of any size, as well as allow reading/writing chunks of the object if the object is too large to fit in a single transaction.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>A standard interface allows any binary objects on EVM-based blockchain to be re-used by other dApps.</p>
+<p>With <a href="/EIPS/eip-4804">EIP-4804</a>, we are able to locate a Web3 resource on blockchain using HTTP-style URIs. One application of Web3 resources are web contents that are referenced within a directory using relative paths such as HTML/SVG. This standard proposes a contract-based directory to simplify the mapping between local web contents and on-chain web contents. Further, with relative paths referenced in the web contents and EIP-4804, the users will have a consistent view of the web contents locally and on-chain.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="directory">
+<a href="#directory" class="anchor-link"></a> Directory
+</h3>
+<h4 id="methods">
+<a href="#methods" class="anchor-link"></a> Methods
+</h4>
+<h4 id="write">
+<a href="#write" class="anchor-link"></a> write
+</h4>
+<p>Writes binary <code class="language-plaintext highlighter-rouge">data</code> to the file <code class="language-plaintext highlighter-rouge">name</code> in the directory by an account with write permission.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function write(bytes memory name, bytes memory data) external payable
+</code></pre></div></div>
+<h4 id="read">
+<a href="#read" class="anchor-link"></a> read
+</h4>
+<p>Returns the binary <code class="language-plaintext highlighter-rouge">data</code> from the file <code class="language-plaintext highlighter-rouge">name</code> in the directory and existence of the file.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function read(bytes memory name) external view returns (bytes memory data, bool exist)
+</code></pre></div></div>
+<h4 id="fallback-read">
+<a href="#fallback-read" class="anchor-link"></a> fallback read
+</h4>
+<p>Returns the binary <code class="language-plaintext highlighter-rouge">data</code> from the file <code class="language-plaintext highlighter-rouge">prefixedName</code> (prefixed with <code class="language-plaintext highlighter-rouge">/</code>) in the directory.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fallback(bytes calldata prefixedName) external returns (bytes memory data) 
+</code></pre></div></div>
+<h4 id="size">
+<a href="#size" class="anchor-link"></a> size
+</h4>
+<p>Returns the size of the <code class="language-plaintext highlighter-rouge">data</code> from the file <code class="language-plaintext highlighter-rouge">name</code> in the directory and the number of chunks of the data.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function size(bytes memory name) external view returns (uint256 size, uint256 chunks)
+</code></pre></div></div>
+<h4 id="remove">
+<a href="#remove" class="anchor-link"></a> remove
+</h4>
+<p>Removes the file <code class="language-plaintext highlighter-rouge">name</code> in the directory and returns the number of chunks removed (0 means the file does not exist) by an account with write permission.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function remove(bytes memory name) external returns (uint256 numOfChunksRemoved)
+</code></pre></div></div>
+<h4 id="countchunks">
+<a href="#countchunks" class="anchor-link"></a> countChunks
+</h4>
+<p>Returns the number of chunks of the file <code class="language-plaintext highlighter-rouge">name</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function countChunks(bytes memory name) external view returns (uint256 numOfChunks);
+</code></pre></div></div>
+<h4 id="writechunk">
+<a href="#writechunk" class="anchor-link"></a> writeChunk
+</h4>
+<p>Writes a chunk of data to the file by an account with write permission. The write will fail if <code class="language-plaintext highlighter-rouge">chunkId &gt; numOfChunks</code>, i.e., the write must append the file or replace the existing chunk.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code> function writeChunk(bytes memory name, uint256 chunkId, bytes memory chunkData) external payable;
+</code></pre></div></div>
+<h4 id="readchunk">
+<a href="#readchunk" class="anchor-link"></a> readChunk
+</h4>
+<p>Returns the chunk data of the file <code class="language-plaintext highlighter-rouge">name</code> and the existence of the chunk.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function readChunk(bytes memory name, uint256 chunkId) external view returns (bytes memory chunkData, bool exist);
+</code></pre></div></div>
+<h4 id="chunksize">
+<a href="#chunksize" class="anchor-link"></a> chunkSize
+</h4>
+<p>Returns the size of a chunk of the file <code class="language-plaintext highlighter-rouge">name</code> and the existence of the chunk.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function chunkSize(bytes memory name, uint256 chunkId) external view returns (uint256 chunkSize, bool exist);
+</code></pre></div></div>
+<h4 id="removechunk">
+<a href="#removechunk" class="anchor-link"></a> removeChunk
+</h4>
+<p>Removes a chunk of the file <code class="language-plaintext highlighter-rouge">name</code> and returns <code class="language-plaintext highlighter-rouge">false</code> if such chunk does not exist. The method should be called by an account with write permission.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function removeChunk(bytes memory name, uint256 chunkId) external returns (bool exist);
+</code></pre></div></div>
+<h4 id="truncate">
+<a href="#truncate" class="anchor-link"></a> truncate
+</h4>
+<p>Removes the chunks of the file <code class="language-plaintext highlighter-rouge">name</code> in the directory from the given <code class="language-plaintext highlighter-rouge">chunkId</code> and returns the number of chunks removed by an account with write permission. When <code class="language-plaintext highlighter-rouge">chunkId = 0</code>, the method is essentially the same as <code class="language-plaintext highlighter-rouge">remove()</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function truncate(bytes memory name, uint256 chunkId) external returns (uint256 numOfChunksRemoved);
+</code></pre></div></div>
+<h4 id="getchunkhash">
+<a href="#getchunkhash" class="anchor-link"></a> getChunkHash
+</h4>
+<p>Returns the hash value of the chunk data.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function getChunkHash(bytes memory name, uint256 chunkId) external view returns (bytes32);
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>One issue of uploading the web contents to the blockchain is that the web contents may be too large to fit into a single transaction. As a result, the standard provides chunk-based operations so that uploading a content can be split into several transactions. Meanwhile, the read operation can be done in a single transaction, i.e., with a single Web3 URL defined in EIP-4804.</p>
+<h3 id="interactions-between-unchunkedchunked-functions">
+<a href="#interactions-between-unchunkedchunked-functions" class="anchor-link"></a> Interactions Between Unchunked/Chunked Functions
+</h3>
+<p><code class="language-plaintext highlighter-rouge">read</code> method should return the concatenated chunked data written by <code class="language-plaintext highlighter-rouge">writeChunk</code> method. The following gives some examples of the interactions:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">read("hello.txt")</code> =&gt; “” (file is empty)</li>
+<li><code class="language-plaintext highlighter-rouge">writeChunk("hello.txt", 0, "abc")</code> will succeed</li>
+<li><code class="language-plaintext highlighter-rouge">read("hello.txt")</code> =&gt; “abc”</li>
+<li><code class="language-plaintext highlighter-rouge">writeChunk("hello.txt", 1, "efg")</code> will succeed</li>
+<li><code class="language-plaintext highlighter-rouge">read("hello.txt")</code> =&gt; “abcefg”</li>
+<li><code class="language-plaintext highlighter-rouge">writeChunk("hello.txt", 0, "aaa")</code> will succeed (replace chunk 0’s data)</li>
+<li><code class="language-plaintext highlighter-rouge">read("hello.txt")</code> =&gt; “aaaefg”</li>
+<li><code class="language-plaintext highlighter-rouge">writeChunk("hello.txt", 3, "hij")</code> will fail because the operation is not replacement or append.</li>
+</ul>
+<p>With <code class="language-plaintext highlighter-rouge">writeChunk</code> method, we allow writing a file with external data that exceeds the current calldata limit (e.g., 1.8MB now), and it is able to read the whole file in a single <code class="language-plaintext highlighter-rouge">read</code> method (which is friendly for large web objects such as HTML/SVG/PNG/JPG, etc).</p>
+<p>For <code class="language-plaintext highlighter-rouge">write</code> method, calling a <code class="language-plaintext highlighter-rouge">write</code> method will replace all data chunks of the file with <code class="language-plaintext highlighter-rouge">write</code> method data, and one implementation can be:</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">writeChunk(filename, chunkId=0, data_from_write)</code> to chunk 0 with the same <code class="language-plaintext highlighter-rouge">write</code> method data; and</li>
+<li><code class="language-plaintext highlighter-rouge">truncate(filename, chunkId=1)</code>, which will remove the rest chunks.</li>
+</ol>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>No backwards compatibility issues were identified.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>No security considerations were found.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/qizhou">Qi Zhou</a>, "EIP-5018: Filesystem-like Interface for Smart Contracts [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5018, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5018.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5018: Filesystem-like Interface for Smart Contracts [DRAFT]",
+    "author": "Qi Zhou (@qizhou)",
+    "name": "EIP-5018: Filesystem-like Interface for Smart Contracts [DRAFT]",
+    "dateCreated": "2022-04-18",
+    "datePublished": "2022-04-18",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-5018-directory-standard/8958",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

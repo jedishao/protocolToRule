@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3074: AUTH and AUTHCALL opcodes</title>
+<meta property="og:title" content="EIP-3074: AUTH and AUTHCALL opcodes" />
+<meta name="description" content="Allow externally owned accounts to delegate control to a contract." />
+<meta property="og:description" content="Allow externally owned accounts to delegate control to a contract." />
+<meta name="twitter:description" content="Allow externally owned accounts to delegate control to a contract." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3074" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3074" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3074: AUTH and AUTHCALL opcodes
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3074.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Allow externally owned accounts to delegate control to a contract.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/SamWilsn">Sam Wilson</a>, <a href="https://github.com/adietrichs">Ansgar Dietrichs</a>, <a href="https://github.com/lightclient">Matt Garnett</a>, <a href="https://github.com/micahzoltu">Micah Zoltu</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3074-sponsored-transaction-precompile/4880">https://ethereum-magicians.org/t/eip-3074-sponsored-transaction-precompile/4880</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-10-15</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-155">155</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#conventions">Conventions</a></li>
+<li><a href="#constants">Constants</a></li>
+<li><a href="#context-variables">Context Variables</a></li>
+<li><a href="#auth-0xf6">AUTH (0xf6)</a></li>
+<li><a href="#authcall-0xf7">AUTHCALL (0xf7)</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#signature-in-memory">Signature in Memory</a></li>
+<li><a href="#signing-address-auth-argument">Signing Address auth Argument</a></li>
+<li><a href="#reserving-one-sixty-fourth-of-available-gas">Reserving One Sixty-Fourth of Available Gas</a></li>
+<li><a href="#throwing-for-unset-authorized-during-authcall">Throwing for Unset authorized During AUTHCALL</a></li>
+<li><a href="#another-sponsored-transaction-eip">Another Sponsored Transaction EIP</a></li>
+<li><a href="#what-to-sign">What to Sign?</a></li>
+<li><a href="#understanding-commit">Understanding commit</a></li>
+<li><a href="#invoker-contracts">Invoker Contracts</a></li>
+<li><a href="#on-call-depth">On Call Depth</a></li>
+<li><a href="#source-of-value">Source of value</a></li>
+<li><a href="#allowing-txorigin-as-signer">Allowing tx.origin as Signer</a></li>
+<li><a href="#authcall-cheaper-than-call-when-sending-value">AUTHCALL cheaper than CALL when sending value</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#secure-invokers">Secure Invokers</a></li>
+<li><a href="#allowing-txorigin-as-signer-1">Allowing tx.origin as Signer</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP introduces two EVM instructions <code class="language-plaintext highlighter-rouge">AUTH</code> and <code class="language-plaintext highlighter-rouge">AUTHCALL</code>. The first sets a context variable <code class="language-plaintext highlighter-rouge">authorized</code> based on an ECDSA signature. The second sends a call as the <code class="language-plaintext highlighter-rouge">authorized</code> account. This essentially delegates control of the externally owned account (EOA) to a smart contract.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Adding more functionality to EOAs has been a long-standing feature request. The requests have spanned from implementing batching capabilities, allowing for gas sponsoring, expirations, scripting, and beyond. These changes often mean increased complexity and rigidity of the protocol. In some cases, it also means increased attack surfaces.</p>
+<p>This EIP takes a different approach. Instead of enshrining these capabilities in the protocol as transaction validity requirements, it allows users to <em>delegate</em> control of their EOA to a contract. This gives developers a flexible framework for developing novel transaction schemes for EOAs. A motivating use case of this EIP is that it allows any EOA to act like a smart contract wallet <em>without</em> deploying a contract.</p>
+<p>Although this EIP provides great benefit to individual users, the leading motivation for this EIP is “sponsored transactions”. This is where the fee for a transaction is provided by a different account than the one that originates the call.</p>
+<p>With the extraordinary growth of tokens on Ethereum, it has become common for EOAs to hold valuable assets without holding any ether at all. Today, these assets must be converted to ether before they can be used to pay gas fees. However, without ether to pay for the conversion, it’s impossible to convert them. Sponsored transactions break the circular dependency.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="conventions">
+<a href="#conventions" class="anchor-link"></a> Conventions
+</h3>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">top - N</code></strong> - the <code class="language-plaintext highlighter-rouge">N</code>th most recently pushed value on the EVM stack, where <code class="language-plaintext highlighter-rouge">top - 0</code> is the most recent.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">||</code></strong> - byte concatenation operator.</li>
+<li><strong>invalid execution</strong> - execution that is invalid and must exit the current execution frame immediately, consuming all remaining gas (in the same way as a stack underflow or invalid jump).</li>
+</ul>
+<h3 id="constants">
+<a href="#constants" class="anchor-link"></a> Constants
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MAGIC</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x03</code></td>
+</tr>
+</tbody>
+</table>
+<p><code class="language-plaintext highlighter-rouge">MAGIC</code> is used for EIP-3074 signatures to prevent signature collisions with other signing formats.</p>
+<h3 id="context-variables">
+<a href="#context-variables" class="anchor-link"></a> Context Variables
+</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th style="text-align: left">Initial Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">authorized</code></td>
+<td><code class="language-plaintext highlighter-rouge">address</code></td>
+<td style="text-align: left">unset</td>
+</tr>
+</tbody>
+</table>
+<p>The context variable <code class="language-plaintext highlighter-rouge">authorized</code> shall indicate the active account for <code class="language-plaintext highlighter-rouge">AUTHCALL</code> instructions in the current frame of execution. If set, <code class="language-plaintext highlighter-rouge">authorized</code> shall only contain an account which has given the contract authorization to act on its behalf. An unset value shall indicate that no such account is set and that there is not yet an active account for <code class="language-plaintext highlighter-rouge">AUTHCALL</code> instructions in the current frame of execution.</p>
+<p>The variable has the same scope as the program counter – <code class="language-plaintext highlighter-rouge">authorized</code> persists throughout a single frame of execution of the contract, but is not passed through any calls (including <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>). If the same contract is being executed in separate execution frames (ex. a <code class="language-plaintext highlighter-rouge">CALL</code> to self), both frames shall have independent values for <code class="language-plaintext highlighter-rouge">authorized</code>. Initially in each frame of execution, <code class="language-plaintext highlighter-rouge">authorized</code> is always unset, even if a previous execution frame for the same contract has a value.</p>
+<h3 id="auth-0xf6">
+<a href="#auth-0xf6" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">AUTH</code> (<code class="language-plaintext highlighter-rouge">0xf6</code>)
+</h3>
+<p>A new opcode <code class="language-plaintext highlighter-rouge">AUTH</code> shall be created at <code class="language-plaintext highlighter-rouge">0xf6</code>. It shall take three stack element inputs (the last two describing a memory range), and it shall return one stack element.</p>
+<h4 id="input">
+<a href="#input" class="anchor-link"></a> Input
+</h4>
+<h5 id="stack">
+<a href="#stack" class="anchor-link"></a> Stack
+</h5>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 0</code></td>
+<td><code class="language-plaintext highlighter-rouge">authority</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 1</code></td>
+<td><code class="language-plaintext highlighter-rouge">offset</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 2</code></td>
+<td><code class="language-plaintext highlighter-rouge">length</code></td>
+</tr>
+</tbody>
+</table>
+<h5 id="memory">
+<a href="#memory" class="anchor-link"></a> Memory
+</h5>
+<p>The final two stack arguments (<code class="language-plaintext highlighter-rouge">offset</code> and <code class="language-plaintext highlighter-rouge">length</code>) describe a range of memory. The format of the contents of that range is:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">memory[offset : offset+32 ]</code> - <code class="language-plaintext highlighter-rouge">yParity</code></li>
+<li><code class="language-plaintext highlighter-rouge">memory[offset+32 : offset+64 ]</code> - <code class="language-plaintext highlighter-rouge">r</code></li>
+<li><code class="language-plaintext highlighter-rouge">memory[offset+64 : offset+96 ]</code> - <code class="language-plaintext highlighter-rouge">s</code></li>
+<li><code class="language-plaintext highlighter-rouge">memory[offset+96 : offset+128]</code> - <code class="language-plaintext highlighter-rouge">commit</code></li>
+</ul>
+<h4 id="output">
+<a href="#output" class="anchor-link"></a> Output
+</h4>
+<h5 id="stack-1">
+<a href="#stack-1" class="anchor-link"></a> Stack
+</h5>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 0</code></td>
+<td><code class="language-plaintext highlighter-rouge">success</code></td>
+</tr>
+</tbody>
+</table>
+<h5 id="memory-1">
+<a href="#memory-1" class="anchor-link"></a> Memory
+</h5>
+<p>Memory is not modified by this instruction.</p>
+<h4 id="behavior">
+<a href="#behavior" class="anchor-link"></a> Behavior
+</h4>
+<p>If <code class="language-plaintext highlighter-rouge">length</code> is greater than 128, the extra bytes are ignored for signature verification (they still incur a gas cost as defined later). Bytes outside the range (in the event <code class="language-plaintext highlighter-rouge">length</code> is less than 128) are treated as if they had been zeroes.</p>
+<p><code class="language-plaintext highlighter-rouge">authority</code> is the address of the account which generated the signature.</p>
+<p>The arguments (<code class="language-plaintext highlighter-rouge">yParity</code>, <code class="language-plaintext highlighter-rouge">r</code>, <code class="language-plaintext highlighter-rouge">s</code>) are interpreted as an ECDSA signature on the secp256k1 curve over the message <code class="language-plaintext highlighter-rouge">keccak256(MAGIC || chainId || paddedInvokerAddress || commit)</code>, where:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">chainId</code> is the current chain’s <a href="/EIPS/eip-155">EIP-155</a> unique identifier padded to 32 bytes.</li>
+<li><code class="language-plaintext highlighter-rouge">paddedInvokerAddress</code> is the address of the contract executing <code class="language-plaintext highlighter-rouge">AUTH</code> (or the active state address in the context of <code class="language-plaintext highlighter-rouge">CALLCODE</code> or <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>), left-padded with zeroes to a total of 32 bytes (ex. <code class="language-plaintext highlighter-rouge">0x000000000000000000000000AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</code>).</li>
+<li><code class="language-plaintext highlighter-rouge">commit</code>, one of the arguments passed into <code class="language-plaintext highlighter-rouge">AUTH</code>, is a 32-byte value that can be used to commit to specific additional validity conditions in the invoker’s pre-processing logic (e.g. a nonce for replay protection).</li>
+</ul>
+<p>Signature validity and signer recovery is handled analogously to transaction signatures, including the stricter <code class="language-plaintext highlighter-rouge">s</code> range for preventing ECDSA malleability. Note that <code class="language-plaintext highlighter-rouge">yParity</code> is expected to be <code class="language-plaintext highlighter-rouge">0</code> or <code class="language-plaintext highlighter-rouge">1</code>.</p>
+<p>If the signature is valid and the signer address is equal to <code class="language-plaintext highlighter-rouge">authority</code>, the context variable <code class="language-plaintext highlighter-rouge">authorized</code> is set to the <code class="language-plaintext highlighter-rouge">authority</code>. In particular, this is also true if <code class="language-plaintext highlighter-rouge">authority == tx.origin</code>, which used to be handled separately in earlier versions of this EIP (see Security Considerations). If the signature is instead invalid or the signer address does not equal <code class="language-plaintext highlighter-rouge">authority</code>, <code class="language-plaintext highlighter-rouge">authorized</code> is reset to an unset value.</p>
+<p><code class="language-plaintext highlighter-rouge">AUTH</code> returns <code class="language-plaintext highlighter-rouge">1</code> if <code class="language-plaintext highlighter-rouge">authorized</code> is set, or <code class="language-plaintext highlighter-rouge">0</code> otherwise.</p>
+<h4 id="gas-cost">
+<a href="#gas-cost" class="anchor-link"></a> Gas Cost
+</h4>
+<p>The gas cost for <code class="language-plaintext highlighter-rouge">AUTH</code> is equal to the sum of:</p>
+<ul>
+<li>fixed fee <code class="language-plaintext highlighter-rouge">3100</code>.</li>
+<li>memory expansion gas cost (<code class="language-plaintext highlighter-rouge">auth_memory_expansion_fee</code>)</li>
+</ul>
+<p>The fixed fee is equal to the cost for the <code class="language-plaintext highlighter-rouge">ecrecover</code> precompile, plus a bit extra to cover a keccak256 hash and some additional logic.</p>
+<p>The memory expansion gas cost (<code class="language-plaintext highlighter-rouge">auth_memory_expansion_fee</code>) shall be calculated in the same way as <code class="language-plaintext highlighter-rouge">RETURN</code>, where memory is expanded if the specified range is outside the current allocation.</p>
+<h3 id="authcall-0xf7">
+<a href="#authcall-0xf7" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">AUTHCALL</code> (<code class="language-plaintext highlighter-rouge">0xf7</code>)
+
+</h3>
+<p>A new opcode <code class="language-plaintext highlighter-rouge">AUTHCALL</code> shall be created at <code class="language-plaintext highlighter-rouge">0xf7</code>. It shall take eight stack elements and return one stack element. It matches the behavior of the existing <code class="language-plaintext highlighter-rouge">CALL</code> (<code class="language-plaintext highlighter-rouge">0xF1</code>) instruction, except where noted below.</p>
+<h4 id="input-1">
+<a href="#input-1" class="anchor-link"></a> Input
+</h4>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 0</code></td>
+<td><code class="language-plaintext highlighter-rouge">gas</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 1</code></td>
+<td><code class="language-plaintext highlighter-rouge">addr</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 2</code></td>
+<td><code class="language-plaintext highlighter-rouge">value</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 3</code></td>
+<td><code class="language-plaintext highlighter-rouge">valueExt</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 4</code></td>
+<td><code class="language-plaintext highlighter-rouge">argsOffset</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 5</code></td>
+<td><code class="language-plaintext highlighter-rouge">argsLength</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 6</code></td>
+<td><code class="language-plaintext highlighter-rouge">retOffset</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 7</code></td>
+<td><code class="language-plaintext highlighter-rouge">retLength</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="output-1">
+<a href="#output-1" class="anchor-link"></a> Output
+</h4>
+<table>
+<thead>
+<tr>
+<th>Stack</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">top - 0</code></td>
+<td><code class="language-plaintext highlighter-rouge">success</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="behavior-1">
+<a href="#behavior-1" class="anchor-link"></a> Behavior
+</h4>
+<p><code class="language-plaintext highlighter-rouge">AUTHCALL</code> is interpreted the same as <code class="language-plaintext highlighter-rouge">CALL</code>, except for (note: this list is also the order of precedence for the logical checks):</p>
+<ul>
+<li>If <code class="language-plaintext highlighter-rouge">authorized</code> is unset, execution is invalid (as defined above). Otherwise, the caller address for the call is set to <code class="language-plaintext highlighter-rouge">authorized</code>.</li>
+<li>The gas cost, including how much gas is available for the subcall, is specified in the Gas Cost section.</li>
+<li>If the <code class="language-plaintext highlighter-rouge">gas</code> operand is equal to <code class="language-plaintext highlighter-rouge">0</code>, the instruction will send all available gas as per <a href="./eip-150">EIP-150</a>.</li>
+<li>If the gas available for the subcall would be less than <code class="language-plaintext highlighter-rouge">gas</code>, execution is invalid.</li>
+<li>There is no gas stipend, even for non-zero <code class="language-plaintext highlighter-rouge">value</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">value</code> is deducted from the balance of the executing contract. It is not paid by <code class="language-plaintext highlighter-rouge">authorized</code>. If <code class="language-plaintext highlighter-rouge">value</code> is higher than the balance of the executing contract, execution is invalid.</li>
+<li>If <code class="language-plaintext highlighter-rouge">valueExt</code> is not zero, the instruction immediately returns 0. In this case the gas that would have been passed into the call is refunded, but not the gas consumed by the <code class="language-plaintext highlighter-rouge">AUTHCALL</code> opcode itself. In the future, this restriction may be relaxed to externally transfer value out of the <code class="language-plaintext highlighter-rouge">authorized</code> account.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">AUTHCALL</code> must increase the call depth by one. <code class="language-plaintext highlighter-rouge">AUTHCALL</code> must not increase the call depth by two as it would if it first called into the authorized account and then into the target.</p>
+<p>The return data area accessed with <code class="language-plaintext highlighter-rouge">RETURNDATASIZE</code> (<code class="language-plaintext highlighter-rouge">0x3d</code>) and <code class="language-plaintext highlighter-rouge">RETURNDATACOPY</code> (<code class="language-plaintext highlighter-rouge">0x3e</code>) must be set in the same way as the <code class="language-plaintext highlighter-rouge">CALL</code> instruction.</p>
+<p>Importantly, <code class="language-plaintext highlighter-rouge">AUTHCALL</code> does not reset <code class="language-plaintext highlighter-rouge">authorized</code>, but leaves it unchanged.</p>
+<h4 id="gas-cost-1">
+<a href="#gas-cost-1" class="anchor-link"></a> Gas Cost
+</h4>
+<p>The gas cost for <code class="language-plaintext highlighter-rouge">AUTHCALL</code> shall be the <strong>sum</strong> of:</p>
+<ul>
+<li>static gas cost (<code class="language-plaintext highlighter-rouge">warm_storage_read</code>)</li>
+<li>memory expansion gas cost (<code class="language-plaintext highlighter-rouge">memory_expansion_fee</code>)</li>
+<li>dynamic gas cost (<code class="language-plaintext highlighter-rouge">dynamic_gas</code>)</li>
+<li>gas available for execution in the subcall (<code class="language-plaintext highlighter-rouge">subcall_gas</code>)</li>
+</ul>
+<p>The memory expansion gas cost (<code class="language-plaintext highlighter-rouge">memory_expansion_fee</code>) shall be calculated in the same way as <code class="language-plaintext highlighter-rouge">CALL</code>.</p>
+<p>The dynamic gas portion (<code class="language-plaintext highlighter-rouge">dynamic_gas</code>), and the gas available for execution in the subcall (<code class="language-plaintext highlighter-rouge">subcall_gas</code>) shall be calculated as:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dynamic_gas = 0
+
+if addr not in accessed_addresses:
+    dynamic_gas += 2500         # cold_account_access - warm_storage_read
+
+if value &gt; 0:
+    dynamic_gas += 6700         # NB: Not 9000, like in `CALL`
+    if is_empty(addr):
+        dynamic_gas += 25000
+
+remaining_gas = available_gas - dynamic_gas
+all_but_one_64th = remaining_gas - (remaining_gas // 64)
+
+if gas == 0:
+    subcall_gas = all_but_one_64th
+elif all_but_one_64th &lt; gas:
+    raise                       # Execution is invalid.
+else:
+    subcall_gas = gas
+</code></pre></div></div>
+<p>As with <code class="language-plaintext highlighter-rouge">CALL</code>, the full gas cost is charged immediately, independently of actually executing the call.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="signature-in-memory">
+<a href="#signature-in-memory" class="anchor-link"></a> Signature in Memory
+</h3>
+<p>The signature format (<code class="language-plaintext highlighter-rouge">yParity</code>, <code class="language-plaintext highlighter-rouge">r</code>, and <code class="language-plaintext highlighter-rouge">s</code>) is fixed, so it might seem curious that <code class="language-plaintext highlighter-rouge">auth</code> accepts a dynamic memory range. The signature is placed in memory so that <code class="language-plaintext highlighter-rouge">auth</code> can be upgraded in the future to work with contract accounts (which might use non-ECDSA signatures) and not just EOAs.</p>
+<h3 id="signing-address-auth-argument">
+<a href="#signing-address-auth-argument" class="anchor-link"></a> Signing Address <code class="language-plaintext highlighter-rouge">auth</code> Argument
+</h3>
+<p>Including <code class="language-plaintext highlighter-rouge">authority</code> (the signing address) as an argument to <code class="language-plaintext highlighter-rouge">auth</code> allows future upgrades to the instruction to work with contract accounts, and not just EOAs.</p>
+<p>If <code class="language-plaintext highlighter-rouge">authority</code> were not included and multiple signature schemes allowed, it would not be possible to compute the authorizing account’s address from just the signature alone.</p>
+<h3 id="reserving-one-sixty-fourth-of-available-gas">
+<a href="#reserving-one-sixty-fourth-of-available-gas" class="anchor-link"></a> Reserving One Sixty-Fourth of Available Gas
+</h3>
+<p><code class="language-plaintext highlighter-rouge">AUTHCALL</code> will not pass more than 63/64th of the available gas for the reasons enumerated in <a href="/EIPS/eip-150">EIP-150</a>.</p>
+<h3 id="throwing-for-unset-authorized-during-authcall">
+<a href="#throwing-for-unset-authorized-during-authcall" class="anchor-link"></a> Throwing for Unset <code class="language-plaintext highlighter-rouge">authorized</code> During <code class="language-plaintext highlighter-rouge">AUTHCALL</code>
+</h3>
+<p>A well-behaved contract should never reach an <code class="language-plaintext highlighter-rouge">AUTHCALL</code> without having successfully set <code class="language-plaintext highlighter-rouge">authorized</code> beforehand. The safest behavior, therefore, is to exit the current frame of execution immediately. This is especially important in the context of transaction sponsoring / relaying, which is expected to be one of the main use cases for this EIP. In a sponsored transaction, the inability to distinguish between a sponsee-attributable fault (like a failing sub-call) and a sponsor-attributable fault (like a failing <code class="language-plaintext highlighter-rouge">AUTH</code>) is especially dangerous and should be prevented because it charges unfair fees to the sponsee.</p>
+<h3 id="another-sponsored-transaction-eip">
+<a href="#another-sponsored-transaction-eip" class="anchor-link"></a> Another Sponsored Transaction EIP
+</h3>
+<p>There are two general approaches to separating the “fee payer” from the “action originator”.</p>
+<p>The first is introducing a new transaction type. This requires significant changes to clients to support and is generally less upgradeable than other solutions (e.g. this EIP). This approach is also not immediately compatible with account abstraction (AA). These proposals require a <em>signed</em> transaction from the sponsor’s account, which is not possible from an AA contract, because it has no private key to sign with. The main advantage of new transaction types is that the validity requirements are enforced by the protocol, therefore invalid transactions do not pollute block space.</p>
+<p>The other main approach is to introduce a new mechanism in the EVM to masquerade as other accounts. This EIP introduces <code class="language-plaintext highlighter-rouge">AUTH</code> and <code class="language-plaintext highlighter-rouge">AUTHCALL</code> to make calls as EOAs. There are many different permutations of this mechanism. An alternative mechanism would be add an opcode that can make arbitrary calls based on a similar address creation scheme as <code class="language-plaintext highlighter-rouge">CREATE2</code>. Although this mechanism would not benefit users today, it would immediately allow for those accounts to send and receive ether – making it feel like a more first-class primitive.</p>
+<p>Besides better compatibility with AA, introducing a new mechanism into the EVM is a much less intrusive change than a new transaction type. This approach requires no changes in existing wallets, and little change in other tooling.</p>
+<p><code class="language-plaintext highlighter-rouge">AUTHCALL</code>’s single deviation from <code class="language-plaintext highlighter-rouge">CALL</code> is to set <code class="language-plaintext highlighter-rouge">CALLER</code>. It implements the minimal functionality to enable sender abstraction for sponsored transactions. This single mindedness makes <code class="language-plaintext highlighter-rouge">AUTHCALL</code> significantly more composable with existing Ethereum features.</p>
+<p>More logic can be implemented around the <code class="language-plaintext highlighter-rouge">AUTHCALL</code> instruction, giving more control to invokers and sponsors without sacrificing security or user experience for sponsees.</p>
+<h3 id="what-to-sign">
+<a href="#what-to-sign" class="anchor-link"></a> What to Sign?
+</h3>
+<p>As originally written, this proposal specified a precompile with storage to track nonces. Since a precompile with storage is unprecedented, a revision moved replay protection into the invoker contract, necessitating a certain level of user trust in the invoker. Expanding on this idea of trusted invokers, the other signed fields were eventually eliminated, one by one, until only <code class="language-plaintext highlighter-rouge">invoker</code> and <code class="language-plaintext highlighter-rouge">commit</code> remained.</p>
+<p>The <code class="language-plaintext highlighter-rouge">invoker</code> binds a particular signed message to a single invoker. If invoker was not part of the message, any invoker could reuse the signature to completely compromise the EOA. This allows users to trust that their message will be validated as they expect, particularly the values committed to in <code class="language-plaintext highlighter-rouge">commit</code>.</p>
+<h3 id="understanding-commit">
+<a href="#understanding-commit" class="anchor-link"></a> Understanding <code class="language-plaintext highlighter-rouge">commit</code>
+</h3>
+<p>Earlier iterations of this EIP included mechanisms for replay protection, and also signed over value, gas, and other arguments to <code class="language-plaintext highlighter-rouge">AUTHCALL</code>. After further investigation, we revised this EIP to its current state: explicitly delegate these responsibilities to the invoker contract.</p>
+<p>A user will specifically interact with an invoker they trust. Because they trust this contract to execute faithfully, they will “commit” to certain properties of a call they would like to make by computing a hash of the call values. They can be certain that the invoker will only allow they call to proceed if it is able to verify the values committed to (e.g. a nonce to protect against replay attacks). This certainty arises from the <code class="language-plaintext highlighter-rouge">commit</code> value that is signed over by the user. This is the hash of values which the invoker will validate. A safe invoker should accept the values from the user and compute the commit hash itself. This ensures that invoker operated on the same input that user authorized.</p>
+<p><img src="/assets/eip-3074/auth-msg.png" alt="auth message format" /></p>
+<p>Using <code class="language-plaintext highlighter-rouge">commit</code> as a hash of values allows for invokers to implement arbitrary constraints. For example, they could allow accounts to have <code class="language-plaintext highlighter-rouge">N</code> parallel nonces. Or, they could allow a user to commit to multiple calls with a single signature. This would allow mult-tx flows, such as ERC-20 <code class="language-plaintext highlighter-rouge">approve</code>-<code class="language-plaintext highlighter-rouge">transfer</code> actions, to be condensed into a single transaction with a single signature verification. A commitment to multiple calls would look something like the diagram below.</p>
+<p><img src="/assets/eip-3074/auth-msg-multi-call.png" alt="multi-call auth message" /></p>
+<h3 id="invoker-contracts">
+<a href="#invoker-contracts" class="anchor-link"></a> Invoker Contracts
+</h3>
+<p>The invoker contract is a trustless intermediary between the sponsor and sponsee. A sponsee signs over <code class="language-plaintext highlighter-rouge">invoker</code> to require they transaction to be processed only by a contract they trust. This allows them to interact with sponsors without needing to trust them.</p>
+<p>Choosing an invoker is similar to choosing a smart contract wallet implementation. It’s important to choose one that has been thoroughly reviewed, tested, and accepted by the community as secure. We expect a few invoker designs to be utilized by most major transaction relay providers, with a few outliers that offer more novel mechanisms.</p>
+<p>An important note is that invoker contracts <strong>MUST NOT</strong> be upgradeable. If an invoker can be redeployed to the same address with different code, it would be possible to redeploy the invoker with code that does not properly verify <code class="language-plaintext highlighter-rouge">commit</code> and any account that signed a message over that invoker would be compromised. Although this sounds scary, it is no different than using a smart contract wallet via <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>. If the wallet is redeployed with different logic, all wallets using its code could be compromised.</p>
+<h3 id="on-call-depth">
+<a href="#on-call-depth" class="anchor-link"></a> On Call Depth
+</h3>
+<p>The EVM limits the maximum number of nested calls, and naively allowing a sponsor to manipulate the call depth before reaching the invoker would introduce a griefing attack against the sponsee. That said, with the 63/64th gas rule, and the cost of <code class="language-plaintext highlighter-rouge">AUTHCALL</code>, the stack is effectively limited to a much smaller depth than the hard maximum by the <code class="language-plaintext highlighter-rouge">gas</code> parameter.</p>
+<p>It is, therefore, sufficient for the invoker to guarantee a minimum amount of gas, because there is no way to reach the hard maximum call depth with any reasonable (i.e. less than billions) amount of gas.</p>
+<h3 id="source-of-value">
+<a href="#source-of-value" class="anchor-link"></a> Source of <code class="language-plaintext highlighter-rouge">value</code>
+</h3>
+<p>Any non-zero <code class="language-plaintext highlighter-rouge">value</code> passed into an <code class="language-plaintext highlighter-rouge">AUTHCALL</code> is deducted from the invoker’s balance. A natural alternative source for <code class="language-plaintext highlighter-rouge">value</code> would be the <code class="language-plaintext highlighter-rouge">authorized</code> account. However, deducting value from an EOA mid-execution is problematic, as it breaks important invariants for handling pending transactions. Specifically:</p>
+<ul>
+<li>Transaction pools expect transactions for a given EOA to only turn invalid when other transactions from the same EOA are included into a block, increasing its nonce and (possibly) decreasing its balance. Deducting <code class="language-plaintext highlighter-rouge">value</code> from the <code class="language-plaintext highlighter-rouge">authorized</code> account would make transaction invalidation an unpredictable side effect of any smart contract execution.</li>
+<li>Similarly, miners rely on the ability to statically pick a set of valid transactions from their transaction pool to include into a new block. Deducting <code class="language-plaintext highlighter-rouge">value</code> from the <code class="language-plaintext highlighter-rouge">authorized</code> account would break this ability, increasing the overhead and thus the time for block creation.</li>
+</ul>
+<p>At the same time, the ability to directly take ether out of the <code class="language-plaintext highlighter-rouge">authorized</code> account is an important piece of functionality and thus a desired future addition via an additional opcode similar to <code class="language-plaintext highlighter-rouge">AUTHCALL</code>. For this reason, it is included as <code class="language-plaintext highlighter-rouge">valueExt</code>, an operand of <code class="language-plaintext highlighter-rouge">AUTHCALL</code>, which may be activated in a future fork. The prerequisite for that would be to find satisfying mitigations to the transaction invalidation concerns outlined above. One potential avenue for that could be the addition of account access lists similar to EIP-2930, used to signal accounts whose balance can be reduced as a side effect of the transaction (without on their own constituting authorization to do so).</p>
+<h3 id="allowing-txorigin-as-signer">
+<a href="#allowing-txorigin-as-signer" class="anchor-link"></a> Allowing <code class="language-plaintext highlighter-rouge">tx.origin</code> as Signer
+</h3>
+<p>Allowing <code class="language-plaintext highlighter-rouge">authorized</code> to equal <code class="language-plaintext highlighter-rouge">tx.origin</code> enables simple transaction batching, where the sender of the outer transaction would be the signing account. The ERC-20 approve-then-transfer pattern, which currently requires two separate transactions, could be completed in a single transaction with this proposal.</p>
+<p><code class="language-plaintext highlighter-rouge">AUTH</code> allows for signatures to be signed by <code class="language-plaintext highlighter-rouge">tx.origin</code>. For any such signatures, subsequent <code class="language-plaintext highlighter-rouge">AUTHCALL</code>s have <code class="language-plaintext highlighter-rouge">msg.sender == tx.origin</code> in their first layer of execution. Without EIP-3074, this situation can only ever arise in the topmost execution layer of a transaction. This EIP breaks that invariant and so affects smart contracts containing <code class="language-plaintext highlighter-rouge">require(msg.sender == tx.origin)</code> checks. This check can be used for at least three purposes:</p>
+<ol>
+<li>Ensuring that <code class="language-plaintext highlighter-rouge">msg.sender</code> is an EOA (given that <code class="language-plaintext highlighter-rouge">tx.origin</code> always has to be an EOA). This invariant does not depend on the execution layer depth and, therefore, is not affected.</li>
+<li>Protecting against atomic sandwich attacks like flash loans, that rely on the ability to modify state before and after the execution of the target contract as part of the same atomic transaction. This protection would be broken by this EIP. However, relying on <code class="language-plaintext highlighter-rouge">tx.origin</code> in this way is considered bad practice, and can already be circumvented by miners conditionally including transactions in a block.</li>
+<li>Preventing re-entrancy.</li>
+</ol>
+<p>Examples of (1) and (2) can be found in contracts deployed on Ethereum mainnet, with (1) being more common (and unaffected by this proposal.) On the other hand, use case (3) is more severely affected by this proposal, but the authors of this EIP did not find any examples of this form of re-entrancy protection, though the search was non-exhaustive.</p>
+<p>This distribution of occurrences—many (1), some (2), and no (3)—is exactly what the authors of this EIP expect, because:</p>
+<ul>
+<li>Determining if <code class="language-plaintext highlighter-rouge">msg.sender</code> is an EOA without <code class="language-plaintext highlighter-rouge">tx.origin</code> is difficult (if not impossible.)</li>
+<li>The only execution context which is safe from atomic sandwich attacks is the topmost context, and <code class="language-plaintext highlighter-rouge">tx.origin == msg.sender</code> is the only way to detect that context.</li>
+<li>In contrast, there are many direct and flexible ways of preventing re-entrancy (ex. using a storage variable.) Since <code class="language-plaintext highlighter-rouge">msg.sender == tx.origin</code> is only true in the topmost context, it would make an obscure tool for preventing re-entrancy, rather than other more common approaches.</li>
+</ul>
+<p>There are other approaches to mitigate this restriction which do not break the invariant:</p>
+<ul>
+<li>Set <code class="language-plaintext highlighter-rouge">tx.origin</code> to a constant <code class="language-plaintext highlighter-rouge">ENTRY_POINT</code> address for <code class="language-plaintext highlighter-rouge">AUTHCALL</code>s.</li>
+<li>Set <code class="language-plaintext highlighter-rouge">tx.origin</code> to the invoker address for <code class="language-plaintext highlighter-rouge">AUTHCALL</code>s.</li>
+<li>Set <code class="language-plaintext highlighter-rouge">tx.origin</code> to a special address derived from any of the sender, invoker, and/or signer addresses.</li>
+<li>Disallow <code class="language-plaintext highlighter-rouge">authorized == tx.origin</code>. This would make the simple batching use cases impossible, but could be relaxed in the future.</li>
+</ul>
+<h3 id="authcall-cheaper-than-call-when-sending-value">
+<a href="#authcall-cheaper-than-call-when-sending-value" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">AUTHCALL</code> cheaper than <code class="language-plaintext highlighter-rouge">CALL</code> when sending value
+</h3>
+<p>Sending non-zero value with <code class="language-plaintext highlighter-rouge">CALL</code> increases its cost by 9,000. Of that, 6,700 covers the increased overhead of the balance transfer and 2,300 is used as a stipend into the subcall to seed its gas counter. <code class="language-plaintext highlighter-rouge">AUTHCALL</code> does not provide a stipend and thus only charges the base 6,700.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Although this EIP poses no issues for backwards compatibility, there are concerns that it limits future changes to accounts by further enshrining ECDSA signatures. For example, it might be desirable to erradicate the concept of EOAs altogether, and replace them with smart contract wallets that emulate the same behavior. This is fully compatible with the EIP as written, however, it gets tricky if users can then elect to “upgrade” their smart contract wallets to use other methods of authentication – e.g. convert into a multisig. Without any changes, <code class="language-plaintext highlighter-rouge">AUTH</code> would not respect this new logic and continue allowing the old private key to perform actions on behalf of the account.</p>
+<p>A solution to this would be at the same time that EOAs are removed, to modify the logic of <code class="language-plaintext highlighter-rouge">AUTH</code> to actually call into the account with some standard message and allow the account to determine if the signature / witness is valid. Further research should be done to understand how invokers would need to change in this situation and how best to write them in a future-compatible manner.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="secure-invokers">
+<a href="#secure-invokers" class="anchor-link"></a> Secure Invokers
+</h3>
+<p>The following is a non-exhaustive list of checks/pitfalls/conditions that invokers <em>should</em> be wary of:</p>
+<ul>
+<li>Replay protection (ex. a nonce) should be implemented by the invoker, and included in <code class="language-plaintext highlighter-rouge">commit</code>. Without it, a malicious actor can reuse a signature, repeating its effects.</li>
+<li><code class="language-plaintext highlighter-rouge">value</code> should be included in <code class="language-plaintext highlighter-rouge">commit</code>. Without it, a malicious sponsor could cause unexpected effects in the callee.</li>
+<li><code class="language-plaintext highlighter-rouge">gas</code> should be included in <code class="language-plaintext highlighter-rouge">commit</code>. Without it, a malicious sponsor could cause the callee to run out of gas and fail, griefing the sponsee.</li>
+<li><code class="language-plaintext highlighter-rouge">addr</code> and <code class="language-plaintext highlighter-rouge">calldata</code> should be included in <code class="language-plaintext highlighter-rouge">commit</code>. Without them, a malicious actor may call arbitrary functions in arbitrary contracts.</li>
+</ul>
+<p>A poorly implemented invoker can <em>allow a malicious actor to take near complete control over a signer’s EOA</em>.</p>
+<h3 id="allowing-txorigin-as-signer-1">
+<a href="#allowing-txorigin-as-signer-1" class="anchor-link"></a> Allowing <code class="language-plaintext highlighter-rouge">tx.origin</code> as Signer
+</h3>
+<p>Allowing <code class="language-plaintext highlighter-rouge">authorized</code> to equal <code class="language-plaintext highlighter-rouge">tx.origin</code> has the possibility to:</p>
+<ul>
+<li>Break atomic sandwich protections which rely on <code class="language-plaintext highlighter-rouge">tx.origin</code>;</li>
+<li>Break re-entrancy guards of the style <code class="language-plaintext highlighter-rouge">require(tx.origin == msg.sender)</code>.</li>
+</ul>
+<p>The authors of this EIP believe the risks of allowing <code class="language-plaintext highlighter-rouge">authorized</code> to equal <code class="language-plaintext highlighter-rouge">tx.origin</code> are acceptable for the reasons outlined in the Rationale section.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/SamWilsn">Sam Wilson</a>, <a href="https://github.com/adietrichs">Ansgar Dietrichs</a>, <a href="https://github.com/lightclient">Matt Garnett</a>, <a href="https://github.com/micahzoltu">Micah Zoltu</a>, "EIP-3074: AUTH and AUTHCALL opcodes [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3074, October 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3074.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3074: AUTH and AUTHCALL opcodes [DRAFT]",
+    "author": "Sam Wilson (@SamWilsn), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient), Micah Zoltu (@micahzoltu)",
+    "name": "EIP-3074: AUTH and AUTHCALL opcodes [DRAFT]",
+    "dateCreated": "2020-10-15",
+    "datePublished": "2020-10-15",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3074-sponsored-transaction-precompile/4880",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

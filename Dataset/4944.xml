@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4944: Contract with Exactly One Non-fungible Token</title>
+<meta property="og:title" content="EIP-4944: Contract with Exactly One Non-fungible Token" />
+<meta name="description" content="An ERC721-compatible single-token NFT" />
+<meta property="og:description" content="An ERC721-compatible single-token NFT" />
+<meta name="twitter:description" content="An ERC721-compatible single-token NFT" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4944" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4944" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4944: Contract with Exactly One Non-fungible Token
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4944.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An ERC721-compatible single-token NFT</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/victormunoz">Víctor Muñoz</a>, <a href="https://github.com/peplluis7">Josep Lluis de la Rosa</a>, <a href="https://github.com/Bluezfish">Andres El-Fakdi</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc721-minting-only-one-token/8602/2">https://ethereum-magicians.org/t/erc721-minting-only-one-token/8602/2</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-03-25</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-721">721</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following describes standard functions for an <a href="/EIPS/eip-721">ERC-721</a> compatible contract with a total supply of one.
+This allows an NFT to be associated uniquely with a single contract address.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>If the ERC721 was modified to mint only 1 token (per contract), then the contract address could be identified uniquely with that minted token (instead of the tuple contract address + token id, as ERC721 requires).
+This change would enable automatically all the capabilities of composable tokens ERC-998 (own other ERC721 or ERC20) natively without adding any extra code, just forbidding to mint more than one token per deployed contract.
+Then the NFT minted with this contract could operate with his “budget” (the ERC20 he owned) and also trade with the other NFTs he could own. Just like an autonomous agent, that could decide what to do with his properties (sell his NFTs, buy other NFTs, etc).</p>
+<p>The first use case that is devised is for value preservation. Digital assets, as NFTs, have value that has to be preserved in order to not be lost. If the asset has its own budget (in other ERC20 coins), could use it to autopreserve itself.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The constructor should mint the unique token of the contract, and then the mint function should add a restriction to avoid further minting.</p>
+<p>Also, a <code class="language-plaintext highlighter-rouge">tokenTransfer</code> function should be added in order to allow the contract owner to transact with the ERC20 tokens owned by the contract/NFT itself. So that if the contract receives a transfer of ERC20 tokens, the owner of the NFT could spend it from the contract wallet.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The main motivation is to keep the contract compatible with current ERC721 platforms.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>There are no backwards compatibility issues.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>Add the variable <code class="language-plaintext highlighter-rouge">_minted</code> in the contract:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kt">bool</span> <span class="k">private</span> <span class="n">_minted</span><span class="p">;</span>
+</code></pre></div></div>
+<p>In the constructor, automint the first token and set the variable to true:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">constructor</span><span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">name</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span> <span class="n">symbol</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span> <span class="n">base_uri</span><span class="p">)</span> <span class="n">ERC721</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">baseUri</span> <span class="o">=</span> <span class="n">base_uri</span><span class="p">;</span>
+        <span class="n">mint</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+        <span class="n">_minted</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>Add additional functions to interact with the NFT properties (for instance, ERC20):</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">modifier</span> <span class="n">onlyOwner</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">balanceOf</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s">"Caller is not the owner of the NFT"</span><span class="p">);</span>
+        <span class="n">_</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">transferTokens</span><span class="p">(</span><span class="n">IERC20</span> <span class="n">token</span><span class="p">,</span> <span class="kt">address</span> <span class="n">recipient</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span> <span class="k">public</span> <span class="n">onlyOwner</span> <span class="p">{</span>
+        <span class="n">token</span><span class="p">.</span><span class="nb">transfer</span><span class="p">(</span><span class="n">recipient</span><span class="p">,</span> <span class="n">amount</span><span class="p">);</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>No security issues found.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/victormunoz">Víctor Muñoz</a>, <a href="https://github.com/peplluis7">Josep Lluis de la Rosa</a>, <a href="https://github.com/Bluezfish">Andres El-Fakdi</a>, "EIP-4944: Contract with Exactly One Non-fungible Token [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4944, March 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4944.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4944: Contract with Exactly One Non-fungible Token [DRAFT]",
+    "author": "Víctor Muñoz (@victormunoz), Josep Lluis de la Rosa (@peplluis7), Andres El-Fakdi (@Bluezfish)",
+    "name": "EIP-4944: Contract with Exactly One Non-fungible Token [DRAFT]",
+    "dateCreated": "2022-03-25",
+    "datePublished": "2022-03-25",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc721-minting-only-one-token/8602/2",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1901: Add OpenRPC Service Discovery To JSON-RPC Services</title>
+<meta property="og:title" content="EIP-1901: Add OpenRPC Service Discovery To JSON-RPC Services" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1901" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1901" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1901: Add OpenRPC Service Discovery To JSON-RPC Services
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1901.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/shanejonas">Shane Jonas</a>, <a href="https://github.com/belfordz">Zachary Belford</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1902">https://github.com/ethereum/EIPs/issues/1902</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2019-02-25</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a>
+<ul>
+<li><a href="#what-is-this">What is this?</a></li>
+</ul>
+</li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#what-is-openrpc">What is OpenRPC?</a></li>
+<li><a href="#use-case">Use Case</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#why-would-we-do-this">Why would we do this?</a></li>
+<li><a href="#alternative">Alternative</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a>
+<ul>
+<li><a href="#tooling">Tooling</a></li>
+</ul>
+</li>
+<li><a href="#resources">Resources</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<h3 id="what-is-this">
+<a href="#what-is-this" class="anchor-link"></a> What is this?
+</h3>
+<p>This is a proposal to add <a href="https://github.com/open-rpc/spec">OpenRPC</a> support to existing and future JSON-RPC services by adding the method <a href="https://github.com/open-rpc/spec#service-discovery-method"><code class="language-plaintext highlighter-rouge">rpc.discover</code></a> to the projects <a href="https://www.jsonrpc.org/specification">JSON-RPC</a> APIs, enabling automation and tooling.</p>
+<p>The OpenRPC Document and generated Documentation that specifies all the methods an EVM-based blockchain should implement can be found <a href="https://github.com/etclabscore/ethereum-json-rpc-specification">here</a>.</p>
+<p>This was first proposed <a href="https://github.com/etclabscore/ECIPs/blob/master/ECIPs/ECIP-1053.md">here as an ECIP</a>, but the benefits of this kind of tooling is apparent across Bitcoin, Ethereum Classic, Ethereum and other JSON-RPC accessible blockchains.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Although <a href="/EIPS/eip-1474">EIP-1474</a> outlines a JSON-RPC specification. Ethereum still lacks a machine-readable JSON-RPC Specification that can be used as the industry standard for tooling. This proposal attempts to standardize such a specification in a way that is versionable, and both human and machine readable.</p>
+<p>Ethereum clients can expose RPC endpoints with different method signatures and cause compatibility issues between clients.</p>
+<p>Developers need a reliable developer experience, and an industry standard way to describe Ethereum JSON-RPC 2.0 APIs.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="what-is-openrpc">
+<a href="#what-is-openrpc" class="anchor-link"></a> What is OpenRPC?
+</h3>
+<p>The <a href="https://github.com/open-rpc/spec">OpenRPC</a> Specification defines a standard, programming language-agnostic interface description for <a href="https://www.jsonrpc.org/specification">JSON-RPC 2.0</a> APIs, which allows both humans and computers to discover and understand the capabilities of a service without requiring access to source code, additional documentation, or inspection of network traffic. When properly defined via OpenRPC, a consumer can understand and interact with the remote service with a minimal amount of implementation logic, and share these logic patterns across use cases. Similar to what interface descriptions have done for lower-level programming, the OpenRPC Specification removes guesswork in calling a service.</p>
+<h5 id="structure">
+<a href="#structure" class="anchor-link"></a> Structure
+
+</h5>
+<p>This is the structure of an OpenRPC Document:</p>
+<p><img src="/assets/eip-1901/OpenRPC_structure.png" alt="openrpc-spec-structure" /></p>
+<p>JSON-RPC APIs can support the OpenRPC specification by implementing a service discovery method that will return the <a href="https://github.com/open-rpc/spec#openrpc-document">OpenRPC document</a> for the JSON-RPC API. The method MUST be named <code class="language-plaintext highlighter-rouge">rpc.discover</code>. The <code class="language-plaintext highlighter-rouge">rpc.</code> prefix is a reserved method prefix for <a href="https://www.jsonrpc.org/specification">JSON-RPC 2.0 Specification</a> system extensions.</p>
+<h3 id="use-case">
+<a href="#use-case" class="anchor-link"></a> Use Case
+</h3>
+<p>This is the vision for the use case of OpenRPC and how it would relate to a client implementation like multi-geth:</p>
+<p><img src="/assets/eip-1901/multi-geth-use-case.png" alt="MultGethRpc-usecase" /></p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="why-would-we-do-this">
+<a href="#why-would-we-do-this" class="anchor-link"></a> Why would we do this?
+</h3>
+<p>Services need to figure out how to talk to each other. If we really want to build the next generation of automation, then having up to date libraries, documented APIs, and modern tools are going to provide easy discovery, on-boarding, and enable end user and developer interaction.</p>
+<p>Use cases for machine-readable <a href="https://www.jsonrpc.org/specification">JSON-RPC 2.0</a> API definition documents include, but are not limited to:</p>
+<ul>
+<li>A common vocabulary and document will keep developers, testers, architects, and technical writers all in sync.</li>
+<li>Server stubs/skeletons generated in many languages</li>
+<li>Clients generated in many languages</li>
+<li>Mock Server generated in many languages</li>
+<li>Tests generated in many languages</li>
+<li>Documentation Generation</li>
+</ul>
+<h3 id="alternative">
+<a href="#alternative" class="anchor-link"></a> Alternative
+</h3>
+<p><a href="https://github.com/open-rpc/spec">OpenRPC</a> documents just describe <a href="https://www.jsonrpc.org/specification">JSON-RPC</a> APIs services, and are represented in JSON format. These documents may be produced and served statically OR generated dynamically from an application and returned via the <a href="https://github.com/open-rpc/spec#service-discovery-method"><code class="language-plaintext highlighter-rouge">rpc.discover</code></a> method. This gives projects and communities the opportunity to adopt tools, documentation, and clients outlined in the <a href="/EIPS/eip-1474">etclabscore/ethereum-json-rpc-specification</a> before the <a href="https://github.com/open-rpc/spec#service-discovery-method"><code class="language-plaintext highlighter-rouge">rpc.discover</code></a> method is implemented for a particular client.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<ul>
+<li><a href="https://github.com/multi-geth/multi-geth#openrpc-discovery">Multi-Geth OpenRPC Discovery</a></li>
+</ul>
+<h3 id="tooling">
+<a href="#tooling" class="anchor-link"></a> Tooling
+</h3>
+<h4 id="interactive-documentation-playground">
+<a href="#interactive-documentation-playground" class="anchor-link"></a> Interactive Documentation Playground
+</h4>
+<p>You can view the interactive documentation <a href="https://playground.open-rpc.org/?schemaUrl=https://raw.githubusercontent.com/etclabscore/ethereum-json-rpc-specification/master/openrpc.json">here</a>.</p>
+<p><strong>OR</strong></p>
+<p>Using <code class="language-plaintext highlighter-rouge">rpc.discover</code> via multi-geth, the playground can discover and display the documentation for the Ethereum JSON-RPC API:</p>
+<p><img src="/assets/eip-1901/eth-playground-openrpc.gif" alt="eth-playground-openrpc" /></p>
+<h4 id="generated-client">
+<a href="#generated-client" class="anchor-link"></a> Generated Client
+</h4>
+<p>The <a href="https://github.com/etclabscore/ethereum-json-rpc-specification#clients">clients</a> are generated from the OpenRPC Document openrpc.json outlined in this EIP, and can be used as an alternative to web3.js or ethers.js but for various languages:</p>
+<p><img src="/assets/eip-1901/eth-generated-client-openrpc.gif" alt="eth-generated-client-openrpc" /></p>
+<h4 id="mock-server">
+<a href="#mock-server" class="anchor-link"></a> Mock Server
+</h4>
+<p>The <a href="https://github.com/open-rpc/mock-server">OpenRPC mock server</a> provides a mock server for any given OpenRPC Document which allows testing without booting up a real network.</p>
+<p><img src="/assets/eip-1901/inspector-mock-server-openrpc.png" alt="inspector-mock-server-openrpc" /></p>
+<h2 id="resources">
+<a href="#resources" class="anchor-link"></a> Resources
+</h2>
+<ul>
+<li><a href="https://github.com/multi-geth/multi-geth#openrpc-discovery">Multi-Geth OpenRPC Discovery</a></li>
+<li><a href="https://www.youtube.com/watch?v=UgSPMZ9FQ4Q">EDCON 2019 talk on OpenRPC and The Future of JSON-RPC Tooling</a></li>
+<li><a href="https://github.com/etclabscore/ethereum-json-rpc-specification">etclabscore/ethereum-json-rpc-specification</a></li>
+<li><a href="https://open-rpc.org">open-rpc.org</a></li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/shanejonas">Shane Jonas</a>, <a href="https://github.com/belfordz">Zachary Belford</a>, "EIP-1901: Add OpenRPC Service Discovery To JSON-RPC Services [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1901, February 2019. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1901.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1901: Add OpenRPC Service Discovery To JSON-RPC Services [DRAFT]",
+    "author": "Shane Jonas (@shanejonas), Zachary Belford (@belfordz)",
+    "name": "EIP-1901: Add OpenRPC Service Discovery To JSON-RPC Services [DRAFT]",
+    "dateCreated": "2019-02-25",
+    "datePublished": "2019-02-25",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1902",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2019"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

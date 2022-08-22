@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3675: Upgrade consensus to Proof-of-Stake</title>
+<meta property="og:title" content="EIP-3675: Upgrade consensus to Proof-of-Stake" />
+<meta name="description" content="Specification of the consensus mechanism upgrade on Ethereum Mainnet that introduces Proof-of-Stake" />
+<meta property="og:description" content="Specification of the consensus mechanism upgrade on Ethereum Mainnet that introduces Proof-of-Stake" />
+<meta name="twitter:description" content="Specification of the consensus mechanism upgrade on Ethereum Mainnet that introduces Proof-of-Stake" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3675" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3675" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3675: Upgrade consensus to Proof-of-Stake
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3675.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Specification of the consensus mechanism upgrade on Ethereum Mainnet that introduces Proof-of-Stake</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/mkalinin">Mikhail Kalinin</a>, <a href="https://github.com/djrtwo">Danny Ryan</a>, <a href="https://github.com/vbuterin">Vitalik Buterin</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3675-upgrade-consensus-to-proof-of-stake/6706">https://ethereum-magicians.org/t/eip-3675-upgrade-consensus-to-proof-of-stake/6706</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2022-08-31</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-07-22</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2124">2124</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#client-software-configuration">Client software configuration</a></li>
+<li><a href="#pow-block-processing">PoW block processing</a></li>
+<li><a href="#constants">Constants</a></li>
+<li><a href="#block-structure">Block structure</a></li>
+<li><a href="#block-validity">Block validity</a></li>
+<li><a href="#block-and-ommer-rewards">Block and ommer rewards</a></li>
+<li><a href="#fork-choice-rule">Fork choice rule</a></li>
+<li><a href="#network">Network</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#total-difficulty-triggering-the-upgrade">Total difficulty triggering the upgrade</a></li>
+<li><a href="#parameterizing-terminal-block-hash">Parameterizing terminal block hash</a></li>
+<li><a href="#halting-the-import-of-pow-blocks">Halting the import of PoW blocks</a></li>
+<li><a href="#replacing-block-fields-with-constants">Replacing block fields with constants</a></li>
+<li><a href="#replacing-difficulty-with-0">Replacing difficulty with 0</a></li>
+<li><a href="#changing-block-validity-rules">Changing block validity rules</a></li>
+<li><a href="#removing-block-rewards">Removing block rewards</a></li>
+<li><a href="#supplanting-fork-choice-rule">Supplanting fork choice rule</a></li>
+<li><a href="#remove-of-pos_consensus_validated">Remove of POS_CONSENSUS_VALIDATED</a></li>
+<li><a href="#eip-2124-fork-identifier">EIP-2124 fork identifier</a></li>
+<li><a href="#removing-block-gossip">Removing block gossip</a></li>
+<li><a href="#restricting-the-length-of-extradata">Restricting the length of extraData</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a>
+<ul>
+<li><a href="#evm">EVM</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#beacon-chain">Beacon chain</a></li>
+<li><a href="#transition-process">Transition process</a></li>
+<li><a href="#ancient-blocks-are-no-longer-a-requisite-for-a-network-security">Ancient blocks are no longer a requisite for a network security</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP deprecates Proof-of-Work (PoW) and supersedes it with the new Proof-of-Stake consensus mechanism (PoS) driven by the beacon chain. Information on the bootstrapping of the new consensus mechanism is documented in <a href="/EIPS/eip-2982">EIP-2982</a>. Full specification of the beacon chain can be found in the <code class="language-plaintext highlighter-rouge">ethereum/consensus-specs</code> repository.</p>
+<p>This document specifies the set of changes to the block structure, block processing, fork choice rule and network interface introduced by the consensus upgrade.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The beacon chain network has been up and running since December 2020. Neither safety nor liveness failures were detected during this period of time. This long period of running without failure demonstrates the sustainability of the beacon chain system and its readiness to become a security provider for the Ethereum Mainnet.</p>
+<p>To understand the motivation of introducing the Proof-of-Stake consensus see the Motivation section of <a href="/EIPS/eip-2982#motivation">EIP-2982</a>.</p>
+<h2 id="specification">
+
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h3>
+<ul>
+<li><strong>PoW block</strong>: Block that is built and verified by the existing proof-of-work mechanism. In other words, a block of the Ethereum network before the consensus upgrade.</li>
+<li><strong>PoS block</strong>: Block that is built and verified by the new proof-of-stake mechanism.</li>
+<li><strong>Terminal PoW block</strong>: A PoW block that satisfies the following conditions –
+<code class="language-plaintext highlighter-rouge">pow_block.total_difficulty &gt;= TERMINAL_TOTAL_DIFFICULTY</code> <em>and</em> <code class="language-plaintext highlighter-rouge">pow_block.parent_block.total_difficulty &lt; TERMINAL_TOTAL_DIFFICULTY</code>.
+There can be more than one terminal PoW block in the network, e.g. multiple children of the same pre-terminal block.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">TERMINAL_TOTAL_DIFFICULTY</code></strong> The amount of total difficulty reached by the network that triggers the consensus upgrade.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code></strong> The earliest PoS block of the canonical chain, i.e. the PoS block with the lowest block height.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code></strong> An event occurring when the state of the proof-of-stake fork choice is updated.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">FORK_NEXT_VALUE</code></strong> A block number set to the <code class="language-plaintext highlighter-rouge">FORK_NEXT</code> parameter for the upcoming consensus upgrade.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code></strong> Designates the hash of the terminal PoW block if set, i.e. if not stubbed with <code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000000000000000000000000000</code>.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_NUMBER</code></strong> Designates the number of the terminal PoW block if <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code> is set.</li>
+</ul>
+<h4 id="pos-events">
+<a href="#pos-events" class="anchor-link"></a> PoS events
+</h4>
+<p>Events having the <code class="language-plaintext highlighter-rouge">POS_</code> prefix in the name (PoS events) are emitted by the new proof-of-stake consensus mechanism. They signify the corresponding assertion that has been made regarding a block specified by the event. The underlying logic of PoS events can be found in the beacon chain specification. On the occurrence of each PoS event the corresponding action that is specified by this EIP <strong>MUST</strong> be taken.</p>
+<p>The details provided below must be taken into account when reading those parts of the specification that refer to the PoS events:</p>
+<ul>
+<li>Reference to a block that is contained by PoS events is provided in a form of a block hash unless another is explicitly specified.</li>
+<li>A <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event contains references to the head of the canonical chain and to the most recent finalized block. Before the first finalized block occurs in the system the finalized block hash provided by this event is stubbed with <code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000000000000000000000000000</code>.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">FIRST_FINALIZED_BLOCK</code></strong> The first finalized block that is designated by <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event and has the hash that differs from the stub.</li>
+</ul>
+<h3 id="client-software-configuration">
+<a href="#client-software-configuration" class="anchor-link"></a> Client software configuration
+</h3>
+<p>The following set of parameters is a part of client software configuration and <strong>MUST</strong> be included into its binary distribution:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_TOTAL_DIFFICULTY</code></li>
+<li><code class="language-plaintext highlighter-rouge">FORK_NEXT_VALUE</code></li>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code></li>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_NUMBER</code></li>
+</ul>
+<p><em>Note</em>: If <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code> is stubbed with <code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000000000000000000000000000</code> then <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code> and <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_NUMBER</code> parameters <strong>MUST NOT</strong> take an effect.</p>
+<h3 id="pow-block-processing">
+<a href="#pow-block-processing" class="anchor-link"></a> PoW block processing
+</h3>
+<p>PoW blocks that are descendants of any terminal PoW block <strong>MUST NOT</strong> be imported. This implies that a terminal PoW block will be the last PoW block in the canonical chain.</p>
+<h3 id="constants">
+<a href="#constants" class="anchor-link"></a> Constants
+</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">MAX_EXTRA_DATA_BYTES</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">32</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="block-structure">
+<a href="#block-structure" class="anchor-link"></a> Block structure
+</h3>
+<p>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, a number of previously dynamic block fields are deprecated by enforcing these values to instead be constants. Each block field listed in the table below <strong>MUST</strong> be replaced with the corresponding constant value.</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Constant value</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">ommersHash</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347</code></td>
+<td><code class="language-plaintext highlighter-rouge">= Keccak256(RLP([]))</code></td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">difficulty</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">0</code></td>
+<td> </td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">mixHash</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000000000000000000000000000</code></td>
+<td> </td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">nonce</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">0x0000000000000000</code></td>
+<td> </td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">ommers</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">[]</code></td>
+<td><code class="language-plaintext highlighter-rouge">RLP([]) = 0xc0</code></td>
+</tr>
+</tbody>
+</table>
+<p>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, the validation of the block’s <strong><code class="language-plaintext highlighter-rouge">extraData</code></strong> field changes: The length of the block’s <strong><code class="language-plaintext highlighter-rouge">extraData</code></strong> <strong>MUST</strong> be less than or equal to <strong><code class="language-plaintext highlighter-rouge">MAX_EXTRA_DATA_BYTES</code></strong> bytes.</p>
+<p><em>Note</em>: Logic and validity conditions of block fields that are <em>not</em> specified here <strong>MUST</strong> remain unchanged. Additionally, the overall block format <strong>MUST</strong> remain unchanged.</p>
+<p><em>Note</em>: Subsequent EIPs may override the constant values specified above to provide additional functionality. For an example, see <a href="/EIPS/eip-4399">EIP-4399</a>.</p>
+<h3 id="block-validity">
+<a href="#block-validity" class="anchor-link"></a> Block validity
+</h3>
+<p>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, the block validity conditions <strong>MUST</strong> be altered by the following:</p>
+<ul>
+<li>Remove verification of the block’s <strong><code class="language-plaintext highlighter-rouge">difficulty</code></strong> value with respect to the difficulty formula.</li>
+<li>Remove verification of the block’s <strong><code class="language-plaintext highlighter-rouge">nonce</code></strong> and <strong><code class="language-plaintext highlighter-rouge">mixHash</code></strong> values with respect to the Ethash function.</li>
+<li>Remove all validation rules that are evaluated over the list of ommers and each member of this list.</li>
+<li>Add verification of the fields noted in the <a href="#block-structure">block structure</a> section.</li>
+</ul>
+<p><em>Note</em>: If one of the new rules fails then the block <strong>MUST</strong> be invalidated.</p>
+<p><em>Note</em>: Validity rules that are not specified in the list above <strong>MUST</strong> remain unchanged.</p>
+<h4 id="transition-block-validity">
+<a href="#transition-block-validity" class="anchor-link"></a> Transition block validity
+</h4>
+<p>In addition to satisfying the above conditions, <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> <strong>MUST</strong> be a child of a terminal PoW block. That is, a parent of <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> <strong>MUST</strong> satisfy terminal PoW block conditions.</p>
+<h3 id="block-and-ommer-rewards">
+<a href="#block-and-ommer-rewards" class="anchor-link"></a> Block and ommer rewards
+</h3>
+<p>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, block and ommer rewards are deprecated. Specifically, the following actions <strong>MUST</strong> be taken:</p>
+<ul>
+<li>Remove increasing the balance of the block’s <strong><code class="language-plaintext highlighter-rouge">beneficiary</code></strong> account by the block reward.</li>
+<li>Remove increasing the balance of the block’s <strong><code class="language-plaintext highlighter-rouge">beneficiary</code></strong> account by the ommer inclusion reward per each ommer.</li>
+<li>Remove increasing the balance of the ommer’s <strong><code class="language-plaintext highlighter-rouge">beneficiary</code></strong> account by the ommer block reward per each ommer.</li>
+</ul>
+<p><em>Note</em>: Transaction fee mechanics affecting the block’s <code class="language-plaintext highlighter-rouge">beneficiary</code> account <strong>MUST</strong> remain unchanged.</p>
+<h3 id="fork-choice-rule">
+<a href="#fork-choice-rule" class="anchor-link"></a> Fork choice rule
+</h3>
+<p>If set, <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code> parameter affects the PoW heaviest chain rule in the following way:</p>
+<ul>
+<li>Canonical blockchain <strong>MUST</strong> contain a block with the hash defined by <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code> parameter at the height defined by <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_NUMBER</code> parameter.</li>
+</ul>
+<p><em>Note</em>: This rule is akin to block hash whitelisting functionality already present in client software implementations.</p>
+<p>As of the first <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event, the fork choice rule <strong>MUST</strong> be altered in the following way:</p>
+<ul>
+<li>Remove the existing PoW heaviest chain rule.</li>
+<li>Adhere to the new PoS LMD-GHOST rule.</li>
+</ul>
+<p>The new PoS LMD-GHOST fork choice rule is specified as follows. On each occurrence of a <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event including the first one, the following actions <strong>MUST</strong> be taken:</p>
+<ul>
+<li>Consider the chain starting at genesis and ending with the head block nominated by the event as the canonical blockchain.</li>
+<li>Set the head of the canonical blockchain to the corresponding block nominated by the event.</li>
+<li>Beginning with the <code class="language-plaintext highlighter-rouge">FIRST_FINALIZED_BLOCK</code>, set the most recent finalized block to the corresponding block nominated by the event.</li>
+</ul>
+<p>Changes to the block tree store that are related to the above actions <strong>MUST</strong> be applied atomically.</p>
+<p><em>Note</em>: This rule <strong>MUST</strong> be strictly enforced. “Optimistic” updates to the head <strong>MUST NOT</strong> be made. That is – if a new block is processed on top of the current head block, this new block becomes the new head if and only if an accompanying <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event occurs.</p>
+<h3 id="network">
+<a href="#network" class="anchor-link"></a> Network
+</h3>
+<h4 id="fork-identifier">
+<a href="#fork-identifier" class="anchor-link"></a> Fork identifier
+</h4>
+<p>For the purposes of the <a href="/EIPS/eip-2124">EIP-2124</a> fork identifier, nodes implementing this EIP <strong>MUST</strong> set the <code class="language-plaintext highlighter-rouge">FORK_NEXT</code> parameter to the <code class="language-plaintext highlighter-rouge">FORK_NEXT_VALUE</code>.</p>
+<h4 id="devp2p">
+<a href="#devp2p" class="anchor-link"></a> devp2p
+</h4>
+<p>The networking stack <strong>SHOULD NOT</strong> send the following messages if they advertise the descendant of any terminal PoW block:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">NewBlockHashes (0x01)</code></li>
+<li><code class="language-plaintext highlighter-rouge">NewBlock (0x07)</code></li>
+</ul>
+<p>Beginning with receiving the <code class="language-plaintext highlighter-rouge">FIRST_FINALIZED_BLOCK</code>, the networking stack <strong>MUST</strong> discard the following ingress messages:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">NewBlockHashes (0x01)</code></li>
+<li><code class="language-plaintext highlighter-rouge">NewBlock (0x07)</code></li>
+</ul>
+<p>Beginning with receiving the finalized block next to the <code class="language-plaintext highlighter-rouge">FIRST_FINALIZED_BLOCK</code>, the networking stack <strong>MUST</strong> remove the handlers corresponding to the following messages:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">NewBlockHashes (0x01)</code></li>
+<li><code class="language-plaintext highlighter-rouge">NewBlock (0x07)</code></li>
+</ul>
+<p>Peers that keep sending these messages after the handlers have been removed <strong>SHOULD</strong> be disconnected.</p>
+<p><em>Note:</em> The logic of message handlers that are not affected by this section <strong>MUST</strong> remain unchanged.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The changes specified in this EIP target a minimal requisite set of consensus and client software modifications to safely replace the existing proof-of-work consensus algorithm with the new proof-of-stake consensus represented by the already in-production beacon chain.</p>
+<p>This EIP was designed to minimize the complexity of hot-swapping the live consensus of the Ethereum network. Both the safety of the operation and time to production were taken into consideration. Additionally, a minimal changeset helps ensure that <em>most</em> smart contracts and services will continue to function as intended during and after the transition with little to no required intervention.</p>
+<h3 id="total-difficulty-triggering-the-upgrade">
+<a href="#total-difficulty-triggering-the-upgrade" class="anchor-link"></a> Total difficulty triggering the upgrade
+</h3>
+<p>See <a href="#terminal-total-difficulty-vs-block-number">Security considerations</a>.</p>
+<h3 id="parameterizing-terminal-block-hash">
+<a href="#parameterizing-terminal-block-hash" class="anchor-link"></a> Parameterizing terminal block hash
+</h3>
+<p>See <a href="#terminal-pow-block-overriding">Security considerations</a>.</p>
+<h3 id="halting-the-import-of-pow-blocks">
+<a href="#halting-the-import-of-pow-blocks" class="anchor-link"></a> Halting the import of PoW blocks
+</h3>
+<p>See <a href="#halt-the-importing-of-pow-blocks">Security considerations</a>.</p>
+<h3 id="replacing-block-fields-with-constants">
+<a href="#replacing-block-fields-with-constants" class="anchor-link"></a> Replacing block fields with constants
+</h3>
+<p>Deprecated block fields are replaced with constant values to ensure the block format remains backwards compatible. Preserving the block format aids existing smart contracts and services in providing uninterrupted service during and after this transition.</p>
+<p>Particularly, this is important for those smart contracts that verify Merkle proofs of transaction/receipt inclusion and state by validating the hash of externally provided block header against the corresponding value returned by the <code class="language-plaintext highlighter-rouge">BLOCKHASH</code> operation.</p>
+<p>This change introduces an additional validity rule that enforces the replacement of deprecated block fields.</p>
+<h3 id="replacing-difficulty-with-0">
+<a href="#replacing-difficulty-with-0" class="anchor-link"></a> Replacing <code class="language-plaintext highlighter-rouge">difficulty</code> with <code class="language-plaintext highlighter-rouge">0</code>
+</h3>
+<p>After deprecating the proof-of-work the notion of difficulty no longer exists and replacing the block header <strong><code class="language-plaintext highlighter-rouge">difficulty</code></strong> field with <code class="language-plaintext highlighter-rouge">0</code> constant is semantically sound.</p>
+<h3 id="changing-block-validity-rules">
+<a href="#changing-block-validity-rules" class="anchor-link"></a> Changing block validity rules
+</h3>
+<p>The rule set enforcing the PoW seal validity is replaced with the corresponding PoS rules along with the consensus upgrade as the rationale behind this change.</p>
+<p>An additional rule validating a set of deprecated block fields is required by the block format changes introduced by this specification.</p>
+<h3 id="removing-block-rewards">
+<a href="#removing-block-rewards" class="anchor-link"></a> Removing block rewards
+</h3>
+<p>Existing rewards for producing and sealing blocks are deprecated along with the PoW mechanism. The new PoS consensus becomes both responsible for sealing blocks and for issuing block rewards once this specification enters into effect.</p>
+<h3 id="supplanting-fork-choice-rule">
+<a href="#supplanting-fork-choice-rule" class="anchor-link"></a> Supplanting fork choice rule
+</h3>
+<p>The fork choice rule of the PoW mechanism becomes completely irrelevant after the upgrade and is replaced with the corresponding rule of the new PoS consensus mechanism.</p>
+<h3 id="remove-of-pos_consensus_validated">
+<a href="#remove-of-pos_consensus_validated" class="anchor-link"></a> Remove of <code class="language-plaintext highlighter-rouge">POS_CONSENSUS_VALIDATED</code>
+</h3>
+<p>In prior draft versions of this EIP, an additional POS event – <code class="language-plaintext highlighter-rouge">POS_CONSENSUS_VALIDATED</code> – was required as a validation condition for blocks. This event gave the signal to either fully incorporate or prune the block from the block tree.</p>
+<p>This event was removed for two reasons:</p>
+<ol>
+<li>This event was an unnecessary optimization to allow for pruning of “bad” blocks from the block tree. This optimization was unnecessary because the PoS consensus would never send <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> for any such bad blocks or their descendants, and eventually any such blocks would be able to be pruned after a PoS finality event of an alternative branch in the block tree.</li>
+<li>This event was dangerous in some scenarios because a block could be referenced by two <em>different</em> and conflicting PoS branches. Thus for the same block in some scenarios, both a <code class="language-plaintext highlighter-rouge">POS_CONSENSUS_VALIDATED == TRUE</code> and <code class="language-plaintext highlighter-rouge">POS_CONSENSUS_VALIDATED == FALSE</code> event could sent, entirely negating the ability to safely perform the optimization in (1).</li>
+</ol>
+<h3 id="eip-2124-fork-identifier">
+<a href="#eip-2124-fork-identifier" class="anchor-link"></a> EIP-2124 fork identifier
+</h3>
+<p>The value of <code class="language-plaintext highlighter-rouge">FORK_NEXT</code> in EIP-2124 refers to the block number of the next fork a given node knows about and <code class="language-plaintext highlighter-rouge">0</code> otherwise.</p>
+<p>The number of <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> cannot be known ahead of time given the dynamic nature of the transition trigger condition. As the block will not be known a priori, nodes can’t use its number for <code class="language-plaintext highlighter-rouge">FORK_NEXT</code> and in light of this fact an explicitly set <code class="language-plaintext highlighter-rouge">FORK_NEXT_VALUE</code> is used instead.</p>
+<h3 id="removing-block-gossip">
+<a href="#removing-block-gossip" class="anchor-link"></a> Removing block gossip
+</h3>
+<p>After the upgrade of the consensus mechanism only the beacon chain network will have enough information to validate a block. Thus, block gossip provided by the <code class="language-plaintext highlighter-rouge">eth</code> network protocol will become unsafe and is deprecated in favour of the block gossip existing in the beacon chain network.</p>
+<p>It is recommended for the client software to not propagate descendants of any terminal PoW block to reduce the load on processing the P2P component and stop operating in the environment with unknown security properties.</p>
+<h3 id="restricting-the-length-of-extradata">
+<a href="#restricting-the-length-of-extradata" class="anchor-link"></a> Restricting the length of <code class="language-plaintext highlighter-rouge">extraData</code>
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">extraData</code> field is defined as a maximum of <code class="language-plaintext highlighter-rouge">32</code> bytes in the yellow paper. Thus mainnet and most PoW testnets cap the value at <code class="language-plaintext highlighter-rouge">32</code> bytes. <code class="language-plaintext highlighter-rouge">extraData</code> fields of greater length are used by clique testnets and other networks to carry special signature/consensus schemes. This EIP restricts the length of <code class="language-plaintext highlighter-rouge">extraData</code> to <code class="language-plaintext highlighter-rouge">32</code> bytes because any network that is transitioning from another consensus mechanism to a beacon chain PoS consensus mechanism no longer needs extended or unbounded <code class="language-plaintext highlighter-rouge">extraData</code>.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP introduces backward incompatibilities in block validity, block rewards and fork choice rule.</p>
+<p>The design of the consensus upgrade specified by this document does not introduce backward incompatibilities for existing applications and services built on top of Ethereum except for those that are described in the <a href="#evm">EVM</a> section below or heavily depends on the PoW consensus in any other way.</p>
+<h3 id="evm">
+<a href="#evm" class="anchor-link"></a> EVM
+</h3>
+<p>Although this EIP does not introduce any explicit changes to the EVM there are a couple of places where it may affect the logic of existing smart contracts.</p>
+<h4 id="difficulty">
+<a href="#difficulty" class="anchor-link"></a> DIFFICULTY
+</h4>
+<p><code class="language-plaintext highlighter-rouge">DIFFICULTY</code> operation will always return <code class="language-plaintext highlighter-rouge">0</code> after this EIP takes effect and deprecates the <strong><code class="language-plaintext highlighter-rouge">difficulty</code></strong> field by replacing it with <code class="language-plaintext highlighter-rouge">0</code> constant.</p>
+<p><em>Note:</em> Altering the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> semantics to return randomness accumulated by the beacon chain is under consideration but will be introduced in a separate EIP.</p>
+<h4 id="blockhash">
+<a href="#blockhash" class="anchor-link"></a> BLOCKHASH
+</h4>
+<p>Pseudo-random numbers obtained as the output of <code class="language-plaintext highlighter-rouge">BLOCKHASH</code> operation become more insecure after this EIP takes effect and the PoW mechanism (which decreases the malleability of block hashes) gets supplanted by PoS.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<ul>
+<li>Block validity
+<ul>
+<li>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, block is invalidated if any of the following is true:
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ommersHash != Keccak256(RLP([]))</code></li>
+<li><code class="language-plaintext highlighter-rouge">difficulty != 0</code></li>
+<li><code class="language-plaintext highlighter-rouge">nonce != 0x0000000000000000</code></li>
+<li><code class="language-plaintext highlighter-rouge">len(extraData) &gt; MAX_EXTRA_DATA_BYTES</code></li>
+</ul>
+</li>
+<li>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, block rewards aren’t added to <code class="language-plaintext highlighter-rouge">beneficiary</code> account</li>
+</ul>
+</li>
+<li>Client software adheres to PoS LMD-GHOST rule
+<ul>
+<li>Head and finalized blocks are set according to the recent <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event</li>
+<li>No fork choice state is updated unless <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code> event is received</li>
+</ul>
+</li>
+<li>Transition process
+<ul>
+<li>Client software doesn’t process any PoW block beyond a terminal PoW block</li>
+<li>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, client software applies new block validity rules</li>
+<li>Beginning with the first <code class="language-plaintext highlighter-rouge">POS_FORKCHOICE_UPDATED</code>, client software switches its fork choice rule to PoS LMD-GHOST</li>
+<li><code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> must be a child of a terminal PoW block</li>
+<li><code class="language-plaintext highlighter-rouge">NewBlockHashes (0x01)</code> and <code class="language-plaintext highlighter-rouge">NewBlock (0x07)</code> network messages are discarded after receiving the <code class="language-plaintext highlighter-rouge">FIRST_FINALIZED_BLOCK</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="beacon-chain">
+<a href="#beacon-chain" class="anchor-link"></a> Beacon chain
+</h3>
+<p>See Security Considerations section of <a href="/EIPS/eip-2982#security-considerations">EIP-2982</a>.</p>
+<h3 id="transition-process">
+<a href="#transition-process" class="anchor-link"></a> Transition process
+</h3>
+<p>The transition process used to take this specification into effect is a more sophisticated version of a hardfork – the regular procedure of applying backwards incompatible changes in the Ethereum network. This process has multiple successive steps instead of the normal block-height point condition of simpler hardforks.</p>
+<p>The complexity of this upgrade process stems from this fork targeting the underlying consensus mechanism rather than the execution layer within the consensus mechanism. Although the design seeks simplicity where possible, safety and liveness considerations during this transition have been prioritized.</p>
+<h4 id="terminal-total-difficulty-vs-block-number">
+<a href="#terminal-total-difficulty-vs-block-number" class="anchor-link"></a> Terminal total difficulty vs block number
+</h4>
+<p>Using a pre-defined block number for the hardfork is unsafe in this context due to the PoS fork choice taking priority during the transition.</p>
+<p>An attacker may use a minority of hash power to build a malicious chain fork that would satisfy the block height requirement. Then the first PoS block may be maliciously proposed on top of the PoW block from this adversarial fork, becoming the head and subverting the security of the transition.</p>
+<p>To protect the network from this attack scenario, difficulty accumulated by the chain (total difficulty) is used to trigger the upgrade.</p>
+<h4 id="ability-to-jump-between-terminal-pow-blocks">
+<a href="#ability-to-jump-between-terminal-pow-blocks" class="anchor-link"></a> Ability to jump between terminal PoW blocks
+</h4>
+<p>There could be the case when a terminal PoW block is not observed by the majority of network participants due to (temporal) network partitioning. In such a case, this minority would switch their fork choice to the new rule provided by the PoS rooted on the minority terminal PoW block that they observed.</p>
+<p>The transition process allows the network to re-org between forks with different terminal PoW blocks as long as (a) these blocks satisfy the terminal PoW block conditions and (b) the <code class="language-plaintext highlighter-rouge">FIRST_FINALIZED_BLOCK</code> has not yet been received. This provides resilience against adverse network conditions during the transition process and prevents irreparable forks/partitions.</p>
+<h4 id="halt-the-importing-of-pow-blocks">
+<a href="#halt-the-importing-of-pow-blocks" class="anchor-link"></a> Halt the importing of PoW blocks
+</h4>
+<p>Suppose the part of the client software that is connected to the beacon chain network goes offline before the Ethereum network reaches the <code class="language-plaintext highlighter-rouge">TERMINAL_TOTAL_DIFFICULTY</code> and stays offline while the network meets this threshold. Such an event makes the client software unable to switch to PoS and allows it to keep following the PoW chain if this chain is being built beyond the terminal PoW block. Depending on how long the beacon chain part was offline, it could result in different adverse effects such as:</p>
+<ul>
+<li>The client has no post-state for the terminal PoW block (the state has been pruned) which prevents it from doing the re-org to the PoS chain and leaving syncing from scratch as the only option to recover.</li>
+<li>An application, a user or a service uses the data from the wrong fork (PoW chain that is kept being built) which can cause security issues on their side.</li>
+</ul>
+<p>Not importing PoW blocks that are beyond the terminal PoW block prevents these adverse effects on safety/re-orgs in the event of software or configuration failures <em>in favor</em> of a liveness failure.</p>
+<h4 id="terminal-pow-block-overriding">
+<a href="#terminal-pow-block-overriding" class="anchor-link"></a> Terminal PoW block overriding
+</h4>
+<p>There is a mechanism allowing for accelerating the consensus upgrade in emergency cases.
+This EIP considers the following emergency case scenarios for the acceleration to come into effect:</p>
+<ul>
+<li>A drop of the network hashing rate which delays the upgrade significantly.</li>
+<li>Attacks on the PoW network before the upgrade.</li>
+</ul>
+<p>The first case can be safely accelerated by updating the following parameters:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_TOTAL_DIFFICULTY</code> – reset to a value that is closer in time than the original one.</li>
+<li><code class="language-plaintext highlighter-rouge">FORK_NEXT_VALUE</code> – adjust accordingly.</li>
+</ul>
+<p>The second, more dire attack scenario requires a more invasive override:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code> – set to the hash of a certain block to become the terminal PoW block.</li>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_NUMBER</code> – set to the number of a block designated by <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">TERMINAL_TOTAL_DIFFICULTY</code> – set to the total difficulty value of a block designated by <code class="language-plaintext highlighter-rouge">TERMINAL_BLOCK_HASH</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">FORK_NEXT_VALUE</code> – adjust accordingly.</li>
+</ul>
+<p><em>Note</em>: Acceleration in the second case is considered for the most extreme of scenarios because it will result in a non-trivial liveness failure on Ethereum Mainnet.</p>
+<h3 id="ancient-blocks-are-no-longer-a-requisite-for-a-network-security">
+<a href="#ancient-blocks-are-no-longer-a-requisite-for-a-network-security" class="anchor-link"></a> Ancient blocks are no longer a requisite for a network security
+</h3>
+<p>Keeping historical blocks starting from genesis is essential in the PoW network. A header of every block that belongs to a particular chain is required to justify the validity of this chain with respect to the PoW seal.</p>
+<p>Validating the entire history of the chain is not required by the new PoS mechanism. Instead, the sync process in the PoS network relies on weak subjectivity checkpoints, which are historical snapshots shared by peers on the network. This means historical blocks beyond weak subjectivity checkpoint are no longer a requisite for determining the canonical blockchain.</p>
+<p>Specification of weak subjectivity checkpoints can be found in the <code class="language-plaintext highlighter-rouge">ethereum/consensus-specs</code> repository.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/mkalinin">Mikhail Kalinin</a>, <a href="https://github.com/djrtwo">Danny Ryan</a>, <a href="https://github.com/vbuterin">Vitalik Buterin</a>, "EIP-3675: Upgrade consensus to Proof-of-Stake [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3675, July 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3675.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3675: Upgrade consensus to Proof-of-Stake [DRAFT]",
+    "author": "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo), Vitalik Buterin (@vbuterin)",
+    "name": "EIP-3675: Upgrade consensus to Proof-of-Stake [DRAFT]",
+    "dateCreated": "2021-07-22",
+    "datePublished": "2021-07-22",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3675-upgrade-consensus-to-proof-of-stake/6706",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4396: Time-Aware Base Fee Calculation</title>
+<meta property="og:title" content="EIP-4396: Time-Aware Base Fee Calculation" />
+<meta name="description" content="Accounts for block time in the base fee calculation to target a stable throughput by time instead of by block." />
+<meta property="og:description" content="Accounts for block time in the base fee calculation to target a stable throughput by time instead of by block." />
+<meta name="twitter:description" content="Accounts for block time in the base fee calculation to target a stable throughput by time instead of by block." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4396" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4396" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4396: Time-Aware Base Fee Calculation
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4396.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Accounts for block time in the base fee calculation to target a stable throughput by time instead of by block.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/adietrichs">Ansgar Dietrichs</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4396-time-aware-base-fee-calculation/7363">https://ethereum-magicians.org/t/eip-4396-time-aware-base-fee-calculation/7363</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-10-28</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#base-fee-volatility-under-proof-of-work">Base Fee Volatility Under Proof-of-Work</a></li>
+<li><a href="#missed-slots">Missed Slots</a></li>
+<li><a href="#throughput-degradation-during-consensus-issues">Throughput Degradation During Consensus Issues</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#mechanism">Mechanism</a></li>
+<li><a href="#limitations">Limitations</a></li>
+<li><a href="#possible-extensions">Possible Extensions</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#timestamp-manipulation">Timestamp Manipulation</a></li>
+<li><a href="#suppressing-base-fee-increases">Suppressing Base Fee Increases</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP proposes accounting for time between blocks in the base fee calculation to target a stable throughput by time, instead of by block. Aiming to minimize changes to the calculation, it only introduces a variable block gas target proportional to the block time. The EIP can, in principle, be applied to either a Proof-of-Work or a Proof-of-Stake chain, however the security implications for the Proof-of-Work case remain unexplored.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The current base fee calculation chooses the gas usage of a block as the signal to determine whether demand for block space is too low (indicating that the base fee should be lowered) or too high (indicating that the base fee should be increased). While simple, this choice of signal has drawbacks: it does not take the block time into account. Assuming a relatively constant demand, a proposer constructing a block after 20 seconds will have transactions available with twice the gas of a proposer constructing a block after 10 seconds. Using the same gas target for both is accordingly sub-optimal. In practice, there are several undesirable consequences of this flawed signal:</p>
+<h3 id="base-fee-volatility-under-proof-of-work">
+<a href="#base-fee-volatility-under-proof-of-work" class="anchor-link"></a> Base Fee Volatility Under Proof-of-Work
+</h3>
+<p>Under Proof-of-Work (PoW), block times are stochastic, and for that reason there exists large block time variability. This variability contributes to the base fee volatility, where the base fee can be expected to oscillate around the equilibrium value even under perfectly stable demand.</p>
+<h3 id="missed-slots">
+<a href="#missed-slots" class="anchor-link"></a> Missed Slots
+</h3>
+<p>Under Proof-of-Stake (PoS), block times are ideally uniform (always 12s), but missed slots lead to individual blocks with increased block time (24s, 36s, …). Such missed slots will result in the next block being overfull, and with the current update rule, signal a fake demand spike and thus cause a small unwarranted base fee spike.</p>
+<p>More importantly, these missed slots directly reduce the overall throughput of the execution chain by the gas target of one block. While the next block can be expected to include the “delayed” transactions of the missed slot, the resulting base fee spike then results in some number of under-full blocks. In the end the block space of the missed slot is lost for the chain.</p>
+<p>This is particularly problematic because a Denial-of-Service (DoS) attack on block proposers can cause them to miss slots, and compromises the overall chain performance.</p>
+<h3 id="throughput-degradation-during-consensus-issues">
+<a href="#throughput-degradation-during-consensus-issues" class="anchor-link"></a> Throughput Degradation During Consensus Issues
+</h3>
+<p>A more severe version of individual missed slots can be caused by consensus issues that prevent a significant portion of block proposers from continuing to create blocks. This can be due to block proposers forking off (and creating blocks on their own fork), being unable to keep up with the current chain head for another reason, or simply being unable to create valid blocks.</p>
+<p>In all these situations, average block times go up significantly, causing chain throughput to fall by the same fraction. While this effect is already present under PoW, the self-healing mechanism of difficulty adjustments is relatively quick to kick in and restore normal block times. On the other hand, under PoS the automatic self-healing mechanism can be extremely slow: potentially several months to return to normal with up to a third of slots missed, or several weeks if more than a third of slots are missed.</p>
+<p>For all these reasons, it would be desirable to target a stable throughput per time instead of per block, by taking block time into account during the base fee calculation.</p>
+<p>To maximize the chance of this EIP being included in the merge fork, the adjustments are kept to a minimum, with more involved changes discussed in the rationale section.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Using the pseudocode language of <a href="/EIPS/eip-1559">EIP-1559</a>, the updated base fee calculation becomes:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+
+<span class="n">BASE_FEE_MAX_CHANGE_DENOMINATOR</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">BLOCK_TIME_TARGET</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">MAX_GAS_TARGET_PERCENT</span> <span class="o">=</span> <span class="mi">95</span>
+
+<span class="k">class</span> <span class="nc">World</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">validate_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">:</span> <span class="n">Block</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">parent_gas_limit</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">block</span><span class="p">).</span><span class="n">gas_limit</span>
+        <span class="n">parent_block_time</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">block</span><span class="p">).</span><span class="n">timestamp</span> <span class="o">-</span> <span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">block</span><span class="p">)).</span><span class="n">timestamp</span>
+        <span class="n">parent_base_gas_target</span> <span class="o">=</span> <span class="n">parent_gas_limit</span> <span class="o">//</span> <span class="n">ELASTICITY_MULTIPLIER</span>
+        <span class="n">parent_adjusted_gas_target</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">parent_base_gas_target</span> <span class="o">*</span> <span class="n">parent_block_time</span> <span class="o">//</span> <span class="n">BLOCK_TIME_TARGET</span><span class="p">,</span> <span class="n">parent_gas_limit</span> <span class="o">*</span> <span class="n">MAX_GAS_TARGET_PERCENT</span> <span class="o">//</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="n">parent_base_fee_per_gas</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">block</span><span class="p">).</span><span class="n">base_fee_per_gas</span>
+        <span class="n">parent_gas_used</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">parent</span><span class="p">(</span><span class="n">block</span><span class="p">).</span><span class="n">gas_used</span>
+
+        <span class="p">...</span>
+
+        <span class="k">if</span> <span class="n">parent_gas_used</span> <span class="o">==</span> <span class="n">parent_adjusted_gas_target</span><span class="p">:</span>
+            <span class="n">expected_base_fee_per_gas</span> <span class="o">=</span> <span class="n">parent_base_fee_per_gas</span>
+        <span class="k">elif</span> <span class="n">parent_gas_used</span> <span class="o">&gt;</span> <span class="n">parent_adjusted_gas_target</span><span class="p">:</span>
+            <span class="n">gas_used_delta</span> <span class="o">=</span> <span class="n">parent_gas_used</span> <span class="o">-</span> <span class="n">parent_adjusted_gas_target</span>
+            <span class="n">base_fee_per_gas_delta</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">parent_base_fee_per_gas</span> <span class="o">*</span> <span class="n">gas_used_delta</span> <span class="o">//</span> <span class="n">parent_base_gas_target</span> <span class="o">//</span> <span class="n">BASE_FEE_MAX_CHANGE_DENOMINATOR</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">expected_base_fee_per_gas</span> <span class="o">=</span> <span class="n">parent_base_fee_per_gas</span> <span class="o">+</span> <span class="n">base_fee_per_gas_delta</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gas_used_delta</span> <span class="o">=</span> <span class="n">parent_adjusted_gas_target</span> <span class="o">-</span> <span class="n">parent_gas_used</span>
+            <span class="n">base_fee_per_gas_delta</span> <span class="o">=</span> <span class="n">parent_base_fee_per_gas</span> <span class="o">*</span> <span class="n">gas_used_delta</span> <span class="o">//</span> <span class="n">parent_base_gas_target</span> <span class="o">//</span> <span class="n">BASE_FEE_MAX_CHANGE_DENOMINATOR</span>
+            <span class="n">expected_base_fee_per_gas</span> <span class="o">=</span> <span class="n">parent_base_fee_per_gas</span> <span class="o">-</span> <span class="n">base_fee_per_gas_delta</span>
+        
+        <span class="p">...</span>
+
+    <span class="p">...</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="mechanism">
+<a href="#mechanism" class="anchor-link"></a> Mechanism
+</h3>
+<p>The proposed new base fee calculation only adjusts the block gas target by scaling it with the block time, capped at a maximum percent of the overall block gas limit:</p>
+<h4 id="current-base-fee-calculation">
+<a href="#current-base-fee-calculation" class="anchor-link"></a> Current Base Fee Calculation
+</h4>
+<p><img src="/assets/eip-4396/old_formula.png" alt="" /></p>
+<h4 id="proposed-base-fee-calculation">
+<a href="#proposed-base-fee-calculation" class="anchor-link"></a> Proposed Base Fee Calculation
+</h4>
+<p><img src="/assets/eip-4396/new_formula.png" alt="" /></p>
+<p>This new calculation thus targets a stable throughput per time instead of per block.</p>
+<h3 id="limitations">
+<a href="#limitations" class="anchor-link"></a> Limitations
+</h3>
+<p>Under PoS, block time increases always come in multiples of full blocks (e.g. a single missed slot = 24s instead of 12s block time). Accounting for this already requires doubling the block gas target, even for a single missed slot. However, with the block elasticity currently set to 2, this target would be equal to the block gas limit. Having the new target equal to the block gas limit is less than ideal, and thus is reduced slightly, according to the <code class="language-plaintext highlighter-rouge">MAX_GAS_TARGET_PERCENT</code> parameter. The reason for the existence of this parameter is twofold:</p>
+<ul>
+<li>Ensure that the signal remains meaningful: A target equal to or greater than the gas limit could never be reached, so the base fee would always be reduced after a missed slot.</li>
+<li>Ensure that the base fee can still react to genuine demand increases: During times of many offline block proposers (and thus many missed slots), genuine demand increases still need a way to eventually result in a base fee increase, to avoid a fallback to a first-price priority fee auction.</li>
+</ul>
+<p>However, this means that even a single missed slot cannot be fully compensated. Even worse, any second or further sequential missed slot cannot be compensated for at all, as the gas target is already at its max. This effect becomes more pronounced as the share of offline validators increases:</p>
+<p><img src="/assets/eip-4396/degradation.png" alt="" /></p>
+<p>As can be observed, while this EIP does indeed increase the robustness of the network throughput in cases of offline validators, it does so imperfectly. Furthermore, there is a tradeoff effected by the <code class="language-plaintext highlighter-rouge">MAX_GAS_TARGET_PERCENT</code> parameter, with a higher value resulting in a higher network robustness, but a more impaired base fee adjustment mechanism during times of frequent missed slots.</p>
+<h3 id="possible-extensions">
+<a href="#possible-extensions" class="anchor-link"></a> Possible Extensions
+</h3>
+<p>These limitations directly result from the design goal of a minimal change, to maximize chances of being included in the merge. There are natural ways of extending the EIP design to more effectively handle offline validators, at the expense of somewhat more extensive changes:</p>
+<h4 id="persistent-multi-slot-buffer">
+<a href="#persistent-multi-slot-buffer" class="anchor-link"></a> Persistent Multi-Slot Buffer
+</h4>
+<p>To be able to compensate multiple consecutive missed slots, a gas buffer could be introduced, that would allow the gas beyond the block elasticity to be carried forward to future blocks. To avoid long-run buffer accumulation that would delay a return to normal operations once block proposers are back online, a cap on the buffer would be added. Even for a relatively small buffer cap, the throughput robustness is significantly improved:</p>
+<p><img src="/assets/eip-4396/degradation_buffers.png" alt="" /></p>
+<p>With an elasticity still at 2, there is no way of avoiding the eventual breakdown for more than 50% offline block proposers.</p>
+<p>The main implementation complexity for this approach comes from the introduction of the buffer as a new persistent field. To retain the ability for calculating base fees only based on headers, it would have to be added to the block header.</p>
+<h4 id="increased-block-elasticity">
+<a href="#increased-block-elasticity" class="anchor-link"></a> Increased Block Elasticity
+</h4>
+<p>In addition to the introduction of a buffer, increasing the block elasticity is another tool for increasing throughput robustness. The following diagram shows the effect of different elasticity levels, both in the presence and absence of a persistent buffer:</p>
+<p><img src="/assets/eip-4396/degradation_elasticity.png" alt="" /></p>
+<p>Again, a clear positive effect can be observed.</p>
+<p>The main additional complexity here would come from the increased peak load (networking, compute &amp; disk access) of multiple sequential overfull blocks. Note though that PoS with its minimum block time of 12s significantly reduces worst case peak stress as compared to PoW.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The EIP has minimal impact on backwards compatibility, only requiring updates to existing base fee calculation tooling.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>tbd</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>tbd</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="timestamp-manipulation">
+<a href="#timestamp-manipulation" class="anchor-link"></a> Timestamp Manipulation
+</h3>
+<p>Under PoW, miners are in control over the timestamp field of their blocks. While there are some enforced limits to valid timestamps, implications regarding potential timestamp manipulation are nontrivial and remain unexplored for this EIP.</p>
+<p>Under PoS, each slot has a <a href="https://github.com/ethereum/consensus-specs/blob/v1.1.3/specs/merge/beacon-chain.md#process_execution_payload">fixed assigned timestamp</a>, rendering any timestamp manipulation by block proposers impossible.</p>
+<h3 id="suppressing-base-fee-increases">
+<a href="#suppressing-base-fee-increases" class="anchor-link"></a> Suppressing Base Fee Increases
+</h3>
+<p>As discussed in the rationale, a high value for <code class="language-plaintext highlighter-rouge">MAX_GAS_TARGET_PERCENT</code> during times of many offline block proposers results in a small remaining signal space for genuine demand increases that should result in base fee increases. This in turn decreases the cost for block proposers for suppresing these base fee increases, instead forcing the fallback to a first-price priority fee auction.</p>
+<p>While the arguments of incentive incompatibility for base fee suppression of the the base EIP-1559 case still apply here, with a decreasing cost of this individually irrational behavior the risk for overriding psychological factors becomes more significant.</p>
+<p>Even in such a case the system degradation would however be graceful, as it would only temporarily suspend the base fee burn. As soon as the missing block proposers would come back online, the system would return to its ordinary EIP-1559 equilibrium.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/adietrichs">Ansgar Dietrichs</a>, "EIP-4396: Time-Aware Base Fee Calculation [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4396, October 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4396.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4396: Time-Aware Base Fee Calculation [DRAFT]",
+    "author": "Ansgar Dietrichs (@adietrichs)",
+    "name": "EIP-4396: Time-Aware Base Fee Calculation [DRAFT]",
+    "dateCreated": "2021-10-28",
+    "datePublished": "2021-10-28",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4396-time-aware-base-fee-calculation/7363",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

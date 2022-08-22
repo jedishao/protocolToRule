@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3770: Chain-specific addresses</title>
+<meta property="og:title" content="EIP-3770: Chain-specific addresses" />
+<meta name="description" content="A standard for displaying CAIP-10 account identifiers in a human readable format" />
+<meta property="og:description" content="A standard for displaying CAIP-10 account identifiers in a human readable format" />
+<meta name="twitter:description" content="A standard for displaying CAIP-10 account identifiers in a human readable format" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3770" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3770" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3770: Chain-specific addresses
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3770.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A standard for displaying CAIP-10 account identifiers in a human readable format</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/lukasschor">Lukas Schor</a>, <a href="https://github.com/rmeissner">Richard Meissner</a>, <a href="https://github.com/pedrouid">Pedro Gomes</a>, <a href="/cdn-cgi/l/email-protection#54383d333d14383d333d7a3031">ligi</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/chain-specific-addresses/6449">https://ethereum-magicians.org/t/chain-specific-addresses/6449</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-08-26</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#syntax">Syntax</a></li>
+<li><a href="#semantics">Semantics</a></li>
+<li><a href="#examples">Examples</a></li>
+<li><a href="#resolution-method">Resolution Method</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP introduced a new address standard to be adapted by wallets and dApps to display chain-specific addresses by mapping human-readable names to <a href="https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-3.md">CAIP-3</a> blockchain IDs.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The need for this EIP emerges from the increasing adoption of non-Ethereum Mainnet chains that use the Ethereum Virtual Machine (EVM). In this context, addresses become ambiguous, as the same address may refer to an EOA on chain X or a smart contract on chain Y. This will eventually lead to Ethereum users losing funds due to human error. For example, users sending funds to a smart contract wallet address which was not deployed on a particular chain.</p>
+<p><a href="https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-10.md">CAIP-10</a> introduces an account identifier that encodes a <a href="https://github.com/ChainAgnostic/CAIPs/blob/master/CAIPs/caip-2.md">CAIP-2</a> blockchain ID as part of the address. For EVM-based chains, these blockchain IDs are defined in CAIP-3 and leverage <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-155.md">EIP-155</a> chainIDs. However, CAIP-10 targets developers, not end-users. These account identifiers are not meant to be displayed to users in dApps or wallets, and they were optimized for developer interoperability, rather than human readability.</p>
+<p>To solve the initial problem of user-facing addresses being ambiguous in a multichain context, we need to extend CAIP-10 with a user-facing format of displaying these account identifiers.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>This EIP extends CAIP-10 with a standard for mapping EVM-based blockchain IDs (CAIP-3) to a human-readable blockchain short name, as defined in <a href="https://github.com/ethereum-lists/chains">ethereum-lists/chains</a>.</p>
+<h3 id="syntax">
+<a href="#syntax" class="anchor-link"></a> Syntax
+</h3>
+<p>A chain-specific address is prefixed with a chain shortName, separated with a colon sign (:).</p>
+<p>Chain-specific address = “<code class="language-plaintext highlighter-rouge">shortName</code>” “<code class="language-plaintext highlighter-rouge">:</code>” “<code class="language-plaintext highlighter-rouge">address</code>”</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">shortName</code> = STRING</li>
+<li><code class="language-plaintext highlighter-rouge">address</code> = STRING</li>
+</ul>
+<h3 id="semantics">
+<a href="#semantics" class="anchor-link"></a> Semantics
+</h3>
+<p><code class="language-plaintext highlighter-rouge">shortName</code> is mandatory and MUST be a valid short name from <a href="https://github.com/ethereum-lists/chains">ethereum-lists/chains</a></p>
+<p><code class="language-plaintext highlighter-rouge">address</code> is mandatory and MUST be a EIP-55 compatible hexadecimal address</p>
+<h3 id="examples">
+<a href="#examples" class="anchor-link"></a> Examples
+</h3>
+<p><img src="../assets/eip-3770/examples.png" alt="Chain-specific addresses" title="Examples of chain-specific addresses" /></p>
+<h3 id="resolution-method">
+<a href="#resolution-method" class="anchor-link"></a> Resolution Method
+</h3>
+<p>Chain-specific addresses are resolved to CAIP-10 account identifiers using <a href="https://github.com/ethereum-lists/chains">ethereum-lists/chains</a>:</p>
+<table>
+<thead>
+<tr>
+<th>EIP-3770 chain-specific address</th>
+<th style="text-align: center">CAIP-10 account identifier</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>eth:0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe</td>
+<td style="text-align: center">eip155:1:0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe</td>
+</tr>
+<tr>
+<td>ovm:0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe</td>
+<td style="text-align: center">eip155:10:0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe</td>
+</tr>
+<tr>
+<td>poly:0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe</td>
+<td style="text-align: center">eip155:137:0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>CAIP-10 account identifiers are not suitable for user-facing addresses that are chain-specific as they are non-human-readable. However, CAIP-10 identifiers are still the preferred option for development purposes, as they are ecosystem-agnostic and work best with chain-splits. As a result, this EIP aims to bridge the benefits of human-readable chain identifiers with the benefits of CAIP-10.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Ethereum addresses without the chain specifier will continue to require additional context to understand which chain the address refers to.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The <a href="https://github.com/ethereum-lists/chains">ethereum-lists/chains</a> curators must consider how similar looking chain short names can be used to confuse users.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/lukasschor">Lukas Schor</a>, <a href="https://github.com/rmeissner">Richard Meissner</a>, <a href="https://github.com/pedrouid">Pedro Gomes</a>, <a href="/cdn-cgi/l/email-protection#e5898c828ca5898c828ccb8180">ligi</a>, "EIP-3770: Chain-specific addresses [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3770, August 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3770.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3770: Chain-specific addresses [DRAFT]",
+    "author": "Lukas Schor (@lukasschor), Richard Meissner (@rmeissner), Pedro Gomes (@pedrouid), ligi <ligi@ligi.de>",
+    "name": "EIP-3770: Chain-specific addresses [DRAFT]",
+    "dateCreated": "2021-08-26",
+    "datePublished": "2021-08-26",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/chain-specific-addresses/6449",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

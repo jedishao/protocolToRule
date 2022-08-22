@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3670: EOF - Code Validation</title>
+<meta property="og:title" content="EIP-3670: EOF - Code Validation" />
+<meta name="description" content="Validate EOF bytecode for correctness at the time of deployment." />
+<meta property="og:description" content="Validate EOF bytecode for correctness at the time of deployment." />
+<meta name="twitter:description" content="Validate EOF bytecode for correctness at the time of deployment." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3670" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3670" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3670: EOF - Code Validation
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3670.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Validate EOF bytecode for correctness at the time of deployment.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/chfast">Paweł Bylica</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693">https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-06-23</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3540">3540</a>,
+<a href="eip-3860">3860</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#terminating-instructions">Terminating instructions</a></li>
+<li><a href="#possibility-for-deprecation">Possibility for deprecation</a></li>
+</ul>
+</li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduce code validation at contract creation time for EOF formatted (<a href="/EIPS/eip-3540">EIP-3540</a>) contracts. Reject contracts which contain truncated <code class="language-plaintext highlighter-rouge">PUSH</code>-data or undefined instructions. Legacy bytecode (code which is not EOF formatted) is unaffected by this change.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently existing contracts require no validation of correctness and EVM implementations can decide how they handle truncated bytecode or undefined instructions. This change aims to bring code validity into consensus, so that it becomes easier to reason about bytecode. Moreover, EVM implementations may require less paths to decide which instruction is valid in the current execution context.</p>
+<p>If it will be desired to introduce new instructions without bumping EOF version, having undefined instructions already deployed would mean such contracts potentially can be broken (since some of the instructions are changing their behaviour). Rejecting to deploy undefined instructions allows introducing new instructions with or without bumping the EOF version.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p><em>Remark:</em> We rely on the notation of <em>initcode</em>, <em>code</em> and <em>creation</em> as defined by <a href="/EIPS/eip-3540">EIP-3540</a>.</p>
+<p>This feature is introduced on the very same block EIP-3540 is enabled, therefore every EOF1-compatible bytecode MUST be validated according to these rules.</p>
+<p>At contract creation time both <em>initcode</em> and <em>code</em> are iterated instruction-by-instruction (the same process is used to perform “JUMPDEST-analysis”). Bytecode is deemed invalid if any of these conditions is true:</p>
+<ul>
+<li>it contains opcodes which are not currently assigned to an instruction (for the sake of assigned instructions, we count <code class="language-plaintext highlighter-rouge">INVALID</code> (0xfe) as assigned),</li>
+<li>the last opcode (<em>terminating instruction</em>) is not <code class="language-plaintext highlighter-rouge">STOP</code> (0x00),<code class="language-plaintext highlighter-rouge">RETURN</code> (0xf3), <code class="language-plaintext highlighter-rouge">REVERT</code> (0xfd), <code class="language-plaintext highlighter-rouge">INVALID</code> (0xfe) or <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> (0xff).</li>
+</ul>
+<p><em>Notice that due to the requirement of the terminating instruction, it is implicitly stated that truncated instructions (e.g. data portion of a <code class="language-plaintext highlighter-rouge">PUSHn</code>) are disallowed.</em></p>
+<p>For a create transaction, if <em>initcode</em> or <em>code</em> is invalid, the contract creation results in an exceptional abort. Such a transaction is valid and may be included in a block.</p>
+<p>For the <code class="language-plaintext highlighter-rouge">CREATE</code> and <code class="language-plaintext highlighter-rouge">CREATE2</code> instructions, if <em>initcode</em> or <em>code</em> is invalid, instructions’ execution ends with the result <code class="language-plaintext highlighter-rouge">0</code> pushed on stack.</p>
+<p>In case <em>initcode</em> is invalid, gas for its execution is not deducted. In case <em>code</em> is invalid, all creation gas is deducted, similar to exceptional abort during initcode execution.</p>
+<p><em>Notice that since EOF1 disallows 0-length code section, a valid contract must contain at least a single byte, which must be a terminating instruction.</em></p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="terminating-instructions">
+<a href="#terminating-instructions" class="anchor-link"></a> Terminating instructions
+</h3>
+<p>An efficient interpreter loop would only need to rely on checking if a terminating instruction has been encountered, and if so stopping execution. Currently this is not possible in the EVM, because of the lack of requirement for a proper termination as well as allowing for truncated instructions, an interpreter must track and check these various conditions.</p>
+<h3 id="possibility-for-deprecation">
+<a href="#possibility-for-deprecation" class="anchor-link"></a> Possibility for deprecation
+</h3>
+<p>The deprecated <code class="language-plaintext highlighter-rouge">CALLCODE</code> (0xf2) opcode may be dropped from the <code class="language-plaintext highlighter-rouge">valid_opcodes</code> list to prevent use of this instruction in future. Likewise <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> (0xff) could also be rejected. Yet we decided not to mix such changes in.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># The ranges below are as specified in the Yellow Paper.
+# Note: range(s, e) excludes e, hence the +1
+</span><span class="n">valid_opcodes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x0b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x1d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="mh">0x20</span><span class="p">,</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x3f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x48</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x50</span><span class="p">,</span> <span class="mh">0x5b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="mh">0x6f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x70</span><span class="p">,</span> <span class="mh">0x7f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="mh">0x8f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x90</span><span class="p">,</span> <span class="mh">0x9f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0xa0</span><span class="p">,</span> <span class="mh">0xa4</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="c1"># Note: 0xfe is considered assigned.
+</span>    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0xf0</span><span class="p">,</span> <span class="mh">0xf5</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mh">0xfa</span><span class="p">,</span> <span class="mh">0xfd</span><span class="p">,</span> <span class="mh">0xfe</span><span class="p">,</span> <span class="mh">0xff</span>
+<span class="p">]</span>
+
+<span class="c1"># STOP, RETURN, REVERT, INVALID, SELFDESTRUCT
+</span><span class="n">terminating_opcodes</span> <span class="o">=</span> <span class="p">[</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0xf3</span><span class="p">,</span> <span class="mh">0xfd</span><span class="p">,</span> <span class="mh">0xfe</span><span class="p">,</span> <span class="mh">0xff</span> <span class="p">]</span>
+
+<span class="c1"># Only for PUSH1..PUSH32
+</span><span class="n">immediate_sizes</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">opcode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="mh">0x7f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># PUSH1..PUSH32
+</span>    <span class="n">immediate_sizes</span><span class="p">[</span><span class="n">opcode</span><span class="p">]</span> <span class="o">=</span> <span class="n">opcode</span> <span class="o">-</span> <span class="mh">0x60</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="c1"># Fails with assertion on invalid code
+</span><span class="k">def</span> <span class="nf">validate_code</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="c1"># Note that EOF1 already asserts this with the code section requirements
+</span>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="n">opcode</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+        <span class="c1"># Ensure the opcode is valid
+</span>        <span class="n">opcode</span> <span class="o">=</span> <span class="n">code</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">opcode</span> <span class="ow">in</span> <span class="n">valid_opcodes</span>
+
+        <span class="c1"># Skip immediates
+</span>        <span class="n">pos</span> <span class="o">+=</span> <span class="n">immediate_sizes</span><span class="p">[</span><span class="n">opcode</span><span class="p">]</span>
+
+    <span class="c1"># Ensure last opcode's immediate doesn't go over code end
+</span>    <span class="k">assert</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="c1"># opcode is the *last opcode*
+</span>    <span class="k">assert</span> <span class="n">opcode</span> <span class="ow">in</span> <span class="n">terminating_opcodes</span>
+</code></pre></div></div>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h4 id="contract-creation">
+<a href="#contract-creation" class="anchor-link"></a> Contract creation
+</h4>
+<p>Each case should be tested for creation transaction, <code class="language-plaintext highlighter-rouge">CREATE</code> and <code class="language-plaintext highlighter-rouge">CREATE2</code>.</p>
+<ul>
+<li>Invalid initcode</li>
+<li>Valid initcode returning invalid code</li>
+<li>Valid initcode returning valid code</li>
+</ul>
+<h4 id="valid-codes">
+<a href="#valid-codes" class="anchor-link"></a> Valid codes
+</h4>
+<ul>
+<li>EOF code containing <code class="language-plaintext highlighter-rouge">INVALID</code></li>
+<li>EOF codes ending with any of the terminating instructions</li>
+<li>EOF code with data section containing bytes that are undefined instructions</li>
+<li>Legacy code containing undefined instruction</li>
+<li>Legacy code ending with incomplete PUSH instruction</li>
+<li>Legacy code ending with any valid non-terminating instruction</li>
+</ul>
+<h4 id="invalid-codes">
+<a href="#invalid-codes" class="anchor-link"></a> Invalid codes
+</h4>
+<ul>
+<li>EOF code containing undefined instruction</li>
+<li>EOF code ending with incomplete <code class="language-plaintext highlighter-rouge">PUSH</code> instruction
+<ul>
+<li>This can include <code class="language-plaintext highlighter-rouge">PUSH</code> instruction unreachable by execution, e.g. after <code class="language-plaintext highlighter-rouge">STOP</code></li>
+</ul>
+</li>
+<li>EOF code ending with any defined instruction other than terminating ones
+<ul>
+<li>This can include codes where non-terminating instruction is not reachable, e.g. <code class="language-plaintext highlighter-rouge">0030</code> (<code class="language-plaintext highlighter-rouge">STOP ADDRESS</code>).</li>
+</ul>
+</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change poses no risk to backwards compatibility, as it is introduced at the same time EIP-3540 is. The validation does not cover legacy bytecode (code which is not EOF formatted).</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The validation of <em>initcode</em> adds additional overhead. We think that the charge introduced by <a href="/EIPS/eip-3860">EIP-3860</a> is sufficient to account for the overhead introduced in this EIP.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, "EIP-3670: EOF - Code Validation [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3670, June 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3670.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3670: EOF - Code Validation [DRAFT]",
+    "author": "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
+    "name": "EIP-3670: EOF - Code Validation [DRAFT]",
+    "dateCreated": "2021-06-23",
+    "datePublished": "2021-06-23",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3670-eof-code-validation/6693",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

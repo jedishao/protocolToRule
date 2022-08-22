@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4546: Wrapped Deposits</title>
+<meta property="og:title" content="EIP-4546: Wrapped Deposits" />
+<meta name="description" content="A singleton contract for managing asset deposits." />
+<meta property="og:description" content="A singleton contract for managing asset deposits." />
+<meta name="twitter:description" content="A singleton contract for managing asset deposits." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4546" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4546" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4546: Wrapped Deposits
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4546.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A singleton contract for managing asset deposits.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/jchancehud">Justice Hudson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/wrapped-deposit-contract-eip/7740">https://ethereum-magicians.org/t/wrapped-deposit-contract-eip/7740</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-12-11</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The wrapped deposit contract handles deposits of assets (Ether, <a href="/EIPS/eip-20">ERC-20</a>, <a href="/EIPS/eip-721">ERC-721</a>) on behalf of a user. A user must only approve a spend limit once and then an asset may be deposited to any number of different applications that support deposits from the contract.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The current user flow for depositing assets in dapps is unnecessarily expensive and insecure. To deposit an ERC-20 asset a user must either:</p>
+<ul>
+<li>send an approve transaction for the exact amount being sent, before making a deposit, and then repeat this process for every subsequent deposit.</li>
+<li>send an approve transaction for an infinite spend amount before making deposits.</li>
+</ul>
+<p>The first option is inconvenient, and expensive. The second option is insecure. Further, explaining approvals to new or non-technical users is confusing. This has to be done in <em>every</em> dapp that supports ERC20 deposits.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The wrapped deposit contract SHOULD be deployed at an identifiable address (e.g. <code class="language-plaintext highlighter-rouge">0x1111119a9e30bceadf9f939390293ffacef93fe9</code>). The contract MUST be non-upgradable with no ability for state variables to be changed.</p>
+<p>The wrapped deposit contract MUST have the following public functions:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">depositERC20</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+<span class="nx">depositERC721</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+<span class="nx">safeDepositERC721</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">memory</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+<span class="nx">safeDepositERC1155</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+<span class="nx">batchDepositERC1155</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">tokenIds</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+<span class="nx">depositEther</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">payable</span><span class="p">;</span>
+</code></pre></div></div>
+<p>Each of these functions MUST revert if <code class="language-plaintext highlighter-rouge">to</code> is an address with a zero code size. Each function MUST attempt to call a method on the <code class="language-plaintext highlighter-rouge">to</code> address confirming that it is willing and able to accept the deposit. If this function call does not return a true value execution MUST revert. If the asset transfer is not successful execution MUST revert.</p>
+<p>The following interfaces SHOULD exist for contracts wishing to accept deposits:</p>
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">ERC20Receiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptERC20Deposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">ERC721Receiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptERC721Deposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">ERC1155Receiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptERC1155Deposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+  <span class="kd">function</span> <span class="nx">acceptERC1155BatchDeposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">tokenIds</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">EtherReceiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptEtherDeposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>A receiving contract MAY implement any of these functions as desired. If a given function is not implemented deposits MUST not be sent for that asset type.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Having a single contract that processes all token transfers allows users to submit a single approval per token to deposit to any number of contracts. The user does not have to trust receiving contracts with token spend approvals and receiving contracts have their complexity reduced by not having to implement token transfers themselves.</p>
+<p>User experience is improved because a simple global dapp can be implemented with the messaging: “enable token for use in other apps”.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP is not backward compatible. Any contract planning to use this deposit system must implement specific functions to accept deposits. Existing contracts that are upgradeable can add support for this EIP retroactively by implementing one or more accept deposit functions.</p>
+<p>Upgraded contracts can allow deposits using both the old system (approving the contract itself) and the proposed deposit system to preserve existing approvals. New users should be prompted to use the proposed deposit system.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="kr">interface</span> <span class="nx">ERC20Receiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptERC20Deposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">ERC721Receiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptERC721Deposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">ERC1155Receiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptERC1155Deposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+  <span class="kd">function</span> <span class="nx">acceptERC1155BatchDeposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">tokenIds</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">EtherReceiver</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">acceptEtherDeposit</span><span class="p">(</span><span class="nx">address</span> <span class="nx">depositor</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">IERC20</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">transferFrom</span><span class="p">(</span><span class="nx">address</span> <span class="nx">sender</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">recipient</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">IERC721</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">transferFrom</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_from</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_tokenId</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">payable</span><span class="p">;</span>
+  <span class="kd">function</span> <span class="nx">safeTransferFrom</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_from</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_tokenId</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">memory</span> <span class="nx">data</span><span class="p">)</span> <span class="nx">external</span> <span class="nx">payable</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">IERC1155</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">safeTransferFrom</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_from</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">_id</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">_value</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">_data</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+  <span class="kd">function</span> <span class="nx">safeBatchTransferFrom</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_from</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint256</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">_ids</span><span class="p">,</span> <span class="nx">uint256</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">_values</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">_data</span><span class="p">)</span> <span class="nx">external</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">WrappedDeposit</span> <span class="p">{</span>
+  <span class="kd">function</span> <span class="nx">depositERC20</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">amount</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">ERC20Receiver</span><span class="p">(</span><span class="nx">to</span><span class="p">).</span><span class="nx">acceptERC20Deposit</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">amount</span><span class="p">));</span>
+    <span class="nx">bytes</span> <span class="nx">memory</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">abi</span><span class="p">.</span><span class="nx">encodeWithSelector</span><span class="p">(</span>
+      <span class="nx">IERC20</span><span class="p">(</span><span class="nx">token</span><span class="p">).</span><span class="nx">transferFrom</span><span class="p">.</span><span class="nx">selector</span><span class="p">,</span>
+      <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span>
+      <span class="nx">to</span><span class="p">,</span>
+      <span class="nx">amount</span>
+    <span class="p">);</span>
+    <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">memory</span> <span class="nx">returndata</span><span class="p">)</span> <span class="o">=</span> <span class="nx">token</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">success</span><span class="p">);</span>
+    <span class="c1">// backward compat for tokens incorrectly implementing the transfer function</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">returndata</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">require</span><span class="p">(</span><span class="nx">abi</span><span class="p">.</span><span class="nx">decode</span><span class="p">(</span><span class="nx">returndata</span><span class="p">,</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)),</span> <span class="dl">"</span><span class="s2">ERC20 operation did not succeed</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">depositERC721</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">ERC721Receiver</span><span class="p">(</span><span class="nx">to</span><span class="p">).</span><span class="nx">acceptERC721Deposit</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">tokenId</span><span class="p">));</span>
+    <span class="nx">IERC721</span><span class="p">(</span><span class="nx">token</span><span class="p">).</span><span class="nx">transferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">tokenId</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">safeDepositERC721</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">memory</span> <span class="nx">data</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">ERC721Receiver</span><span class="p">(</span><span class="nx">to</span><span class="p">).</span><span class="nx">acceptERC721Deposit</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">tokenId</span><span class="p">));</span>
+    <span class="nx">IERC721</span><span class="p">(</span><span class="nx">token</span><span class="p">).</span><span class="nx">safeTransferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">safeDepositERC1155</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">ERC1155Receiver</span><span class="p">(</span><span class="nx">to</span><span class="p">).</span><span class="nx">acceptERC1155Deposit</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">data</span><span class="p">));</span>
+    <span class="nx">IERC1155</span><span class="p">(</span><span class="nx">token</span><span class="p">).</span><span class="nx">safeTransferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">tokenId</span><span class="p">,</span> <span class="nx">value</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">batchDepositERC1155</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">token</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">tokenIds</span><span class="p">,</span> <span class="nx">uint</span><span class="p">[]</span> <span class="nx">calldata</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">calldata</span> <span class="nx">data</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+    <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">ERC1155Receiver</span><span class="p">(</span><span class="nx">to</span><span class="p">).</span><span class="nx">acceptERC1155BatchDeposit</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">tokenIds</span><span class="p">,</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">data</span><span class="p">));</span>
+    <span class="nx">IERC1155</span><span class="p">(</span><span class="nx">token</span><span class="p">).</span><span class="nx">safeBatchTransferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">tokenIds</span><span class="p">,</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">data</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">depositEther</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">)</span> <span class="k">public</span> <span class="nx">payable</span> <span class="p">{</span>
+    <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">to</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">EtherReceiver</span><span class="p">(</span><span class="nx">to</span><span class="p">).</span><span class="nx">acceptEtherDeposit</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">));</span>
+    <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">,</span> <span class="p">)</span> <span class="o">=</span> <span class="nx">to</span><span class="p">.</span><span class="nx">call</span><span class="p">{</span><span class="nl">value</span><span class="p">:</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">}(</span><span class="dl">''</span><span class="p">);</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">success</span><span class="p">,</span> <span class="dl">"</span><span class="s2">nonpayable</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kd">function</span> <span class="nx">_assertContract</span><span class="p">(</span><span class="nx">address</span> <span class="nx">c</span><span class="p">)</span> <span class="k">private</span> <span class="nx">view</span> <span class="p">{</span>
+    <span class="nx">uint</span> <span class="nx">size</span><span class="p">;</span>
+    <span class="nx">assembly</span> <span class="p">{</span>
+      <span class="nl">size</span> <span class="p">:</span><span class="o">=</span> <span class="nx">extcodesize</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="nx">require</span><span class="p">(</span><span class="nx">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="dl">"</span><span class="s2">noncontract</span><span class="dl">"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The wrapped deposit implementation should be as small as possible to reduce the risk of bugs. The contract should be small enough that an engineer can read and understand it in a few minutes.</p>
+<p>Receiving contracts MUST verify that <code class="language-plaintext highlighter-rouge">msg.sender</code> is equal to the wrapped deposit contract. Failing to do so allows anyone to simulate deposits.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/jchancehud">Justice Hudson</a>, "EIP-4546: Wrapped Deposits [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4546, December 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4546.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4546: Wrapped Deposits [DRAFT]",
+    "author": "Justice Hudson (@jchancehud)",
+    "name": "EIP-4546: Wrapped Deposits [DRAFT]",
+    "dateCreated": "2021-12-11",
+    "datePublished": "2021-12-11",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/wrapped-deposit-contract-eip/7740",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

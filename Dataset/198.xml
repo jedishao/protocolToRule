@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-198: Big integer modular exponentiation</title>
+<meta property="og:title" content="EIP-198: Big integer modular exponentiation" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-198" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-198" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-198: Big integer modular exponentiation
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-198.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2017-01-30</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h1 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h1>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">GQUADDIVISOR: 20</code></li>
+</ul>
+<h1 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h1>
+<p>At address 0x00……05, add a precompile that expects input in the following format:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;length_of_BASE&gt; &lt;length_of_EXPONENT&gt; &lt;length_of_MODULUS&gt; &lt;BASE&gt; &lt;EXPONENT&gt; &lt;MODULUS&gt;
+</code></pre></div></div>
+<p>Where every length is a 32-byte left-padded integer representing the number of bytes to be taken up by the next value. Call data is assumed to be infinitely right-padded with zero bytes, and excess data is ignored. Consumes <code class="language-plaintext highlighter-rouge">floor(mult_complexity(max(length_of_MODULUS, length_of_BASE)) * max(ADJUSTED_EXPONENT_LENGTH, 1) / GQUADDIVISOR)</code> gas, and if there is enough gas, returns an output <code class="language-plaintext highlighter-rouge">(BASE**EXPONENT) % MODULUS</code> as a byte array with the same length as the modulus.</p>
+<p><code class="language-plaintext highlighter-rouge">ADJUSTED_EXPONENT_LENGTH</code> is defined as follows.</p>
+<ul>
+<li>If <code class="language-plaintext highlighter-rouge">length_of_EXPONENT &lt;= 32</code>, and all bits in <code class="language-plaintext highlighter-rouge">EXPONENT</code> are 0, return 0</li>
+<li>If <code class="language-plaintext highlighter-rouge">length_of_EXPONENT &lt;= 32</code>, then return the index of the highest bit in <code class="language-plaintext highlighter-rouge">EXPONENT</code> (eg. 1 -&gt; 0, 2 -&gt; 1, 3 -&gt; 1, 255 -&gt; 7, 256 -&gt; 8).</li>
+<li>If <code class="language-plaintext highlighter-rouge">length_of_EXPONENT &gt; 32</code>, then return <code class="language-plaintext highlighter-rouge">8 * (length_of_EXPONENT - 32)</code> plus the index of the highest bit in the first 32 bytes of <code class="language-plaintext highlighter-rouge">EXPONENT</code> (eg. if <code class="language-plaintext highlighter-rouge">EXPONENT = \x00\x00\x01\x00.....\x00</code>, with one hundred bytes, then the result is 8 * (100 - 32) + 253 = 797). If all of the first 32 bytes of <code class="language-plaintext highlighter-rouge">EXPONENT</code> are zero, return exactly <code class="language-plaintext highlighter-rouge">8 * (length_of_EXPONENT - 32)</code>.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">mult_complexity</code> is a function intended to approximate the difficulty of Karatsuba multiplication (used in all major bigint libraries) and is defined as follows.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>def mult_complexity(x):
+    if x &lt;= 64: return x ** 2
+    elif x &lt;= 1024: return x ** 2 // 4 + 96 * x - 3072
+    else: return x ** 2 // 16 + 480 * x - 199680
+</code></pre></div></div>
+<p>For example, the input data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0000000000000000000000000000000000000000000000000000000000000001
+0000000000000000000000000000000000000000000000000000000000000020
+0000000000000000000000000000000000000000000000000000000000000020
+03
+fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e
+fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
+</code></pre></div></div>
+<p>Represents the exponent <code class="language-plaintext highlighter-rouge">3**(2**256 - 2**32 - 978) % (2**256 - 2**32 - 977)</code>. By Fermat’s little theorem, this equals 1, so the result is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div></div>
+<p>Returned as 32 bytes because the modulus length was 32 bytes. The <code class="language-plaintext highlighter-rouge">ADJUSTED_EXPONENT_LENGTH</code> would be 255, and the gas cost would be <code class="language-plaintext highlighter-rouge">mult_complexity(32) * 255 / 20 = 13056</code> gas (note that this is ~8 times the cost of using the EXP opcode to compute a 32-byte exponent). A 4096-bit RSA exponentiation would cost <code class="language-plaintext highlighter-rouge">mult_complexity(512) * 4095 / 100 = 22853376</code> gas in the worst case, though RSA verification in practice usually uses an exponent of 3 or 65537, which would reduce the gas consumption to 5580 or 89292, respectively.</p>
+<p>This input data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000020
+0000000000000000000000000000000000000000000000000000000000000020
+fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2e
+fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f
+</code></pre></div></div>
+<p>Would be parsed as a base of 0, exponent of <code class="language-plaintext highlighter-rouge">2**256 - 2**32 - 978</code> and modulus of <code class="language-plaintext highlighter-rouge">2**256 - 2**32 - 977</code>, and so would return 0. Notice how if the length_of_BASE is 0, then it does not interpret <em>any</em> data as the base, instead immediately interpreting the next 32 bytes as EXPONENT.</p>
+<p>This input data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000020
+ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe
+fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffd
+</code></pre></div></div>
+<p>Would parse a base length of 0, an exponent length of 32, and a modulus length of <code class="language-plaintext highlighter-rouge">2**256 - 1</code>, where the base is empty, the exponent is <code class="language-plaintext highlighter-rouge">2**256 - 2</code> and the modulus is <code class="language-plaintext highlighter-rouge">(2**256 - 3) * 256**(2**256 - 33)</code> (yes, that’s a really big number). It would then immediately fail, as it’s not possible to provide enough gas to make that computation.</p>
+<p>This input data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0000000000000000000000000000000000000000000000000000000000000001
+0000000000000000000000000000000000000000000000000000000000000002
+0000000000000000000000000000000000000000000000000000000000000020
+03
+ffff
+8000000000000000000000000000000000000000000000000000000000000000
+07
+</code></pre></div></div>
+<p>Would parse as a base of 3, an exponent of 65535, and a modulus of <code class="language-plaintext highlighter-rouge">2**255</code>, and it would ignore the remaining 0x07 byte.</p>
+<p>This input data:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0000000000000000000000000000000000000000000000000000000000000001
+0000000000000000000000000000000000000000000000000000000000000002
+0000000000000000000000000000000000000000000000000000000000000020
+03
+ffff
+80
+</code></pre></div></div>
+<p>Would also parse as a base of 3, an exponent of 65535 and a modulus of <code class="language-plaintext highlighter-rouge">2**255</code>, as it attempts to grab 32 bytes for the modulus starting from 0x80 - but there is no further data, so it right-pads it with 31 zero bytes.</p>
+<h1 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h1>
+<p>This allows for efficient RSA verification inside of the EVM, as well as other forms of number theory-based cryptography. Note that adding precompiles for addition and subtraction is not required, as the in-EVM algorithm is efficient enough, and multiplication can be done through this precompile via <code class="language-plaintext highlighter-rouge">a * b = ((a + b)**2 - (a - b)**2) / 4</code>.</p>
+<p>The bit-based exponent calculation is done specifically to fairly charge for the often-used exponents of 2 (for multiplication) and 3 and 65537 (for RSA verification).</p>
+<h1 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h1>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, "EIP-198: Big integer modular exponentiation," <em>Ethereum Improvement Proposals</em>, no. 198, January 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-198.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-198: Big integer modular exponentiation",
+    "author": "Vitalik Buterin (@vbuterin)",
+    "name": "EIP-198: Big integer modular exponentiation",
+    "dateCreated": "2017-01-30",
+    "datePublished": "2017-01-30",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

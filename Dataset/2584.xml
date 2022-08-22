@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2584: Trie format transition with overlay trees</title>
+<meta property="og:title" content="EIP-2584: Trie format transition with overlay trees" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2584" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2584" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2584: Trie format transition with overlay trees
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2584.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gballet">Guillaume Ballet</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethresear.ch/t/overlay-method-for-hex-bin-tree-conversion/7104">https://ethresear.ch/t/overlay-method-for-hex-bin-tree-conversion/7104</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-04-03</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#binary-tries">Binary tries</a></li>
+<li><a href="#phase-1">Phase 1</a></li>
+<li><a href="#phase-2">Phase 2</a></li>
+<li><a href="#phase-3">Phase 3</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#community-feedback">Community feedback</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This EIP proposes a method to convert the state trie format from hexary to binary: new values are directly stored in a binary trie “laid over” the hexary trie. Meanwhile, the hexary trie is converted to a binary trie in the background. When the process is finished, both layers are merged.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP describes a four phase process to complete the conversion.</p>
+<ul>
+<li>In the first phase, all new state writes are made to an overlay binary trie, while the hexary trie is being converted to binary. The block format is changed to have two storage roots: the root of the hexary trie (hereafter called the “base” trie) and the root of the overlay binary trie.</li>
+<li>After enough time has been given to miners to perform the conversion, the second phase begins. The overlay tree is progressively merged back into the newly converted binary base trie. A constant number of entries are deleted from the overlay and inserted into the base trie.</li>
+<li>The third and final phase begins when the overlay trie is empty. The field holding its root is removed from the block header.</li>
+</ul>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There is a long running interest in switching the state trie from a hexary format to a binary format, for reasons pertaining to proof and storage sizes. The conversion process poses a catch-up issue, caused by the sheer size of the full state: it can not be translated in a reasonable time (i.e. on the same order of magnitude as the block time).</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>This specification follows the notation introduced by the <a href="https://ethereum.github.io/yellowpaper">Yellow Paper</a>. Prior to reading it is advisable to be familiar with the Yellow Paper.</p>
+<h3 id="binary-tries">
+<a href="#binary-tries" class="anchor-link"></a> Binary tries
+</h3>
+<p>This EIP assumes that a binary trie is defined like the MPT, except that:</p>
+<ul>
+<li>The series of bytes in I₀ is seen as a series of <em>bits</em> and so ∀i≤256, I₀[i] is the ith bit in key I₀</li>
+<li>The first item of an <strong>extension</strong> or a <strong>leaf</strong> is replacing nibbles with bits;</li>
+<li>A <strong>branch</strong> is a 2 item structure in which both items correspond to each of the two possible bit values for the keys at this point in their traversal;</li>
+<li>c(𝕴,i) ≡ RLP((u(0), u(1)) at a branch, where u(j) = n({I : I ∈ 𝕴 ⋀ I₀[i] = j}, i+1)</li>
+</ul>
+<p>Let ß be the function that, given a hexary trie, computes the equivalent representation of that trie in the aforementioned binary trie format.</p>
+<h3 id="phase-1">
+<a href="#phase-1" class="anchor-link"></a> Phase 1
+</h3>
+<p>Let <em>h₁</em> be the previously agreed-upon block height at which phase 1 starts, and <em>h₂</em> the block at which phase 2 starts. For each block of height h₁ ≤ <em>h</em> &lt; h₂:</p>
+<ol>
+<li>A conversion process is started in the background, to turn the hexary trie into its binary equivalent. The end goal of this process is the calculation of the <em>root hash of the converted binary trie</em>, denoted Hᵣ². The root of the hexary trie is hereafter called Hᵣ¹⁶. Formally, this process is written as Hᵣ² ≡ ß(Hᵣ¹⁶).</li>
+<li>Block headers contain a new Hₒ field, which is the <em>root of the overlay binary trie</em>;</li>
+<li>Hᵣ ≡ P(H)ᵣ¹⁶, i.e. as long as the conversion from hexary to binary is not complete, the hexary trie root is the same as that of its parent block.</li>
+</ol>
+<p>The following is changed in the execution environment:</p>
+<ul>
+<li>Upon executing a <em>state read</em>, ϒ first searches for the address in the overlay trie. If the key can not be found there, ϒ then searches the base trie as it did at block heights h’ &lt; h₁;</li>
+<li>Upon executing a <em>state write</em>, ϒ inserts or updates the value into the overlay tree. The base tree is left untouched;</li>
+<li>If an account is deleted, ϒ inserts the empty hash H(∅) at the address of that account in order to mark its deletion; reads from such an address behave the same as a missing account, regardless of what is present in the base trie.</li>
+</ul>
+<p>Phase 1 ends at block height h₂, which is set far enough from h₁ to offer miners enough time to perform the conversion.</p>
+<h3 id="phase-2">
+<a href="#phase-2" class="anchor-link"></a> Phase 2
+</h3>
+<p>This phase differs from the previous one on the following points:</p>
+<ul>
+<li>At block height h₂, before the execution of ϒ, Hᵣ ≡ Hᵣ², i.e. the value before the execution of the transition function is set to the root of the converted <em>binary base trie</em>;</li>
+<li>Hₒ is still present in the block tree, however the overlay trie content can only be <em>read from or deleted</em>;</li>
+<li>At block height h ≥ h₂, before the execution of ϒ, N accounts are being deleted from the binary overlay trie and inserted into the binary base trie;</li>
+<li>Upon executing a <em>state write</em>, ϒ will insert or update the value into the <em>base</em> trie. If the search key exists in the overlay trie, it is deleted.</li>
+</ul>
+<p>Account deletion is performed according to the following rules:</p>
+<ul>
+<li>The first N accounts (in lexicographic order) remaining in the overlay tree are selected; For each of these accounts:</li>
+<li>If the value is the empty hash, remove the account at the same address from the binary base trie;</li>
+<li>Otherwise, insert/update the account at the corresponding address in the base trie with its overlay trie value.</li>
+</ul>
+<p>When the overlay trie is empty, phase 2 ends and phase 3 begins.</p>
+<h3 id="phase-3">
+<a href="#phase-3" class="anchor-link"></a> Phase 3
+</h3>
+<p>Phase 3 is the same as phase 2, except for the following change:</p>
+<ul>
+<li>Hₒ is dropped from the block header</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Methods that have been discussed until now include a “stop the world” approach, in which the chain is stopped for the significant amount of time that is required by the conversion, and a “copy on write” approach, in which branches are converted upon being accessed.
+The approach suggested here has the advantage that the chain continues to operate normally during the conversion process, and that the tree is fully converted to a binary format, in a predictable time.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This requires a fork and will break backwards compatibility, as the hashes and block formats will necessarily be different. This will cause a fork in clients that don’t implement the overlay tree, and those that do not accept the new binary root. No mitigation is proposed, as this is a hard fork.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<ul>
+<li>For testing phase 1, it suffices to check that every key in the hexary trie is also available in the binary trie. A looser but faster test picks 1% of keys in the hexary trie at random, and checks that they are present in the binary trie;</li>
+<li>TBD for phase 2 &amp; 3</li>
+</ul>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>A prototype version of the conversion process (phase 1) is available for <code class="language-plaintext highlighter-rouge">geth</code> in <a href="https://github.com/holiman/go-ethereum/pull/12">this PR</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>There are three attack vectors that I can foresee:</p>
+<ul>
+<li>A targeted attack that would cause the overlay trie to be unreasonably large. Since gas costs will likely increase during the transition process, lengthening phase 2 will make Ethereum more expensive during an extended period of time. This could be solved by increasing the cost of <code class="language-plaintext highlighter-rouge">SSTORE</code> during phase 1.</li>
+<li>Conversely, if h₂ comes too soon, a majority of miners might not be able to produce the correct value for Hᵣ² in time.</li>
+<li>If a group of miners representing more than 51% of the network are reporting an invalid value, they could be stealing funds without anyone having a say.</li>
+</ul>
+<h2 id="community-feedback">
+<a href="#community-feedback" class="anchor-link"></a> Community feedback
+</h2>
+<ul>
+<li>Preliminary tests indicate that a fast machine can perform the conversion in roughly 30 minutes.</li>
+<li>The initial version of this EIP expected miners to vote on the value of the binary base root. This has been removed because of the complexity of this process, and because this functionality is already guaranteed by the “longest chain” rule.</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gballet">Guillaume Ballet</a>, "EIP-2584: Trie format transition with overlay trees [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2584, April 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2584.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2584: Trie format transition with overlay trees [DRAFT]",
+    "author": "Guillaume Ballet (@gballet)",
+    "name": "EIP-2584: Trie format transition with overlay trees [DRAFT]",
+    "dateCreated": "2020-04-03",
+    "datePublished": "2020-04-03",
+
+    "discussionUrl": "https://ethresear.ch/t/overlay-method-for-hex-bin-tree-conversion/7104",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+ <div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

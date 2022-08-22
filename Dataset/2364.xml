@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2364: eth/64: forkid-extended protocol handshake</title>
+<meta property="og:title" content="EIP-2364: eth/64: forkid-extended protocol handshake" />
+<meta name="description" content="Introduces validation of the `forkid` when handshaking with peers." />
+<meta property="og:description" content="Introduces validation of the `forkid` when handshaking with peers." />
+<meta name="twitter:description" content="Introduces validation of the `forkid` when handshaking with peers." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2364" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2364" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-2364: eth/64: forkid-extended protocol handshake
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2364.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Introduces validation of the `forkid` when handshaking with peers.</h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#d1a1b4a5b4a3bab491b6bcb0b8bdffb2bebc">Péter Szilágyi</a>, <a href="https://github.com/karalabe">Péter Szilágyi</a>, <a href="https://github.com/timbeiko">Tim Beiko</a></td></tr>
+ <tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2365">https://github.com/ethereum/EIPs/issues/2365</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Networking</td></tr>
+<tr><th>Created</th><td>2019-11-08</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2124">2124</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#eip-2124-mentions-advertising-the-forkid-in-the-discovery-protocol-too-how-does-that-compare-to-advertising-in-the-eth-protocol-why-is-the-redundancy-needed">EIP-2124 mentions advertising the forkid in the discovery protocol too. How does that compare to advertising in the eth protocol? Why is the redundancy needed?</a></li>
+<li><a href="#the-forkid-implicitly-contains-the-genesis-hash-checksummed-into-the-fork_hash-field-why-doesnt-this-proposal-remove-the-genesishash-field-from-the-eth-handshake">The forkid implicitly contains the genesis hash checksummed into the FORK_HASH field. Why doesn’t this proposal remove the genesisHash field from the eth handshake?</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP specifies the inclusion of the <code class="language-plaintext highlighter-rouge">forkid</code>, originally defined in <a href="/EIPS/eip-2124">(EIP-2124)</a>, as a new field in the Ethereum wire protocol (<code class="language-plaintext highlighter-rouge">eth</code>) handshake. This change is implemented as a new version of the wire protocol, <code class="language-plaintext highlighter-rouge">eth/64</code>.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The <a href="/EIPS/eip-2124"><code class="language-plaintext highlighter-rouge">forkid</code> (EIP-2124)</a> was designed to permit two Ethereum nodes to quickly and cheaply decide if they are compatible or not, not only at a genesis/networking level, but also from the perspective of the currently passed network updates (i.e. forks).</p>
+<p><a href="/EIPS/eip-2124">EIP-2124</a> only defines how the <code class="language-plaintext highlighter-rouge">forkid</code> is calculated and validated, but does not specify how the <code class="language-plaintext highlighter-rouge">forkid</code> should be exchanged between peers. This EIP specifies the inclusion of the <code class="language-plaintext highlighter-rouge">forkid</code> as a new field in the Ethereum wire protocol (<code class="language-plaintext highlighter-rouge">eth</code>) handshake (releasing a new version, <code class="language-plaintext highlighter-rouge">eth/64</code>).</p>
+<p>By cross-validating <code class="language-plaintext highlighter-rouge">forkid</code> during the handshake, incompatible nodes can disconnect before expensive block exchanges and validations take place (PoW check, EVM execution, state reconstruction). This further prevents peer slots from being taken up by nodes that are incompatible, but have not yet been detected as such.</p>
+<p>From a micro perspective, cutting off incompatible nodes from one another ensures that a node only spends its resources on tasks that are genuinely useful to it. The sooner we can decide the remote peer is useless, the less time and processing we expend in vain.</p>
+<p>From a macro perspective, keeping incompatible nodes partitioned from one another ensures that disjoint clusters retain more resources for maintaining their own chain, thus raising the quality of service for all networks globally.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<ul>
+<li>Implement <code class="language-plaintext highlighter-rouge">forkid</code> generation and validation per <a href="/EIPS/eip-2124">EIP-2124</a>.</li>
+<li>Advertise a new <code class="language-plaintext highlighter-rouge">eth</code> protocol capability (version) at <code class="language-plaintext highlighter-rouge">eth/64</code>.
+<ul>
+<li>The old <code class="language-plaintext highlighter-rouge">eth/63</code> protocol should still be kept alive side-by-side, until <code class="language-plaintext highlighter-rouge">eth/64</code> is sufficiently adopted by implementors.</li>
+</ul>
+</li>
+<li>Redefine <code class="language-plaintext highlighter-rouge">Status (0x00)</code> for <code class="language-plaintext highlighter-rouge">eth/64</code> to add a trailing <code class="language-plaintext highlighter-rouge">forkid</code> field:
+<ul>
+<li>Old packet: <code class="language-plaintext highlighter-rouge">[protocolVersion, networkId, td, bestHash, genesisHash]</code></li>
+<li>New packet: <code class="language-plaintext highlighter-rouge">[protocolVersion, networkId, td, bestHash, genesisHash, forkid]</code>,
+where <code class="language-plaintext highlighter-rouge">forkid</code> is <code class="language-plaintext highlighter-rouge">[forkHash: [4]byte, forkNext: uint64]</code> (fields per <a href="/EIPS/eip-2124">EIP-2124</a> ).</li>
+</ul>
+</li>
+</ul>
+<p>Whenever two peers connect using the <code class="language-plaintext highlighter-rouge">eth/64</code> protocol, the updated <code class="language-plaintext highlighter-rouge">Status</code> message must be sent as the protocol handshake, and each peer must validate the remote <code class="language-plaintext highlighter-rouge">forkid</code>, disconnecting at a detected incompatibility.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The specification is tiny since most parts are already specified in EIP-2124. <code class="language-plaintext highlighter-rouge">eth/63</code> is not specified as an EIP, but is maintained in the <a href="https://github.com/ethereum/devp2p">ethereum/devp2p</a> Github repository.</p>
+<h3 id="eip-2124-mentions-advertising-the-forkid-in-the-discovery-protocol-too-how-does-that-compare-to-advertising-in-the-eth-protocol-why-is-the-redundancy-needed">
+<a href="#eip-2124-mentions-advertising-the-forkid-in-the-discovery-protocol-too-how-does-that-compare-to-advertising-in-the-eth-protocol-why-is-the-redundancy-needed" class="anchor-link"></a> EIP-2124 mentions advertising the <code class="language-plaintext highlighter-rouge">forkid</code> in the discovery protocol too. How does that compare to advertising in the <code class="language-plaintext highlighter-rouge">eth</code> protocol? Why is the redundancy needed?
+</h3>
+<p>Advertising and validating the <code class="language-plaintext highlighter-rouge">forkid</code> in the discovery protocol is a more optimal solution, as it can help avoid the cost of setting up the TCP connection and cryptographic RLPx stream, only to be torn down if <code class="language-plaintext highlighter-rouge">eth/64</code> rejects it.</p>
+<p>Compared to the <code class="language-plaintext highlighter-rouge">eth</code> protocol however, discovery is a bit fuzzy. The goal there is to suggest potential peers, not to be fool-proof. Information may be outdated, nodes may have changed or disappeared. Discovery can do a rough filtering, but more precision is still needed afterwards.</p>
+<p>Additionally, <code class="language-plaintext highlighter-rouge">forkid</code> validation via the discovery protocol requires ENR implementation (<a href="/EIPS/eip-778">EIP-778</a>) and ENR extension support (<a href="/EIPS/eip-868">EIP-868</a>), which is not mandated by the Ethereum network currently. Lastly, the discovery protocol is just one way to find peers, but systems that cannot use UDP or that rely on other mechanism (e.g. DNS discovery)) still need a way to filter connections.</p>
+<h3 id="the-forkid-implicitly-contains-the-genesis-hash-checksummed-into-the-fork_hash-field-why-doesnt-this-proposal-remove-the-genesishash-field-from-the-eth-handshake">
+<a href="#the-forkid-implicitly-contains-the-genesis-hash-checksummed-into-the-fork_hash-field-why-doesnt-this-proposal-remove-the-genesishash-field-from-the-eth-handshake" class="anchor-link"></a> The <code class="language-plaintext highlighter-rouge">forkid</code> implicitly contains the genesis hash checksummed into the <code class="language-plaintext highlighter-rouge">FORK_HASH</code> field. Why doesn’t this proposal remove the <code class="language-plaintext highlighter-rouge">genesisHash</code> field from the <code class="language-plaintext highlighter-rouge">eth</code> handshake?
+</h3>
+<p>Originally this EIP did remove it as redundant data, since filtering based on the <code class="language-plaintext highlighter-rouge">forkid</code> is a superset of filtering based on genesis hash. The reason for backing out of that decision was that the genesis hash may be useful for other things too, not just connection filtering (network crawlers use it currently to split nodes across networks).</p>
+<p>Although the <code class="language-plaintext highlighter-rouge">forkid</code> will hopefully take over all the roles of the genesis hash currently in use, there’s no reason to be overly aggressive in deduplicating data. It’s fine to keep both side-by-side for now, and remove in a future version when 3rd party infrastructures switch over.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP extends the <code class="language-plaintext highlighter-rouge">eth</code> protocol handshake in a backwards incompatible way and requires rolling out a new version, <code class="language-plaintext highlighter-rouge">eth/64</code>. However, <code class="language-plaintext highlighter-rouge">devp2p</code> supports running multiple versions of the same wire protocol side-by-side, so rolling out <code class="language-plaintext highlighter-rouge">eth/64</code> does not require client coordination, since non-updated clients can keep using <code class="language-plaintext highlighter-rouge">eth/63</code>.</p>
+<p>This EIP does not change the consensus engine, thus does <em>not</em> require a hard fork.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>For calculating and validating fork IDs, see test cases in <a href="/EIPS/eip-2124">EIP-2124</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>None.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#6d1d0819081f06082d0a000c0401430e0200">Péter Szilágyi</a>, <a href="https://github.com/karalabe">Péter Szilágyi</a>, <a href="https://github.com/timbeiko">Tim Beiko</a>, "EIP-2364: eth/64: forkid-extended protocol handshake," <em>Ethereum Improvement Proposals</em>, no. 2364, November 2019. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2364.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2364: eth/64: forkid-extended protocol handshake",
+    "author": "Péter Szilágyi <peterke@gmail.com>, Péter Szilágyi (@karalabe), Tim Beiko (@timbeiko)",
+    "name": "EIP-2364: eth/64: forkid-extended protocol handshake",
+    "dateCreated": "2019-11-08",
+    "datePublished": "2019-11-08",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2365",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2019"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

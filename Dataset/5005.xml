@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5005: Zodiac Avatar Accounts</title>
+<meta property="og:title" content="EIP-5005: Zodiac Avatar Accounts" />
+<meta name="description" content="A composable design philosophy for programmable accounts." />
+<meta property="og:description" content="A composable design philosophy for programmable accounts." />
+<meta name="twitter:description" content="A composable design philosophy for programmable accounts." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5005" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5005" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5005: Zodiac Avatar Accounts
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5005.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A composable design philosophy for programmable accounts.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/auryn-macmillan">Auryn Macmillan</a>, <a href="https://github.com/keikreutler">Kei Kreutler</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-zodiac-a-composable-design-philosophy-for-daos/8963">https://ethereum-magicians.org/t/eip-zodiac-a-composable-design-philosophy-for-daos/8963</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-04-14</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>ERC-5005 (Zodiac Avatar Accounts) is a philosophy and open standard for composable and interoperable tooling for programmable Ethereum accounts. Zodiac-compatible tooling separates the account taking actions/holding tokens (known as the “avatar”) and the authorization logic into two (or more) separate contracts. This standard defines the <code class="language-plaintext highlighter-rouge">IAvatar</code> interface, to be implemented by avatar contracts, while the authorization logic can be implemented with any combination of other tools (for example, DAO tools and frameworks).</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently, most programmable accounts (like DAO tools and frameworks) are built as somewhat monolithic systems, wherein account and control logic are coupled, either in the same contract or in a tightly bound system of contracts. This needlessly inhibits the future flexibility of individuals and organizations using these tools and encourages platform lock-in via extraordinarily high switching costs.</p>
+<p>By using the Zodiac standard to decouple account and control logic, individuals and organizations are able to:</p>
+<ol>
+<li>Enable flexible, module-based control of programmable accounts</li>
+<li>Easily switch between tools and frameworks without unnecessary overhead.</li>
+<li>Enable multiple control mechanism in parallel.</li>
+<li>Enable cross-chain / cross-layer governance.</li>
+<li>Progressively decentralize their governance as their project and community matures.</li>
+</ol>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p>The Zodiac standard consists of four key concepts—Avatars, Modules, Modifiers, and Guards:</p>
+<ol>
+<li><strong>Avatars</strong> are programmable Ethereum accounts. Avatars are the address that holds balances, owns systems, executes transaction, is referenced externally, and ultimately represents your DAO. Avatars MUST expose the <code class="language-plaintext highlighter-rouge">IAvatar</code> interface.</li>
+<li><strong>Modules</strong> are contracts enabled by an avatar that implement some control logic.</li>
+<li><strong>Modifiers</strong> are contracts that sit between modules and avatars to modify the module’s behavior. For example, they might enforce a delay on all functions a module attempts to execute or limit the scope of transactions that can be initiated by the module. Modifiers MUST expose the <code class="language-plaintext highlighter-rouge">IAvatar</code> interface.</li>
+<li><strong>Guards</strong> are contracts that MAY be enabled on modules or modifiers and implement pre- or post-checks on each transaction executed by those modules or modifiers. This allows avatars to do things like limit the scope of addresses and functions that a module or modifier can call or ensure a certain state is never changed by a module or modifier. Guards MUST expose the <code class="language-plaintext highlighter-rouge">IGuard</code> interface. Modules, modifiers, and avatars that wish to be guardable MUST inherit <code class="language-plaintext highlighter-rouge">Guardable</code>, MUST call <code class="language-plaintext highlighter-rouge">checkTransaction()</code> before triggering execution on their target, and MUST call <code class="language-plaintext highlighter-rouge">checkAfterExecution()</code> after execution is complete.</li>
+</ol>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// @title Zodiac Avatar - A contract that manages modules that can execute transactions via this contract.
+</span>
+<span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./Enum.sol"</span><span class="p">;</span>
+
+
+<span class="k">interface</span> <span class="n">IAvatar</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">EnabledModule</span><span class="p">(</span><span class="kt">address</span> <span class="n">module</span><span class="p">);</span>
+    <span class="k">event</span> <span class="n">DisabledModule</span><span class="p">(</span><span class="kt">address</span> <span class="n">module</span><span class="p">);</span>
+    <span class="k">event</span> <span class="n">ExecutionFromModuleSuccess</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">module</span><span class="p">);</span>
+    <span class="k">event</span> <span class="n">ExecutionFromModuleFailure</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">module</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Enables a module on the avatar.
+</span>    <span class="c1">/// @notice Can only be called by the avatar.
+</span>    <span class="c1">/// @notice Modules should be stored as a linked list.
+</span>    <span class="c1">/// @notice Must emit EnabledModule(address module) if successful.
+</span>    <span class="c1">/// @param module Module to be enabled.
+</span>    <span class="k">function</span> <span class="n">enableModule</span><span class="p">(</span><span class="kt">address</span> <span class="n">module</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @dev Disables a module on the avatar.
+</span>    <span class="c1">/// @notice Can only be called by the avatar.
+</span>    <span class="c1">/// @notice Must emit DisabledModule(address module) if successful.
+</span>    <span class="c1">/// @param prevModule Address that pointed to the module to be removed in the linked list
+</span>    <span class="c1">/// @param module Module to be removed.
+</span>    <span class="k">function</span> <span class="n">disableModule</span><span class="p">(</span><span class="kt">address</span> <span class="n">prevModule</span><span class="p">,</span> <span class="kt">address</span> <span class="n">module</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @dev Allows a Module to execute a transaction.
+</span>    <span class="c1">/// @notice Can only be called by an enabled module.
+</span>    <span class="c1">/// @notice Must emit ExecutionFromModuleSuccess(address module) if successful.
+</span>    <span class="c1">/// @notice Must emit ExecutionFromModuleFailure(address module) if unsuccessful.
+</span>    <span class="c1">/// @param to Destination address of module transaction.
+</span>    <span class="c1">/// @param value Ether value of module transaction.
+</span>    <span class="c1">/// @param data Data payload of module transaction.
+</span>    <span class="c1">/// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+</span>    <span class="k">function</span> <span class="n">execTransactionFromModule</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="n">to</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">value</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">data</span><span class="p">,</span>
+        <span class="n">Enum</span><span class="p">.</span><span class="n">Operation</span> <span class="n">operation</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">success</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Allows a Module to execute a transaction and return data
+</span>    <span class="c1">/// @notice Can only be called by an enabled module.
+</span>    <span class="c1">/// @notice Must emit ExecutionFromModuleSuccess(address module) if successful.
+</span>    <span class="c1">/// @notice Must emit ExecutionFromModuleFailure(address module) if unsuccessful.
+</span>    <span class="c1">/// @param to Destination address of module transaction.
+</span>    <span class="c1">/// @param value Ether value of module transaction.
+</span>    <span class="c1">/// @param data Data payload of module transaction.
+</span>    <span class="c1">/// @param operation Operation type of module transaction: 0 == call, 1 == delegate call.
+</span>    <span class="k">function</span> <span class="n">execTransactionFromModuleReturnData</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="n">to</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">value</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">data</span><span class="p">,</span>
+        <span class="n">Enum</span><span class="p">.</span><span class="n">Operation</span> <span class="n">operation</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span> <span class="n">success</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">returnData</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Returns if an module is enabled
+</span>    <span class="c1">/// @return True if the module is enabled
+</span>    <span class="k">function</span> <span class="n">isModuleEnabled</span><span class="p">(</span><span class="kt">address</span> <span class="n">module</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Returns array of modules.
+</span>    <span class="c1">/// @param start Start of the page.
+</span>    <span class="c1">/// @param pageSize Maximum number of modules that should be returned.
+</span>    <span class="c1">/// @return array Array of modules.
+</span>    <span class="c1">/// @return next Start of the next page.
+</span>    <span class="k">function</span> <span class="n">getModulesPaginated</span><span class="p">(</span><span class="kt">address</span> <span class="n">start</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">pageSize</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">view</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">array</span><span class="p">,</span> <span class="kt">address</span> <span class="n">next</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./Enum.sol"</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IGuard</span> <span class="p">{</span>
+    <span class="k">function</span> <span class="n">checkTransaction</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="n">to</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">value</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">data</span><span class="p">,</span>
+        <span class="n">Enum</span><span class="p">.</span><span class="n">Operation</span> <span class="n">operation</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">safeTxGas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">baseGas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">gasPrice</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">gasToken</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="k">payable</span> <span class="n">refundReceiver</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">signatures</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">msgSender</span>
+    <span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="n">checkAfterExecution</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">txHash</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">success</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./Enum.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./BaseGuard.sol"</span><span class="p">;</span>
+
+<span class="c1">/// @title Guardable - A contract that manages fallback calls made to this contract
+</span><span class="k">contract</span> <span class="n">Guardable</span> <span class="p">{</span>
+    <span class="kt">address</span> <span class="k">public</span> <span class="n">guard</span><span class="p">;</span>
+
+    <span class="k">event</span> <span class="n">ChangedGuard</span><span class="p">(</span><span class="kt">address</span> <span class="n">guard</span><span class="p">);</span>
+
+    <span class="c1">/// `guard_` does not implement IERC165.
+</span>    <span class="n">error</span> <span class="n">NotIERC165Compliant</span><span class="p">(</span><span class="kt">address</span> <span class="n">guard_</span><span class="p">);</span>
+
+    <span class="c1">/// @dev Set a guard that checks transactions before execution.
+</span>    <span class="c1">/// @param _guard The address of the guard to be used or the 0 address to disable the guard.
+</span>    <span class="k">function</span> <span class="n">setGuard</span><span class="p">(</span><span class="kt">address</span> <span class="n">_guard</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">_guard</span> <span class="o">!=</span> <span class="kt">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">BaseGuard</span><span class="p">(</span><span class="n">_guard</span><span class="p">).</span><span class="n">supportsInterface</span><span class="p">(</span><span class="k">type</span><span class="p">(</span><span class="n">IGuard</span><span class="p">).</span><span class="n">interfaceId</span><span class="p">))</span>
+                <span class="nb">revert</span> <span class="n">NotIERC165Compliant</span><span class="p">(</span><span class="n">_guard</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">guard</span> <span class="o">=</span> <span class="n">_guard</span><span class="p">;</span>
+        <span class="k">emit</span> <span class="n">ChangedGuard</span><span class="p">(</span><span class="n">guard</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">getGuard</span><span class="p">()</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span> <span class="n">_guard</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">guard</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"./Enum.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IERC165.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IGuard.sol"</span><span class="p">;</span>
+
+<span class="k">abstract</span> <span class="k">contract</span> <span class="n">BaseGuard</span> <span class="k">is</span> <span class="n">IERC165</span> <span class="p">{</span>
+    <span class="k">function</span> <span class="n">supportsInterface</span><span class="p">(</span><span class="kt">bytes4</span> <span class="n">interfaceId</span><span class="p">)</span>
+        <span class="k">external</span>
+        <span class="k">pure</span>
+        <span class="k">override</span>
+        <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span>
+            <span class="n">interfaceId</span> <span class="o">==</span> <span class="k">type</span><span class="p">(</span><span class="n">IGuard</span><span class="p">).</span><span class="n">interfaceId</span> <span class="o">||</span> <span class="c1">// 0xe6d7a83a
+</span>            <span class="n">interfaceId</span> <span class="o">==</span> <span class="k">type</span><span class="p">(</span><span class="n">IERC165</span><span class="p">).</span><span class="n">interfaceId</span><span class="p">;</span> <span class="c1">// 0x01ffc9a7
+</span>    <span class="p">}</span>
+
+    <span class="c1">/// @dev Module transactions only use the first four parameters: to, value, data, and operation.
+</span>    <span class="c1">/// Module.sol hardcodes the remaining parameters as 0 since they are not used for module transactions.
+</span>    <span class="k">function</span> <span class="n">checkTransaction</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="n">to</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">value</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">data</span><span class="p">,</span>
+        <span class="n">Enum</span><span class="p">.</span><span class="n">Operation</span> <span class="n">operation</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">safeTxGas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">baseGas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">gasPrice</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">gasToken</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="k">payable</span> <span class="n">refundReceiver</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">signatures</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">msgSender</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">virtual</span><span class="p">;</span>
+
+    <span class="k">function</span> <span class="n">checkAfterExecution</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">txHash</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">success</span><span class="p">)</span> <span class="k">external</span> <span class="k">virtual</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">&gt;=</span><span class="mf">0.7</span><span class="p">.</span><span class="mi">0</span> <span class="o">&lt;</span><span class="mf">0.9</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="c1">/// @title Enum - Collection of enums
+</span><span class="k">contract</span> <span class="n">Enum</span> <span class="p">{</span>
+    <span class="k">enum</span> <span class="n">Operation</span> <span class="p">{</span><span class="n">Call</span><span class="p">,</span> <span class="n">DelegateCall</span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The interface defined in this standard is deliberately made to be compatible with the most popular programmable accounts in use today in the Ethereum ecosystem, so as to be maximally composable with existing tooling.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>No backward compatibility issues are introduced by this standard.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>There are some considerations that module developers and users should take into account.</p>
+<ol>
+<li><strong>Modules have unilateral control:</strong> Modules have unilateral control over any avatar on which they are enabled, so any module implementation should be treated as security critical and users should be vary cautious about enabling new modules. ONLY ENABLE MODULES THAT YOU TRUST WITH THE FULL VALUE OF THE AVATAR.</li>
+<li><strong>Race conditions:</strong> A given avatar may have any number of modules enabled, each with unilateral control over the safe. In such cases, there may be race conditions between different modules and/or other control mechanisms.</li>
+<li><strong>Don’t brick your avatar:</strong> Be warned, there are no safe guards to stop you adding or removing modules. If you remove all of the modules that let you control an avatar, the avatar will cease to function and all funds will be stuck.</li>
+</ol>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/auryn-macmillan">Auryn Macmillan</a>, <a href="https://github.com/keikreutler">Kei Kreutler</a>, "EIP-5005: Zodiac Avatar Accounts [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5005, April 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5005.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5005: Zodiac Avatar Accounts [DRAFT]",
+    "author": "Auryn Macmillan (@auryn-macmillan), Kei Kreutler (@keikreutler)",
+    "name": "EIP-5005: Zodiac Avatar Accounts [DRAFT]",
+    "dateCreated": "2022-04-14",
+    "datePublished": "2022-04-14",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-zodiac-a-composable-design-philosophy-for-daos/8963",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

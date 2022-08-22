@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5345: Silent Signing Extension for JSON-RPC</title>
+<meta property="og:title" content="EIP-5345: Silent Signing Extension for JSON-RPC" />
+<meta name="description" content="Temporary transaction signing without user interaction" />
+<meta property="og:description" content="Temporary transaction signing without user interaction" />
+<meta name="twitter:description" content="Temporary transaction signing without user interaction" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5345" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5345" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5345: Silent Signing Extension for JSON-RPC
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5345.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Temporary transaction signing without user interaction</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/fruit37">Stanley Wu</a>, <a href="https://github.com/anndro">Mücahit Büyükyılmaz</a>, <a href="https://github.com/muhammedea">Muhammed Emin Aydın</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/walletconnect-silent-signing-extension/10137">https://ethereum-magicians.org/t/walletconnect-silent-signing-extension/10137</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2022-07-26</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#silent-signing-user-flow">Silent Signing User Flow</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#new-rpc-methods">New RPC Methods</a></li>
+<li><a href="#application-and-wallet-communication">Application and Wallet Communication</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Mobile applications supporting lots of transactions might become a source of bad user experience due to uncontrolled switching between the wallet’s and application’s UI. By this proposal, we would like to introduce the means to sign and send wallet transactions without the need for user participation. This feature can be implemented by providing user consent for a specific time duration. We call the feature Silent Signing.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Some blockchain applications interact with a blockchain much more frequently than others. It is especially true for gaming applications having their own sidechains. Interrupting the gaming process and switching to the wallet to perform a transaction drastically affect the user experience.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>To remedy the situation, we’d like to introduce new RPC methods for the ethereum JSON-RPC. Those methods help enable wallets to implement the Silent Signing feature.</p>
+<h3 id="silent-signing-user-flow">
+<a href="#silent-signing-user-flow" class="anchor-link"></a> Silent Signing User Flow
+</h3>
+<p>The Silent Signing process has the following structure:</p>
+<ol>
+<li>First, the application requests the wallet to use Silent Signing via the RPC’s <code class="language-plaintext highlighter-rouge">wallet_requestSilentSign</code> method.</li>
+<li>Second, the wallet prompts the user to confirm enabling the Silent Singing functionality for a specific time duration.</li>
+<li>If the user does not confirm Silent Signing or the RPC method is not allowed, the application will continue using the regular methods.</li>
+<li>If the user confirms Silent Signing, then each subsequent transaction will be sent using the <code class="language-plaintext highlighter-rouge">wallet_silentSendTransaction</code> method for the time duration specified.</li>
+</ol>
+<h3 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h3>
+<p>The implementation introduces new RPC methods and flow for application and wallet side.</p>
+<h3 id="new-rpc-methods">
+<a href="#new-rpc-methods" class="anchor-link"></a> New RPC Methods
+</h3>
+<h4 id="wallet_requestsilentsign">
+<a href="#wallet_requestsilentsign" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">wallet_requestSilentSign</code>
+</h4>
+<p>This RPC method opens the wallet and prompts the user to enable automatic signing for a specific time duration. This function grants the application to call the following methods until the timestamp expires. Standard methods like <code class="language-plaintext highlighter-rouge">eth_signTrancaction</code> remain untouched.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Parameters
+  Object: request object
+    <span class="k">until</span>: NUMBER - unix timesptamp, the end <span class="nb">time </span>the permission will be valid
+    chainId: NUMBER - the chain <span class="nb">id </span>that the contract located <span class="k">in
+    </span>contractAddress: ADDRESS - address of the contract to be allowed
+    allowedFunctions: STRING ARRAY - allowed <span class="k">function </span>signatures
+          Ex: <span class="o">[</span><span class="s2">"equip(address,uint256)"</span>, <span class="s2">"unequip(address,uint256)"</span><span class="o">]</span>
+    description: STRING - extra description that can be shown to user by the wallet
+
+Returns
+  DATA, 20 Bytes: permissionSecret - a secret key <span class="k">for </span>silent-signing requests <span class="o">(</span>randomly generated<span class="o">)</span>
+</code></pre></div></div>
+<h4 id="wallet_silentsigntransaction">
+<a href="#wallet_silentsigntransaction" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">wallet_silentSignTransaction</code>
+</h4>
+<p>This RPC method creates a transaction and sends its data to the wallet for signing. The wallet signs the data in the background, interfering with no processes the user is involved in. Afterward, the application sends the signed transaction to the blockchain using Nethereum’s or other libraries’ <code class="language-plaintext highlighter-rouge">sendRawTransaction</code> method.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Parameters
+  DATA, 20 Bytes: permissionSecret - secret key obtained from <span class="sb">`</span>wallet_requestSilentSign<span class="sb">`</span> method
+  Object - The transaction object
+    from: DATA, 20 Bytes - The address the transaction is sent from.
+    to: DATA, 20 Bytes - <span class="o">(</span>optional when creating new contract<span class="o">)</span> The address the transaction is directed to.
+    gas: QUANTITY - <span class="o">(</span>optional, default: 90000<span class="o">)</span> Integer of the gas provided <span class="k">for </span>the transaction execution. It will <span class="k">return </span>unused gas.
+    gasPrice: QUANTITY - <span class="o">(</span>optional, default: To-Be-Determined<span class="o">)</span> Integer of the gasPrice used <span class="k">for </span>each paid gas, <span class="k">in </span>Wei.
+    value: QUANTITY - <span class="o">(</span>optional<span class="o">)</span> Integer of the value sent with this transaction, <span class="k">in </span>Wei.
+    data: DATA - The compiled code of a contract OR the <span class="nb">hash </span>of the invoked method signature and encoded parameters.
+    nonce: QUANTITY - <span class="o">(</span>optional<span class="o">)</span> Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.
+  
+Returns
+  DATA, The signed transaction object.
+</code></pre></div></div>
+<h4 id="wallet_silentsendtransaction">
+<a href="#wallet_silentsendtransaction" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">wallet_silentSendTransaction</code>
+</h4>
+<p>This RPC method creates a transaction and sends it to the blockchain without interfering with the process the user is involved in.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Parameters
+  DATA, 20 Bytes: permissionSecret - secret key obtained from <span class="sb">`</span>wallet_requestSilentSign<span class="sb">`</span> method
+  Object - The transaction object
+    from: DATA, 20 Bytes - The address the transaction is sent from.
+    to: DATA, 20 Bytes - <span class="o">(</span>optional when creating new contract<span class="o">)</span> The address the transaction is directed to.
+    gas: QUANTITY - <span class="o">(</span>optional, default: 90000<span class="o">)</span> Integer of the gas provided <span class="k">for </span>the transaction execution. It will <span class="k">return </span>unused gas.
+    gasPrice: QUANTITY - <span class="o">(</span>optional, default: To-Be-Determined<span class="o">)</span> Integer of the gasPrice used <span class="k">for </span>each paid gas.
+    value: QUANTITY - <span class="o">(</span>optional<span class="o">)</span> Integer of the value sent with this transaction.
+    data: DATA - The compiled code of a contract OR the <span class="nb">hash </span>of the invoked method signature and encoded parameters.
+    nonce: QUANTITY - <span class="o">(</span>optional<span class="o">)</span> Integer of a nonce. This allows to overwrite your own pending transactions that use the same nonce.
+
+Returns
+  DATA, 32 Bytes - the transaction <span class="nb">hash</span>, or the zero <span class="nb">hash </span><span class="k">if </span>the transaction is not yet available.
+</code></pre></div></div>
+<h3 id="application-and-wallet-communication">
+<a href="#application-and-wallet-communication" class="anchor-link"></a> Application and Wallet Communication
+</h3>
+<p>Sending RPC requests between application and wallet can be as usual. For example browser extension wallets can use these new methods easly. Even hardware wallets can implement this too. But for mobile wallets extra communication techniques should be considered. Because mobile wallets can be inactive when it is not in use.</p>
+<p>Mobile wallets mostly use Walletconnect protocol. The application closed or active in the background can’t connect to the Bridge server via WebSocket. Therefore, we have to trigger the wallet to connect to the Bridge and to start waiting for requests. For this purpose, push notifications are to be used. That means that only the wallets supporting push notifications can implement the feature.</p>
+<p><img src="/assets/eip-5345/walletconnect-flow.png" alt="" /></p>
+<p>Whenever the wallet receives a push notification, it connects to the Bridge server and gets access to the pending requests. If there are <code class="language-plaintext highlighter-rouge">wallet_silenSignTransaction</code> or <code class="language-plaintext highlighter-rouge">wallet_silentSendTransaction</code> silent signing requests pending and the interaction with the requesting client has been confirmed for this particular time duration, then the wallet executes the request without interfering with the ongoing user activity.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Games and Metaverse applications imply lots of cases when the user interacts with the wallet, switching to it and approving transactions. This switching aspect might interfere with gaming per se and create a bad user experience. That is why such applications can benefit if the wallets can support the Silent Signing functionality allowing transactions to be signed with no user interaction.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>These new RPC methods don’t interfere with the current ones, and for mobile wallets the push notifications API is currently a part of the <code class="language-plaintext highlighter-rouge">WalletConnect</code> specification. Implementing the proposal’s functionality changes nothing for other applications and wallets.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The proposed feature aims to improve the user experience and can only be enabled with user consent. Users might freely choose to use the application as usual.</p>
+<p>Silent Signing permission has restrictions that makes it more secure.</p>
+<ul>
+<li>Permission granted only for a specified time duration</li>
+<li>Permission granted only for specific contract in a specific chain and restricted to specified functions.</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/fruit37">Stanley Wu</a>, <a href="https://github.com/anndro">Mücahit Büyükyılmaz</a>, <a href="https://github.com/muhammedea">Muhammed Emin Aydın</a>, "EIP-5345: Silent Signing Extension for JSON-RPC [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5345, July 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5345.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5345: Silent Signing Extension for JSON-RPC [DRAFT]",
+    "author": "Stanley Wu (@fruit37), Mücahit Büyükyılmaz (@anndro), Muhammed Emin Aydın (@muhammedea)",
+    "name": "EIP-5345: Silent Signing Extension for JSON-RPC [DRAFT]",
+    "dateCreated": "2022-07-26",
+    "datePublished": "2022-07-26",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/walletconnect-silent-signing-extension/10137",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

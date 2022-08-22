@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1207: DAuth Access Delegation Standard</title>
+<meta property="og:title" content="EIP-1207: DAuth Access Delegation Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1207" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1207" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1207: DAuth Access Delegation Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1207.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/wxygeek">Xiaoyu Wang</a>, <a href="https://github.com/Wangbicong">Bicong Wang</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1207">https://github.com/ethereum/EIPs/issues/1207</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-07-10</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#dauth-access-delegation-standard">DAuth Access Delegation Standard</a>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="dauth-access-delegation-standard">
+<a href="#dauth-access-delegation-standard" class="anchor-link"></a> DAuth Access Delegation Standard
+</h1>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>DAuth is a standard interface for accessing authorization delegation between smart contracts and users.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The DAuth protocol defines a set of standard API allowing identity delegations between smart contracts without the user’s private key. Identity delegations include accessing and operating a user’s data and assets contained in the delegated contracts.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The inspiration for designing DAuth comes from OAuth protocol that is extensively used in web applications. But unlike the centralized authorization of OAuth, DAuth works in a distributed manner, thus providing much more reliability and generality.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p><img src="/assets/eip-1207/rationale.png" alt="Rationale" /></p>
+<p><strong>Resource owner</strong>: the authorizer</p>
+<p><strong>Resource contract</strong>: the contract providing data and operators</p>
+<p><strong>API</strong>: the resource contract APIs that the grantee contract can invoke</p>
+<p><strong>Client contract</strong>: the grantee contract using authorization to access and operate the data</p>
+<p><strong>Grantee request</strong>: the client contract calls the resource contract with the authorizer authorization</p>
+<p><strong>AuthInfo</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">struct</span> <span class="nx">AuthInfo</span> <span class="p">{</span>
+    <span class="nx">string</span><span class="p">[]</span> <span class="nx">funcNames</span><span class="p">;</span>
+    <span class="nx">uint</span> <span class="nx">expireAt</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Required - The struct contains user authorization information</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">funcNames</code>: a list of function names callable by the granted contract</li>
+<li><code class="language-plaintext highlighter-rouge">expireAt</code>: the authorization expire timestamp in seconds</li>
+</ul>
+<p><strong>userAuth</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span> <span class="o">=&gt;</span> <span class="nx">AuthInfo</span><span class="p">))</span> <span class="nx">userAuth</span><span class="p">;</span>
+</code></pre></div></div>
+<p>Required - userAuth maps (authorizer address, grantee contract address) pair to the user’s authorization AuthInfo object</p>
+<p><strong>callableFuncNames</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">string</span><span class="p">[]</span> <span class="nx">callableFuncNames</span><span class="p">;</span>
+</code></pre></div></div>
+<p>Required - All methods that are allowed other contracts to call</p>
+<ul>
+<li>The callable function MUST verify the grantee’s authorization</li>
+</ul>
+<p><strong>updateCallableFuncNames</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">updateCallableFuncNames</span><span class="p">(</span><span class="nx">string</span> <span class="nx">_invokes</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Optional - Update the callable function list for the client contract by the resource contract’s administrator</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">_invokes</code>: the invoke methods that the client contract can call</li>
+<li>return: Whether the callableFuncNames is updated or not</li>
+<li>This method MUST return success or throw, no other outcomes can be possible</li>
+</ul>
+<p><strong>verify</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">verify</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_authorizer</span><span class="p">,</span> <span class="nx">string</span> <span class="nx">_invoke</span><span class="p">)</span> <span class="nx">internal</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Required - check the invoke method authority for the client contract</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">_authorizer</code>: the user address that the client contract agents</li>
+<li><code class="language-plaintext highlighter-rouge">_invoke</code>: the invoke method that the client contract wants to call</li>
+<li>return: Whether the grantee request is authorized or not</li>
+<li>This method MUST return success or throw, no other outcomes can be possible</li>
+</ul>
+<p><strong>grant</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">grant</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_grantee</span><span class="p">,</span> <span class="nx">string</span> <span class="nx">_invokes</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">_expireAt</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Required - delegate a client contract to access the user’s resource</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">_grantee</code>: the client contract address</li>
+<li><code class="language-plaintext highlighter-rouge">_invokes</code>: the callable methods that the client contract can access. It is a string which contains all function names split by spaces</li>
+<li><code class="language-plaintext highlighter-rouge">_expireAt</code>: the authorization expire timestamp in seconds</li>
+<li>return: Whether the grant is successful or not</li>
+<li>This method MUST return success or throw, no other outcomes can be possible</li>
+<li>A successful grant MUST fire the Grant event(defined below)</li>
+</ul>
+<p><strong>regrant</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">regrant</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_grantee</span><span class="p">,</span> <span class="nx">string</span> <span class="nx">_invokes</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">_expireAt</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Optional - alter a client contract’s delegation</p>
+<p><strong>revoke</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">revoke</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_grantee</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Required - delete a client contract’s delegation</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">_grantee</code>: the client contract address</li>
+<li>return: Whether the revoke is successful or not</li>
+<li>A successful revoke MUST fire the Revoke event(defined below).</li>
+</ul>
+<p><strong>Grant</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Grant</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_authorizer</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_grantee</span><span class="p">,</span> <span class="nx">string</span> <span class="nx">_invokes</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">_expireAt</span><span class="p">);</span>
+</code></pre></div></div>
+<ul>
+<li>This event MUST trigger when the authorizer grant a new authorization when <code class="language-plaintext highlighter-rouge">grant</code> or <code class="language-plaintext highlighter-rouge">regrant</code> processes successfully</li>
+</ul>
+<p><strong>Revoke</strong></p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Revoke</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_authorizer</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_grantee</span><span class="p">);</span>
+</code></pre></div></div>
+<ul>
+<li>This event MUST trigger when the authorizer revoke a specific authorization successfully</li>
+</ul>
+<p><strong>Callable Resource Contract Functions</strong></p>
+<p>All public or external functions that are allowed the grantee to call MUST use overload to implement two functions: The First one is the standard method that the user invokes directly, the second one is the grantee methods of the same function name with one more authorizer address parameter.</p>
+<p>Example:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">approve</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">_approve</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">_value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">approve</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_authorizer</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">verify</span><span class="p">(</span><span class="nx">_authorizer</span><span class="p">,</span> <span class="dl">"</span><span class="s2">approve</span><span class="dl">"</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="nx">_approve</span><span class="p">(</span><span class="nx">_authorizer</span><span class="p">,</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">_value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">_approve</span><span class="p">(</span><span class="nx">address</span> <span class="nx">sender</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">internal</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">allowed</span><span class="p">[</span><span class="nx">sender</span><span class="p">][</span><span class="nx">_spender</span><span class="p">]</span> <span class="o">=</span> <span class="nx">_value</span><span class="p">;</span>
+    <span class="nx">emit</span> <span class="nx">Approval</span><span class="p">(</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">_spender</span><span class="p">,</span> <span class="nx">_value</span><span class="p">);</span>
+    <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p><strong>Current Limitations</strong></p>
+<p>The current design of many smart contracts only considers the user invokes the smart contract functions by themselves using the private key. However, in some case, the user wants to delegate other client smart contracts to access and operate their data or assets in the resource smart contract. There isn’t a common protocol to provide a standard delegation approach.</p>
+<p><strong>Rationale</strong></p>
+<p>On the Ethereum platform, all storage is transparent and the <code class="language-plaintext highlighter-rouge">msg.sender</code> is reliable. Therefore, the DAuth don’t need an <code class="language-plaintext highlighter-rouge">access_token</code> like OAuth. DAuth just recodes the users’ authorization for the specific client smart contract’s address. It is simple and reliable on the Ethereum platform.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP introduces no backward compatibility issues. In the future, the new version protocol has to keep these interfaces.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Following is the DAuth Interface implementation. Furthermore, the example implementations of EIP20 Interface and ERC-DAuth Interface are also provided. Developers can easily implement their own contracts with ERC-DAuth Interface and other EIP.</p>
+<ul>
+<li>
+<p>ERC-DAuth Interface implementation is available at:</p>
+<p>https://github.com/DIA-Network/ERC-DAuth/blob/master/ERC-DAuth-Interface.sol</p>
+</li>
+ <li>
+<p>Example implementation with EIP20 Interface and ERC-DAuth Interface is available at:</p>
+<p>https://github.com/DIA-Network/ERC-DAuth/blob/master/eip20-dauth-example/EIP20DAuth.sol</p>
+</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/wxygeek">Xiaoyu Wang</a>, <a href="https://github.com/Wangbicong">Bicong Wang</a>, "EIP-1207: DAuth Access Delegation Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1207, July 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1207.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1207: DAuth Access Delegation Standard [DRAFT]",
+    "author": "Xiaoyu Wang (@wxygeek), Bicong Wang (@Wangbicong)",
+    "name": "EIP-1207: DAuth Access Delegation Standard [DRAFT]",
+    "dateCreated": "2018-07-10",
+    "datePublished": "2018-07-10",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1207",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

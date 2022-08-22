@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2645: Hierarchical Deterministic Wallet for Layer-2</title>
+<meta property="og:title" content="EIP-2645: Hierarchical Deterministic Wallet for Layer-2" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2645" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2645" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2645: Hierarchical Deterministic Wallet for Layer-2
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2645.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#4e3a21230e3d3a2f3c25392f3c2b602d21">Tom Brand</a>, <a href="/cdn-cgi/l/email-protection#513d3e24382211222530233a263023347f323e">Louis Guthmann</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/hierarchical-deterministic-wallet-for-computation-integrity-proof-cip-layer-2/4286">https://ethereum-magicians.org/t/hierarchical-deterministic-wallet-for-computation-integrity-proof-cip-layer-2/4286</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-05-13</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>In the context of Computation Integrity Proof (CIP) Layer-2 solutions such as ZK-Rollups, users are required to sign messages on new elliptic curves optimized for those environnements. We leverage existing work on Key Derivation (<a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki">BIP32</a>, <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a> and <a href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">BIP44</a>) to define an efficient way to securely produce CIP L2s private keys, as well as creating domain separation between Layer-2 applications.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>We provide a Derivation Path allowing a user to derive hierarchical keys for Layer-2 solutions depending on the zk-technology, the application, the user’s Layer-1 address, as well as an efficient grinding method to enforce the private key distribution within the curve domain. The propose Derivation Path is defined as follow</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>m / purpose' / layer' / application' / eth_address_1' / eth_address_2' / index
+</code></pre></div></div>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>In the context of Computation Integrity Proof (CIP) Layer-2 solutions such as ZK-Rollups, users are required to sign messages on new elliptic curves optimized for those environnements. Extensive work has been done to make it secure on Bitcoin via <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki">BIP32</a>, <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP39</a> and <a href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">BIP44</a>. These protocols are the standard for wallets in the entire industry, independent of the underlying blockchain. As Layer-2 solutions are taking off, it is a necessary requirement to maintain the same standard and security in this new space.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Starkware keys are derived with the following <a href="https://github.com/bitcoin/bips/blob/master/bip-0043.mediawiki">BIP43</a>-compatible derivation path, with direct inspiration from <a href="https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki">BIP44</a>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>m / purpose' / layer' / application' / eth_address_1' / eth_address_2' / index
+</code></pre></div></div>
+<p>where:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">m</code> - the seed.</li>
+<li><code class="language-plaintext highlighter-rouge">purpose</code> - <code class="language-plaintext highlighter-rouge">2645</code> (the number of this EIP).</li>
+<li><code class="language-plaintext highlighter-rouge">layer</code> - the 31 lowest bits of sha256 on the layer name. Serve as a domain separator between different technologies. In the context of <code class="language-plaintext highlighter-rouge">starkex</code>, the value would be <code class="language-plaintext highlighter-rouge">579218131</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">application</code> - the 31 lowest bits of sha256 of the application name. Serve as a domain separator between different applications. In the context of DeversiFi in June 2020, it is the 31 lowest bits of sha256(starkexdvf) and the value would be <code class="language-plaintext highlighter-rouge">1393043894</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">eth_address_1 / eth_address_2</code> - the first and second 31 lowest bits of the corresponding eth_address.</li>
+<li><code class="language-plaintext highlighter-rouge">index</code> - to allow multiple keys per eth_address.</li>
+</ul>
+<p>As example, the expected path for address 0x0000….0000 assuming seed <code class="language-plaintext highlighter-rouge">m</code> and index 0 in the context of DeversiFi in June 2020: <code class="language-plaintext highlighter-rouge">m/2645'/579218131'/1393043894'/0'/0'/0</code></p>
+<p>The key derivation should follow the following algorithm</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>N = 2**256
+n = Layer2 curve order
+path = stark derivation path
+BIP32() = Official BIP-0032 derivation function on secp256k1
+hash = SHA256
+i = 0
+root_key = BIP32(path)
+while True:
+	key = hash(root_key|i)
+	if (key &lt; (N - (N % n))):
+		return key % n
+	i++
+</code></pre></div></div>
+<p>This algorithm has been defined to maintain efficiency on existing restricted devices.</p>
+<p>Nota Bene: At each round, the probability for a key to be greater than (N - (N % n)) is &lt; 2^(-5).</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP specifies two aspects of keys derivation in the context of Hierarchical Wallets:</p>
+<ul>
+<li>Derivation Path</li>
+<li>Grinding Algorithm to enforce a uniform distribution over the elliptic curve.
+The derivation path is defined to allow efficient keys separation based on technology and application while maintaining a 1-1 relation with the Layer-1 wallet. In such a way, losing EIP-2645 wallets falls back to losing the Layer-1 wallet.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This standard complies with BIP43.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>This EIP has been defined to maintain separation of keys while providing foolproof logic on key derivation.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#8ffbe0e2cffcfbeefde4f8eefdeaa1ece0">Tom Brand</a>, <a href="/cdn-cgi/l/email-protection#6a06051f03192a191e0b18011d0b180f440905">Louis Guthmann</a>, "EIP-2645: Hierarchical Deterministic Wallet for Layer-2 [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2645, May 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2645.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2645: Hierarchical Deterministic Wallet for Layer-2 [DRAFT]",
+    "author": "Tom Brand <tom@starkware.co>, Louis Guthmann <louis@starkware.co>",
+    "name": "EIP-2645: Hierarchical Deterministic Wallet for Layer-2 [DRAFT]",
+    "dateCreated": "2020-05-13",
+    "datePublished": "2020-05-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/hierarchical-deterministic-wallet-for-computation-integrity-proof-cip-layer-2/4286",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

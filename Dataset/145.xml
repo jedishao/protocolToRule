@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-145: Bitwise shifting instructions in EVM</title>
+<meta property="og:title" content="EIP-145: Bitwise shifting instructions in EVM" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-145" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-145" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-145: Bitwise shifting instructions in EVM
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-145.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2017-02-13</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#0x1b-shl-shift-left">0x1b: SHL (shift left)</a></li>
+<li><a href="#0x1c-shr-logical-shift-right">0x1c: SHR (logical shift right)</a></li>
+<li><a href="#0x1d-sar-arithmetic-shift-right">0x1d: SAR (arithmetic shift right)</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a>
+<ul>
+<li><a href="#shl-shift-left">SHL (shift left)</a></li>
+<li><a href="#shr-logical-shift-right">SHR (logical shift right)</a></li>
+<li><a href="#sar-arithmetic-shift-right">SAR (arithmetic shift right)</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#tests">Tests</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>To provide native bitwise shifting with cost on par with other arithmetic operations.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Native bitwise shifting instructions are introduced, which are more efficient processing wise on the host and are cheaper to use by a contract.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>EVM is lacking bitwise shifting operators, but supports other logical and arithmetic operators. Shift operations can be implemented via arithmetic operators, but that has a higher cost and requires more processing time from the host. Implementing <code class="language-plaintext highlighter-rouge">SHL</code> and <code class="language-plaintext highlighter-rouge">SHR</code> using arithmetic cost each 35 gas, while the proposed instructions take 3 gas.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The following instructions are introduced:</p>
+<h3 id="0x1b-shl-shift-left">
+<a href="#0x1b-shl-shift-left" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">0x1b</code>: <code class="language-plaintext highlighter-rouge">SHL</code> (shift left)
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">SHL</code> instruction (shift left) pops 2 values from the stack, first <code class="language-plaintext highlighter-rouge">arg1</code> and then <code class="language-plaintext highlighter-rouge">arg2</code>, and pushes on the stack <code class="language-plaintext highlighter-rouge">arg2</code> shifted to the left by <code class="language-plaintext highlighter-rouge">arg1</code> number of bits. The result is equal to</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(arg2 * 2^arg1) mod 2^256
+</code></pre></div></div>
+<p>Notes:</p>
+<ul>
+<li>The value (<code class="language-plaintext highlighter-rouge">arg2</code>) is interpreted as an unsigned number.</li>
+<li>The shift amount (<code class="language-plaintext highlighter-rouge">arg1</code>) is interpreted as an unsigned number.</li>
+<li>If the shift amount (<code class="language-plaintext highlighter-rouge">arg1</code>) is greater or equal 256 the result is 0.</li>
+<li>This is equivalent to <code class="language-plaintext highlighter-rouge">PUSH1 2 EXP MUL</code>.</li>
+</ul>
+<h3 id="0x1c-shr-logical-shift-right">
+<a href="#0x1c-shr-logical-shift-right" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">0x1c</code>: <code class="language-plaintext highlighter-rouge">SHR</code> (logical shift right)
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">SHR</code> instruction (logical shift right) pops 2 values from the stack, first <code class="language-plaintext highlighter-rouge">arg1</code> and then <code class="language-plaintext highlighter-rouge">arg2</code>, and pushes on the stack <code class="language-plaintext highlighter-rouge">arg2</code> shifted to the right by <code class="language-plaintext highlighter-rouge">arg1</code> number of bits with zero fill. The result is equal to</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>floor(arg2 / 2^arg1)
+</code></pre></div></div>
+<p>Notes:</p>
+<ul>
+<li>The value (<code class="language-plaintext highlighter-rouge">arg2</code>) is interpreted as an unsigned number.</li>
+<li>The shift amount (<code class="language-plaintext highlighter-rouge">arg1</code>) is interpreted as an unsigned number.</li>
+<li>If the shift amount (<code class="language-plaintext highlighter-rouge">arg1</code>) is greater or equal 256 the result is 0.</li>
+<li>This is equivalent to <code class="language-plaintext highlighter-rouge">PUSH1 2 EXP DIV</code>.</li>
+</ul>
+<h3 id="0x1d-sar-arithmetic-shift-right">
+<a href="#0x1d-sar-arithmetic-shift-right" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">0x1d</code>: <code class="language-plaintext highlighter-rouge">SAR</code> (arithmetic shift right)
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">SAR</code> instruction (arithmetic shift right) pops 2 values from the stack, first <code class="language-plaintext highlighter-rouge">arg1</code> and then <code class="language-plaintext highlighter-rouge">arg2</code>, and pushes on the stack <code class="language-plaintext highlighter-rouge">arg2</code> shifted to the right by <code class="language-plaintext highlighter-rouge">arg1</code> number of bits with sign extension. The result is equal to</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>floor(arg2 / 2^arg1)
+</code></pre></div></div>
+<p>Notes:</p>
+<ul>
+<li>The value (<code class="language-plaintext highlighter-rouge">arg2</code>) is interpreted as a signed number.</li>
+<li>The shift amount (<code class="language-plaintext highlighter-rouge">arg1</code>) is interpreted as an unsigned number.</li>
+<li>If the shift amount (<code class="language-plaintext highlighter-rouge">arg1</code>) is greater or equal 256 the result is 0 if <code class="language-plaintext highlighter-rouge">arg2</code> is non-negative or -1 if <code class="language-plaintext highlighter-rouge">arg2</code> is negative.</li>
+<li>This is <strong>not</strong> equivalent to <code class="language-plaintext highlighter-rouge">PUSH1 2 EXP SDIV</code>, since it rounds differently. See <code class="language-plaintext highlighter-rouge">SDIV(-1, 2) == 0</code>, while <code class="language-plaintext highlighter-rouge">SAR(-1, 1) == -1</code>.</li>
+</ul>
+<p>The cost of the shift instructions is set at <code class="language-plaintext highlighter-rouge">verylow</code> tier (3 gas).</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Instruction operands were chosen to fit the more natural use case of shifting a value already on the stack. This means the operand order is swapped compared to most arithmetic insturctions.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The newly introduced instructions have no effect on bytecode created in the past.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h3 id="shl-shift-left">
+<a href="#shl-shift-left" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">SHL</code> (shift left)
+</h3>
+<ol>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x00
+SHL
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x01
+SHL
+---
+0x0000000000000000000000000000000000000000000000000000000000000002
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0xff
+SHL
+---
+0x8000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x0100
+SHL
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x0101
+SHL
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x00
+SHL
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x01
+SHL
+---
+0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0xff
+SHL
+---
+0x8000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x0100
+SHL
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x01
+SHL
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x01
+SHL
+---
+0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe
+</code></pre></div> </div>
+</li>
+</ol>
+<h3 id="shr-logical-shift-right">
+<a href="#shr-logical-shift-right" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">SHR</code> (logical shift right)
+</h3>
+<ol>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x00
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x01
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x01
+SHR
+---
+0x4000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0xff
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x0100
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x0101
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x00
+SHR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x01
+SHR
+---
+0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0xff
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x0100
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x01
+SHR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+</ol>
+<h3 id="sar-arithmetic-shift-right">
+<a href="#sar-arithmetic-shift-right" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">SAR</code> (arithmetic shift right)
+</h3>
+<ol>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x00
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000001
+PUSH 0x01
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x01
+SAR
+---
+0xc000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0xff
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x0100
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x8000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x0101
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x00
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x01
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0xff
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x0100
+SAR
+---
+0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x0000000000000000000000000000000000000000000000000000000000000000
+PUSH 0x01
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x4000000000000000000000000000000000000000000000000000000000000000
+PUSH 0xfe
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0xf8
+SAR
+---
+0x000000000000000000000000000000000000000000000000000000000000007f
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0xfe
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000001
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0xff
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+<li>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+PUSH 0x0100
+SAR
+---
+0x0000000000000000000000000000000000000000000000000000000000000000
+</code></pre></div> </div>
+</li>
+</ol>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Client support:</p>
+<ul>
+<li>cpp-ethereum: https://github.com/ethereum/cpp-ethereum/pull/4054</li>
+</ul>
+<p>Compiler support:</p>
+<ul>
+<li>Solidity/LLL: https://github.com/ethereum/solidity/pull/2541</li>
+</ul>
+<h2 id="tests">
+<a href="#tests" class="anchor-link"></a> Tests
+</h2>
+<p>Sources:</p>
+<ul>
+<li>https://github.com/ethereum/tests/tree/develop/src/GeneralStateTestsFiller/stShift</li>
+</ul>
+<p>Filled Tests:</p>
+<ul>
+<li>https://github.com/ethereum/tests/tree/develop/GeneralStateTests/stShift</li>
+<li>https://github.com/ethereum/tests/tree/develop/BlockchainTests/GeneralStateTests/stShift</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, "EIP-145: Bitwise shifting instructions in EVM," <em>Ethereum Improvement Proposals</em>, no. 145, February 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-145.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-145: Bitwise shifting instructions in EVM",
+    "author": "Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
+    "name": "EIP-145: Bitwise shifting instructions in EVM",
+    "dateCreated": "2017-02-13",
+    "datePublished": "2017-02-13",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

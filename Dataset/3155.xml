@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3155: EVM trace specification</title>
+<meta property="og:title" content="EIP-3155: EVM trace specification" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3155" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3155" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3155: EVM trace specification
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3155.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/holiman">Martin Holst Swende</a>, <a href="https://github.com/MariusVanDerWijden">Marius van der Wijden</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3155-create-evm-trace-specification/5007">https://ethereum-magicians.org/t/eip-3155-create-evm-trace-specification/5007</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+ </td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-12-07</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#datatypes">Datatypes</a></li>
+<li><a href="#output">Output</a></li>
+<li><a href="#summary-and-error-handling">Summary and error handling</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a>
+<ul>
+<li><a href="#clients">Clients</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Introduce a new JSON standard for EVM traces during execution of state tests.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The Ethereum Virtual Machine executes all smart contract code on ethereum.
+In order to debug smart contracts and state tests better, a common format was introduced to log every execution step of the EVM.
+This format was implemented by go-ethereum, parity, nethermind and Besu.
+Since the common format was not well defined, the implementations differed slightly making it hard to develop adequate tooling which reduces the usefulness of tracing significantly.</p>
+<p>This EIP has multiple objectives:</p>
+<ul>
+<li>Move the specification to a more visible place to encourage new clients to implement it</li>
+<li>Strictly define corner cases that were not addressed in the previous version</li>
+<li>Allow for updates to the specification in case new fields are introduced during execution</li>
+<li>Provide sample output</li>
+</ul>
+<p>Implementing this EIP in all major clients allows us to create meaningful differential fuzzers that fuzz EVM implementations for the mainnet and all upcoming hardforks.
+It also helps finding differences in execution quickly in the case of a chain split.</p>
+<p>This EIP will enable users to create better differential fuzzing infrastructure to compare the EVM implementations of all major Ethereum clients against each other.
+This could help to find bugs that are currently present in the client implementations.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Clients should be able to execute simple transactions as well as code and return traces. In the following, we will call this client CUT (client under test) and use go-ethereums <code class="language-plaintext highlighter-rouge">evm</code> binary for code examples.</p>
+<h3 id="datatypes">
+<a href="#datatypes" class="anchor-link"></a> Datatypes
+</h3>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Explanation</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Number</td>
+<td>Plain json number</td>
+<td>“pc”:0</td>
+</tr>
+<tr>
+<td>Hex-Number</td>
+<td>Hex-encoded number</td>
+<td>“gas”:”0x2540be400”</td>
+</tr>
+<tr>
+<td>String</td>
+<td>Plain string</td>
+<td>“opName”:”PUSH1”</td>
+</tr>
+<tr>
+<td>Hex-String</td>
+<td>Hex-encoded string</td>
+<td> </td>
+</tr>
+<tr>
+<td>Array of x</td>
+<td>Array of x encoded values</td>
+<td> </td>
+</tr>
+<tr>
+<td>Key-Value</td>
+<td>Key-Value structure with key and values encoded as hex strings</td>
+<td> </td>
+</tr>
+<tr>
+<td>Boolean</td>
+<td>Json bool can either be true or false</td>
+<td>“pass”: true</td>
+</tr>
+</tbody>
+</table>
+<h3 id="output">
+<a href="#output" class="anchor-link"></a> Output
+</h3>
+<p>The CUT MUST output a <code class="language-plaintext highlighter-rouge">json</code> object for EACH operation.</p>
+<p>Required Fields:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">pc</code></td>
+<td>Number</td>
+<td>Program Counter</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">op</code></td>
+<td>Number</td>
+<td>OpCode</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">gas</code></td>
+<td>Hex-Number</td>
+<td>Gas left before executing this operation</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">gasCost</code></td>
+<td>Hex-Number</td>
+<td>Gas cost of this operation</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">stack</code></td>
+<td>Array of Hex-Numbers</td>
+<td>Array of all values on the stack</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">depth</code></td>
+<td>Number</td>
+<td>Depth of the call stack</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">returnData</code></td>
+<td>Hex-String</td>
+<td>Data returned by function call</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">refund</code></td>
+<td>Hex-Number</td>
+<td>Amount of <strong>global</strong> gas refunded</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">memSize</code></td>
+<td>Number</td>
+<td>Size of memory array</td>
+</tr>
+</tbody>
+</table>
+<p>Optional Fields:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">opName</code></td>
+<td>String</td>
+<td>Name of the operation</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">error</code></td>
+<td>Hex-String</td>
+<td>Description of an error (should contain revert reason if supported)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">memory</code></td>
+<td>Array of Hex-Strings</td>
+<td>Array of all allocated values</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">storage</code></td>
+<td>Key-Value</td>
+<td>Array of all stored values</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">returnStack</code></td>
+<td>Array of Hex-Numbers</td>
+<td>Array of values, Stack of the called function</td>
+</tr>
+</tbody>
+</table>
+<p><em>Example:</em></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{"pc":0,"op":96,"gas":"0x2540be400","gasCost":"0x3","memory":"0x","memSize":0,"stack":[],"depth":1,"error":null,"opName":"PUSH1"}
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">stack</code>, <code class="language-plaintext highlighter-rouge">memory</code> and <code class="language-plaintext highlighter-rouge">memSize</code> are the values <em>before</em> execution of the op.
+All array attributes (<code class="language-plaintext highlighter-rouge">stack</code>, <code class="language-plaintext highlighter-rouge">returnStack</code>, <code class="language-plaintext highlighter-rouge">memory</code>) MUST be initialized to empty arrays (“stack”:[],) NOT to null.
+If the CUT will not output values for <code class="language-plaintext highlighter-rouge">memory</code> or <code class="language-plaintext highlighter-rouge">storage</code> then the <code class="language-plaintext highlighter-rouge">memory</code> and <code class="language-plaintext highlighter-rouge">storage</code> fields are omitted.
+This can happen either because the CUT does not support tracing these fields or it has been configured not to trace it.
+The <code class="language-plaintext highlighter-rouge">memSize</code> field MUST be present regardless of <code class="language-plaintext highlighter-rouge">memory</code> support.
+Clients SHOULD implement a way to disable recording the storage as the stateroot includes all storage updates.
+Clients SHOULD output the fields in the same order as listed in this EIP.</p>
+<p>The CUT MUST NOT output a line for the <code class="language-plaintext highlighter-rouge">STOP</code> operation if an error occurred:
+<em>Example:</em></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{"pc":2,"op":0,"gas":"0x2540be3fd","gasCost":"0x0","memory":"0x","memSize":0,"stack":["0x40"],"depth":1,"error":null,"opName":"STOP"}
+</code></pre></div></div>
+<h3 id="summary-and-error-handling">
+<a href="#summary-and-error-handling" class="anchor-link"></a> Summary and error handling
+</h3>
+<p>At the end of execution, the CUT MUST print some summerical info, this info SHOULD have the following fields.
+The summary should be a single <code class="language-plaintext highlighter-rouge">jsonl</code> object.</p>
+<p>Required Fields:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Explanation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">stateRoot</code></td>
+<td>Hex-String</td>
+<td>Root of the state trie after executing the transaction</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">output</code></td>
+<td> </td>
+<td>Return values of the function</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">gasUsed</code></td>
+<td>Hex-Number</td>
+<td>All gas used by the transaction</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">pass</code></td>
+<td>Boolean</td>
+<td>Bool whether transaction was executed successfully</td>
+</tr>
+</tbody>
+</table>
+<p>OptionalFields:</p>
+<p>| Name | Type | Explanation |
+|—|—|—|
+| <code class="language-plaintext highlighter-rouge">time</code> | Number | Time in nanoseconds needed to execute the transaction |
+| <code class="language-plaintext highlighter-rouge">fork</code> | String | Name of the fork rules used for execution |</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{"stateRoot":"0xd4c577737f5d20207d338c360c42d3af78de54812720e3339f7b27293ef195b7","output":"","gasUsed":"0x3","successful":"true","time":141485}
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP is largely based on the previous non-official documentation for EVM tracing.
+It tries to cover as many corner cases as possible to enable true client compatibility.
+The datatypes and if a field is optional is chosen to be as compatible with current implementations as possible.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP is fully backward compatible with ethereum as it only introduces a better tracing infrastructure that is optional for clients to implement.</p>
+<h3 id="clients">
+<a href="#clients" class="anchor-link"></a> Clients
+</h3>
+<p>This EIP is fully backward compatible with go-ethereum. OpenEthereum, Besu and Nethermind clients would have to change their JSON output of <code class="language-plaintext highlighter-rouge">openethereum-evm</code> <code class="language-plaintext highlighter-rouge">evmtool</code> and <code class="language-plaintext highlighter-rouge">nethtest</code> slightly do adhere to the new and stricter specs. New clients would need to implement this change if they want to be part of the differential fuzzing group.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ~/go/src/github.com/ethereum/go-ethereum/build/bin/evm <span class="nt">--code</span> 604080536040604055604060006040600060025afa6040f3 <span class="nt">--json</span> run
+<span class="o">{</span><span class="s2">"pc"</span>:0,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540be400"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x"</span>,<span class="s2">"memSize"</span>:0,<span class="s2">"stack"</span>:[],<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:2,<span class="s2">"op"</span>:128,<span class="s2">"gas"</span>:<span class="s2">"0x2540be3fd"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x"</span>,<span class="s2">"memSize"</span>:0,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"DUP1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:3,<span class="s2">"op"</span>:83,<span class="s2">"gas"</span>:<span class="s2">"0x2540be3fa"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0xc"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"MSTORE8"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:4,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540be3ee"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[],<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:6,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540be3eb"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:8,<span class="s2">"op"</span>:85,<span class="s2">"gas"</span>:<span class="s2">"0x2540be3e8"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x4e20"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"SSTORE"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:9,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95c8"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[],<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:11,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95c5"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:13,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95c2"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:15,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95bf"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span>,<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:17,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95bc"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span>,<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:19,<span class="s2">"op"</span>:90,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95b9"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x2"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span>,<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span>,<span class="s2">"0x2"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"GAS"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:20,<span class="s2">"op"</span>:250,<span class="s2">"gas"</span>:<span class="s2">"0x2540b95b7"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x24abb676c"</span>,<span class="s2">"memory"</span>:<span class="s2">"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span>,<span class="s2">"0x40"</span>,<span class="s2">"0x0"</span>,<span class="s2">"0x2"</span>,<span class="s2">"0x2540b95b7"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0x"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"STATICCALL"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:21,<span class="s2">"op"</span>:96,<span class="s2">"gas"</span>:<span class="s2">"0x2540b92a7"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x3"</span>,<span class="s2">"memory"</span>:<span class="s2">"0xf5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b00000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x1"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0xf5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"PUSH1"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"pc"</span>:23,<span class="s2">"op"</span>:243,<span class="s2">"gas"</span>:<span class="s2">"0x2540b92a4"</span>,<span class="s2">"gasCost"</span>:<span class="s2">"0x0"</span>,<span class="s2">"memory"</span>:<span class="s2">"0xf5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b00000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000"</span>,<span class="s2">"memSize"</span>:96,<span class="s2">"stack"</span>:[<span class="s2">"0x1"</span>,<span class="s2">"0x40"</span><span class="o">]</span>,<span class="s2">"returnStack"</span>:[],<span class="s2">"returnData"</span>:<span class="s2">"0xf5a5fd42d16a20302798ef6ed309979b43003d2320d9f0e8ea9831a92759fb4b"</span>,<span class="s2">"depth"</span>:1,<span class="s2">"refund"</span>:0,<span class="s2">"opName"</span>:<span class="s2">"RETURN"</span>,<span class="s2">"error"</span>:<span class="s2">""</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"stateRoot"</span>:<span class="s2">"2eef130ec61805516c1f050720b520619787704a5dd826a39aeefb850f83acfd"</span>, <span class="s2">"output"</span>:<span class="s2">"40"</span>,<span class="s2">"gasUsed"</span>:<span class="s2">"0x515c"</span>,<span class="s2">"time"</span>:350855<span class="o">}</span>
+</code></pre></div></div>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Implementation in <a href="https://github.com/ethereum/go-ethereum/tree/master/cmd/evm">go-ethereum</a>
+Implementation in <a href="https://github.com/openethereum/openethereum/tree/master/evmbin">OpenEthereum</a>
+Implementation in <a href="https://github.com/hyperledger/besu/tree/master/ethereum/evmtool">Besu</a>
+Implementation in <a href="https://github.com/NethermindEth/nethermind/tree/master/src/Nethermind/Nethermind.State.Test.Runner">Nethermind</a></p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Tracing is expensive.
+Exposing an endpoint for creating traces publicly could open up a denial of service vector.
+Clients should consider putting trace endpoints behind a separate flag from other endpoints.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/holiman">Martin Holst Swende</a>, <a href="https://github.com/MariusVanDerWijden">Marius van der Wijden</a>, "EIP-3155: EVM trace specification [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3155, December 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3155.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3155: EVM trace specification [DRAFT]",
+    "author": "Martin Holst Swende (@holiman), Marius van der Wijden (@MariusVanDerWijden)",
+    "name": "EIP-3155: EVM trace specification [DRAFT]",
+    "dateCreated": "2020-12-07",
+    "datePublished": "2020-12-07",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3155-create-evm-trace-specification/5007",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

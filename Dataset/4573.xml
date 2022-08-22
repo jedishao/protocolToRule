@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4573: Procedures for the EVM</title>
+<meta property="og:title" content="EIP-4573: Procedures for the EVM" />
+<meta name="description" content="Introduces support for EVM Procedures." />
+<meta property="og:description" content="Introduces support for EVM Procedures." />
+<meta name="twitter:description" content="Introduces support for EVM Procedures." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4573" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4573" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4573: Procedures for the EVM
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4573.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Introduces support for EVM Procedures.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gcolvin">Greg Colvin</a>, <a href="/cdn-cgi/l/email-protection#0e697c6b694e6d616278676020617c69">Greg Colvin</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4573-named-procedures-for-evm-code-sections/7776">https://ethereum-magicians.org/t/eip-4573-named-procedures-for-evm-code-sections/7776</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-12-16</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2315">2315</a>,
+<a href="eip-3540">3540</a>,
+<a href="eip-3670">3670</a>,
+<a href="eip-3779">3779</a>,
+<a href="eip-4200">4200</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#prior-art">Prior Art</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#instructions">Instructions</a></li>
+<li><a href="#memory-costs">Memory Costs</a></li>
+<li><a href="#call-frame-stack">Call Frame Stack</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security">Security</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Five EVM instructions are introduced to define, call, and return from named EVM <em>procedures</em> and access their <em>call frames</em> in memory - <code class="language-plaintext highlighter-rouge">ENTERPROC</code>, <code class="language-plaintext highlighter-rouge">LEAVEPROC</code>, <code class="language-plaintext highlighter-rouge">CALLPROC</code>, <code class="language-plaintext highlighter-rouge">RETURNPROC</code>, and <code class="language-plaintext highlighter-rouge">FRAMEADDRESS</code>.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently, Ethereum bytecode has no syntactic structure, and <em>subroutines</em> have no defined interfaces.</p>
+<p>We propose to add <em>procedures</em> – delimited blocks of code that can be entered only by calling into them via defined interfaces.</p>
+<p>Also, the EVM currently has no automatic management of memory for <em>procedures</em>. So we also propose to automatically reserve call frames on an in-memory stack.</p>
+<p>Constraints on the use of <em>procedures</em> must be validated at contract initialization time to maintain the safety properties of <a href="/EIPS/eip-3779">EIP-3779</a>: Valid programs will not halt with an exception unless they run out of gas or recursively overflow stack.</p>
+<h3 id="prior-art">
+<a href="#prior-art" class="anchor-link"></a> Prior Art
+</h3>
+<p>The terminology is not well-defined, but we will follow Intel in calling the low-level concept <em>subroutines</em> and the higher level concept <em>procedures</em>. The distinction is that <em>subroutines</em> are little more than a jump that knows where it came from, whereas procedures have a defined interface and manage memory as a stack. <a href="/EIPS/eip-2315">EIP-2315</a> introduces <em>subroutines</em>, and this EIP introduces <em>procedures</em>.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="instructions">
+<a href="#instructions" class="anchor-link"></a> Instructions
+</h3>
+<h4 id="enterproc-0x-dest_section-uint8-dest_offset-uint8-n_inputs-uint16-n_outputs-uint16-n_locals-uint16">
+<a href="#enterproc-0x-dest_section-uint8-dest_offset-uint8-n_inputs-uint16-n_outputs-uint16-n_locals-uint16" class="anchor-link"></a> ENTERPROC (0x??) dest_section: uint8, dest_offset: uint8, n_inputs: uint16, n_outputs: uint16, n_locals: uint16
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>frame_stack.push(FP)
+FP -= n_locals * 32
+PC +- &lt;length of immediates&gt;
+</code></pre></div></div>
+<p>Marks the entry point to a procedure</p>
+<ul>
+<li>at offset <code class="language-plaintext highlighter-rouge">dest_offset</code> from the beginning of the <code class="language-plaintext highlighter-rouge">dest_section</code>.</li>
+<li>taking <code class="language-plaintext highlighter-rouge">n_inputs</code> arguments from the data stack,</li>
+<li>returning <code class="language-plaintext highlighter-rouge">n_outputs</code> values on the <code class="language-plaintext highlighter-rouge">data stack</code>, and</li>
+<li>reserving <code class="language-plaintext highlighter-rouge">n_locals</code> words of data in memory on the <code class="language-plaintext highlighter-rouge">frame stack</code>.</li>
+</ul>
+<p>Procedures can only be entered via a <code class="language-plaintext highlighter-rouge">CALLPROC</code> to their entry point.</p>
+<h4 id="leaveproc-0x">
+<a href="#leaveproc-0x" class="anchor-link"></a> LEAVEPROC (0x??)
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   FP = frame_stack.pop()
+   asm RETURNSUB
+</code></pre></div></div>
+<blockquote>
+<p>Pop the <code class="language-plaintext highlighter-rouge">frame stack</code> and return to the calling procedure using <code class="language-plaintext highlighter-rouge">RETURNSUB</code>.</p>
+</blockquote>
+<p>Marks the end of a procedure. Each <code class="language-plaintext highlighter-rouge">ENTERPROC</code> requires a closing <code class="language-plaintext highlighter-rouge">LEAVEPROC</code>.</p>
+<p><em>Note: Attempts to jump into a procedure (including its <code class="language-plaintext highlighter-rouge">LEAVEPROC</code>) from outside of the procedure or to jump or step to <code class="language-plaintext highlighter-rouge">ENTERPROC</code> at all must be prevented at validation time. <code class="language-plaintext highlighter-rouge">CALLPROC</code> is the only valid way to enter a procedure.</em></p>
+<h4 id="callproc-0x-dest_section-uint16-dest_proc-uint16">
+<a href="#callproc-0x-dest_section-uint16-dest_proc-uint16" class="anchor-link"></a> CALLPROC (0x??) dest_section: uint16, dest_proc: uint16
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   FP -= n_locals
+   asm JUMPSUB &lt;offset of section&gt; + &lt;offset of procedure&gt;
+</code></pre></div></div>
+<blockquote>
+<p>Allocate a <em>stack frame</em> and transfer control and <code class="language-plaintext highlighter-rouge">JUMPSUB</code> to the Nth (N=<em>dest_proc</em>) <em>procedure</em> in the Mth(M=<em>dest_section</em>) <em>section</em> of the code. <em>Section 0</em> is the current code section, any other code sections are indexed starting at <em>1</em>.</p>
+</blockquote>
+<p><em>Note: That the procedure is defined and the required <code class="language-plaintext highlighter-rouge">n_inputs</code> words are available on the <code class="language-plaintext highlighter-rouge">data stack</code> must be shown at validation time.</em></p>
+<h4 id="returnproc-0x">
+<a href="#returnproc-0x" class="anchor-link"></a> RETURNPROC (0x??)
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   FP += n_locals
+   asm RETURNSUB
+</code></pre></div></div>
+<blockquote>
+<p>Pop the <code class="language-plaintext highlighter-rouge">frame stack</code> and return control to the calling procedure using <code class="language-plaintext highlighter-rouge">RETURNSUB</code>.</p>
+</blockquote>
+<p><em>Note: That the promised <code class="language-plaintext highlighter-rouge">n_outputs</code> words are available on the <code class="language-plaintext highlighter-rouge">data stack</code> must be shown at validation time.</em></p>
+<h4 id="frameaddress-0x-offset-int16">
+<a href="#frameaddress-0x-offset-int16" class="anchor-link"></a> FRAMEADDRESS (0x??) offset: int16
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asm PUSH2 FP + offset
+</code></pre></div></div>
+<blockquote>
+<p>Push the address <code class="language-plaintext highlighter-rouge">FP + offset</code> onto the data stack.</p>
+</blockquote>
+<p>Call frame data is addressed at an immediate <code class="language-plaintext highlighter-rouge">offset</code> relative to <code class="language-plaintext highlighter-rouge">FP</code>.</p>
+<p>Typical usage includes storing data on a call frame</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH 0xdada
+FRAMEADDRESS 32
+MSTORE
+</code></pre></div></div>
+<p>and loading data from a call frame</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>FRAMEADDRESS 32
+MLOAD
+</code></pre></div></div>
+<h3 id="memory-costs">
+<a href="#memory-costs" class="anchor-link"></a> Memory Costs
+</h3>
+<p>Presently,<code class="language-plaintext highlighter-rouge">MSTORE</code> is defined as</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   memory[stack[0]...stack[0]+31] = stack[1]
+   memory_size = max(memory_size,floor((stack[0]+32)÷32)
+</code></pre></div></div>
+<ul>
+<li>where <code class="language-plaintext highlighter-rouge">memory_size</code> is the number of active words of memory above <em>0</em>.</li>
+</ul>
+<p>We propose to treat memory addresses as signed, so the formula needs to be</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   memory[stack[0]...stack[0]+31] = stack[1]
+   if (stack[0])+32)÷32) &lt; 0
+      negative_memory_size = max(negative_memory_size,floor((stack[0]+32)÷32))
+   else
+      positive_memory_size = max(positive_memory_size,floor((stack[0]+32)÷32))
+   memory_size = positive_memory_size + negative_memory_size
+</code></pre></div></div>
+<ul>
+<li>where <code class="language-plaintext highlighter-rouge">negative_memory_size</code> is the number of active words of memory below <em>0</em> and</li>
+<li>where <code class="language-plaintext highlighter-rouge">positive_memory_size</code> is the number of active words of memory at or above <em>0</em>.</li>
+</ul>
+<h3 id="call-frame-stack">
+<a href="#call-frame-stack" class="anchor-link"></a> Call Frame Stack
+</h3>
+<p>These instructions make use of a <code class="language-plaintext highlighter-rouge">frame stack</code> to allocate and free frames of local data for <em>procedures</em> in memory. Frame memory begins at address 0 in memory and grows downwards, towards more negative addresses. A frame is allocated for each procedure when it is called, and freed when it returns.</p>
+<p>Memory can be addressed relative to the frame pointer <code class="language-plaintext highlighter-rouge">FP</code> or by absolute address. <code class="language-plaintext highlighter-rouge">FP</code> starts at 0, and moves downward towards more negative addresses to point to the frame for each <code class="language-plaintext highlighter-rouge">CALLPROC</code> and moving upward towards less negative addresses to point to the previous frame for the corresponding <code class="language-plaintext highlighter-rouge">RETURNPROC</code>.</p>
+<p>Equivalently, in the EVM’s twos-complement arithmetic, <code class="language-plaintext highlighter-rouge">FP</code> moves from the highest address down, as is common in many calling conventions.</p>
+<p>For example, after an initial <code class="language-plaintext highlighter-rouge">CALLPROC</code> to a procedure needing two words of data the <code class="language-plaintext highlighter-rouge">frame stack</code> might look like this</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     0-&gt; ........
+         ........
+    FP-&gt;
+</code></pre></div></div>
+<p>Then, after a further <code class="language-plaintext highlighter-rouge">CALLPROC</code> to a procedure needing three words of data the <code class="language-plaintext highlighter-rouge">frame stack</code> would like this</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     0-&gt; ........
+         ........
+   -64-&gt; ........
+         ........
+         ........
+    FP-&gt;
+</code></pre></div></div>
+<p>After a <code class="language-plaintext highlighter-rouge">RETURNPROC</code> from that procedure the <code class="language-plaintext highlighter-rouge">frame stack</code> would look like this</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     0-&gt; ........
+         ........
+    FP-&gt; ........
+         ........
+         ........
+</code></pre></div></div>
+<p>and after a final <code class="language-plaintext highlighter-rouge">RETURNPROC</code>, like this</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    FP-&gt; ........
+         ........
+         ........
+         ........
+         ........
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>There is actually not much new here. It amounts to <a href="/EIPS/eip-615">EIP-615</a>, refined and refactored into bite-sized pieces, along lines common to other machines.</p>
+<p>This proposal uses the <a href="/EIPS/eip-2315">EIP-2315</a> return stack to manage calls and returns, and steals ideas from <a href="/EIPS/eip-615">EIP-615</a>, <a href="/EIPS/eip-3336">EIP-3336</a>, and <a href="/EIPS/eip-4200">EIP-4200</a>. <code class="language-plaintext highlighter-rouge">ENTERPROC</code> corresponds to <code class="language-plaintext highlighter-rouge">BEGINSUB</code> from EIP-615. Like EIP-615 it uses a frame stack to track call-frame addresses with <code class="language-plaintext highlighter-rouge">FP</code> as <em>procedures</em> are entered and left, but like EIP-3336 and EIP-3337 it moves call frames from the data stack to memory.</p>
+<p>Aliasing call frames with ordinary memory supports addressing call-frame data with ordinary stores and loads. This is generally useful, especially for languages like C that provide pointers to variables on the stack.</p>
+<p>The design model here is the <em>subroutines</em> and <em>procedures</em> of the Intel x86 architecture.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">JUMPSUB</code> and <code class="language-plaintext highlighter-rouge">RETURNSUB</code> (from <a href="/EIPS/eip-2315">EIP-2315</a> – like <code class="language-plaintext highlighter-rouge">CALL</code> and <code class="language-plaintext highlighter-rouge">RET</code> – jump to and return from <em>subroutines</em>.</li>
+<li><code class="language-plaintext highlighter-rouge">ENTERPROC</code> – like <code class="language-plaintext highlighter-rouge">ENTER</code> – sets up the stack frame for a <em>procedure</em>.</li>
+<li><code class="language-plaintext highlighter-rouge">CALLPROC</code> amounts to a <code class="language-plaintext highlighter-rouge">JUMPSUB</code> to an <code class="language-plaintext highlighter-rouge">ENTERPROC</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">RETURNPROC</code> amounts to an early <code class="language-plaintext highlighter-rouge">LEAVEPROC</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">LEAVEPROC</code> – like <code class="language-plaintext highlighter-rouge">LEAVE</code> – takes down the stack frame for a <em>procedure</em>. It then executes a <code class="language-plaintext highlighter-rouge">RETURNSUB</code>.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This proposal adds new EVM opcodes. It doesn’t remove or change the semantics of any existing opcodes, so there should be no backwards compatibility issues.</p>
+<h2 id="security">
+<a href="#security" class="anchor-link"></a> Security
+</h2>
+<p>Safe use of these constructs must be checked completely at validation time – per EIP-3779 – so there should be no security issues at runtime.</p>
+<p><code class="language-plaintext highlighter-rouge">ENTERPROC</code> and <code class="language-plaintext highlighter-rouge">LEAVEPROC</code> must follow the same safety rules as for <code class="language-plaintext highlighter-rouge">JUMPSUB</code> and <code class="language-plaintext highlighter-rouge">RETURNSUB</code> in EIP-2315. In addition, the following constraints must be validated:</p>
+<ul>
+<li>Every<code class="language-plaintext highlighter-rouge">ENTERPROC</code> must be followed by a <code class="language-plaintext highlighter-rouge">LEAVEPROC</code> to delimit the bodies of <em>procedures</em>.</li>
+<li>There can be no nested <em>procedures</em>.</li>
+<li>There can be no jump into the body of a procedure (including its <code class="language-plaintext highlighter-rouge">LEAVEPROC</code>) from outside of that body.</li>
+<li>There can be no jump or step to <code class="language-plaintext highlighter-rouge">BEGINPROC</code> at all – only <code class="language-plaintext highlighter-rouge">CALLPROC</code>.</li>
+<li>The specified <code class="language-plaintext highlighter-rouge">n_inputs</code> and <code class="language-plaintext highlighter-rouge">n_outputs</code> must be on the stack.</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gcolvin">Greg Colvin</a>, <a href="/cdn-cgi/l/email-protection#1a7d687f7d5a7975766c73743475687d">Greg Colvin</a>, "EIP-4573: Procedures for the EVM [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4573, December 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4573.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4573: Procedures for the EVM [DRAFT]",
+    "author": "Greg Colvin (@gcolvin), Greg Colvin <greg@colvin.org>",
+    "name": "EIP-4573: Procedures for the EVM [DRAFT]",
+    "dateCreated": "2021-12-16",
+    "datePublished": "2021-12-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4573-named-procedures-for-evm-code-sections/7776",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

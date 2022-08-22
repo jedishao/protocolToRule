@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4361: Sign-In with Ethereum</title>
+<meta property="og:title" content="EIP-4361: Sign-In with Ethereum" />
+<meta name="description" content="Off-chain authentication for Ethereum accounts to establish sessions." />
+<meta property="og:description" content="Off-chain authentication for Ethereum accounts to establish sessions." />
+<meta name="twitter:description" content="Off-chain authentication for Ethereum accounts to establish sessions." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4361" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4361" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4361: Sign-In with Ethereum
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4361.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Off-chain authentication for Ethereum accounts to establish sessions.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/wyc">Wayne Chang</a>, <a href="https://github.com/obstropolos">Gregory Rocco</a>, <a href="https://github.com/brantlymillegan">Brantly Millegan</a>, <a href="https://github.com/Arachnid">Nick Johnson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4361-sign-in-with-ethereum/7263">https://ethereum-magicians.org/t/eip-4361-sign-in-with-ethereum/7263</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-10-11</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-55">55</a>,
+<a href="eip-137">137</a>,
+<a href="eip-155">155</a>,
+<a href="eip-191">191</a>,
+<a href="eip-1271">1271</a>,
+<a href="eip-1328">1328</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#example-message">Example message</a></li>
+<li><a href="#informal-message-template">Informal Message Template</a></li>
+<li><a href="#message-field-descriptions">Message Field Descriptions</a></li>
+<li><a href="#abnf-message-format">ABNF Message Format</a></li>
+<li><a href="#resolving-ethereum-name-service-ens-data">Resolving Ethereum Name Service (ENS) Data</a></li>
+<li><a href="#relying-party-implementer-steps">Relying Party Implementer Steps</a></li>
+<li><a href="#wallet-implementer-steps">Wallet Implementer Steps</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#design-goals">Design Goals</a></li>
+<li><a href="#technical-decisions">Technical Decisions</a></li>
+<li><a href="#out-of-scope">Out of Scope</a></li>
+<li><a href="#considerations-for-forwards-compatibility">Considerations for Forwards Compatibility</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright-waiver">Copyright Waiver</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Sign-In with Ethereum describes how Ethereum accounts authenticate with off-chain services by signing a standard message format parameterized by scope, session details, and security mechanisms (e.g., a nonce). The goals of this specification are to provide a self-custodied alternative to centralized identity providers, improve interoperability across off-chain services for Ethereum-based authentication, and provide wallet vendors a consistent machine-readable message format to achieve improved user experiences and consent management.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>When signing in to popular non-blockchain services today, users will typically use identity providers (IdPs) that are centralized entities with ultimate control over users’ identifiers, for example, large internet companies and email providers. Incentives are often misaligned between these parties. Sign-In with Ethereum offers a new self-custodial option for users who wish to assume more control and responsibility over their own digital identity.</p>
+<p>Already, many services support workflows to authenticate Ethereum accounts using message signing, such as to establish a cookie-based web session which can manage privileged metadata about the authenticating address. This is an opportunity to standardize the sign-in workflow and improve interoperability across existing services, while also providing wallet vendors a reliable method to identify signing requests as Sign-In with Ethereum requests for improved UX.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Sign-In with Ethereum works as follows:</p>
+<ol>
+<li>The wallet presents the user with a structured plaintext message or equivalent interface for signing with the <a href="/EIPS/eip-191">EIP-191</a> signed data format. Before signing, the <code class="language-plaintext highlighter-rouge">message</code> is prefixed with <code class="language-plaintext highlighter-rouge">\x19Ethereum Signed Message:\n&lt;length of message&gt;</code> as defined in <a href="/EIPS/eip-191">EIP-191</a>.
+The <code class="language-plaintext highlighter-rouge">message</code> MUST incorporate an Ethereum <code class="language-plaintext highlighter-rouge">address</code>, <code class="language-plaintext highlighter-rouge">domain</code> requesting the signing, <code class="language-plaintext highlighter-rouge">version</code> of the message, a chain identifier <code class="language-plaintext highlighter-rouge">chain-id</code>, <code class="language-plaintext highlighter-rouge">uri</code> for scoping, <code class="language-plaintext highlighter-rouge">nonce</code> acceptable to the relying party, and <code class="language-plaintext highlighter-rouge">issued-at</code> timestamp.</li>
+<li>The signature is then presented to the relying party, which checks the signature’s validity and message content.</li>
+<li>Additional fields, including <code class="language-plaintext highlighter-rouge">expiration-time</code>, <code class="language-plaintext highlighter-rouge">not-before</code>, <code class="language-plaintext highlighter-rouge">request-id</code>, <code class="language-plaintext highlighter-rouge">statement</code>, and <code class="language-plaintext highlighter-rouge">resources</code> MAY be incorporated as part of the sign-in process.</li>
+<li>The relying party MAY further fetch data associated with the Ethereum address, such as from the Ethereum blockchain (e.g., ENS, account balances, <a href="/EIPS/eip-20">EIP-20</a>/<a href="/EIPS/eip-721">EIP-721</a>/<a href="/EIPS/eip-1155">EIP-1155</a> asset ownership), or other data sources that might or might not be permissioned.</li>
+</ol>
+<h3 id="example-message">
+<a href="#example-message" class="anchor-link"></a> Example message
+</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>service.invalid wants you to sign in with your Ethereum account:
+0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
+
+I accept the ServiceOrg Terms of Service: https://service.invalid/tos
+
+URI: https://service.invalid/login
+Version: 1
+Chain ID: 1
+Nonce: 32891756
+Issued At: 2021-09-30T16:25:24Z
+Resources:
+- ipfs://bafybeiemxf5abjwjbikoz4mc3a3dla6ual3jsgpdr4cjr3oz3evfyavhwq/
+- https://example.com/my-web2-claim.json
+</code></pre></div></div>
+<h3 id="informal-message-template">
+<a href="#informal-message-template" class="anchor-link"></a> Informal Message Template
+</h3>
+<p>A Bash-like informal template of the full message is presented below for readability and ease of understanding. Field descriptions are provided in the following section. A full ABNF description is provided in the section thereafter.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>${domain} wants you to sign in with your Ethereum account:
+${address}
+
+${statement}
+
+URI: ${uri}
+Version: ${version}
+Chain ID: ${chain-id}
+Nonce: ${nonce}
+Issued At: ${issued-at}
+Expiration Time: ${expiration-time}
+Not Before: ${not-before}
+Request ID: ${request-id}
+Resources:
+- ${resources[0]}
+- ${resources[1]}
+...
+- ${resources[n]}
+</code></pre></div></div>
+<h3 id="message-field-descriptions">
+<a href="#message-field-descriptions" class="anchor-link"></a> Message Field Descriptions
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">domain</code> is the RFC 3986 authority that is requesting the signing.</li>
+<li><code class="language-plaintext highlighter-rouge">address</code> is the Ethereum address performing the signing conformant to capitalization encoded checksum specified in <a href="/EIPS/eip-55">EIP-55</a> where applicable.</li>
+<li><code class="language-plaintext highlighter-rouge">statement</code> (optional) is a human-readable ASCII assertion that the user will sign, and it must not contain <code class="language-plaintext highlighter-rouge">'\n'</code> (the byte <code class="language-plaintext highlighter-rouge">0x0a</code>).</li>
+<li><code class="language-plaintext highlighter-rouge">uri</code> is an RFC 3986 URI referring to the resource that is the subject of the signing (as in the <em>subject of a claim</em>).</li>
+<li><code class="language-plaintext highlighter-rouge">version</code> is the current version of the <code class="language-plaintext highlighter-rouge">message</code>, which MUST be <code class="language-plaintext highlighter-rouge">1</code> for this specification.</li>
+<li><code class="language-plaintext highlighter-rouge">chain-id</code> is the <a href="/EIPS/eip-155">EIP-155</a> Chain ID to which the session is bound, and the network where Contract Accounts MUST be resolved.</li>
+<li><code class="language-plaintext highlighter-rouge">nonce</code> is a randomized token typically chosen by the relying party and used to prevent replay attacks, at least 8 alphanumeric characters.</li>
+<li><code class="language-plaintext highlighter-rouge">issued-at</code> is the ISO 8601 datetime string of the current time.</li>
+<li><code class="language-plaintext highlighter-rouge">expiration-time</code> (optional) is the ISO 8601 datetime string that, if present, indicates when the signed authentication message is no longer valid.</li>
+<li><code class="language-plaintext highlighter-rouge">not-before</code> (optional) is the ISO 8601 datetime string that, if present, indicates when the signed authentication message will become valid.</li>
+<li><code class="language-plaintext highlighter-rouge">request-id</code> (optional) is an system-specific identifier that may be used to uniquely refer to the sign-in request.</li>
+<li><code class="language-plaintext highlighter-rouge">resources</code> (optional) is a list of information or references to information the user wishes to have resolved as part of authentication by the relying party. They are expressed as RFC 3986 URIs separated by <code class="language-plaintext highlighter-rouge">"\n- "</code> where <code class="language-plaintext highlighter-rouge">\n</code> is the byte <code class="language-plaintext highlighter-rouge">0x0a</code>.</li>
+</ul>
+<h3 id="abnf-message-format">
+<a href="#abnf-message-format" class="anchor-link"></a> ABNF Message Format
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">message</code> MUST conform with the following Augmented Backus–Naur Form (ABNF, RFC 5234) expression (note that <code class="language-plaintext highlighter-rouge">%s</code> denotes case sensitivity for a string term, as per RFC 7405).</p>
+<pre><code class="language-abnf">sign-in-with-ethereum =
+    domain %s" wants you to sign in with your Ethereum account:" LF
+    address LF
+    LF
+    [ statement LF ]
+    LF
+    %s"URI: " uri LF
+    %s"Version: " version LF
+    %s"Chain ID: " chain-id LF
+    %s"Nonce: " nonce LF
+    %s"Issued At: " issued-at
+    [ LF %s"Expiration Time: " expiration-time ]
+    [ LF %s"Not Before: " not-before ]
+    [ LF %s"Request ID: " request-id ]
+    [ LF %s"Resources:"
+    resources ]
+
+domain = authority
+    ; From RFC 3986:
+    ;     authority     = [ userinfo "@" ] host [ ":" port ]
+    ; See RFC 3986 for the fully contextualized
+    ; definition of "authority".
+
+address = "0x" 40*40HEXDIG
+    ; Must also conform to captilization
+    ; checksum encoding specified in EIP-55
+    ; where applicable (EOAs).
+
+statement = *( reserved / unreserved / " " )
+    ; See RFC 3986 for the definition
+    ; of "reserved" and "unreserved".
+    ; The purpose is to exclude LF (line break).
+
+uri = URI
+    ; See RFC 3986 for the definition of "URI".
+
+version = "1"
+
+chain-id = 1*DIGIT
+    ; See EIP-155 for valid CHAIN_IDs.
+
+nonce = 8*( ALPHA / DIGIT )
+    ; See RFC 5234 for the definition
+    ; of "ALPHA" and "DIGIT".
+
+issued-at = date-time
+expiration-time = date-time
+not-before = date-time
+    ; See RFC 3339 (ISO 8601) for the
+    ; definition of "date-time".
+
+request-id = *pchar
+    ; See RFC 3986 for the definition of "pchar".
+
+resources = *( LF resource )
+
+resource = "- " URI
+</code></pre>
+<h4 id="signing-and-verifying-with-ethereum-accounts">
+<a href="#signing-and-verifying-with-ethereum-accounts" class="anchor-link"></a> Signing and Verifying with Ethereum Accounts
+</h4>
+<ul>
+<li>For Externally Owned Accounts (EOAs), the verification method specified in <a href="/EIPS/eip-191">EIP-191</a> MUST be used.</li>
+<li>For Contract Accounts,
+<ul>
+<li>The verification method specified in <a href="/EIPS/eip-1271">EIP-1271</a> SHOULD be used, and if it is not, the implementer MUST clearly define the verification method to attain security and interoperability for both wallets and relying parties.</li>
+<li>When performing <a href="/EIPS/eip-1271">EIP-1271</a> signature verification, the contract performing the verification MUST be resolved from the specified <code class="language-plaintext highlighter-rouge">chain-id</code>.</li>
+<li>Implementers SHOULD take into consideration that <a href="/EIPS/eip-1271">EIP-1271</a> implementations are not required to be pure functions, and can return different results for the same inputs depending on blockchain state. This can affect the security model and session validation rules. For example, a service with <a href="/EIPS/eip-1271">EIP-1271</a> signing enabled could rely on webhooks to receive notifications when state affecting the results is changed. When it receives a notification, it invalidates any matching sessions.</li>
+</ul>
+</li>
+</ul>
+<h3 id="resolving-ethereum-name-service-ens-data">
+<a href="#resolving-ethereum-name-service-ens-data" class="anchor-link"></a> Resolving Ethereum Name Service (ENS) Data
+</h3>
+<ul>
+<li>The relying party or wallet MAY additionally perform resolution of ENS data, as this can improve the user experience by displaying human-friendly information that is related to the <code class="language-plaintext highlighter-rouge">address</code>. Resolvable ENS data include:
+<ul>
+<li>The <a href="/EIPS/eip-181">primary ENS name</a>.</li>
+<li>The <a href="/EIPS/eip-634">ENS avatar</a>.</li>
+<li>Any other resolvable resources specified in the ENS documentation.</li>
+</ul>
+</li>
+<li>If resolution of ENS data is performed, implementers SHOULD take precautions to preserve user privacy and consent, as their <code class="language-plaintext highlighter-rouge">address</code> could be forwarded to third party services as part of the resolution process.</li>
+</ul>
+<h3 id="relying-party-implementer-steps">
+<a href="#relying-party-implementer-steps" class="anchor-link"></a> Relying Party Implementer Steps
+</h3>
+<h4 id="verifying-a-signed-message">
+<a href="#verifying-a-signed-message" class="anchor-link"></a> Verifying a signed <code class="language-plaintext highlighter-rouge">message</code>
+</h4>
+<ul>
+<li>The message MUST be checked for conformance to the ABNF above, checked against expected term values after parsing, and its signature MUST be verified.</li>
+</ul>
+<h4 id="creating-sessions">
+<a href="#creating-sessions" class="anchor-link"></a> Creating sessions
+</h4>
+<ul>
+<li>Sessions MUST be bound to the <code class="language-plaintext highlighter-rouge">address</code> and not to further resolved resources that can change.</li>
+</ul>
+<h4 id="interpreting-and-resolving-resources">
+<a href="#interpreting-and-resolving-resources" class="anchor-link"></a> Interpreting and resolving <code class="language-plaintext highlighter-rouge">resources</code>
+</h4>
+<ul>
+<li>The listed <code class="language-plaintext highlighter-rouge">resources</code> MUST be RFC 3986 URIs, but their interpretation is out of scope of this specification.</li>
+<li>Implementers SHOULD ensure that that URIs are human-friendly when expressed in plaintext form.</li>
+</ul>
+<h3 id="wallet-implementer-steps">
+<a href="#wallet-implementer-steps" class="anchor-link"></a> Wallet Implementer Steps
+</h3>
+<h4 id="verifying-message">
+<a href="#verifying-message" class="anchor-link"></a> Verifying <code class="language-plaintext highlighter-rouge">message</code>
+</h4>
+<ul>
+<li>The full <code class="language-plaintext highlighter-rouge">message</code> MUST be checked for conformance to the ABNF above.</li>
+<li>Wallet implementers SHOULD warn users if the substring <code class="language-plaintext highlighter-rouge">"wants you to sign in
+with your Ethereum account"</code> appears anywhere in an <a href="/EIPS/eip-191">EIP-191</a> message signing
+request unless the message fully conforms to the format defined in this specification.</li>
+</ul>
+<h4 id="verifying-domain-binding">
+<a href="#verifying-domain-binding" class="anchor-link"></a> Verifying <code class="language-plaintext highlighter-rouge">domain</code> binding
+</h4>
+<ul>
+<li>Wallet implementers MUST prevent phishing attacks by matching on the <code class="language-plaintext highlighter-rouge">domain</code> term when processing a signing request. For example, when processing the message beginning with <code class="language-plaintext highlighter-rouge">"service.invalid wants you to sign in..."</code>, the wallet checks that the request actually originated from <code class="language-plaintext highlighter-rouge">service.invalid</code>.</li>
+<li>The domain SHOULD be read from a trusted data source such as the browser window or over WalletConnect (<a href="/EIPS/eip-1328">EIP-1328</a>) sessions for comparison against the signing message contents.</li>
+</ul>
+<h4 id="creating-sign-in-with-ethereum-interfaces">
+<a href="#creating-sign-in-with-ethereum-interfaces" class="anchor-link"></a> Creating Sign-In with Ethereum interfaces
+</h4>
+<ul>
+<li>Wallet implementers MUST display to the user the following terms from the Sign-In with Ethereum signing request by default and prior to signing, if they are present: <code class="language-plaintext highlighter-rouge">domain</code>, <code class="language-plaintext highlighter-rouge">address</code>, <code class="language-plaintext highlighter-rouge">statement</code>, and <code class="language-plaintext highlighter-rouge">resources</code>. Other present terms MUST also be made available to the user prior to signing either by default or through an extended interface.</li>
+<li>Wallet implementers displaying a plaintext <code class="language-plaintext highlighter-rouge">message</code> to the user SHOULD require the user to scroll to the bottom of the text area prior to signing.</li>
+<li>Wallet implementers MAY construct a custom Sign-In With Ethereum user interface by parsing the ABNF terms into data elements for use in the interface. The display rules above still apply to custom interfaces.</li>
+</ul>
+<h4 id="supporting-internationalization-i18n">
+<a href="#supporting-internationalization-i18n" class="anchor-link"></a> Supporting internationalization (i18n)
+</h4>
+<ul>
+<li>After successfully parsing the message into ABNF terms, translation MAY happen at the UX level per human language.</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="requirements">
+<a href="#requirements" class="anchor-link"></a> Requirements
+</h3>
+<p>Write a specification for how Sign-In with Ethereum should work. The specification should be simple and generally follow existing practices. Avoid feature bloat, particularly the inclusion of lesser-used projects who see getting into the specification as a means of gaining adoption. The core specification should be decentralized, open, non-proprietary, and have long-term viability. It should have no dependence on a centralized server except for the servers already being run by the application that the user is signing in to. The basic specification should include: Ethereum accounts used for authentication, ENS names for usernames (via reverse resolution), and data from the ENS name’s text records for additional profile information (e.g. avatar, social media handles, etc).</p>
+<p>Additional functional requirements:</p>
+<ol>
+<li>The user must be presented a human-understandable interface prior to signing, mostly free of machine-targeted artifacts such as JSON blobs, hex codes (aside from the Ethereum address), and baseXX-encoded strings.</li>
+<li>The application server must be able to implement fully usable support for its end without forcing a change in the wallets.</li>
+<li>There must be a simple and straightforward upgrade path for both applications and wallets already using Ethereum account-based signing for authentication.</li>
+<li>There must be facilities and guidelines for adequate mitigation of Man-in-the-Middle (MITM) attacks, replay attacks, and malicious signing requests.</li>
+</ol>
+<h3 id="design-goals">
+<a href="#design-goals" class="anchor-link"></a> Design Goals
+</h3>
+<ol>
+<li>Human-Friendly</li>
+<li>Simple to Implement</li>
+<li>Secure</li>
+<li>Machine Readable</li>
+<li>Extensible</li>
+</ol>
+<h3 id="technical-decisions">
+<a href="#technical-decisions" class="anchor-link"></a> Technical Decisions
+</h3>
+<ul>
+<li>Why <a href="/EIPS/eip-191">EIP-191</a> (Signed Data Standard) over <a href="/EIPS/eip-712">EIP-712</a> (Ethereum typed structured data hashing and signing)
+<ul>
+<li><a href="/EIPS/eip-191">EIP-191</a> is already broadly supported across wallets UX, while <a href="/EIPS/eip-712">EIP-712</a> support for friendly user display is pending. <strong>(1, 2, 3, 4)</strong></li>
+<li><a href="/EIPS/eip-191">EIP-191</a> is simple to implement using a pre-set prefix prior to signing, while <a href="/EIPS/eip-712">EIP-712</a> is more complex to implement requiring the further implementations of a bespoke Solidity-inspired type system, RLP-based encoding format, and custom keccak-based hashing scheme. <strong>(2)</strong></li>
+<li>
+<p><a href="/EIPS/eip-191">EIP-191</a> produces more human-readable messages, while <a href="/EIPS/eip-712">EIP-712</a> creates signing outputs for machine consumption, with most wallets not displaying the payload to be signed in a manner friendly to humans. <strong>(1)</strong><img src="/assets/eip-4361/signing.png" alt="" /></p>
+</li>
+<li><a href="/EIPS/eip-712">EIP-712</a> has the advantage of on-chain representation and on-chain verifiability, such as for their use in metatransactions, but this feature is not relevant for the specification’s scope. <strong>(2)</strong></li>
+</ul>
+</li>
+<li>Why not use JWTs? Wallets don’t support JWTs. The keccak hash function is not assigned by IANA for use as a JOSE algorithm. <strong>(2, 3)</strong></li>
+<li>Why not use YAML or YAML with exceptions? YAML is loose compared to ABNF, which can readily express character set limiting, required ordering, and strict whitespacing. <strong>(2, 3)</strong></li>
+</ul>
+<h3 id="out-of-scope">
+<a href="#out-of-scope" class="anchor-link"></a> Out of Scope
+</h3>
+<p>The following concerns are out of scope for this version of the specification to define:</p>
+<ul>
+<li>Additional authentication not based on Ethereum addresses.</li>
+<li>Authorization to server resources.</li>
+<li>Interpretation of the URIs in the <code class="language-plaintext highlighter-rouge">resources</code> term as claims or other resources.</li>
+<li>The specific mechanisms to ensure domain-binding.</li>
+<li>The specific mechanisms to generate nonces and evaluation of their appropriateness.</li>
+<li>Protocols for use without TLS connections.</li>
+</ul>
+<h3 id="considerations-for-forwards-compatibility">
+<a href="#considerations-for-forwards-compatibility" class="anchor-link"></a> Considerations for Forwards Compatibility
+</h3>
+<p>The following items are considered for future support in either through an iteration of this specification or new work items using this specification as a dependency.</p>
+<ul>
+<li>Possible support for Decentralized Identifiers and Verifiable Credentials.</li>
+<li>Possible cross-chain support.</li>
+<li>Possible SIOPv2 support.</li>
+<li>Possible future support for <a href="/EIPS/eip-712">EIP-712</a>.</li>
+<li>Version interpretation rules, e.g., sign with minor revision greater than understood, but not greater major version.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<ul>
+<li>Most wallet implementations already support <a href="/EIPS/eip-191">EIP-191</a>, so this is used as a base pattern with additional features.</li>
+<li>Requirements were gathered from existing implementations of similar sign-in workflows, including statements to allow the user to accept a Terms of Service, nonces for replay protection, and inclusion of the Ethereum address itself in the message.</li>
+</ul>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>A reference implementation is available <a href="/assets/eip-4361/example.js">here</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h4 id="identifier-reuse">
+<a href="#identifier-reuse" class="anchor-link"></a> Identifier reuse
+</h4>
+<ul>
+<li>Towards perfect privacy, it would be ideal to use a new uncorrelated identifier (e.g., Ethereum address) per digital interaction, selectively disclosing the information required and no more.</li>
+<li>This concern is less relevant to certain user demographics who are likely to be early adopters of this specification, such as those who manage an Ethereum address and/or ENS names intentionally associated with their public presence. These users often prefer identifier reuse to maintain a single correlated identity across many services.</li>
+<li>This consideration will become increasingly important with mainstream adoption. There are several ways to move towards this model, such as using HD wallets, signed delegations, and zero-knowledge proofs. However, these approaches are out of scope for this specification and better suited for follow-on specifications.</li>
+</ul>
+<h4 id="key-management">
+<a href="#key-management" class="anchor-link"></a> Key management
+</h4>
+<ul>
+<li>Sign-In with Ethereum gives users control through their keys. This is additional responsibility that mainstream users may not be accustomed to accepting, and key management is a hard problem especially for individuals. For example, there is no “forgot password” button as centralized identity providers commonly implement.</li>
+<li>Early adopters of this specification are likely to be already adept at key management, so this consideration becomes more relevant with mainstream adoption.</li>
+<li>Certain wallets can use smart contracts and multisigs to provide an enhanced user experiences with respect to key usage and key recovery, and these can be supported via <a href="/EIPS/eip-1271">EIP-1271</a> signing.</li>
+</ul>
+<h4 id="wallet-and-relying-party-combined-security">
+<a href="#wallet-and-relying-party-combined-security" class="anchor-link"></a> Wallet and relying party combined security
+</h4>
+<ul>
+<li>Both the wallet and relying party have to implement this specification for improved security to the end user. Specifically, the wallet MUST confirm that the message is for the correct <code class="language-plaintext highlighter-rouge">domain</code> or provide the user means to do so manually (such as instructions to visually confirming the correct domain in a TLS-protected website prior to connecting via QR code or deeplink), otherwise the user is subject to phishing attacks.</li>
+</ul>
+<h4 id="minimizing-wallet-and-server-interaction">
+<a href="#minimizing-wallet-and-server-interaction" class="anchor-link"></a> Minimizing wallet and server interaction
+</h4>
+<ul>
+<li>In some implementions of wallet sign-in workflows, the server first sends parameters of the <code class="language-plaintext highlighter-rouge">message</code> to the wallet. Others generate the message for signing entirely in the client side (e.g., dapps). The latter approach without initial server interaction SHOULD be preferred when there is a user privacy advantage by minimizing wallet-server interaction. Often, the backend server first produces a <code class="language-plaintext highlighter-rouge">nonce</code> to prevent replay attacks, which it verifies after signing. Privacy-preserving alternatives are suggested in the next section on preventing replay attacks.</li>
+<li>Before the wallet presents the message signing request to the user, it MAY consult the server for the proper contents of the message to be signed, such as an acceptable <code class="language-plaintext highlighter-rouge">nonce</code> or requested set of <code class="language-plaintext highlighter-rouge">resources</code>. When communicating to the server, the wallet SHOULD take precautions to protect user privacy by mitigating user information revealed as much as possible.</li>
+<li>Prior to signing, the wallet MAY consult the user for preferences, such as the selection of one <code class="language-plaintext highlighter-rouge">address</code> out of many, or a preferred ENS name out of many.</li>
+</ul>
+<h4 id="preventing-replay-attacks">
+<a href="#preventing-replay-attacks" class="anchor-link"></a> Preventing replay attacks
+</h4>
+<ul>
+<li>A <code class="language-plaintext highlighter-rouge">nonce</code> SHOULD be selected per session initiation with enough entropy to prevent replay attacks, a man-in-the-middle attack in which an attacker is able to capture the user’s signature and resend it to establish a new session for themselves.</li>
+<li>Implementers MAY consider using privacy-preserving yet widely-available <code class="language-plaintext highlighter-rouge">nonce</code> values, such as one derived from a recent Ethereum block hash or a recent Unix timestamp.</li>
+</ul>
+<h4 id="verification-of-domain-binding">
+<a href="#verification-of-domain-binding" class="anchor-link"></a> Verification of domain binding
+</h4>
+<ul>
+<li>Wallets MUST check that the <code class="language-plaintext highlighter-rouge">domain</code> matches the actual signing request source.</li>
+<li>This value SHOULD be checked against a trusted data source such as the browser window or over another protocol.</li>
+</ul>
+<h4 id="channel-security">
+<a href="#channel-security" class="anchor-link"></a> Channel security
+</h4>
+<ul>
+<li>For web-based applications, all communications SHOULD use HTTPS to prevent man-in-the-middle attacks on the message signing.</li>
+<li>When using protocols other than HTTPS, all communications SHOULD be protected with proper techniques to maintain confidentiality, data integrity, and sender/receiver authenticity.</li>
+</ul>
+<h4 id="session-invalidation">
+<a href="#session-invalidation" class="anchor-link"></a> Session invalidation
+</h4>
+<p>There are several cases where an implementer SHOULD check for state changes as they relate to sessions.</p>
+<ul>
+<li>If an <a href="/EIPS/eip-1271">EIP-1271</a> implementation or dependent data changes the signature computation, the server SHOULD invalidate sessions appropriately.</li>
+<li>If any resources specified in <code class="language-plaintext highlighter-rouge">resources</code> change, the server SHOULD invalidate sessions appropriately. However, the interpretation of <code class="language-plaintext highlighter-rouge">resources</code> is out of scope of this specification.</li>
+</ul>
+<h4 id="maximum-lengths-for-abnf-terms">
+<a href="#maximum-lengths-for-abnf-terms" class="anchor-link"></a> Maximum lengths for ABNF terms
+</h4>
+<ul>
+<li>While this specification does not contain normative requirements around maximum string lengths, implementers SHOULD choose maximum lengths for terms that strike a balance across the prevention of denial of service attacks, support for arbitrary use cases, and user readability.</li>
+</ul>
+<h2 id="copyright-waiver">
+<a href="#copyright-waiver" class="anchor-link"></a> Copyright Waiver
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/wyc">Wayne Chang</a>, <a href="https://github.com/obstropolos">Gregory Rocco</a>, <a href="https://github.com/brantlymillegan">Brantly Millegan</a>, <a href="https://github.com/Arachnid">Nick Johnson</a>, "EIP-4361: Sign-In with Ethereum [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4361, October 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4361.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4361: Sign-In with Ethereum [DRAFT]",
+    "author": "Wayne Chang (@wyc), Gregory Rocco (@obstropolos), Brantly Millegan (@brantlymillegan), Nick Johnson (@Arachnid)",
+    "name": "EIP-4361: Sign-In with Ethereum [DRAFT]",
+    "dateCreated": "2021-10-11",
+    "datePublished": "2021-10-11",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4361-sign-in-with-ethereum/7263",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

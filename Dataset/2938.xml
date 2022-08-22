@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2938: Account Abstraction</title>
+<meta property="og:title" content="EIP-2938: Account Abstraction" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2938" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2938" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2938: Account Abstraction
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2938.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/adietrichs">Ansgar Dietrichs</a>, <a href="https://github.com/lightclient">Matt Garnett</a>, <a href="https://github.com/villanuevawill">Will Villanueva</a>, <a href="https://github.com/SamWilsn">Sam Wilson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2938-account-abstraction/4630">https://ethereum-magicians.org/t/eip-2938-account-abstraction/4630</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-09-04</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2718">2718</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#single-tenant">Single Tenant</a></li>
+<li><a href="#single-tenant-1">Single Tenant+</a></li>
+<li><a href="#multi-tenant--beyond">Multi-Tenant &amp; Beyond</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#nonces-still-enshrined-in-single-tenant-aa">Nonces still enshrined in single-tenant AA</a></li>
+<li><a href="#nonces-are-exposed-to-the-evm">Nonces are exposed to the EVM</a></li>
+<li><a href="#replay-protection-1">Replay Protection</a></li>
+<li><a href="#miners-refuse-transactions-that-access-external-data-or-the-targets-own-balance-before-paygas">Miners refuse transactions that access external data or the target’s own balance, before PAYGAS</a></li>
+<li><a href="#aa-transactions-must-call-contracts-with-prefix">AA transactions must call contracts with prefix</a></li>
+<li><a href="#multi-tenant-aa">Multi-tenant AA</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#re-validation">Re-validation</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Account abstraction (AA) allows a contract to be the top-level account that pays fees and starts transaction execution.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p><strong>See also: <a href="https://ethereum-magicians.org/t/implementing-account-abstraction-as-part-of-eth1-x/4020">https://ethereum-magicians.org/t/implementing-account-abstraction-as-part-of-eth1-x/4020</a> and the links therein for historical work and motivation.</strong></p>
+<p>Transaction validity, as of Muir Glacier, is defined rigidly by the protocol: ECDSA signature, a simple nonce, and account balance. Account abstraction extends the validity conditions of transactions with the execution of arbitrary EVM bytecode (with some limits on what state may be accessed.) To signal validity, we propose a new EVM opcode <code class="language-plaintext highlighter-rouge">PAYGAS</code>, which also sets the gas price and gas limit the contract is willing to pay.</p>
+<p>We split account abstraction into two tiers: <strong>single-tenant AA</strong>, which is intended to support wallets or other use cases with few participants, and <strong>multi-tenant AA</strong>, which is intended to support applications with many participants (eg. tornado.cash, Uniswap).</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The existing limitations preclude innovation in a number of important areas, particularly:</p>
+<ol>
+<li>Smart contract wallets that use signature verification other than ECDSA (eg. Schnorr, BLS, post-quantum…)</li>
+<li>Smart contract wallets that include features such as multisig verification or social recovery, reducing the highly prevalent risk of funds being lost or stolen</li>
+<li>Privacy-preserving systems like <a href="http://tornado.cash">tornado.cash</a></li>
+<li>Attempts to improve gas efficiency of DeFi protocols by preventing transactions that don’t satisfy high-level conditions (eg. existence of a matching order) from being included on chain</li>
+<li>Users being able to pay for transaction fees in a token other than ETH (eg. by converting that token into the ETH needed for fees inside the transaction in real-time)</li>
+</ol>
+<p>Most of the above use cases are currently possible using intermediaries, most notably the <a href="https://www.opengsn.org/">Gas Station Network</a> and application-specific alternatives. These implementations are (i) technically inefficient, due to the extra 21000 gas to pay for the relayer, (ii) economically inefficient, as relayers need to make a profit on top of the gas fees that they pay. Additionally, use of intermediary protocols means that these applications cannot simply rely on base Ethereum infrastructure and need to rely on extra protocols that have smaller userbases and higher risk of no longer being available at some future date.</p>
+<p>Out of the five use cases above, single-tenant AA approximately supports (1) and (2), and multi-tenant AA approximately supports (3) and (4). We discuss the differences between the two tiers in the specification and rationale sections below.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="single-tenant">
+<a href="#single-tenant" class="anchor-link"></a> Single Tenant
+</h3>
+<p>After <code class="language-plaintext highlighter-rouge">FORK_BLOCK</code>, the following changes will be recognized by the protocol.</p>
+<h4 id="constants">
+<a href="#constants" class="anchor-link"></a> Constants
+</h4>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">AA_ENTRY_POINT</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">0xffffffffffffffffffffffffffffffffffffffff</code></td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">AA_TX_TYPE</code></strong></td>
+<td><code class="language-plaintext highlighter-rouge">2</code></td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></strong></td>
+<td>TBD</td>
+</tr>
+<tr>
+<td><strong><code class="language-plaintext highlighter-rouge">AA_BASE_GAS_COST</code></strong></td>
+<td>15000</td>
+</tr>
+</tbody>
+</table>
+<h4 id="new-transaction-type">
+<a href="#new-transaction-type" class="anchor-link"></a> New Transaction Type
+</h4>
+<p>A new <a href="/EIPS/eip-2718">EIP-2718</a> transaction with type <code class="language-plaintext highlighter-rouge">AA_TX_TYPE</code> is introduced. Transactions of this type are referred to as “AA transactions”. Their payload should be interpreted as <code class="language-plaintext highlighter-rouge">rlp([nonce, target, data])</code>.</p>
+<p>The base gas cost of this transaction is set to <code class="language-plaintext highlighter-rouge">AA_BASE_GAS_COST</code> instead of 21000 to reflect the lack of “intrinsic” ECDSA and signature.</p>
+<p>Nonces are processed analogously to existing transactions (check <code class="language-plaintext highlighter-rouge">tx.nonce == tx.target.nonce</code>, transaction is invalid if this fails, otherwise proceed and immediately set <code class="language-plaintext highlighter-rouge">tx.nonce += 1</code>).</p>
+<p>Note that this transaction type has no intrinsic gas limit; when beginning execution, the gas limit is simply set to the remaining gas in the block (ie. <code class="language-plaintext highlighter-rouge">block.gas_limit</code> minus gas spent on previous transactions), and the <code class="language-plaintext highlighter-rouge">PAYGAS</code> opcode (see below) can adjust the gas limit downwards.</p>
+<h4 id="transaction-wide-global-variables">
+<a href="#transaction-wide-global-variables" class="anchor-link"></a> Transaction-wide global variables
+</h4>
+<p>Introduce some new transaction-wide global variables. These variables work similarly (in particular, have similar reversion logic) to the SSTORE refunds counter.</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Type</th>
+<th>Initial value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">globals.transaction_fee_paid</code></td>
+<td><code class="language-plaintext highlighter-rouge">bool</code></td>
+<td><code class="language-plaintext highlighter-rouge">False if type(tx) == AA_TX_TYPE else True</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">globals.gas_price</code></td>
+<td><code class="language-plaintext highlighter-rouge">int</code></td>
+<td><code class="language-plaintext highlighter-rouge">0 if type(tx) == AA_TX_TYPE else tx.gas_price</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">globals.gas_limit</code></td>
+<td><code class="language-plaintext highlighter-rouge">int</code></td>
+<td><code class="language-plaintext highlighter-rouge">0 if type(tx) == AA_TX_TYPE else tx.gas_limit</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="nonce-0x48-opcode">
+<a href="#nonce-0x48-opcode" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">NONCE (0x48)</code> Opcode
+</h4>
+<p>A new opcode <code class="language-plaintext highlighter-rouge">NONCE (0x48)</code> is introduced, with gas cost <code class="language-plaintext highlighter-rouge">G_base</code>, which pushes the <code class="language-plaintext highlighter-rouge">nonce</code> of the callee onto the stack.</p>
+<h4 id="paygas-0x49-opcode">
+<a href="#paygas-0x49-opcode" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">PAYGAS (0x49)</code> Opcode
+</h4>
+<p>A new opcode <code class="language-plaintext highlighter-rouge">PAYGAS (0x49)</code> is introduced, with gas cost <code class="language-plaintext highlighter-rouge">G_base</code>. It takes two arguments off the stack: (top) <code class="language-plaintext highlighter-rouge">version_number</code>, (second from top) <code class="language-plaintext highlighter-rouge">memory_start</code>. In the initial implementation, it will <code class="language-plaintext highlighter-rouge">assert version_number == 0</code> and read:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">gas_price = bytes_to_int(vm.memory[memory_start: memory_start + 32])</code></li>
+<li><code class="language-plaintext highlighter-rouge">gas_limit = bytes_to_int(vm.memory[memory_start + 32: memory_start + 64])</code></li>
+</ul>
+<p>Both reads use similar mechanics to MLOAD and CALL, so memory expands if needed.</p>
+<p>Future hard forks may add support for different version numbers, in which case the opcode may take different-sized memory slices and interpret them differently. Two particular potential use cases are <a href="https://notes.ethereum.org/@vbuterin/BkSQmQTS8">EIP 1559</a> and <a href="https://ethresear.ch/t/another-simple-gas-fee-model-the-escalator-algorithm-from-the-agoric-papers/6399">the escalator mechanism</a>.</p>
+<p>The opcode works as follows. If all three of the following conditions (in addition to the version number check above) are satisfied:</p>
+<ol>
+<li>The account’s balance is <code class="language-plaintext highlighter-rouge">&gt;= gas_price * gas_limit</code></li>
+<li><code class="language-plaintext highlighter-rouge">globals.transaction_fee_paid == False</code></li>
+<li>We are in a top-level AA execution frame (ie. if the currently running EVM execution exits or reverts, the EVM execution of the entire transaction is finished)</li>
+</ol>
+<p>Then do the following:</p>
+<ul>
+<li>Subtract <code class="language-plaintext highlighter-rouge">gas_price * gas_limit</code> from the contract’s balance</li>
+<li>Set <code class="language-plaintext highlighter-rouge">globals.transaction_fee_paid</code> to <code class="language-plaintext highlighter-rouge">True</code></li>
+<li>Set <code class="language-plaintext highlighter-rouge">globals.gas_price</code> to <code class="language-plaintext highlighter-rouge">gas_price</code>, and <code class="language-plaintext highlighter-rouge">globals.gas_limit</code> to <code class="language-plaintext highlighter-rouge">gas_limit</code></li>
+<li>Set the remaining gas in the current execution context to equal <code class="language-plaintext highlighter-rouge">gas_limit</code> minus the gas that was already consumed</li>
+</ul>
+<p>If any of the above three conditions are not satisfied, throw an exception.</p>
+<p>At the end of execution of an AA transaction, it is mandatory that <code class="language-plaintext highlighter-rouge">globals.transaction_fee_paid == True</code>; if it is not, then the transaction is invalid. At the end of execution, the contract is refunded <code class="language-plaintext highlighter-rouge">globals.gas_price * remaining_gas</code> for any remaining gas, and <code class="language-plaintext highlighter-rouge">(globals.gas_limit - remaining_gas) * globals.gas_price</code> is transferred to the miner.</p>
+<p><code class="language-plaintext highlighter-rouge">PAYGAS</code> also serves as an EVM execution <em>checkpoint</em>: if the top-level execution frame reverts after <code class="language-plaintext highlighter-rouge">PAYGAS</code> has been called, then the execution only reverts up to the point right after <code class="language-plaintext highlighter-rouge">PAYGAS</code> was called, and exits there. In that case, the contract receives no refund, and <code class="language-plaintext highlighter-rouge">globals.gas_limit * globals.gas_price</code> is transferred to the miner.</p>
+<h4 id="replay-protection">
+<a href="#replay-protection" class="anchor-link"></a> Replay Protection
+</h4>
+<p>One of the two following approaches must be implemented to safeguard against replay attacks.</p>
+<h5 id="require-set_indestructible">
+<a href="#require-set_indestructible" class="anchor-link"></a> Require <code class="language-plaintext highlighter-rouge">SET_INDESTRUCTIBLE</code>
+</h5>
+<p>Require that contracts targeted by AA transactions begin with <a href="/EIPS/eip-2937">EIP-2937</a>’s <code class="language-plaintext highlighter-rouge">SET_INDESTRUCTIBLE</code> opcode. AA transactions targeting contracts that do not begin with <code class="language-plaintext highlighter-rouge">SET_INDESTRUCTIBLE</code> are invalid, and cannot be included in blocks.</p>
+<p><code class="language-plaintext highlighter-rouge">AA_PREFIX</code> would need to be modified to include this opcode.</p>
+<h5 id="preserve-nonce-on-selfdestruct">
+<a href="#preserve-nonce-on-selfdestruct" class="anchor-link"></a> Preserve Nonce on <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>
+</h5>
+<p>The other option is to preserve contract nonces across <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> invocations, instead of setting the nonce to zero.</p>
+<h4 id="miscellaneous">
+<a href="#miscellaneous" class="anchor-link"></a> Miscellaneous
+</h4>
+<ul>
+<li>If <code class="language-plaintext highlighter-rouge">CALLER (0x33)</code> is invoked in the first frame of
+execution of a call initiated by an AA transaction, then it must return <code class="language-plaintext highlighter-rouge">AA_ENTRY_POINT</code>.</li>
+<li>If <code class="language-plaintext highlighter-rouge">ORIGIN (0x32)</code> is invoked in any frame of execution of an AA
+transaction it must return <code class="language-plaintext highlighter-rouge">AA_ENTRY_POINT</code>.</li>
+<li>The <code class="language-plaintext highlighter-rouge">GASPRICE (0x3A)</code> opcode now pushes the value <code class="language-plaintext highlighter-rouge">globals.gas_price</code></li>
+</ul>
+<p>Note that the new definition of <code class="language-plaintext highlighter-rouge">GASPRICE</code> does not lead to any changes in behavior in non-AA transactions, because <code class="language-plaintext highlighter-rouge">globals.gas_price</code> is initialized to <code class="language-plaintext highlighter-rouge">tx.gas_price</code> and cannot be changed as <code class="language-plaintext highlighter-rouge">PAYGAS</code> cannot be called.</p>
+<h4 id="mining-and-rebroadcasting-strategies">
+<a href="#mining-and-rebroadcasting-strategies" class="anchor-link"></a> Mining and Rebroadcasting Strategies
+</h4>
+<p>Much of the complexity in account abstraction originates from the strategies used by miners and validating nodes to determine whether or not to accept and rebroadcast transactions. Miners need to determine if a transaction will actually pay the fee if they include it after only a small amount of processing to avoid <a href="https://hackingdistributed.com/2016/06/28/ethereum-soft-fork-dos-vector/">DoS attacks</a>. Validating nodes need to perform an essentially identical verification to determine whether or not to rebroadcast the transaction.</p>
+<p>By keeping the consensus changes minimal, this EIP allows for gradual introduction of AA mempool support by miners and validating nodes. Initial support would be focused on enabling simple, single-tenant use cases, while later steps would additionally allow for more complex, multi-tenant use cases. Earlier stages are deliberately more fully fleshed-out than later stages, as there is still more time before later stages need to be implemented.</p>
+<h5 id="transactions-with-fixed-nonces">
+<a href="#transactions-with-fixed-nonces" class="anchor-link"></a> Transactions with Fixed Nonces
+</h5>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">VERIFICATION_GAS_MULTIPLIER</code></td>
+<td><code class="language-plaintext highlighter-rouge">6</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">VERIFICATION_GAS_CAP</code></td>
+<td><code class="language-plaintext highlighter-rouge">= VERIFICATION_GAS_MULTIPLIER * AA_BASE_GAS_COST = 90000</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">AA_PREFIX</code></td>
+<td><code class="language-plaintext highlighter-rouge">if(msg.sender != shr(-1, 12)) { LOG1(msg.sender, msg.value); return }</code>; compilation to EVM TBD</td>
+</tr>
+</tbody>
+</table>
+<p>When a node receives an AA transaction, they process it (i.e. attempt to execute it against the current chain head's post-state) to determine its validity, continuing to execute until one of several events happens:</p>
+<ul>
+<li>If the code of the <code class="language-plaintext highlighter-rouge">target</code> is NOT prefixed with <code class="language-plaintext highlighter-rouge">AA_PREFIX</code>, exit with failure</li>
+<li>If the execution hits any of the following, exit with failure:
+<ul>
+<li>An environment opcode (<code class="language-plaintext highlighter-rouge">BLOCKHASH</code>, <code class="language-plaintext highlighter-rouge">COINBASE</code>, <code class="language-plaintext highlighter-rouge">TIMESTAMP</code>, <code class="language-plaintext highlighter-rouge">NUMBER</code>, <code class="language-plaintext highlighter-rouge">DIFFICULTY</code>, <code class="language-plaintext highlighter-rouge">GASLIMIT</code>)</li>
+<li><code class="language-plaintext highlighter-rouge">BALANCE</code> (of any account, including the <code class="language-plaintext highlighter-rouge">target</code> itself)</li>
+<li>An external call/create that changes the <code class="language-plaintext highlighter-rouge">callee</code> to anything but the <code class="language-plaintext highlighter-rouge">target</code> or a precompile (<code class="language-plaintext highlighter-rouge">CALL</code>, <code class="language-plaintext highlighter-rouge">CALLCODE</code>, <code class="language-plaintext highlighter-rouge">STATICCALL</code>, <code class="language-plaintext highlighter-rouge">CREATE</code>, <code class="language-plaintext highlighter-rouge">CREATE2</code>).</li>
+<li>An external state access that reads code (<code class="language-plaintext highlighter-rouge">EXTCODESIZE</code>, <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code>, <code class="language-plaintext highlighter-rouge">EXTCODECOPY</code>, but also <code class="language-plaintext highlighter-rouge">CALLCODE</code> and <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>), unless the address of the code that is read is the <code class="language-plaintext highlighter-rouge">target</code>.</li>
+</ul>
+</li>
+<li>If the execution consumes more gas than <code class="language-plaintext highlighter-rouge">VERIFICATION_GAS_CAP</code> (specified above), or more gas than is available in the block, exit with failure</li>
+<li>If the execution reaches <code class="language-plaintext highlighter-rouge">PAYGAS</code>, then exit with success or failure depending on whether or not the balance is sufficient (e.g. <code class="language-plaintext highlighter-rouge">balance &gt;= gas_price * gas_limit</code>).</li>
+</ul>
+<p>Nodes do not keep transactions with nonces higher than the current valid nonce in the mempool. If the mempool already contains a transaction with a currently valid nonce, another incoming transaction to the same contract and with the same nonce either replaces the existing one (if its gas price is sufficiently higher) or is dropped. Thus, the mempool keeps only at most one pending transaction per account.</p>
+<p>While processing a new block, take note of which accounts were the <code class="language-plaintext highlighter-rouge">target</code> of an AA transaction (each block currently has <code class="language-plaintext highlighter-rouge">12500000</code> gas and an AA transaction costs <code class="language-plaintext highlighter-rouge">&gt;= 15000</code> so there would be at most <code class="language-plaintext highlighter-rouge">12500000 // 15000 = 833</code> targeted accounts). Drop all pending transactions targeting those accounts. All other transactions remain in the mempool.</p>
+<h3 id="single-tenant-1">
+<a href="#single-tenant-1" class="anchor-link"></a> Single Tenant+
+</h3>
+<p>If the <a href="http://github.com/ethereum/EIPs/pull/2937">indestructible contracts EIP</a> is added, Single Tenant AA can be adapted to allow for <code class="language-plaintext highlighter-rouge">DELEGATECALL</code> during transaction verification: during execution of a new AA transaction, external state access that reads code (<code class="language-plaintext highlighter-rouge">EXTCODESIZE</code>, <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code>, <code class="language-plaintext highlighter-rouge">EXTCODECOPY</code>, <code class="language-plaintext highlighter-rouge">CALLCODE</code>, <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>) of any contract whose first byte is the <code class="language-plaintext highlighter-rouge">SET_INDESTRUCTIBLE</code> opcode is no longer banned. However, calls to anything but the <code class="language-plaintext highlighter-rouge">target</code> or a precompile that change the <code class="language-plaintext highlighter-rouge">callee</code> (i.e., calls other than <code class="language-plaintext highlighter-rouge">CALLCODE</code> and <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>) are still not permitted.</p>
+<p>If the <a href="http://github.com/ethereum/EIPs/pull/2975">IS_STATIC EIP</a> is added, the list of allowed prefixes can be extended to allow a prefix that enables incoming static calls but not state-changing calls.</p>
+<p>The list of allowed prefixes can also be extended to enable other benign use cases (eg. logging incoming payments).</p>
+<p>External calls <em>into</em> AA accounts can be allowed as follows. We can add an opcode <code class="language-plaintext highlighter-rouge">RESERVE_GAS</code>, which takes as argument a value <code class="language-plaintext highlighter-rouge">N</code> and has simple behavior: immediately burn <code class="language-plaintext highlighter-rouge">N</code> gas and add <code class="language-plaintext highlighter-rouge">N</code> gas to the refund. We then add an allowed <code class="language-plaintext highlighter-rouge">AA_PREFIX</code> that reserves <code class="language-plaintext highlighter-rouge">&gt;= AA_BASE_GAS_COST * 2</code> gas. This ensures that at least <code class="language-plaintext highlighter-rouge">AA_BASE_GAS_COST</code> gas must be spent (as refunds can refund max 50% of total consumption) in order to call into an account and invalidate transactions targeting that account in the mempool, preserving that invariant.</p>
+<p>Note that accounts may also opt to set a higher <code class="language-plaintext highlighter-rouge">RESERVE_GAS</code> value in order to safely have a higher <code class="language-plaintext highlighter-rouge">VERIFICATION_GAS_CAP</code>; the goal would be to preserve a <code class="language-plaintext highlighter-rouge">VERIFICATION_GAS_MULTIPLIER</code>-to-1 ratio between the minimum gas cost to edit an account (ie. half its <code class="language-plaintext highlighter-rouge">RESERVE_GAS</code>) and the <code class="language-plaintext highlighter-rouge">VERIFICATION_GAS_CAP</code> that is permitted that account. This would also preserve invariants around maximum reverification gas consumption that are implied by the previous section.</p>
+<h3 id="multi-tenant--beyond">
+<a href="#multi-tenant--beyond" class="anchor-link"></a> Multi-Tenant &amp; Beyond
+</h3>
+<p>In a later stage, we can add support for multiple pending transactions per account in the mempool. The main challenge here is that a single transaction can potentially cause state changes that invalidate all other transactions to that same account. Additionally, if we naively prioritize transactions by gasprice, there is an attack vector where the user willing to pay the highest gasprice publishes many (mutually exclusive) versions of their transaction with small alterations, thereby pushing everyone else’s transactions out of the mempool.</p>
+<p>Here is a sketch of a strategy for mitigating this problem. We would require incoming transactions to contain an <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2930.md">EIP-2930</a>-style access list detailing the storage slots that the transaction reads or modifies, and make it binding; that is, accesses outside the access list would be invalid. A transaction would only be included in the mempool if its access list is disjoint from the access lists of other transactions in the mempool (or if its gasprice is higher). An alternative way to think about this is to have per-storage-slot mempools instead of just per-account mempools, except a transaction could be part of multiple per-storage-slot mempools (if desired it could be capped to eg. 5 storage slots).</p>
+<p>Note also that multi-tenant AA will almost certainly require allowing miners to edit the nonces of incoming transactions to put them into sequence, with the result that the final hash of a transaction is unpredictable at publication time. Clients will need to explicitly work around this.</p>
+<p>More research is required to refine these ideas, and this is left for later work.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The core problem in an account abstraction setup is always that miners and network nodes need to be able to verify that a transaction that they attempt to include, or rebroadcast, will actually pay a fee. Currently, this is fairly simple, because a transaction is guaranteed to be includable and pay a fee as long as the signature and nonce are valid and the balance and gasprice are sufficient. These checks can be done quickly.</p>
+<p>In an account abstraction setup, the goal is to allow accounts to specify EVM code that can establish more flexible conditions for a transaction’s validity, but with the requirement that this EVM code can be quickly verified, with the same safety properties as the existing setup.</p>
+<p>In a normal transaction, the top-level call goes from the <code class="language-plaintext highlighter-rouge">tx.sender</code> to <code class="language-plaintext highlighter-rouge">tx.to</code> and carries with it <code class="language-plaintext highlighter-rouge">tx.value</code>. In an AA transaction, the top-level call goes from the <em>entry point address</em> (<code class="language-plaintext highlighter-rouge">0xFFFF...FF</code>) to the <code class="language-plaintext highlighter-rouge">tx.target</code>.</p>
+<p>The top-level code execution is expected to be split into two phases: the shorter <strong>verification phase</strong> (before <code class="language-plaintext highlighter-rouge">PAYGAS</code>) and the longer <strong>execution phase</strong> (after <code class="language-plaintext highlighter-rouge">PAYGAS</code>). If execution throws an exception during the verification phase, the transaction is invalid, much like a transaction with an invalid signature in the current system. If execution throws an exception after the verification phase, the transaction pays fees, and so the miner can still include it.</p>
+<p>The transition between different stages of AA is entirely done through changes in miner strategy. The first stage supports <strong>single-tenant AA</strong>, where the only use cases that can be easily implemented are where the <code class="language-plaintext highlighter-rouge">tx.target</code> is a contract representing a user account (that is, a smart contract wallet, eg. multisig). Later stages improve support for eg. logs and libraries, and also move toward supporting <strong>multi-tenant AA</strong>, where the goal is to try to support cases where the <code class="language-plaintext highlighter-rouge">tx.target</code> represents an <em>application</em> that processes incoming activity from multiple users.</p>
+<h3 id="nonces-still-enshrined-in-single-tenant-aa">
+<a href="#nonces-still-enshrined-in-single-tenant-aa" class="anchor-link"></a> Nonces still enshrined in single-tenant AA
+</h3>
+<p>Nonces are still enforced in single-tenant AA to ensure that single-target AA does not break the invariant that each transaction (and hence each transaction hash) can only be included in the chain once. While there is some limited value in allowing arbitrary-order transaction inclusion in single-tenant AA, there is not enough value to justify breaking that invariant.</p>
+<p>Note that nonces in AA accounts do end up having a dual-purpose: they are both there for replay protection and for contract address generation when using the <code class="language-plaintext highlighter-rouge">CREATE</code> opcode. This does mean that a single transaction could increment the nonce by more than 1. This is deemed acceptable, as the other mechanics introduced by AA already break the ability to easily verify that a chain longer than one transaction can be processed. However, we strongly recommend that AA contracts use <code class="language-plaintext highlighter-rouge">CREATE2</code> instead of <code class="language-plaintext highlighter-rouge">CREATE</code>.</p>
+<p>In multi-tenant AA, as mentioned above, nonces are expected to become malleable and applications that use multi-tenant AA systems would need to manage this.</p>
+<h3 id="nonces-are-exposed-to-the-evm">
+<a href="#nonces-are-exposed-to-the-evm" class="anchor-link"></a> Nonces are exposed to the EVM
+
+</h3>
+<p>This is done to allow signature checking done in validation code to validate the nonce.</p>
+<h3 id="replay-protection-1">
+<a href="#replay-protection-1" class="anchor-link"></a> Replay Protection
+</h3>
+<p>One of the above two approaches (requiring <code class="language-plaintext highlighter-rouge">SET_INDESTRUCTIBLE</code> or modifying <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> behavior) must be implemented so that nonces cannot be reused. It must be a consensus change, and not simply part of <code class="language-plaintext highlighter-rouge">AA_PREFIX</code>, so that transaction hash uniqueness is maintained.</p>
+<h3 id="miners-refuse-transactions-that-access-external-data-or-the-targets-own-balance-before-paygas">
+<a href="#miners-refuse-transactions-that-access-external-data-or-the-targets-own-balance-before-paygas" class="anchor-link"></a> Miners refuse transactions that access external data or the target’s own balance, before PAYGAS
+</h3>
+<p>An important property of traditional transactions is that activity happening as part of transactions that originate outside of some given account X cannot make transactions whose sender is X invalid. The only state change that an outside transaction can impose on X is increasing its balance, which cannot invalidate a transaction.</p>
+<p>Allowing AA contracts to access external data (both other accounts and environment variables such as GASPRICE, DIFFICULTY, etc.) before they call <code class="language-plaintext highlighter-rouge">PAYGAS</code> (ie. during the verification phase) breaks this invariant. For example, imagine someone sends many thousands of AA transactions that perform an external call <code class="language-plaintext highlighter-rouge">if FOO.get_number() != 5: throw()</code>. <code class="language-plaintext highlighter-rouge">FOO.number</code> might be set to <code class="language-plaintext highlighter-rouge">5</code> when those transactions are all sent, but a single transaction to <code class="language-plaintext highlighter-rouge">FOO</code> could set the <code class="language-plaintext highlighter-rouge">number</code> to something else, invalidating <em>all of the thousands of AA transactions</em> that depend on it. This would be a serious DoS vector.</p>
+<p>The one allowed exception is contracts that are indestructible (that is, whose first byte is the <code class="language-plaintext highlighter-rouge">SET_INDESTRUCTIBLE</code> opcode defined in <a href="https://hackmd.io/@HWeNw8hNRimMm2m2GH56Cw/SyNT3Cdmw">this EIP</a>). This is a safe exception, because the data that is being read cannot be changed.</p>
+<p>Disallowing reading <code class="language-plaintext highlighter-rouge">BALANCE</code> blocks a milder attack vector: an attacker could force a transaction to be reprocessed at a mere cost of 6700 gas (not 15000 or 21000), in the worst case more than doubling the number of transactions that would need to be reprocessed.</p>
+<p>In the long term, AA could be expanded to allow reading external data, though protections such as mandatory access lists would be required.</p>
+<h3 id="aa-transactions-must-call-contracts-with-prefix">
+<a href="#aa-transactions-must-call-contracts-with-prefix" class="anchor-link"></a> AA transactions must call contracts with prefix
+</h3>
+<p>The prelude is used to ensure that <em>only</em> AA transactions can call the contract. This is another measure taken to ensure the invariant described above. If this check did not occur, it would be possible for a transaction originating outside some AA account X to call into X and make a storage change, forcing transactions targeting that account to be reprocessed at the cost of a mere 5000 gas.</p>
+<h3 id="multi-tenant-aa">
+<a href="#multi-tenant-aa" class="anchor-link"></a> Multi-tenant AA
+</h3>
+<p>Multi-tenant AA extends single-tenant AA by <strong>better handling cases where distinct and uncoordinated users attempt to send transactions for/to the same account and those transactions may interfere with each other</strong>.</p>
+<p>We can understand the value of multi-tenant AA by examining two example use cases: (i) <a href="http://tornado.cash">tornado.cash</a> and (ii) <a href="http://uniswap.exchange">Uniswap</a>. In both of these cases, there is a single central contract that represents the application, and not any specific user. Nevertheless, there is important value in using abstraction to do application-specific validation of transactions.</p>
+<h4 id="tornado-cash">
+<a href="#tornado-cash" class="anchor-link"></a> Tornado Cash
+</h4>
+<p>The tornado.cash workflow is as follows:</p>
+<ol>
+<li>A user sends a transaction to the TC contract, depositing some standard quantity of coins (eg. 1 ETH). A record of their deposit, containing the hash of a secret known by the user, is added to a Merkle tree whose root is stored in the TC contract.</li>
+<li>When that user later wants to withdraw, they generate and send a ZK-SNARK proving that they know a secret whose hash is in a leaf somewhere in the deposit tree (without revealing where). The TC contract verifies the ZK-SNARK, and also verifies that a nullifier value (also derivable from the secret) has not yet been spent. The contract sends 1 ETH to the user’s desired address, and saves a record that the user’s nullifier has been spent.</li>
+</ol>
+<p>The privacy provided by TC arises because when a user makes a withdrawal, they can prove that it came from <em>some</em> unique deposit, but no one other than the user knows which deposit it came from. However, implementing TC naively has a fatal flaw: the user usually does not yet have ETH in their withdrawal address, and if the user uses their deposit address to pay for gas, that creates an on-chain link between their deposit address and their withdrawal address.</p>
+<p>Currently, this is solved via relayers; a third-party relayer verifies the ZK-SNARK and unspent status of the nullifier, publishes the transaction using their own ETH to pay for gas, and collects the fee back from the user from the TC contract.</p>
+<p>AA allows this without relayers: the user could simply send an AA transaction targeting the TC contract, the ZK-SNARK verification and the nullifier checking can be done in the verification step, and PAYGAS can be called directly after that. This allows the withdrawer to pay for gas directly out of the coins going to their withdrawal address, avoiding the need for relayers or for an on-chain link to their deposit address.</p>
+<p>Note that fully implementing this functionality requires AA to be structured in a way that supports multiple users sending withdrawals at the same time (requiring nonces would make this difficult), and that allows a single account to support both AA transactions (the withdrawals) and externally-initiated calls (the deposits).</p>
+<h4 id="uniswap">
+<a href="#uniswap" class="anchor-link"></a> Uniswap
+</h4>
+<p>A new version of Uniswap could be built that allows transactions to be sent that directly target the Uniswap contract. Users could deposit tokens into Uniswap ahead of time, and Uniswap would store their balances as well as a public key that transactions spending those balances could be verified against. An AA-initiated Uniswap trade would only be able to spend these internal balances.</p>
+<p>This would be useless for normal traders, as normal traders have their coins outside the Uniswap contract, but it would be a powerful boon to arbitrageurs. Arbitrageurs would deposit their coins into Uniswap, and they would be able to send transactions that perform arbitrage every time external market conditions change, and logic such as price limits could be enforced during the verification step. Hence, transactions that do not get in (eg. because some other arbitrageur made the trade first) would not be included on-chain, allowing arbitrageurs to not pay gas, and reducing the number of “junk” transactions that get included on-chain. This could significantly increase both de-facto blockchain scalability as well as market efficiency, as arbitrageurs would be able to much more finely correct for cross-exchange discrepancies between prices.</p>
+<p>Note that here also, Uniswap would need to support both AA transactions and externally-initiated calls.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This AA implementation preserves the existing transaction type. The use of <code class="language-plaintext highlighter-rouge">assert origin == caller</code> to verify that an account is an EOA remains sound, but is not extensible to AA accounts; AA transactions will always have <code class="language-plaintext highlighter-rouge">origin == AA_ENTRY_POINT</code>.</p>
+<p>Badly-designed single-tenant AA contracts will break the transaction non-malleability invariant. That is, it is possible to take an AA transaction in-flight, modify it, and have the modified version still be valid; AA account contracts can be designed in such a way as to make that not possible, but it is their responsibility. Multi-tenant AA will break the transaction non-malleability invariant much more thoroughly, making the transaction hash unpredictable even for legitimate applications that use the multi-tenant AA features (though the invariant will not further break for applications that existed before then).</p>
+<p>AA contracts may not have replay protection unless they build it in explicitly; this can be done with the <code class="language-plaintext highlighter-rouge">CHAINID (0x46)</code> opcode introduced in <a href="/EIPS/eip-1344">EIP 1344</a>.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>See: <a href="https://github.com/quilt/tests/tree/account-abstraction">https://github.com/quilt/tests/tree/account-abstraction</a></p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>See: <a href="https://github.com/quilt/go-ethereum/tree/account-abstraction">https://github.com/quilt/go-ethereum/tree/account-abstraction</a></p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>See <a href="https://ethresear.ch/t/dos-vectors-in-account-abstraction-aa-or-validation-generalization-a-case-study-in-geth/7937">https://ethresear.ch/t/dos-vectors-in-account-abstraction-aa-or-validation-generalization-a-case-study-in-geth/7937</a> for an analysis of DoS issues.</p>
+<h3 id="re-validation">
+<a href="#re-validation" class="anchor-link"></a> Re-validation
+</h3>
+<p>When a transaction enters the mempool, the client is able to quickly ascertain whether the transaction is valid. Once it determines this, it can be confident that the transaction will continue to be valid unless a transaction from the same account invalidates it.</p>
+<p>There are, however, cases where an attacker can publish a transaction that invalidates existing transactions and requires the network to perform more recomputation than the computation in the transaction itself. The EIP maintains the invariant that recomputation is bounded to a theoretical maximum of six times the block gas limit in a single block; this is somewhat more expensive than before, but not that much more expensive.</p>
+<h4 id="peer-denial-of-service">
+<a href="#peer-denial-of-service" class="anchor-link"></a> Peer denial-of-service
+</h4>
+<p>Denial-of-Service attacks are difficult to defend against, due to the difficulty in identifying sybils within a peer list. At any moment, one may decide (or be bribed) to initiate an attack. This is not a problem that Account Abstraction introduces. It can be accomplished against existing clients today by inundating a target with transactions whose signatures are invalid. However, due to the increased allotment of validation work allowed by AA, it’s important to bound the amount of computation an adversary can force a client to expend with invalid transactions. For this reason, it’s best for the miner to follow the recommended mining strategies.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/adietrichs">Ansgar Dietrichs</a>, <a href="https://github.com/lightclient">Matt Garnett</a>, <a href="https://github.com/villanuevawill">Will Villanueva</a>, <a href="https://github.com/SamWilsn">Sam Wilson</a>, "EIP-2938: Account Abstraction [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2938, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2938.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2938: Account Abstraction [DRAFT]",
+    "author": "Vitalik Buterin (@vbuterin), Ansgar Dietrichs (@adietrichs), Matt Garnett (@lightclient), Will Villanueva (@villanuevawill), Sam Wilson (@SamWilsn)",
+    "name": "EIP-2938: Account Abstraction [DRAFT]",
+    "dateCreated": "2020-09-04",
+    "datePublished": "2020-09-04",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2938-account-abstraction/4630",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

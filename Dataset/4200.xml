@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4200: Static relative jumps</title>
+<meta property="og:title" content="EIP-4200: Static relative jumps" />
+<meta name="description" content="RJUMP and RJUMPI instructions with a signed immediate encoding the jump destination" />
+<meta property="og:description" content="RJUMP and RJUMPI instructions with a signed immediate encoding the jump destination" />
+<meta name="twitter:description" content="RJUMP and RJUMPI instructions with a signed immediate encoding the jump destination" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4200" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4200" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4200: Static relative jumps
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4200.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>RJUMP and RJUMPI instructions with a signed immediate encoding the jump destination</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/chfast">Paweł Bylica</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108">https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-07-16</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3540">3540</a>,
+<a href="eip-3670">3670</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#relative-addressing">Relative addressing</a></li>
+<li><a href="#immediate-size">Immediate size</a></li>
+<li><a href="#pushn-jump-sequences">PUSHn JUMP sequences</a></li>
+<li><a href="#relation-to-dynamic-jumps">Relation to dynamic jumps</a></li>
+<li><a href="#lack-of-jumpdest">Lack of JUMPDEST</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a>
+<ul>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#execution">Execution</a></li>
+</ul>
+</li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Two new EVM jump instructions are introduced (<code class="language-plaintext highlighter-rouge">RJUMP</code> and <code class="language-plaintext highlighter-rouge">RJUMPI</code>) which encode the destination as a signed immediate value. These can be useful in the majority of (but not all) use cases and offer a cost reduction.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>A recurring discussion topic is that EVM only has a mechanism for dynamic jumps. They provide a very flexible architecture with only 2 (!) instructions. This flexibility comes at a cost however: it makes analysis of code more complicated and it also (partially) resulted in the need to have the <code class="language-plaintext highlighter-rouge">JUMPDEST</code> marker.</p>
+<p>In a great many cases control flow is actually static and there is no need for any dynamic behaviour, though not every use case can be solved by static jumps.</p>
+<p>There are various ways to reduce the need for dynamic jumps, some examples:</p>
+<ol>
+<li>With native support for functions / subroutines</li>
+<li>A “return to caller” instruction</li>
+<li>A “switch-case” table with dynamic indexing</li>
+</ol>
+<p>This change does not attempt to solve these, but instead introduces a minimal feature set to allow compilers to decide which is the most adequate option for a given use case. It is expected that compilers will use <code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> almost exclusively, with the exception of returning to the caller continuing to use <code class="language-plaintext highlighter-rouge">JUMP</code>.</p>
+<p>This functionality does not preclude the EVM from introducing other forms of control flow later on. <code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> can efficiently co-exists with a higher-level declaration of functions, where static relative jumps should be used for intra-function control flow.</p>
+<p>The main benefit of these instruction is reduced gas cost (both at deploy and execution time) and better analysis properties.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>We introduce two new instructions on the same block number <a href="/EIPS/eip-3540">EIP-3540</a> is activated on:</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code> (0x5c)</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMPI</code> (0x5d)</li>
+</ol>
+<p>If the code is legacy bytecode, both of these instructions result in an <em>exceptional halt</em>. (<em>Note: This means no change to behaviour.</em>)</p>
+<p>If the code is valid EOF1:</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">RJUMP relative_offset</code> (0x5c), sets the <code class="language-plaintext highlighter-rouge">PC</code> to <code class="language-plaintext highlighter-rouge">PC_post_instruction + relative_offset</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMPI relative_offset</code> (0x5d), pops a value (<code class="language-plaintext highlighter-rouge">condition</code>) from the stack, and sets the <code class="language-plaintext highlighter-rouge">PC</code> to <code class="language-plaintext highlighter-rouge">PC_post_instruction + ((condition == 0) ? 0 : relative_offset)</code>.</li>
+</ol>
+<p>The immediate argument <code class="language-plaintext highlighter-rouge">relative_offset</code> is encoded as a 16-bit <strong>signed</strong> (two’s-complement) big-endian value. Under <code class="language-plaintext highlighter-rouge">PC_post_instruction</code> we mean the <code class="language-plaintext highlighter-rouge">PC</code> position after the entire immediate value.</p>
+<p>We also extend the validation algorithm of <a href="/EIPS/eip-3670">EIP-3670</a> to verify that each <code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> has a <code class="language-plaintext highlighter-rouge">relative_offset</code> pointing to an instruction. This means it cannot point to an immediate data of <code class="language-plaintext highlighter-rouge">PUSHn</code>/<code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code>. It cannot point outside of code bounds. It is allowed to point to a <code class="language-plaintext highlighter-rouge">JUMPDEST</code>, but is not required to.</p>
+<p>Because the destinations are validated upfront, the cost of these instructions are less than their dynamic counterparts: <code class="language-plaintext highlighter-rouge">RJUMP</code> should cost 5, and <code class="language-plaintext highlighter-rouge">RJUMPI</code> should cost 7. This is a reduction of 2 gas, compared to <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="relative-addressing">
+<a href="#relative-addressing" class="anchor-link"></a> Relative addressing
+</h3>
+<p>We chose relative addressing in order to support code which is moveable. This also means it can be injected. A technique seen used prior to this EIP to achieve this same goal was to inject code like <code class="language-plaintext highlighter-rouge">PUSHn PC ADD JUMPI</code>.</p>
+<p>We do not see any significant downside to relative addressing, but it also allows the deprecation of the <code class="language-plaintext highlighter-rouge">PC</code> instruction.</p>
+<p><em>Note: EIP-3670 should reject <code class="language-plaintext highlighter-rouge">PC</code>.</em></p>
+<h3 id="immediate-size">
+<a href="#immediate-size" class="anchor-link"></a> Immediate size
+</h3>
+<p>The signed 16-bit immediate means that the largest jump distance possible is 32767. In the case the bytecode at <code class="language-plaintext highlighter-rouge">PC=0</code> starts with an <code class="language-plaintext highlighter-rouge">RJUMP</code>, it will be possible to jump as far as <code class="language-plaintext highlighter-rouge">PC=32770</code>.</p>
+<p>Given <code class="language-plaintext highlighter-rouge">MAX_CODE_SIZE = 24576</code> (in <a href="/EIPS/eip-170">EIP-170</a>) and <code class="language-plaintext highlighter-rouge">MAX_INITCODE_SIZE = 49152</code> (in <a href="/EIPS/eip-3860">EIP-3860</a>), we think the 16-bit immediate is large enough.</p>
+<p>A version with an 8-bit immediate would only allow moving <code class="language-plaintext highlighter-rouge">PC</code> backward by 125 or forward by 127 bytes. While that seems to be a good enough distance for many for-loops, it is likely not good enough for cross-function jumps, and since the 16-bit immediate is the same size as what a dynamic jump would take in such cases (3 bytes: <code class="language-plaintext highlighter-rouge">JUMP PUSH1 n</code>), we think having less instructions is better.</p>
+<p>Should there be a need to have immediate encodings of other size (such as 8-bits, 24-bits or 32-bits), it would be possible to introduce new opcodes, similarly to how multiple <code class="language-plaintext highlighter-rouge">PUSH</code> instructions exist.</p>
+<h3 id="pushn-jump-sequences">
+<a href="#pushn-jump-sequences" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">PUSHn JUMP</code> sequences
+</h3>
+<p>If we chose absolute addressing, then <code class="language-plaintext highlighter-rouge">RJUMP</code> could be viewed similar to the sequence <code class="language-plaintext highlighter-rouge">PUSHn JUMP</code> (and <code class="language-plaintext highlighter-rouge">RJUMPI</code> similar to <code class="language-plaintext highlighter-rouge">PUSHn RJUMPI</code>). In that case one could argue that instead of introducing a new instruction, such sequences should get a discount, because EVMs could optimise them.</p>
+<p>We think this is a bad direction to go:</p>
+<ol>
+<li>It further complicates the already complex rules of gas calculation.</li>
+<li>And it either requires a consensus defined internal representation for EVM code, or forces EVM implementations to do optimisations on their own.</li>
+</ol>
+<p>Both of these are risky. Furthermore we think that EVM implementations should be free to chose what optimisations they apply, and the savings do not need to be passed down at all cost.</p>
+<p>Additionally it requires a potentially significant change to the current implementations which depend on a streaming one-by-one execution without a lookahead.</p>
+<h3 id="relation-to-dynamic-jumps">
+<a href="#relation-to-dynamic-jumps" class="anchor-link"></a> Relation to dynamic jumps
+</h3>
+<p>The goal was not to completely replace the current control flow system of the EVM, but to augment it. There are many cases where dynamic jumps are useful, such as returning to the caller.</p>
+<p>It is possible to introduce a new mechanism for having a pre-defined table of valid jump destinations, and dynamically supplying the index within this table to accomplish some form of dynamic jumps. This is very useful for efficiently encoding a form of “switch-cases” statements. It could also be used for “return to caller” cases, however it is likely inefficient or awkward.</p>
+<h3 id="lack-of-jumpdest">
+<a href="#lack-of-jumpdest" class="anchor-link"></a> Lack of <code class="language-plaintext highlighter-rouge">JUMPDEST</code>
+</h3>
+<p><code class="language-plaintext highlighter-rouge">JUMPDEST</code> serves two purposes:</p>
+<ol>
+<li>To efficiently partition code – this can be useful for pre-calculating total gas usage for a given <em>block</em> (i.e. instructions between <code class="language-plaintext highlighter-rouge">JUMPDEST</code>s), and for JIT/AOT translation.</li>
+<li>To explicitly show valid locations (otherwise any non-data location would be valid).</li>
+</ol>
+<p>This functionality is not needed for static jumps, as the analysers can easily tell destinations from the static jump immediates during jumpdest-analysis.</p>
+<p>There are two benefits here:</p>
+<ol>
+<li>Not wasting a byte for a <code class="language-plaintext highlighter-rouge">JUMPDEST</code> also means a saving of 200 gas during deployment, for each jump destination.</li>
+<li>Saving an extra 1 gas per jump during execution, given <code class="language-plaintext highlighter-rouge">JUMPDEST</code> itself cost 1 gas and is “executed” during jumping.</li>
+</ol>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+ </h2>
+<h3 id="validation">
+<a href="#validation" class="anchor-link"></a> Validation
+</h3>
+<h4 id="valid-cases">
+<a href="#valid-cases" class="anchor-link"></a> Valid cases
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> with <code class="language-plaintext highlighter-rouge">JUMPDEST</code> as target
+<ul>
+<li><code class="language-plaintext highlighter-rouge">relative_offset</code> is positive/negative/<code class="language-plaintext highlighter-rouge">0</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> with instruction other than <code class="language-plaintext highlighter-rouge">JUMPDEST</code> as target
+<ul>
+<li><code class="language-plaintext highlighter-rouge">relative_offset</code> is positive/negative/<code class="language-plaintext highlighter-rouge">0</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="invalid-cases">
+<a href="#invalid-cases" class="anchor-link"></a> Invalid cases
+</h4>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> with truncated immediate</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> as a final instruction in code section</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> target outside of code section bounds</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> target push data</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> target another <code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> immediate argument</li>
+</ul>
+<h3 id="execution">
+<a href="#execution" class="anchor-link"></a> Execution
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>/<code class="language-plaintext highlighter-rouge">RJUMPI</code> in legacy code aborts execution</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">relative_offset</code> is positive/negative/<code class="language-plaintext highlighter-rouge">0</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMPI</code>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">relative_offset</code> is positive/negative/<code class="language-plaintext highlighter-rouge">0</code>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">condition</code> equals <code class="language-plaintext highlighter-rouge">0</code></li>
+<li><code class="language-plaintext highlighter-rouge">condition</code> does not equal <code class="language-plaintext highlighter-rouge">0</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># The ranges below are as specified in the Yellow Paper.
+# Note: range(s, e) excludes e, hence the +1
+</span><span class="n">valid_opcodes</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x0b</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x10</span><span class="p">,</span> <span class="mh">0x1d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="mh">0x20</span><span class="p">,</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x3f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x48</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x50</span><span class="p">,</span> <span class="mh">0x5d</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="mh">0x6f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x70</span><span class="p">,</span> <span class="mh">0x7f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x80</span><span class="p">,</span> <span class="mh">0x8f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0x90</span><span class="p">,</span> <span class="mh">0x9f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0xa0</span><span class="p">,</span> <span class="mh">0xa4</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="c1"># Note: 0xfe is considered assigned.
+</span>    <span class="o">*</span><span class="nb">range</span><span class="p">(</span><span class="mh">0xf0</span><span class="p">,</span> <span class="mh">0xf5</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mh">0xfa</span><span class="p">,</span> <span class="mh">0xfd</span><span class="p">,</span> <span class="mh">0xfe</span><span class="p">,</span> <span class="mh">0xff</span>
+<span class="p">]</span>
+
+<span class="c1"># STOP, RETURN, REVERT, INVALID, SELFDESTRUCT
+</span><span class="n">terminating_opcodes</span> <span class="o">=</span> <span class="p">[</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0xf3</span><span class="p">,</span> <span class="mh">0xfd</span><span class="p">,</span> <span class="mh">0xfe</span><span class="p">,</span> <span class="mh">0xff</span> <span class="p">]</span>
+
+<span class="n">immediate_sizes</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">immediate_sizes</span><span class="p">[</span><span class="mh">0x5c</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># RJUMP
+</span><span class="n">immediate_sizes</span><span class="p">[</span><span class="mh">0x5d</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># RJUMPI
+</span><span class="k">for</span> <span class="n">opcode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x60</span><span class="p">,</span> <span class="mh">0x7f</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>  <span class="c1"># PUSH1..PUSH32
+</span>    <span class="n">immediate_sizes</span><span class="p">[</span><span class="n">opcode</span><span class="p">]</span> <span class="o">=</span> <span class="n">opcode</span> <span class="o">-</span> <span class="mh">0x60</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="c1"># Fails with assertion on invalid code
+</span><span class="k">def</span> <span class="nf">validate_code</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="c1"># Note that EOF1 already asserts this with the code section requirements
+</span>    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="n">opcode</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">rjumpdests</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">immediates</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">):</span>
+        <span class="c1"># Ensure the opcode is valid
+</span>        <span class="n">opcode</span> <span class="o">=</span> <span class="n">code</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">assert</span> <span class="n">opcode</span> <span class="ow">in</span> <span class="n">valid_opcodes</span>
+
+        <span class="k">if</span> <span class="n">opcode</span> <span class="o">==</span> <span class="mh">0x5c</span> <span class="ow">or</span> <span class="n">opcode</span> <span class="o">==</span> <span class="mh">0x5d</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">pos</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">code</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span> <span class="n">byteorder</span> <span class="o">=</span> <span class="s">"big"</span><span class="p">,</span> <span class="n">signed</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+
+            <span class="n">rjumpdest</span> <span class="o">=</span> <span class="n">pos</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">offset</span>
+            <span class="k">assert</span> <span class="n">rjumpdest</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">rjumpdest</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+            <span class="n">rjumpdests</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">rjumpdest</span><span class="p">)</span>
+
+        <span class="c1"># Save positions of each byte of immediate value
+</span>        <span class="n">immediates</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">pos</span> <span class="o">+</span> <span class="n">immediate_sizes</span><span class="p">[</span><span class="n">opcode</span><span class="p">]))</span>
+        <span class="c1"># Skip immediates
+</span>        <span class="n">pos</span> <span class="o">+=</span> <span class="n">immediate_sizes</span><span class="p">[</span><span class="n">opcode</span><span class="p">]</span>
+
+    <span class="c1"># Ensure last opcode's immediate doesn't go over code end
+</span>    <span class="k">assert</span> <span class="n">pos</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+
+    <span class="c1"># opcode is the *last opcode*
+</span>    <span class="k">assert</span> <span class="n">opcode</span> <span class="ow">in</span> <span class="n">terminating_opcodes</span>
+
+    <span class="c1"># Ensure relative jump destinations don't target immediates
+</span>    <span class="k">assert</span> <span class="n">rjumpdests</span><span class="p">.</span><span class="n">isdisjoint</span><span class="p">(</span><span class="n">immediates</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Comparing to validation code of EIP-3670:</p>
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code> # The ranges below are as specified in the Yellow Paper.
+ # Note: range(s, e) excludes e, hence the +1
+ valid_opcodes = [
+     *range(0x00, 0x0b + 1),
+     *range(0x10, 0x1d + 1),
+     0x20,
+     *range(0x30, 0x3f + 1),
+     *range(0x40, 0x48 + 1),
+<span class="gd">-    *range(0x50, 0x5b + 1),
+</span><span class="gi">+    *range(0x50, 0x5d + 1),
+</span>     *range(0x60, 0x6f + 1),
+     *range(0x70, 0x7f + 1),
+     *range(0x80, 0x8f + 1),
+     *range(0x90, 0x9f + 1),
+     *range(0xa0, 0xa4 + 1),
+     # Note: 0xfe is considered assigned.
+     *range(0xf0, 0xf5 + 1), 0xfa, 0xfd, 0xfe, 0xff
+ ]
+ 
+ # STOP, RETURN, REVERT, INVALID, SELFDESTRUCT
+ terminating_opcodes = [ 0x00, 0xf3, 0xfd, 0xfe, 0xff ]
+ 
+<span class="gd">-# Only for PUSH1..PUSH32
+</span> immediate_sizes = 256 * [0]
+<span class="gi">+immediate_sizes[0x5c] = 2  # RJUMP
++immediate_sizes[0x5d] = 2  # RJUMPI
+</span> for opcode in range(0x60, 0x7f + 1):  # PUSH1..PUSH32
+     immediate_sizes[opcode] = opcode - 0x60 + 1
+ 
+ # Fails with assertion on invalid code
+ def validate_code(code: bytes):
+     # Note that EOF1 already asserts this with the code section requirements
+     assert len(code) &gt; 0
+ 
+     opcode = 0
+     pos = 0
+<span class="gi">+    rjumpdests = set()
++    immediates = set()
+</span>     while pos &lt; len(code):
+         # Ensure the opcode is valid
+         opcode = code[pos]
+         pos += 1
+         assert opcode in valid_opcodes
+ 
+<span class="gi">+        if opcode == 0x5c or opcode == 0x5d:
++            assert pos + 2 &lt;= len(code)
++            offset = int.from_bytes(code[pos:pos+2], byteorder = "big", signed = True)
++
++            rjumpdest = pos + 2 + offset
++            assert rjumpdest &gt;= 0 and rjumpdest &lt; len(code)
++
++            rjumpdests.add(rjumpdest)
++
++        # Save positions of each byte of immediate value
++        immediates.update(range(pos, pos + immediate_sizes[opcode]))
+</span>         # Skip immediates
+         pos += immediate_sizes[opcode]
+ 
+     # Ensure last opcode's immediate doesn't go over code end
+     assert pos == len(code)
+ 
+     # opcode is the *last opcode*
+     assert opcode in terminating_opcodes
+ 
+<span class="gi">+    # Ensure relative jump destinations don't target immediates
++    assert rjumpdests.isdisjoint(immediates)
+</span></code></pre></div></div>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change poses no risk to backwards compatibility, as it is introduced at the same time EIP-3540 is. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TBA</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, "EIP-4200: Static relative jumps [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4200, July 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4200.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4200: Static relative jumps [DRAFT]",
+    "author": "Alex Beregszaszi (@axic), Andrei Maiboroda (@gumb0), Paweł Bylica (@chfast)",
+    "name": "EIP-4200: Static relative jumps [DRAFT]",
+    "dateCreated": "2021-07-16",
+    "datePublished": "2021-07-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3920-static-relative-jumps/7108",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-634: Storage of text records in ENS</title>
+<meta property="og:title" content="EIP-634: Storage of text records in ENS" />
+<meta name="description" content="Profiles for ENS resolvers to store arbitrary text key/value pairs." />
+<meta property="og:description" content="Profiles for ENS resolvers to store arbitrary text key/value pairs." />
+<meta name="twitter:description" content="Profiles for ENS resolvers to store arbitrary text key/value pairs." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-634" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-634" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-634: Storage of text records in ENS
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-634.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Profiles for ENS resolvers to store arbitrary text key/value pairs.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/ricmoo">Richard Moore</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2439">https://github.com/ethereum/EIPs/issues/2439</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2017-05-17</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-137">137</a>,
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#resolver-profile">Resolver Profile</a></li>
+<li><a href="#global-keys">Global Keys</a></li>
+<li><a href="#service-keys">Service Keys</a></li>
+<li><a href="#legacy-keys">Legacy Keys</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#application-specific-vs-general-purpose-record-types">Application-specific vs general-purpose record types</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP defines a resolver profile for ENS that permits the lookup of arbitrary key-value
+text data. This allows ENS name holders to associate e-mail addresses, URLs and other
+informational data with a ENS name.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There is often a desire for human-readable metadata to be associated with otherwise
+machine-driven data; used for debugging, maintenance, reporting and general information.</p>
+<p>In this EIP we define a simple resolver profile for ENS that permits ENS names to
+associate arbitrary key-value text.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="resolver-profile">
+<a href="#resolver-profile" class="anchor-link"></a> Resolver Profile
+</h3>
+<p>A new resolver interface is defined, consisting of the following method:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">IERC634</span> <span class="p">{</span>
+  <span class="c1">/// @notice Returns the text data associated with a key for an ENS name
+</span>  <span class="c1">/// @param node A nodehash for an ENS name
+</span>  <span class="c1">/// @param key A key to lookup text data for
+</span>  <span class="c1">/// @return The text data
+</span>  <span class="k">function</span> <span class="n">text</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">node</span><span class="p">,</span> <span class="kt">string</span> <span class="n">key</span><span class="p">)</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="n">text</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The <a href="/EIPS/eip-165">EIP-165</a> interface ID of this interface is <code class="language-plaintext highlighter-rouge">0x59d1d43c</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">text</code> data may be any arbitrary UTF-8 string. If the key is not present, the empty string
+must be returned.</p>
+<h3 id="global-keys">
+<a href="#global-keys" class="anchor-link"></a> Global Keys
+</h3>
+<p>Global Keys must be made up of lowercase letters, numbers and
+the hyphen (-).</p>
+<ul>
+<li><strong>avatar</strong> - a URL to an image used as an avatar or logo</li>
+<li><strong>description</strong> - A description of the name</li>
+<li><strong>display</strong> - a canonical display name for the ENS name; this MUST match the ENS name when its case is folded, and clients should ignore this value if it does not (e.g. <code class="language-plaintext highlighter-rouge">"ricmoo.eth"</code> could set this to <code class="language-plaintext highlighter-rouge">"RicMoo.eth"</code>)</li>
+<li><strong>email</strong> - an e-mail address</li>
+<li><strong>keywords</strong> - A list of comma-separated keywords, ordered by most significant first; clients that interpresent this field may choose a threshold beyond which to ignore</li>
+<li><strong>mail</strong> - A physical mailing address</li>
+<li><strong>notice</strong> - A notice regarding this name</li>
+<li><strong>location</strong> - A generic location (e.g. <code class="language-plaintext highlighter-rouge">"Toronto, Canada"</code>)</li>
+<li><strong>phone</strong> - A phone number as an E.164 string</li>
+<li><strong>url</strong> - a website URL</li>
+</ul>
+<h3 id="service-keys">
+<a href="#service-keys" class="anchor-link"></a> Service Keys
+</h3>
+<p>Service Keys must be made up of a <em>reverse dot notation</em> for
+a namespace which the service owns, for example, DNS names
+(e.g. <code class="language-plaintext highlighter-rouge">.com</code>, <code class="language-plaintext highlighter-rouge">.io</code>, etc) or ENS name (i.e. <code class="language-plaintext highlighter-rouge">.eth</code>). Service
+Keys must contain at least one dot.</p>
+<p>This allows new services to start using their own keys without
+worrying about colliding with existing services and also means
+new services do not need to update this document.</p>
+<p>The following services are common, which is why recommendations are
+provided here, but ideally a service would declare its own key.</p>
+<ul>
+<li><strong>com.github</strong> - a GitHub username</li>
+<li><strong>com.peepeth</strong> - a Peepeth username</li>
+<li><strong>com.linkedin</strong> - a LinkedIn username</li>
+<li><strong>com.twitter</strong> - a Twitter username</li>
+<li><strong>io.keybase</strong> - a Keybase username</li>
+<li><strong>org.telegram</strong> - a Telegram username</li>
+</ul>
+<p>This technique also allows for a service owner to specify a hierarchy
+for their keys, such as:</p>
+<ul>
+<li><strong>com.example.users</strong></li>
+<li><strong>com.example.groups</strong></li>
+<li><strong>com.example.groups.public</strong></li>
+<li><strong>com.example.groups.private</strong></li>
+</ul>
+<h3 id="legacy-keys">
+<a href="#legacy-keys" class="anchor-link"></a> Legacy Keys
+</h3>
+<p>The following keys were specified in earlier versions of this EIP,
+which is still in draft.</p>
+<p>Their use is not likely very wide, but applications attempting
+maximal compatibility may wish to query these keys as a fallback
+if the above replacement keys fail.</p>
+<ul>
+<li><strong>vnd.github</strong> - a GitHub username (renamed to <code class="language-plaintext highlighter-rouge">com.github</code>)</li>
+<li><strong>vnd.peepeth</strong> - a peepeth username (renamced to <code class="language-plaintext highlighter-rouge">com.peepeth</code>)</li>
+<li><strong>vnd.twitter</strong> - a twitter username (renamed to <code class="language-plaintext highlighter-rouge">com.twitter</code>)</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="application-specific-vs-general-purpose-record-types">
+<a href="#application-specific-vs-general-purpose-record-types" class="anchor-link"></a> Application-specific vs general-purpose record types
+</h3>
+<p>Rather than define a large number of specific record types (each for generally human-readable
+data) such as <code class="language-plaintext highlighter-rouge">url</code> and <code class="language-plaintext highlighter-rouge">email</code>, we follow an adapted model of DNS’s <code class="language-plaintext highlighter-rouge">TXT</code> records, which allow
+for a general keys and values, allowing future extension without adjusting the resolver, while
+allowing applications to use custom keys for their own purposes.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Not applicable.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>None.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/ricmoo">Richard Moore</a>, "EIP-634: Storage of text records in ENS [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 634, May 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-634.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-634: Storage of text records in ENS [DRAFT]",
+    "author": "Richard Moore (@ricmoo)",
+    "name": "EIP-634: Storage of text records in ENS [DRAFT]",
+    "dateCreated": "2017-05-17",
+    "datePublished": "2017-05-17",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2439",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2696: JavaScript `request` method RPC transport</title>
+<meta property="og:title" content="EIP-2696: JavaScript `request` method RPC transport" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2696" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2696" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-2696: JavaScript `request` method RPC transport
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2696.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/MicahZoltu">Micah Zoltu</a>, <a href="https://github.com/rekmarks">Erik Marks</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2697">https://github.com/ethereum/EIPs/issues/2697</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-06-04</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#rfc-2119">RFC-2119</a></li>
+<li><a href="#interface">Interface</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#errors">Errors</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard for remote procedure calls between an Ethereum Provider and an Ethereum Client when both are able to interface with each other via a shared JavaScript object.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard provides the description of an object that is made available to JavaScript applications which they can use to communicate with the Ethereum blockchain through. This standard only describes the transport mechanism, it does not specify the payloads that are valid nor does it specify how the client or the provider will discover or agree on payload content.</p>
+<p>How/where this Ethereum object is exposed is left to future standards.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>When working within a JavaScript runtime (such as NodeJS, Electron, Browser, etc.) it may be possible for the runtime or a runtime plugin to inject objects into the runtime. Someone authoring a runtime or a runtime plugin may choose to expose an Ethereum Provider to any JavaScript apps or scripts running within that runtime in order to provide indirect access to an Ethereum-like blockchain and potentially signing tools. In order to achieve maximum compatibility between the provider and the client, a standard is necessary for what the shape of that object is.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="rfc-2119">
+<a href="#rfc-2119" class="anchor-link"></a> RFC-2119
+</h3>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC-2119</a>.</p>
+<h3 id="interface">
+<a href="#interface" class="anchor-link"></a> Interface
+</h3>
+<p>TypeScript interface definition:</p>
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">RequestArguments</span> <span class="p">{</span>
+	<span class="k">readonly</span> <span class="nx">method</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+	<span class="k">readonly</span> <span class="nx">params</span><span class="p">?:</span> <span class="k">readonly</span> <span class="nx">unknown</span><span class="p">[]</span> <span class="o">|</span> <span class="nx">object</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kr">interface</span> <span class="nx">EthereumProvider</span> <span class="p">{</span>
+	<span class="nx">request</span><span class="p">(</span><span class="nx">args</span><span class="p">:</span> <span class="nx">RequestArguments</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">unknown</span><span class="o">&gt;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The Provider <strong>MUST</strong> implement implement a <code class="language-plaintext highlighter-rouge">request</code> method on the exposed <code class="language-plaintext highlighter-rouge">EthereumProvider</code> object. The <code class="language-plaintext highlighter-rouge">request</code> method <strong>MUST</strong> be callable with a single parameter which contains the arguments for the request as defined in the TypeScript <code class="language-plaintext highlighter-rouge">interface</code> above.</p>
+<p>If the Provider supports a JSON-RPC (https://www.jsonrpc.org/specification) request as specified elsewhere, then it <strong>MUST</strong> accept a <code class="language-plaintext highlighter-rouge">request</code> call for that JSON-RPC method with the <code class="language-plaintext highlighter-rouge">RequestArguments.method</code> argument matching the JSON-RPC <code class="language-plaintext highlighter-rouge">method</code> string for the RPC call and the <code class="language-plaintext highlighter-rouge">RequestArguments.params</code> matching the <code class="language-plaintext highlighter-rouge">params</code> object of the RPC call. The <code class="language-plaintext highlighter-rouge">RequestArguments.params</code> should be encoded as a JavaScript object matching the specified JSON-RPC type, not encoded as a JSON string as would normally be the case when transporting JSON-RPC.</p>
+<h4 id="example">
+<a href="#example" class="anchor-link"></a> Example
+</h4>
+<p>If the JSON-RPC request would contain a payload like:</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">{ "jsonrpc": "2.0", "id": 1, "method": "do_work", "params": [ 5, "hello" ] }</span><span class="dl">'</span>
+</code></pre></div></div>
+<p>Then the matching <code class="language-plaintext highlighter-rouge">EthereumProvider.request</code> call would be:</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">declare</span> <span class="kd">const</span> <span class="nx">provider</span><span class="p">:</span> <span class="nx">EthereumProvider</span>
+<span class="nx">provider</span><span class="p">.</span><span class="nx">request</span><span class="p">({</span> <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">method</span><span class="dl">'</span><span class="p">,</span> <span class="na">params</span><span class="p">:</span> <span class="p">[</span> <span class="mi">5</span><span class="p">,</span> <span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span> <span class="p">]</span> <span class="p">})</span>
+</code></pre></div></div>
+<h3 id="results">
+<a href="#results" class="anchor-link"></a> Results
+</h3>
+<p>If the Provider supports a JSON-RPC request as specified elsewhere, then it <strong>MUST</strong> return an object that matches the expected <code class="language-plaintext highlighter-rouge">result</code> definition for the associated JSON-RPC request.</p>
+<h4 id="example-1">
+<a href="#example-1" class="anchor-link"></a> Example
+</h4>
+<p>If the JSON-RPC response would contain a payload like:</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="dl">'</span><span class="s1">{ "jsonrpc": "2.0", "id": 1, "result": { "color": "red", "value": 5 } }</span><span class="dl">'</span>
+</code></pre></div></div>
+<p>Then the matching <code class="language-plaintext highlighter-rouge">EthereumProvider.request</code> response would be:</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span> <span class="nl">color</span><span class="p">:</span> <span class="dl">'</span><span class="s1">red</span><span class="dl">'</span><span class="p">,</span> <span class="nx">value</span><span class="p">:</span> <span class="mi">5</span> <span class="p">}</span>
+</code></pre></div></div>
+<h3 id="errors">
+<a href="#errors" class="anchor-link"></a> Errors
+</h3>
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">ProviderRpcError</span> <span class="kd">extends</span> <span class="nb">Error</span> <span class="p">{</span>
+	<span class="nl">message</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+	<span class="nl">code</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+	<span class="nl">data</span><span class="p">?:</span> <span class="nx">unknown</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<table>
+<thead>
+<tr>
+<th>code</th>
+<th>message</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4001</td>
+<td>User Rejected Request</td>
+<td>The user rejected the request.</td>
+</tr>
+<tr>
+<td>4100</td>
+<td>Unauthorized</td>
+<td>The requested method and/or account has not been authorized by the user.</td>
+</tr>
+<tr>
+<td>4200</td>
+<td>Unsupported Method</td>
+<td>The Provider does not support the requested method.</td>
+</tr>
+<tr>
+<td>4900</td>
+<td>Disconnected</td>
+<td>The Provider is disconnected from all chains.</td>
+</tr>
+<tr>
+<td>4901</td>
+<td>Chain Disconnected</td>
+<td>The Provider is not connected to the requested chain.</td>
+</tr>
+</tbody>
+</table>
+<p>If the Provider is unable to fulfill a request for any reason, it <strong>MUST</strong> resolve the promise as an error. The resolved error <strong>MUST</strong> be shaped as a <code class="language-plaintext highlighter-rouge">ProviderRpcError</code> defined above whenever possible. <em>While it is impossible to guaranteed that a JavaScript application will never throw an out of memory or stack overflow error, care should be taken to ensure that promise rejections conform to the above shape whenever possible.</em></p>
+<p>If a <code class="language-plaintext highlighter-rouge">code</code> is provided that is listed in the list above, or in the JSON-RPC specification (https://www.jsonrpc.org/specification#error_object), or in the associated JSON-RPC request standard being followed, then the error reason <strong>MUST</strong> align with the established meaning of that code and the <code class="language-plaintext highlighter-rouge">message</code> <strong>MUST</strong> match the provided <code class="language-plaintext highlighter-rouge">message</code></p>
+<p>The <code class="language-plaintext highlighter-rouge">data</code> field <strong>MAY</strong> contain any data that is relevant to the error or would help the user understand or troubleshoot the error.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>While this standard is perhaps not the greatest mechanism for communicating between an application and a blockchain, it is closely aligned with established practices within the community so migration from existing systems to this one should be relatively easy. Most communication is currently done via JSON-RPC, so aligning with the JSON-RPC standard was desired to enable quick integration with existing systems.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The relationship between Ethereum Provider and client is a trusted one, where it is assumed that the user implicitly trusts the Ethereum Provider which is how it managed to get injected into the client, or the client expressly pulled in a connection to it.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/MicahZoltu">Micah Zoltu</a>, <a href="https://github.com/rekmarks">Erik Marks</a>, "EIP-2696: JavaScript `request` method RPC transport," <em>Ethereum Improvement Proposals</em>, no. 2696, June 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2696.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2696: JavaScript `request` method RPC transport",
+    "author": "Micah Zoltu (@MicahZoltu), Erik Marks (@rekmarks)",
+    "name": "EIP-2696: JavaScript `request` method RPC transport",
+    "dateCreated": "2020-06-04",
+    "datePublished": "2020-06-04",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2697",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

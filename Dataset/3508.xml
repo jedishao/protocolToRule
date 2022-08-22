@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3508: Transaction Data Opcodes</title>
+<meta property="og:title" content="EIP-3508: Transaction Data Opcodes" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3508" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3508" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3508: Transaction Data Opcodes
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3508.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/alex-ppg">Alex Papageorgiou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-draft-transaction-data-opcodes/6017">https://ethereum-magicians.org/t/eip-draft-transaction-data-opcodes/6017</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-04-16</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#origindataload-0x47-origindatasize-0x48-and-origindatacopy-0x49">ORIGINDATALOAD (0x47), ORIGINDATASIZE (0x48) and ORIGINDATACOPY (0x49)</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#authcall-0xf7-interaction">AUTHCALL (0xf7) Interaction</a></li>
+<li><a href="#naming-conventions">Naming Conventions</a></li>
+<li><a href="#instruction-address-space">Instruction Address Space</a></li>
+<li><a href="#gas-costs">Gas Costs</a></li>
+<li><a href="#instruction-space-pollution">Instruction Space Pollution</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#introspective-contracts">Introspective Contracts</a></li>
+<li><a href="#denial-of-service-attack">Denial-of-Service Attack</a></li>
+<li><a href="#multi-contract-system-gas-reduction">Multi-Contract System Gas Reduction</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Provide access to original transaction data.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP introduces the following three EVM instructions: <code class="language-plaintext highlighter-rouge">ORIGINDATALOAD</code>, <code class="language-plaintext highlighter-rouge">ORIGINDATASIZE</code>, and <code class="language-plaintext highlighter-rouge">ORIGINDATACOPY</code>.</p>
+<p>These three instructions are meant to provide access to the original transaction’s <code class="language-plaintext highlighter-rouge">data</code> payload, enabling a gas-efficient way of accessing large data payloads in cross-contract calls.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>As the Ethereum development scene matures, more ambitious and complex features are introduced into smart contracts more often than not requiring the utilization of complex and at times large data structures. Given the inherent limits of the EVM, however, transporting large data structures in between contracts is a costly task that can at times lead to even futile scenarios whereby the gas consumption of such an operation is impossible to execute within the gas limit bounds as well as without sacrificing a large chunk of ETH to facilitate its gas cost.</p>
+<p>The purpose of this EIP is to render these features viable by introducing a way via which multi-contract systems are able to access the same in-memory data source without necessarily transmitting the full payload between them.</p>
+<p>This EIP enables elaborate smart contract features to become part of a larger call-chain by efficiently reading data from the original transaction payload rather than requiring the data to be passed in as call-level data. Its inclusion will mainly benefit advanced trustless schemes to manifest, such as efficient verification of Merkle Patricia trees validating the storage value of a particular Ethereum block or EVM-based layer 2 solutions.</p>
+<p>A side-effect of this change is that smart contract systems relying entirely on origin data inherently guarantee that the data they receive has not been malformed by an intermediate smart contract call.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="origindataload-0x47-origindatasize-0x48-and-origindatacopy-0x49">
+<a href="#origindataload-0x47-origindatasize-0x48-and-origindatacopy-0x49" class="anchor-link"></a> ORIGINDATALOAD (<code class="language-plaintext highlighter-rouge">0x47</code>), ORIGINDATASIZE (<code class="language-plaintext highlighter-rouge">0x48</code>) and ORIGINDATACOPY (<code class="language-plaintext highlighter-rouge">0x49</code>)
+</h3>
+<p>These instructions are meant to operate similarly to their call-prefixed counterparts with the exception that they instead operate on the original <code class="language-plaintext highlighter-rouge">data</code> of a transaction instead of the current call’s data. In detail:</p>
+<ul>
+<li>ORIGINDATALOAD (<code class="language-plaintext highlighter-rouge">0x47</code>) performs similarly to CALLDATALOAD (<code class="language-plaintext highlighter-rouge">0x35</code>)</li>
+<li>ORIGINDATASIZE (<code class="language-plaintext highlighter-rouge">0x48</code>) performs similarly to CALLDATASIZE (<code class="language-plaintext highlighter-rouge">0x36</code>)</li>
+<li>ORIGINDATACOPY (<code class="language-plaintext highlighter-rouge">0x49</code>) performs similarly to CALLDATACOPY (<code class="language-plaintext highlighter-rouge">0x37</code>)</li>
+</ul>
+<p>As the data is retrieved once again from the execution environment, the costs for the three instructions will be <code class="language-plaintext highlighter-rouge">G_verylow</code>, <code class="language-plaintext highlighter-rouge">G_base</code> and <code class="language-plaintext highlighter-rouge">G_base + G_verylow * (number of words copied, rounded up)</code> respectively.</p>
+<p>The transaction data the <code class="language-plaintext highlighter-rouge">ORIGINDATA*</code> opcodes operate on will be equivalent to the <code class="language-plaintext highlighter-rouge">calldata</code> specified in the <code class="language-plaintext highlighter-rouge">args*</code> parameter to the nearest <code class="language-plaintext highlighter-rouge">AUTHCALL</code> (<code class="language-plaintext highlighter-rouge">0xf7</code>) up the stack. If there is no <code class="language-plaintext highlighter-rouge">AUTHCALL</code> in the stack then <code class="language-plaintext highlighter-rouge">ORIGINDATA*</code> will operate on the transaction’s original <code class="language-plaintext highlighter-rouge">data</code> field.</p>
+<p>This interaction ensures full compatibility with <a href="/EIPS/eip-3074">EIP-3074</a> and ensures that no form of discrimination is introduced back into the system by this EIP e.g. by contracts entirely relying on <code class="language-plaintext highlighter-rouge">ORIGINDATA*</code> and thus allowing only EOAs to supply data to them.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="authcall-0xf7-interaction">
+<a href="#authcall-0xf7-interaction" class="anchor-link"></a> AUTHCALL (<code class="language-plaintext highlighter-rouge">0xf7</code>) Interaction
+</h3>
+<p>The <a href="/EIPS/eip-3074">EIP-3074</a> that will be part of the London fork has introduced a new call instruction called <code class="language-plaintext highlighter-rouge">AUTHCALL</code> (<code class="language-plaintext highlighter-rouge">0xf7</code>) that will replace a transaction’s <code class="language-plaintext highlighter-rouge">ORIGIN</code> (<code class="language-plaintext highlighter-rouge">0x32</code>) with the context variable <code class="language-plaintext highlighter-rouge">authorized</code>. The intention of <code class="language-plaintext highlighter-rouge">AUTHCALL</code> is to prevent discrimination between smart contracts and EOAs which <code class="language-plaintext highlighter-rouge">ORIGIN</code> initially facilitated and as a result, it is sensible also replace the values retrieved by the <code class="language-plaintext highlighter-rouge">ORIGINDATA*</code> opcodes to the ones used in the <code class="language-plaintext highlighter-rouge">AUTHCALL</code>.</p>
+<h3 id="naming-conventions">
+<a href="#naming-conventions" class="anchor-link"></a> Naming Conventions
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">ORIGIN</code>-prefixed instructions attempted to conform to the existing naming convention of <code class="language-plaintext highlighter-rouge">CALL</code>-prefixed instructions given the existence of the <code class="language-plaintext highlighter-rouge">ORIGIN</code> (<code class="language-plaintext highlighter-rouge">0x32</code>) instruction which is equivalent to the <code class="language-plaintext highlighter-rouge">CALLER</code> (<code class="language-plaintext highlighter-rouge">0x33</code>) instruction but on the original transaction’s context.</p>
+<h3 id="instruction-address-space">
+<a href="#instruction-address-space" class="anchor-link"></a> Instruction Address Space
+</h3>
+<p>The instruction address space of the <code class="language-plaintext highlighter-rouge">0x30-0x3f</code> has been exhausted by calls that already provide information about the execution context of a call so a new range had to be identified that is suitable for the purposes of the EIP.</p>
+<p>Given that the <a href="/EIPS/eip-1344">EIP-1344</a> <code class="language-plaintext highlighter-rouge">CHAINID</code> opcode was included at <code class="language-plaintext highlighter-rouge">0x46</code>, it made sense to include additional transaction-related data beyond it since the Chain ID is also included in transaction payloads apart from the blocks themselves, rendering the <code class="language-plaintext highlighter-rouge">0x46-0x4f</code> address space reserved for more transaction-related data that may be necessary in the future, such as the EOA’s nonce.</p>
+<h3 id="gas-costs">
+<a href="#gas-costs" class="anchor-link"></a> Gas Costs
+</h3>
+<p>The opcodes ORIGINDATALOAD (<code class="language-plaintext highlighter-rouge">0x47</code>), ORIGINDATASIZE (<code class="language-plaintext highlighter-rouge">0x48</code>), and ORIGINDATACOPY (<code class="language-plaintext highlighter-rouge">0x49</code>) essentially perform the same thing as opcodes CALLDATALOAD (<code class="language-plaintext highlighter-rouge">0x35</code>), CALLDATASIZE (<code class="language-plaintext highlighter-rouge">0x36</code>), and CALLDATACOPY (<code class="language-plaintext highlighter-rouge">0x37</code>) respectively and thus share the exact same gas costs.</p>
+<h3 id="instruction-space-pollution">
+<a href="#instruction-space-pollution" class="anchor-link"></a> Instruction Space Pollution
+</h3>
+<p>One can argue that multiple new EVM instructions pollute the EVM instruction address space and could cause issues in assigning sensible instruction codes to future instructions. This particular issue was assessed and a methodology via which the raw RLP encoded transaction may be accessible to the EVM was ideated. This would <em>future-proof</em> the new instruction set as it would be usable for other members of the transaction that may be desired to be accessible on-chain in the future, however, it would also cause a redundancy in the <code class="language-plaintext highlighter-rouge">ORIGIN</code> opcode.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The EIP does not alter or adjust existing functionality provided by the EVM and as such, no known issues exist.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TODO.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="introspective-contracts">
+<a href="#introspective-contracts" class="anchor-link"></a> Introspective Contracts
+</h3>
+<p>Atomically, the <code class="language-plaintext highlighter-rouge">ORIGINDATALOAD</code> and <code class="language-plaintext highlighter-rouge">ORIGINDATACOPY</code> values should be considered insecure as they can easily be spoofed by creating an entry smart contract with the appropriate function signature and arguments that consequently invokes other contracts within the call chain. In brief, one should always assume that <code class="language-plaintext highlighter-rouge">tx.data != calldata</code> and these instructions should not be used as an introspection tool alone.</p>
+<h3 id="denial-of-service-attack">
+<a href="#denial-of-service-attack" class="anchor-link"></a> Denial-of-Service Attack
+</h3>
+<p>An initial concern that may arise from this EIP is the additional contextual data that must be provided at the software level of nodes to the EVM in order for it to be able to access the necessary data via the <code class="language-plaintext highlighter-rouge">ORIGINDATALOAD</code> and <code class="language-plaintext highlighter-rouge">ORIGINDATACOPY</code> instructions.</p>
+<p>This would lead to an increase in memory consumption, however, this increase should be negligible if at all existent given that the data of a transaction should already exist in memory as part of its execution process; a step in the overall inclusion of a transaction within a block.</p>
+<h3 id="multi-contract-system-gas-reduction">
+<a href="#multi-contract-system-gas-reduction" class="anchor-link"></a> Multi-Contract System Gas Reduction
+</h3>
+<p>Given that most complex smart contract systems deployed on Ethereum today rely on cross-contract interactions whereby values are passed from one contract to another via function calls, the <code class="language-plaintext highlighter-rouge">ORIGIN</code>-prefixed instruction set would enable a way for smart contract systems to acquire access to the original transaction data at any given step in the call chain execution which could result in cross-contract calls ultimately consuming less gas if the data passed between them is reduced as a side-effect of this change.</p>
+<p>The gas reduction, however, would be an implementation-based optimization that would also be solely applicable for rudimentary memory arguments rather than storage-based data, the latter of which is most commonly utilized in these types of calls. As a result, the overall gas reduction observed by this change will be negligible for most implementations.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/alex-ppg">Alex Papageorgiou</a>, "EIP-3508: Transaction Data Opcodes [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3508, April 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3508.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3508: Transaction Data Opcodes [DRAFT]",
+    "author": "Alex Papageorgiou (@alex-ppg)",
+    "name": "EIP-3508: Transaction Data Opcodes [DRAFT]",
+    "dateCreated": "2021-04-16",
+    "datePublished": "2021-04-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-draft-transaction-data-opcodes/6017",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+
+</footer>
+</body>
+</html>

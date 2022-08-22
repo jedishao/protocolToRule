@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1132: Extending ERC20 with token locking capability</title>
+<meta property="og:title" content="EIP-1132: Extending ERC20 with token locking capability" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1132" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1132" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1132: Extending ERC20 with token locking capability
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1132.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#2f41465b46444e6f4840594d43404c445c014640">nitika-goel</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1132">https://github.com/ethereum/EIPs/issues/1132</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-06-03</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#locking-of-tokens">Locking of tokens</a></li>
+<li><a href="#fetching-number-of-tokens-locked-under-each-utility">Fetching number of tokens locked under each utility</a></li>
+<li><a href="#fetching-number-of-tokens-locked-under-each-utility-at-a-future-timestamp">Fetching number of tokens locked under each utility at a future timestamp</a></li>
+<li><a href="#fetching-number-of-tokens-held-by-an-address">Fetching number of tokens held by an address</a></li>
+<li><a href="#extending-lock-period">Extending lock period</a></li>
+<li><a href="#increasing-number-of-tokens-locked">Increasing number of tokens locked</a></li>
+<li><a href="#fetching-number-of-unlockable-tokens-under-each-utility">Fetching number of unlockable tokens under each utility</a></li>
+<li><a href="#fetching-number-of-unlockable-tokens">Fetching number of unlockable tokens</a></li>
+<li><a href="#unlocking-tokens">Unlocking tokens</a></li>
+<li><a href="#lock-event-recorded-in-the-token-contract">Lock event recorded in the token contract</a></li>
+<li><a href="#unlock-event-recorded-in-the-token-contract">Unlock event recorded in the token contract</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>An extension to the ERC20 standard with methods for time-locking of tokens within a contract.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal provides basic functionality to time-lock tokens within an ERC20 smart contract for multiple utilities without the need of transferring tokens to an external escrow smart contract. It also allows fetching balance of locked and transferable tokens.</p>
+<p>Time-locking can also be achieved via staking (#900), but that requires transfer of tokens to an escrow contract / stake manager, resulting in the following six concerns:</p>
+<ol>
+<li>additional trust on escrow contract / stake manager</li>
+<li>additional approval process for token transfer</li>
+<li>increased ops costs due to gas requirements in transfers</li>
+<li>tough user experience as the user needs to claim the amount back from external escrows</li>
+<li>inability for the user to track their true token balance / token activity</li>
+<li>inability for the user to utilize their locked tokens within the token ecosystem.</li>
+</ol>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>dApps often require tokens to be time-locked against transfers for letting members 1) adhere to vesting schedules and 2) show skin in the game to comply with the underlying business process. I realized this need while building Nexus Mutual and GovBlocks.</p>
+<p>In <a href="https://nexusmutual.io">Nexus Mutual</a>, claim assessors are required to lock their tokens before passing a vote for claims assessment. This is important as it ensures assessors’ skin in the game. The need here was that once a claim assessor locks his tokens for ‘n’ days, he should be able to cast multiple votes during that period of ‘n’ days, which is not feasible with staking mechanism. There are other scenarios like skills/identity verification or participation in gamified token curated registries where time-locked tokens are required as well.</p>
+<p>In <a href="https://govblocks.io">GovBlocks</a>, I wanted to allow dApps to lock member tokens for governance, while still allowing members to use those locked tokens for other activities within the dApp business. This is also the case with DGX governance model where they’ve proposed quarterly token locking for participation in governance activities of DGX.</p>
+<p>In addition to locking functionality, I have proposed a <code class="language-plaintext highlighter-rouge">Lock()</code> and <code class="language-plaintext highlighter-rouge">Unlock()</code> event, just like the <code class="language-plaintext highlighter-rouge">Transfer()</code> event , to track token lock and unlock status. From token holder’s perspective, it gets tough to manage token holdings if certain tokens are transferred to another account for locking, because whenever <code class="language-plaintext highlighter-rouge">balanceOf()</code> queries are triggered on token holder’s account – the result does not include locked tokens. A <code class="language-plaintext highlighter-rouge">totalBalanceOf()</code> function intends to solve this problem.</p>
+<p>The intention with this proposal is to enhance the ERC20 standard with token-locking capability so that dApps can time-lock tokens of the members without having to transfer tokens to an escrow / stake manager and at the same time allow members to use the locked tokens for multiple utilities.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>I’ve extended the ERC20 interface with the following enhancements:</p>
+<h3 id="locking-of-tokens">
+<a href="#locking-of-tokens" class="anchor-link"></a> Locking of tokens
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Locks a specified amount of tokens against an address,
+  *      for a specified reason and time
+  * @param _reason The reason to lock tokens
+  * @param _amount Number of tokens to be locked
+  * @param _time Lock time in seconds
+  */</span>
+<span class="k">function</span> <span class="n">lock</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_reason</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_amount</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_time</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="fetching-number-of-tokens-locked-under-each-utility">
+<a href="#fetching-number-of-tokens-locked-under-each-utility" class="anchor-link"></a> Fetching number of tokens locked under each utility
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Returns tokens locked for a specified address for a
+  *      specified reason
+  *
+  * @param _of The address whose tokens are locked
+  * @param _reason The reason to query the lock tokens for
+  */</span>
+   <span class="n">tokensLocked</span><span class="p">(</span><span class="kt">address</span> <span class="n">_of</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_reason</span><span class="p">)</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="fetching-number-of-tokens-locked-under-each-utility-at-a-future-timestamp">
+<a href="#fetching-number-of-tokens-locked-under-each-utility-at-a-future-timestamp" class="anchor-link"></a> Fetching number of tokens locked under each utility at a future timestamp
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Returns tokens locked for a specified address for a
+  *      specified reason at a specific time
+  *
+  * @param _of The address whose tokens are locked
+  * @param _reason The reason to query the lock tokens for
+  * @param _time The timestamp to query the lock tokens for
+  */</span>
+  <span class="k">function</span> <span class="n">tokensLockedAtTime</span><span class="p">(</span><span class="kt">address</span> <span class="n">_of</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_reason</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_time</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="fetching-number-of-tokens-held-by-an-address">
+<a href="#fetching-number-of-tokens-held-by-an-address" class="anchor-link"></a> Fetching number of tokens held by an address
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev @dev Returns total tokens held by an address (locked + transferable)
+  * @param _of The address to query the total balance of
+  */</span>
+<span class="k">function</span> <span class="n">totalBalanceOf</span><span class="p">(</span><span class="kt">address</span> <span class="n">_of</span><span class="p">)</span>  <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="extending-lock-period">
+<a href="#extending-lock-period" class="anchor-link"></a> Extending lock period
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Extends lock for a specified reason and time
+  * @param _reason The reason to lock tokens
+  * @param _time Lock extension time in seconds
+  */</span>
+  <span class="k">function</span> <span class="n">extendLock</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_reason</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_time</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="increasing-number-of-tokens-locked">
+<a href="#increasing-number-of-tokens-locked" class="anchor-link"></a> Increasing number of tokens locked
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Increase number of tokens locked for a specified reason
+  * @param _reason The reason to lock tokens
+  * @param _amount Number of tokens to be increased
+  */</span>
+  <span class="k">function</span> <span class="n">increaseLockAmount</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_reason</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_amount</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="fetching-number-of-unlockable-tokens-under-each-utility">
+<a href="#fetching-number-of-unlockable-tokens-under-each-utility" class="anchor-link"></a> Fetching number of unlockable tokens under each utility
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Returns unlockable tokens for a specified address for a specified reason
+  * @param _of The address to query the the unlockable token count of
+  * @param _reason The reason to query the unlockable tokens for
+  */</span>
+  <span class="k">function</span> <span class="n">tokensUnlockable</span><span class="p">(</span><span class="kt">address</span> <span class="n">_of</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_reason</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">amount</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="fetching-number-of-unlockable-tokens">
+<a href="#fetching-number-of-unlockable-tokens" class="anchor-link"></a> Fetching number of unlockable tokens
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Gets the unlockable tokens of a specified address
+  * @param _of The address to query the the unlockable token count of
+  */</span>
+  <span class="k">function</span> <span class="n">getUnlockableTokens</span><span class="p">(</span><span class="kt">address</span> <span class="n">_of</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">unlockableTokens</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="unlocking-tokens">
+<a href="#unlocking-tokens" class="anchor-link"></a> Unlocking tokens
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
+  * @dev Unlocks the unlockable tokens of a specified address
+  * @param _of Address of user, claiming back unlockable tokens
+  */</span>
+  <span class="k">function</span> <span class="n">unlock</span><span class="p">(</span><span class="kt">address</span> <span class="n">_of</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">unlockableTokens</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="lock-event-recorded-in-the-token-contract">
+<a href="#lock-event-recorded-in-the-token-contract" class="anchor-link"></a> Lock event recorded in the token contract
+</h3>
+<p><code class="language-plaintext highlighter-rouge">event Locked(address indexed _of, uint256 indexed _reason, uint256 _amount, uint256 _validity)</code></p>
+<h3 id="unlock-event-recorded-in-the-token-contract">
+<a href="#unlock-event-recorded-in-the-token-contract" class="anchor-link"></a> Unlock event recorded in the token contract
+</h3>
+<p><code class="language-plaintext highlighter-rouge">event Unlocked(address indexed _of, uint256 indexed _reason, uint256 _amount)</code></p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Test cases are available at <a href="https://github.com/nitika-goel/lockable-token">https://github.com/nitika-goel/lockable-token</a>.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<ul>
+<li>Complete implementation available at https://github.com/nitika-goel/lockable-token</li>
+<li><a href="https://govblocks.io">GovBlocks</a> Project specific implementation available at https://github.com/somish/govblocks-protocol/blob/Locking/contracts/GBTStandardToken.sol</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#c5abacb1acaea485a2aab3a7a9aaa6aeb6ebacaa">nitika-goel</a>, "EIP-1132: Extending ERC20 with token locking capability [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1132, June 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1132.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1132: Extending ERC20 with token locking capability [DRAFT]",
+    "author": "nitika-goel <nitika@govblocks.io>",
+    "name": "EIP-1132: Extending ERC20 with token locking capability [DRAFT]",
+    "dateCreated": "2018-06-03",
+    "datePublished": "2018-06-03",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1132",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

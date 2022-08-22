@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4750: EOF - Functions</title>
+<meta property="og:title" content="EIP-4750: EOF - Functions" />
+<meta name="description" content="Individual sections for functions with `CALLF` and `RETF` instructions" />
+<meta property="og:description" content="Individual sections for functions with `CALLF` and `RETF` instructions" />
+<meta name="twitter:description" content="Individual sections for functions with `CALLF` and `RETF` instructions" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4750" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4750" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4750: EOF - Functions
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4750.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Individual sections for functions with `CALLF` and `RETF` instructions</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4750-eof-functions/8195">https://ethereum-magicians.org/t/eip-4750-eof-functions/8195</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2022-01-10</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3540">3540</a>,
+<a href="eip-3670">3670</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#eof-container-changes">EOF container changes</a></li>
+<li><a href="#new-execution-state-in-evm">New execution state in EVM</a></li>
+<li><a href="#new-instructions">New instructions</a></li>
+<li><a href="#code-validation">Code Validation</a></li>
+<li><a href="#execution">Execution</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#retf-in-the-top-frame-ends-execution-vs-exceptionally-halts">RETF in the top frame ends execution vs exceptionally halts</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduce the ability to have several code sections in EOF-formatted (<a href="/EIPS/eip-3540">EIP-3540</a>) bytecode, each one representing a separate subroutine/function. Two new opcodes,<code class="language-plaintext highlighter-rouge">CALLF</code> and <code class="language-plaintext highlighter-rouge">RETF</code>, are introduced to call and return from such a function.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Currently in the EVM everything is a dynamic jump. Languages like Solidity generate most jumps in a static manner (i.e. the destination is pushed to the stack right before, <code class="language-plaintext highlighter-rouge">PUSHn .. JUMP</code>). Unfortunately however this cannot be used by most EVM interpreters, because of added requirement of validation/analysis. This also restricts them from making optimisations and potentially reducing the cost of jumps.</p>
+<p><a href="/EIPS/eip-4200">EIP-4200</a> introduces static jump instructions, which remove the need for <em>most</em> dynamic jump use cases, but not everything can be solved with them.</p>
+<p>This EIP aims to remove the need for dynamic jumps as it offers the most important feature those are used for: calling into and returning from functions. While it removes the need, it does not disallow those instructions.</p>
+<p>Furthermore it aims to improve analysis opportunities by encoding the number of inputs and outputs for each given function, and isolating the stack of each function (i.e. a function cannot read the stack of the caller/callee).</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="eof-container-changes">
+<a href="#eof-container-changes" class="anchor-link"></a> EOF container changes
+</h3>
+<ol>
+<li>The requirement of <a href="/EIPS/eip-3540">EIP-3540</a> “Exactly one code section MUST be present.” is relaxed to “At least one code section MUST be present.”, i.e. multiple code sections (<code class="language-plaintext highlighter-rouge">kind = 1</code>) are allowed.</li>
+<li>Total number of code sections MUST NOT exceed 1024.</li>
+<li>All code sections MUST precede a data section, if data section is present.</li>
+<li>New section with <code class="language-plaintext highlighter-rouge">kind = 3</code> is introduced called the <em>type section</em>.</li>
+<li>Exactly one type section MAY be present.</li>
+<li>The type section, if present, MUST directly precede all code sections.</li>
+<li>The type section, if present, contains a sequence of pairs of bytes: first byte in a pair encodes number of inputs, and second byte encodes number of outputs of the code section with the same index. <em>Note:</em> This implies that there is a limit of 256 stack for the input and in the output.</li>
+<li>Therefore type section size MUST be <code class="language-plaintext highlighter-rouge">n * 2</code> bytes, where <code class="language-plaintext highlighter-rouge">n</code> is the number of code sections.</li>
+<li>First code section MUST have 0 inputs and 0 outputs.</li>
+<li>Type section MAY be omitted if only a single code
+section is present. In that case it implicitly defines 0 inputs and 0 outputs for this code section.</li>
+</ol>
+<p>To summarize, a well-formed EOF bytecode will have the following format:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bytecode := magic, version, [type_section_header], (code_section_header)+, [data_section_header], 0, [type_section_contents], (code_section_contents)+, [data_section_contents]
+
+type_section_header := 3, number_of_code_sections * 2 # section kind and size
+type_section_contents := 0, 0, code_section_1_inputs, code_section_1_outputs, code_section_2_inputs, code_section_2_outputs, ..., code_section_n_inputs, code_section_n_outputs
+</code></pre></div></div>
+<h3 id="new-execution-state-in-evm">
+<a href="#new-execution-state-in-evm" class="anchor-link"></a> New execution state in EVM
+</h3>
+<p>A return stack is introduced, separate from the data stack. It is a stack of items representing execution state to return to after function execution is finished. Each item is comprised of: code section index, offset in the code section (PC value), calling function stack height.</p>
+<p>Note: Implementations are free to choose particular encoding for a stack item. In the specification below we assume that representation is three unsigned integers: <code class="language-plaintext highlighter-rouge">code_section_index</code>, <code class="language-plaintext highlighter-rouge">offset</code>, <code class="language-plaintext highlighter-rouge">stack_height</code>.</p>
+<p>The return stack is limited to a maximum 1024 items.</p>
+<p>Additionally, EVM keeps track of the index of currently executing section - <code class="language-plaintext highlighter-rouge">current_section_index</code>.</p>
+<h3 id="new-instructions">
+<a href="#new-instructions" class="anchor-link"></a> New instructions
+</h3>
+<p>We introduce two new instructions:</p>
+<ol>
+<li><code class="language-plaintext highlighter-rouge">CALLF</code> (<code class="language-plaintext highlighter-rouge">0x5e</code>)</li>
+<li><code class="language-plaintext highlighter-rouge">RETF</code> (<code class="language-plaintext highlighter-rouge">0x5f</code>)</li>
+</ol>
+<p>If the code is legacy bytecode, both of these instructions result in an <em>exceptional halt</em>. (<em>Note: This means no change to behaviour.</em>)</p>
+<p>First we define several helper values:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">caller_stack_height = return_stack.top().stack_height</code> - stack height value saved in the top item of return stack</li>
+<li><code class="language-plaintext highlighter-rouge">type[i].inputs = type_section_contents[i * 2]</code> - number of inputs of ith section</li>
+<li><code class="language-plaintext highlighter-rouge">type[i].outputs = type_section_contents[i * 2 + 1]</code> - number of outputs of ith section</li>
+</ul>
+<p>If the code is valid EOF1, the following execution rules apply:</p>
+<h4 id="callf">
+<a href="#callf" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">CALLF</code>
+</h4>
+<ol>
+<li>Has one immediate argument,<code class="language-plaintext highlighter-rouge">code_section_index</code>, encoded as a 16-bit unsigned big-endian value.</li>
+<li>If data stack has less than <code class="language-plaintext highlighter-rouge">caller_stack_height + type[code_section_index].inputs</code>, execution results in exceptional halt.</li>
+<li>If return stack already has <code class="language-plaintext highlighter-rouge">1024</code> items, execution results in exceptional halt.</li>
+<li>Pops nothing and pushes nothing to data stack.</li>
+<li>Pushes to return stack an item:
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(code_section_index = current_section_index, 
+offset = PC_post_instruction,
+stack_height = data_stack.height - types[code_section_index].inputs)
+</code></pre></div> </div>
+</li>
+</ol>
+<p>Under <code class="language-plaintext highlighter-rouge">PC_post_instruction</code> we mean the PC position after the entire immediate argument of <code class="language-plaintext highlighter-rouge">CALLF</code>. Data stack height is saved as it was before function inputs were pushed.</p>
+<p><em>Note:</em> Code validation rules of <a href="/EIPS/eip-3670">EIP-3670</a> guarantee there is always an instruction following <code class="language-plaintext highlighter-rouge">CALLF</code> (since terminating instruction is required to be final one in the section), therefore <code class="language-plaintext highlighter-rouge">PC_post_instruction</code> always points to an instruction inside section bounds.</p>
+<ol>
+<li>Sets <code class="language-plaintext highlighter-rouge">current_section_index</code> to <code class="language-plaintext highlighter-rouge">code_section_index</code> and <code class="language-plaintext highlighter-rouge">PC</code> to <code class="language-plaintext highlighter-rouge">0</code>, and execution continues in the called section.</li>
+</ol>
+<h4 id="retf">
+<a href="#retf" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">RETF</code>
+</h4>
+<ol>
+<li>Does not have immediate arguments.</li>
+<li>If data stack has less than <code class="language-plaintext highlighter-rouge">caller_stack_height + types[code_section_index].outputs</code>, execution results in exceptional halt.</li>
+<li>Pops nothing and pushes nothing to data stack.</li>
+<li>Pops an item from return stack and sets <code class="language-plaintext highlighter-rouge">current_section_index</code> and <code class="language-plaintext highlighter-rouge">PC</code> to values from this item.
+4.1. If return stack is empty after this, execution halts with success.</li>
+</ol>
+<h3 id="code-validation">
+<a href="#code-validation" class="anchor-link"></a> Code Validation
+</h3>
+<p>In addition to container format validation rules above, we extend code section validation rules (as defined in <a href="/EIPS/eip-3670">EIP-3670</a>).</p>
+<ol>
+<li>Code validation rules of EIP-3670 are applied to every code section.</li>
+<li>List of allowed <em>terminating instructions</em> in EIP-3670 is extended to include <code class="language-plaintext highlighter-rouge">RETF</code>. (<em>Note that <code class="language-plaintext highlighter-rouge">CALLF</code>, like other instructions with immediates, cannot be truncated.</em>)</li>
+<li>Code section is invalid in case an immediate argument of any <code class="language-plaintext highlighter-rouge">CALLF</code> is greater than or equal to the total number of code sections.</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMP</code> and <code class="language-plaintext highlighter-rouge">RJUMPI</code> immediate argument value (jump destination relative offset) validation:
+4.1. Code section is invalid in case offset points to a position outside of section bounds.
+4.2. Code section is invalid in case offset points to one of two bytes directly following <code class="language-plaintext highlighter-rouge">CALLF</code> instruction.</li>
+</ol>
+<h3 id="execution">
+<a href="#execution" class="anchor-link"></a> Execution
+</h3>
+<ol>
+<li>Execution starts at the first byte of the first code section, and PC is set to 0.</li>
+<li>Return stack is initialized to contain one item: <code class="language-plaintext highlighter-rouge">(code_section_index = 0, offset = 0, stack_height = 0)</code></li>
+<li>Destinations of jumps are allowed only to be inside current code section. <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code> result in exceptional halt when destination is outside of current section bounds.</li>
+<li>If any instruction would access a data stack item below <code class="language-plaintext highlighter-rouge">caller_stack_height</code>, execution results in exceptional halt. This rule replaces the old stack underflow check.</li>
+</ol>
+<h4 id="implications-on-the-jumpdest-analysis">
+<a href="#implications-on-the-jumpdest-analysis" class="anchor-link"></a> Implications on the JUMPDEST analysis
+</h4>
+<ul>
+<li>Analysis is done separately for each section, i.e. output of entire analysis is <code class="language-plaintext highlighter-rouge">number_of_code_sections</code> lists of possible jump destinations.</li>
+<li>Analysis is extended to consider 2 bytes directly following <code class="language-plaintext highlighter-rouge">CALLF</code> to be invalid jump destination</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="retf-in-the-top-frame-ends-execution-vs-exceptionally-halts">
+<a href="#retf-in-the-top-frame-ends-execution-vs-exceptionally-halts" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">RETF</code> in the top frame ends execution vs exceptionally halts
+</h3>
+<p>Alternative logic for executing <code class="language-plaintext highlighter-rouge">RETF</code> in the top frame could be to exceptionally halt execution, because there is arguably no caller for the starting function. This would mean that return stack is initialized as empty, and <code class="language-plaintext highlighter-rouge">RETF</code> exceptionally aborts when return stack is empty.</p>
+<p>We have decided in favor of always having at least one item in the return stack, because it allows to avoid having a special case for empty stack in the interpreter loop stack underflow check. We keep the stack underflow rule general by having <code class="language-plaintext highlighter-rouge">caller_stack_height = 0</code> in the top frame.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This change poses no risk to backwards compatibility, as it is introduced only for EOF1 contracts, for which deploying undefined instructions is not allowed, therefore there are no existing contracts using these instructions. The new instructions are not introduced for legacy bytecode (code which is not EOF formatted).</p>
+<p>The new execution state and multi-section control flow pose no risk to backwards compatibility, because it is a generalization of executing a single code section. Executing existing contracts (both legacy and EOF1) has no user-observable changes.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>TBA</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gumb0">Andrei Maiboroda</a>, <a href="https://github.com/axic">Alex Beregszaszi</a>, <a href="https://github.com/chfast">Paweł Bylica</a>, "EIP-4750: EOF - Functions [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4750, January 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4750.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4750: EOF - Functions [DRAFT]",
+    "author": "Andrei Maiboroda (@gumb0), Alex Beregszaszi (@axic), Paweł Bylica (@chfast)",
+    "name": "EIP-4750: EOF - Functions [DRAFT]",
+    "dateCreated": "2022-01-10",
+    "datePublished": "2022-01-10",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4750-eof-functions/8195",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

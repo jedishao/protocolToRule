@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3561: Trust Minimized Upgradeability Proxy</title>
+<meta property="og:title" content="EIP-3561: Trust Minimized Upgradeability Proxy" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3561" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3561" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3561: Trust Minimized Upgradeability Proxy
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3561.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/SamPorter1984">Sam Porter</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/trust-minimized-proxy/5742">https://ethereum-magicians.org/t/trust-minimized-proxy/5742</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-05-09</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#next-logic-contract-address">Next Logic Contract Address</a></li>
+<li><a href="#upgrade-block">Upgrade Block</a></li>
+<li><a href="#propose-block">Propose Block</a></li>
+<li><a href="#deadline-block">Deadline Block</a></li>
+<li><a href="#trust_minimized-boolean">Trust_minimized Boolean</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Additional storage slots for upgradeability proxy to decrease trust in interaction with upgradeable smart contracts.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Removing trust from upgradeability proxy is required for anonymous developers. To achieve that, disallowing sudden, potentially malicious upgrades is required. This EIP introduces a time lock, a period of one month, before defined by proxy admin implementation becomes active implementation.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>It’s usually not possible for anonymous developers who use upgradeability proxies to gain community trust.</p>
+<p>Fairer, better future for humanity absolutely requires some developers to stay anonymous while still attract vital attention to solutions they propose and at the same time leverage the benefits of possible upgradeability. For example, a project like Collateralized Asset Protocol allows to trade stocks and securities on the blockchain in a purely decentralized way making the developers of such projects potentially risking their freedom. Aletheo was born to fight tyranny.</p>
+<p>Extinction is more likely with closed internet borders. As long as internet has eyes everywhere, devastating conventional warfare is less likely to happen regardless of power vacuum or exponential increase in existential threats.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The specification is an addition to the standard <a href="/EIPS/eip-1967">EIP-1967</a> transparent proxy design.
+The specification focuses on the slots it adds. All admin interactions with trust minimized proxy must emit an event to make admin actions trackable, and all admin actions must be guarded with <code class="language-plaintext highlighter-rouge">onlyAdmin()</code> modifier.</p>
+<h3 id="next-logic-contract-address">
+<a href="#next-logic-contract-address" class="anchor-link"></a> Next Logic Contract Address
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0xe8c186b11a4be12af079b0a5c235146db6f3615b2a8b1b47f9bfe3a956337ef9</code> (obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip3561.proxy.next_implementation')) - 1)</code>).
+Logic address must be first defined as next logic, before it can function as actual logic implementation stored in EIP-1967 <code class="language-plaintext highlighter-rouge">IMPLEMENTATION_SLOT</code>.
+Admin interactions with next logic contract address correspond with these methods and events:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// sets next logic contract address and initializes it. Emits NextLogicDefined
+// 0x as calldata is an equivalent of proposeTo()
+</span><span class="k">function</span> <span class="n">proposeToAndCall</span><span class="p">(</span><span class="kt">address</span> <span class="n">implementation</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">data</span><span class="p">)</span> <span class="k">external</span> <span class="n">onlyAdmin</span><span class="p">;</span>
+<span class="c1">// sets the address stored as next implementation as current IMPLEMENTATION_SLOT
+// as soon UPGRADE_BLOCK_SLOT allows
+</span><span class="k">function</span> <span class="n">upgrade</span><span class="p">()</span> <span class="k">external</span> <span class="n">onlyAdmin</span><span class="p">;</span>
+<span class="c1">// cancelling is possible for as long as upgrade() for given next logic was not called
+// emits NextLogicCanceled
+</span><span class="k">function</span> <span class="n">cancelUpgrade</span><span class="p">()</span> <span class="k">external</span> <span class="n">onlyAdmin</span><span class="p">;</span>
+
+<span class="k">event</span> <span class="n">NextLogicDefined</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">nextLogic</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">earliestArrivalBlock</span><span class="p">);</span> <span class="c1">// important to have
+</span><span class="k">event</span> <span class="n">NextLogicCanceled</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">oldLogic</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="upgrade-block">
+<a href="#upgrade-block" class="anchor-link"></a> Upgrade Block
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0xd366e20ef9f21888e3d225d6a18f0bceb0ce0008a1e881be9a0467a0293afc96</code> (obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip3561.proxy.upgrade_block')) - 1)</code>).
+On/after this block next logic contract address can be set to EIP-1967 <code class="language-plaintext highlighter-rouge">IMPLEMENTATION_SLOT</code> or, in other words, start to function as current logic. Updated automatically and is shown as <code class="language-plaintext highlighter-rouge">earliestArrivalBlock</code> in the event <code class="language-plaintext highlighter-rouge">NextLogicDefined</code>.</p>
+<h3 id="propose-block">
+<a href="#propose-block" class="anchor-link"></a> Propose Block
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0x1e166c9744902ecbb9f589bbc9e7da5f078e553ad162c2ee62c71827916db75f</code> (obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip3561.proxy.propose_block')) - 1)</code>).
+Defines after/on which block <em>proposing</em> next logic is possible. Required for convenience, for example can be manually set to a year from given time, so that the users can have peace of mind during the year. Can be set to maximum number to completely seal the code, must not overflow.
+Admin interactions with this slot correspond with this method and event:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">prolongLock</span><span class="p">(</span><span class="kt">uint</span> <span class="n">n</span><span class="p">)</span> <span class="k">external</span> <span class="n">onlyAdmin</span><span class="p">;</span>
+<span class="k">event</span> <span class="n">UpgradesRestrictedUntil</span><span class="p">(</span><span class="kt">uint</span> <span class="n">block</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="deadline-block">
+<a href="#deadline-block" class="anchor-link"></a> Deadline Block
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0x560a0645803da084600e483b1076fd54059fdee9045033b88b51d342faf2b2af</code> (obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip3561.proxy.deadline')) - 1)</code>).
+Defines after/on which block it becomes impossible to upgrade the contract, can be set in constructor if used or can be set many times as long as next value is lower than previous. Required in case of probability that the project development can be compromised, unlike <code class="language-plaintext highlighter-rouge">PROPOSE_BLOCK_SLOT</code>, deadline is less likely to require any urgent transaction like <code class="language-plaintext highlighter-rouge">PROPOSE_BLOCK_SLOT</code>.
+Admin interactions with this slot should correspond with this method and event:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">setDeadline</span><span class="p">(</span><span class="kt">uint</span> <span class="n">block</span><span class="p">)</span> <span class="k">external</span> <span class="n">onlyAdmin</span><span class="p">;</span>
+<span class="k">event</span> <span class="n">DeadlineSet</span><span class="p">(</span><span class="kt">uint</span> <span class="n">block</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="trust_minimized-boolean">
+<a href="#trust_minimized-boolean" class="anchor-link"></a> Trust_minimized Boolean
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0x17dc395ab915c140774b2c05da17fd5b71a2d193e53bc9732d6b62d419a46635</code> (obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip3561.proxy.trust_minimized')) - 1)</code>).
+False by default and can only ever be set true. While it is false, then the proxy operates exactly as standard EIP-1967 transparent proxy, which allows to correct potential mistakes of first deployment. After set to true, all above specification becomes active.
+Admin interactions with this slot should correspond with this method and event:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">removeTrust</span><span class="p">()</span> <span class="k">external</span> <span class="n">onlyAdmin</span><span class="p">;</span>
+<span class="k">event</span> <span class="n">TrustRemoved</span><span class="p">();</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>An argument “just don’t make such contracts upgadeable at all” fails when it comes to complex systems. It might be impossible to model complex systems right on first try.</p>
+<p>A proxy is easily abusable by anonymous soulless scammers without a time delay before an actual upgrade(change of current implementation address) goes live. A time delay is probably unavoidable, even if it means that inexperienced developers might not have confidence using it. Albeit this is a downside of this EIP, it’s a critically important option to have in smart contract development today.</p>
+<p>Propose block adds to convenience if used, so should be kept. An ability to cancel next logic can also be important for the same reason. Deadline block, while can be omitted, can be critically important for some projects, it would be reasonable to rather keep it too. Unless developers always write correct automatic deployment scripts, trustless boolean is required from my own experience, because I once failed to execute 15 deployment steps correctly.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>The following implementation is an example which lacks trustless boolean slot and uses <code class="language-plaintext highlighter-rouge">NEXT_LOGIC_BLOCK_SLOT</code> instead of <code class="language-plaintext highlighter-rouge">UPGRADE_BLOCK_SLOT</code> to get farther slot value: <a href="https://github.com/SamPorter1984/Aletheo/blob/main/contracts/TrustMinimizedProxy.sol">Aletheo repository</a>.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/SamPorter1984">Sam Porter</a>, "EIP-3561: Trust Minimized Upgradeability Proxy [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3561, May 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3561.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3561: Trust Minimized Upgradeability Proxy [DRAFT]",
+    "author": "Sam Porter (@SamPorter1984)",
+    "name": "EIP-3561: Trust Minimized Upgradeability Proxy [DRAFT]",
+    "dateCreated": "2021-05-09",
+    "datePublished": "2021-05-09",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/trust-minimized-proxy/5742",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

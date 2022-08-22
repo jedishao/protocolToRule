@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2844: Add DID related methods to the JSON-RPC</title>
+<meta property="og:title" content="EIP-2844: Add DID related methods to the JSON-RPC" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2844" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2844" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2844: Add DID related methods to the JSON-RPC
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2844.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/oed">Joel Thorstensson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2845">https://github.com/ethereum/EIPs/issues/2845</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-08-01</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#auth">Auth</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#permission-system">Permission system</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Add new methods to the JSON-RPC for signing and decrypting JOSE objects under a new <code class="language-plaintext highlighter-rouge">did_*</code> prefix.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP describes three new methods to add to the JSON-RPC that enables wallets to support <em>Decentralized Identifiers</em> (DIDs) as well as <em>JSON Object Signing and Encryption</em> (JOSE). These standards enables wallets to support data decryption as well as authenticated data, both in standard formats using JOSE. With these new methods apps can request the DID from a users wallet, from which a DID document can be resolved. The DID document contains public keys that can be used for encryption and signature verification. This enables Alice to discover Bobs public keys by only knowing Bobs DID. This EIP does not enforce the user of any particular DID method or JOSE algorithms, wallets are free to implement these however they wish.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There has been one main previous effort (<a href="https://github.com/ethereum/EIPs/issues/130">#130</a>, <a href="https://github.com/ethereum/EIPs/pull/1098">#1098</a>) to add decryption to Ethereum wallets in a standard way. This previous approach used a non standard way to encode and represent data encrypted using <code class="language-plaintext highlighter-rouge">x25519-xsalsa20-poly1305</code>. While this approach does provide a functional way to add encryption support to wallets, it does not take into account similar work that has gone into standardizing the way encrypted data is represented, namely using <a href="https://datatracker.ietf.org/wg/jose/documents/">JOSE</a>. This is a standard from IETF for representing signed and encrypted objects. Another shortcoming of the previous approach is that it’s impossible to retrieve the <code class="language-plaintext highlighter-rouge">x25519</code> public key from another user if only an Ethereum address is known. Public key discoverability is at the core of the work that is happening with the <a href="https://w3c.github.io/did-core">W3C DID standard</a>, where given a DID a document which contains public keys can always be discovered. Implementations of this standard already exist and are adopted within the Ethereum community, e.g. <a href="https://github.com/decentralized-identity/ethr-did-resolver/"><code class="language-plaintext highlighter-rouge">did:ethr</code></a> and <a href="https://github.com/3box/3id-resolver"><code class="language-plaintext highlighter-rouge">did:3</code></a>. Interoperability between JOSE and DIDs <a href="https://github.com/decentralized-identity/did-jwt">already exists</a>, and work is being done to <a href="https://github.com/decentralized-identity/did-jose-extensions">strengthen it</a>. Adding support for JOSE and DIDs will enable Ethereum wallets to support a wide range of new use cases such as more traditional authentication using JWTs, as well as new emerging technologies such as <a href="https://identity.foundation/secure-data-store/">Secure Data Stores</a> and <a href="https://github.com/ipld/specs/pull/269">encrypted data in IPFS</a>.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Three new JSON-RPC methods are specified under the new <code class="language-plaintext highlighter-rouge">did_*</code> prefix.</p>
+<h3 id="auth">
+<a href="#auth" class="anchor-link"></a> Auth
+</h3>
+<p>Authenticate the current rpc connection to the DID methods.</p>
+<p>Prompt the user to give permission to the current connection to access the user DID and the given <code class="language-plaintext highlighter-rouge">paths</code>.</p>
+<h5 id="method">
+<a href="#method" class="anchor-link"></a> Method:
+</h5>
+<p><code class="language-plaintext highlighter-rouge">did_authenticate</code></p>
+<h5 id="params">
+<a href="#params" class="anchor-link"></a> Params:
+</h5>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">nonce</code> - a random string used as a challenge</li>
+<li><code class="language-plaintext highlighter-rouge">aud</code> - the intended audience of the authentication response</li>
+<li><code class="language-plaintext highlighter-rouge">paths</code> - an array of strings</li>
+</ul>
+<h5 id="returns">
+<a href="#returns" class="anchor-link"></a> Returns:
+</h5>
+<p>A JWS with general serialization containing the following properties:</p>
+<ul>
+<li>
+<p><code class="language-plaintext highlighter-rouge">nonce </code> - the random string which was given as a challenge</p>
+</li>
+<li><code class="language-plaintext highlighter-rouge">did</code> - the DID which authentication was given for</li>
+<li><code class="language-plaintext highlighter-rouge">paths</code> - the paths which was given permission for</li>
+<li><code class="language-plaintext highlighter-rouge">exp</code> - a unix timestamp after which the JWS should be considered invalid</li>
+<li><code class="language-plaintext highlighter-rouge">aud</code> - optional audience for the JWS, should match the domain which made the request</li>
+</ul>
+<p>An additional property <code class="language-plaintext highlighter-rouge">kid</code> with the value which represents the DID, and the <code class="language-plaintext highlighter-rouge">keyFragment</code> that was used to sign the JWS should be added to the protected header (<a href="https://github.com/decentralized-identity/did-jose-extensions/issues/2">details</a>).</p>
+<h4 id="createjws">
+<a href="#createjws" class="anchor-link"></a> CreateJWS
+</h4>
+<p>Creates a JSON Web Signature (JWS).</p>
+<p>An additional property <code class="language-plaintext highlighter-rouge">kid</code> with the value which represents the DID, and the <code class="language-plaintext highlighter-rouge">keyFragment</code> that was used to sign the JWS should be added to the protected header (<a href="https://github.com/decentralized-identity/did-jose-extensions/issues/2">details</a>). When <code class="language-plaintext highlighter-rouge">revocable</code> is set to false the JWS signature should not be possible to revoke. For some DID methods like. <code class="language-plaintext highlighter-rouge">did:key</code> this is always the case. For other methods which support key revocation it is necessary to include the <code class="language-plaintext highlighter-rouge">version-id</code> in the <code class="language-plaintext highlighter-rouge">kid</code> to refer to a specific version of the DID document. When <code class="language-plaintext highlighter-rouge">revocable</code> is set to true <code class="language-plaintext highlighter-rouge">version-id</code> must not be included in the <code class="language-plaintext highlighter-rouge">kid</code> for DID methods that support key revocation.</p>
+<h5 id="method-1">
+<a href="#method-1" class="anchor-link"></a> Method:
+</h5>
+<p><code class="language-plaintext highlighter-rouge">did_createJWS</code></p>
+<h5 id="params-1">
+<a href="#params-1" class="anchor-link"></a> Params:
+</h5>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">payload</code> - the payload to sign, json object or <code class="language-plaintext highlighter-rouge">base64url</code> encoded string</li>
+<li><code class="language-plaintext highlighter-rouge">protected</code> - the protected header, json object</li>
+<li><code class="language-plaintext highlighter-rouge">did</code> - the DID that should sign the message, may include the key fragment, string</li>
+<li><code class="language-plaintext highlighter-rouge">revocable</code> - makes the JWS revocable when rotating keys, boolean default to <code class="language-plaintext highlighter-rouge">false</code></li>
+</ul>
+<h5 id="returns-1">
+<a href="#returns-1" class="anchor-link"></a> Returns:
+</h5>
+<p>An object containing a JWS with general serialization on the <code class="language-plaintext highlighter-rouge">jws</code> property.</p>
+<h5 id="recommendation">
+<a href="#recommendation" class="anchor-link"></a> Recommendation:
+</h5>
+<p>Use <code class="language-plaintext highlighter-rouge">secp256k1</code> for signing, alternatively <code class="language-plaintext highlighter-rouge">ed25519</code>.</p>
+<h4 id="decryptjwe">
+<a href="#decryptjwe" class="anchor-link"></a> DecryptJWE
+</h4>
+<p>Decrypt the given JWE.</p>
+<p>If the cleartext object contains a property <code class="language-plaintext highlighter-rouge">paths</code> that contains an array of strings and one of the paths in there are already authenticated using <code class="language-plaintext highlighter-rouge">did_authenticate</code> the decryption should happen without user confirmation.</p>
+<h5 id="method-2">
+<a href="#method-2" class="anchor-link"></a> Method:
+</h5>
+<p><code class="language-plaintext highlighter-rouge">did_decryptJWE</code></p>
+<h5 id="params-2">
+<a href="#params-2" class="anchor-link"></a> Params:
+</h5>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">jwe</code> - a JWE with general serialization, string</li>
+<li><code class="language-plaintext highlighter-rouge">did</code> - the DID that should try to decrypt the JWE, string</li>
+</ul>
+<h5 id="returns-2">
+<a href="#returns-2" class="anchor-link"></a> Returns:
+</h5>
+<p>An object containing the cleartext, encoded using <a href="https://github.com/multiformats/multibase"><code class="language-plaintext highlighter-rouge">base64pad</code></a>, assigned to the <code class="language-plaintext highlighter-rouge">cleartext</code> property.</p>
+<h5 id="recommendation-1">
+<a href="#recommendation-1" class="anchor-link"></a> Recommendation:
+</h5>
+<p>Implement decryption using <code class="language-plaintext highlighter-rouge">xchacha20poly1305</code> and <code class="language-plaintext highlighter-rouge">x25519</code> for key agreement.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This EIP chooses to rely on DIDs and JOSE since there is already support for these standards in many places, by current systems and new systems. By using DIDs and JOSE wallet implementers can also choose which signing and encryption algorithms that they want to support, since these formats are fairly agnostic to specific crypto implementations.</p>
+<h3 id="permission-system">
+<a href="#permission-system" class="anchor-link"></a> Permission system
+</h3>
+<p>A simple permission system is proposed where clients can request permissions though path prefixes, e.g. <code class="language-plaintext highlighter-rouge">/some/permission</code>. When decryption of a JWE is requested the wallet should check if the decrypted payload contains a <code class="language-plaintext highlighter-rouge">paths</code> property. If this property doesn’t exist the user may be prompted to confirm that the given rpc connection (app) is allowed to read the decrypted data. If the <code class="language-plaintext highlighter-rouge">paths</code> property is present in the decrypted data it should contain an array of string paths. If one of the these path prefixes matches with one of the path prefixes the user has already granted permission for then decryption should happen automatically without any user confirmation.</p>
+<p>This simple permission system was inspired by some previous comments (<a href="https://github.com/ethereum/EIPs/issues/130#issuecomment-329770999">1</a>, <a href="https://medium.com/@wighawag/3-proposals-for-making-web3-a-better-experience-974f97765700">2</a>) but avoids data lock in around origins.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p><a href="https://github.com/3box/identity-wallet-js/">IdentityWallet</a>: An implementation of the wallet side <code class="language-plaintext highlighter-rouge">did_*</code> methods using the 3ID DID.</p>
+<p><a href="https://github.com/ceramicnetwork/key-did-provider-ed25519">key-did-provider-ed25519</a>: An implementation of the wallet side <code class="language-plaintext highlighter-rouge">did_*</code> methods using the <code class="language-plaintext highlighter-rouge">did:key</code> method.</p>
+<p><a href="https://github.com/ceramicnetwork/js-did">js-did</a>: A small library which consumes the <code class="language-plaintext highlighter-rouge">did_*</code> methods.</p>
+<p><a href="https://github.com/digitalbazaar/minimal-cipher">MinimalCipher</a>: An implementation of DID related encryption for JWE.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Both JOSE and DIDs are standards that have gone though a lot of scrutiny. Their security will not be considered in this document. In the specification section, recommendations are given for which algorithms to use. For signatures <code class="language-plaintext highlighter-rouge">secp256k1</code> is already used by ethereum and for decryption <code class="language-plaintext highlighter-rouge">xchacha20poly1305</code> is widely available, very performant, and already used in TLS.</p>
+<p>The main security consideration of this EIP is the suggested permission system. Here various threat models could be considered. However, this EIP does not go into details about how it should work other than suggesting an approach. In the end it is up to wallet implementations to choose how to ask their users for consent.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/oed">Joel Thorstensson</a>, "EIP-2844: Add DID related methods to the JSON-RPC [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2844, August 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2844.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2844: Add DID related methods to the JSON-RPC [DRAFT]",
+    "author": "Joel Thorstensson (@oed)",
+    "name": "EIP-2844: Add DID related methods to the JSON-RPC [DRAFT]",
+    "dateCreated": "2020-08-01",
+    "datePublished": "2020-08-01",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2845",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

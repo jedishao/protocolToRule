@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1923: zk-SNARK Verifier Registry Standard</title>
+<meta property="og:title" content="EIP-1923: zk-SNARK Verifier Registry Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1923" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1923" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1923: zk-SNARK Verifier Registry Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1923.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#85e8ece6ede4e0e9abe6eaebebeaf7c5f0eeabe0fcabe6eae8">Michael Connor</a>, <a href="/cdn-cgi/l/email-protection#e18289808895808f9880cf8a8e8f8580a1948acf8498cf828e8c">Chaitanya Konda</a>, <a href="/cdn-cgi/l/email-protection#fc9889929f9d92d28b998f88909d9298bc8997d29985d29f9391">Duncan Westland</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1923">https://github.com/ethereum/EIPs/issues/1923</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-12-22</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>,
+<a href="eip-196">196</a>,
+<a href="eip-197">197</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#interface">Interface</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+</ul>
+</li>
+<li><a href="#implementations">Implementations</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard interface for a “Verifier Registry”’” contract, through which all zk-SNARK verification activity can be registered.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following standard allows for the implementation of a standard contract API for the registration of zk-SNARKs (“Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge”), also known as “proofs”, “arguments”, or “commitments”.</p>
+<p>TODO: Which functionality is exposed in this standard interface?</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>zk-SNARKs are a promising area of interest for the Ethereum community. Key applications of zk-SNARKs include:</p>
+<ul>
+<li>Private transactions</li>
+<li>Private computations</li>
+<li>Ethereum scaling through proofs of ‘bundled’ transactions</li>
+</ul>
+<p>A standard interface for registering all zk-SNARKs will allow applications to more easily implement private transactions, private contracts, and scaling solutions; and to extract and interpret the limited information which gets emitted during zk-SNARK verifications.</p>
+<p>:warning: TODO: Explain the motivation for standardizing a registry, other than simply standardizing the verifier interactions.</p>
+<p>⚠️ TODO: Explain the benefits to and perspective of a consumer of information. I.e. the thing that interfaces with the standard verifier registry.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.5</span><span class="p">.</span><span class="mi">6</span><span class="p">;</span>
+
+<span class="c1">/// @title EIP-XXXX zk-SNARK Verifier Registry Standard
+/// @dev See https://github.com/EYBlockchain/zksnark-verifier-standard
+///  Note: the ERC-165 identifier for this interface is 0xXXXXXXXXX.
+/// ⚠️ TODO: Set the interface identifier
+</span><span class="k">interface</span> <span class="n">EIP</span><span class="o">-</span><span class="n">XXXX</span> <span class="cm">/* is ERC165 */</span> <span class="p">{</span>
+
+  <span class="k">event</span> <span class="n">NewProofSubmitted</span><span class="p">(</span><span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">_proofId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="n">_proof</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">[]</span> <span class="n">_inputs</span><span class="p">);</span>
+
+  <span class="k">event</span> <span class="n">NewVkRegistered</span><span class="p">(</span><span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">_vkId</span><span class="p">);</span>
+
+  <span class="k">event</span> <span class="n">NewVerifierContractRegistered</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">_contractAddress</span><span class="p">);</span>
+
+  <span class="k">event</span> <span class="n">NewAttestation</span><span class="p">(</span><span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">_proofId</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_verifier</span><span class="p">,</span> <span class="kt">bool</span> <span class="k">indexed</span> <span class="n">_result</span><span class="p">);</span>
+
+
+  <span class="k">function</span> <span class="n">getVk</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_vkId</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">registerVerifierContract</span><span class="p">(</span><span class="kt">address</span> <span class="n">_verifierContract</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">registerVk</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_vk</span><span class="p">,</span> <span class="kt">address</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_verifierContracts</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">submitProof</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_proof</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_inputs</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_vkId</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">submitProof</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_proof</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_inputs</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_vkId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_verifierContract</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">submitProofAndVerify</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_proof</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_inputs</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_vkId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_verifierContract</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">attestProof</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_proofId</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_vkId</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_result</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+  <span class="k">function</span> <span class="n">attestProofs</span><span class="p">(</span><span class="kt">bytes32</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_proofIds</span><span class="p">,</span> <span class="kt">bytes32</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_vkIds</span><span class="p">,</span> <span class="kt">bool</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_results</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+  <span class="k">function</span> <span class="n">challengeAttestation</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_proofId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_proof</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">[]</span> <span class="k">calldata</span>  <span class="n">_inputs</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_verifierContract</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+  <span class="k">function</span> <span class="n">createNewVkId</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_vk</span><span class="p">)</span> <span class="k">external</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+  <span class="k">function</span> <span class="n">createNewProofId</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_proof</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_inputs</span><span class="p">)</span> <span class="k">external</span> <span class="k">pure</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="interface">
+<a href="#interface" class="anchor-link"></a> Interface
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">ERC165</span> <span class="p">{</span>
+    <span class="c1">/// @notice Query if a contract implements an interface
+</span>    <span class="c1">/// @param interfaceID The interface identifier, as specified in ERC-165
+</span>    <span class="c1">/// @dev Interface identification is specified in ERC-165. This function
+</span>    <span class="c1">///  uses less than 30,000 gas.
+</span>    <span class="c1">/// @return `true` if the contract implements `interfaceID` and
+</span>    <span class="c1">///  `interfaceID` is not 0xffffffff, `false` otherwise
+</span>    <span class="k">function</span> <span class="n">supportsInterface</span><span class="p">(</span><span class="kt">bytes4</span> <span class="n">interfaceID</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>⚠️ TODO: Add Rationale section.</p>
+<h3 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h3>
+<p>⚠️ TODO: Add Backwards Compatibility section.</p>
+<h3 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h3>
+<p>Truffle tests of example implementations are included in this Repo.</p>
+<p>⚠️ TODO: Reference specific test cases because there are many currently in the repository.</p>
+<h2 id="implementations">
+<a href="#implementations" class="anchor-link"></a> Implementations
+</h2>
+<p>Detailed example implementations and Truffle tests of these example implementations are included in this Repo.</p>
+<p>⚠️ TODO: Update referenced verifier registry implementations so that they are ready-to-deploy or reference deployed versions of those implementations. At current, the referenced code specifically states “DO NOT USE THIS IN PRODUCTION”.</p>
+<p>⚠️ TODO: Provide reference to an implementation which interrogates a standard verifier registry contract that implements this standard.</p>
+<h2 id="references">
+<a href="#references" class="anchor-link"></a> References
+</h2>
+<p>⚠️ TODO: Update references and confirm that each reference is cited (parenthetical documentation not necessary) in the text.</p>
+<p><strong>Standards</strong></p>
+<ol>
+<li>
+<p>ERC-20 Token Standard. ./eip-20.md</p>
+</li>
+<li>ERC-165 Standard Interface Detection. ./eip-165.md</li>
+<li>ERC-173 Contract Ownership Standard (DRAFT). ./eip-173.md</li>
+<li>ERC-196 Precompiled contracts for addition and scalar multiplication on the elliptic curve alt_bn128. ./eip-196.md</li>
+<li>ERC-197 Precompiled contracts for optimal ate pairing check on the elliptic curve alt_bn128. ./eip-197.md</li>
+<li>Ethereum Name Service (ENS). https://ens.domains</li>
+<li>RFC 2119 Key words for use in RFCs to Indicate Requirement Levels. https://www.ietf.org/rfc/rfc2119.txt</li>
+</ol>
+<h5 id="educational-material--zk-snarks">
+<a href="#educational-material--zk-snarks" class="anchor-link"></a> Educational material: zk-SNARKs
+</h5>
+<ol>
+<li>Zcash. What are zk-SNARKs? https://z.cash/technology/zksnarks.html</li>
+<li>Vitalik Buterin. zk-SNARKs: Under the Hood. https://medium.com/@VitalikButerin/zk-snarks-under-the-hood-b33151a013f6</li>
+<li>Christian Reitweissner. zk-SNARKs in a Nutshell. https://blog.ethereum.org/2016/12/05/zksnarks-in-a-nutshell/</li>
+<li>Ben-Sasson, Chiesa, Tromer, et. al. Succinct Non-Interactive Zero Knowledge for a von Neumann Architecture. https://eprint.iacr.org/2013/879.pdf</li>
+</ol>
+<h5 id="notable-applications-of-zk-snarks">
+<a href="#notable-applications-of-zk-snarks" class="anchor-link"></a> Notable applications of zk-SNARKs
+</h5>
+<ol>
+<li>EY. Implementation of a business agreement through Token Commitment transactions on the Ethereum mainnet. https://github.com/EYBlockchain/ZKPChallenge</li>
+<li>Zcash. https://z.cash</li>
+<li>Zcash. How Transactions Between Shielded Addresses Work. https://blog.z.cash/zcash-private-transactions/</li>
+</ol>
+<h5 id="notable-projects-relating-to-zk-snarks">
+<a href="#notable-projects-relating-to-zk-snarks" class="anchor-link"></a> Notable projects relating to zk-SNARKs
+</h5>
+<ol>
+<li>libsnark: A C++ Library for zk-SNARKs (“project README)”. https://github.com/scipr-lab/libsnark</li>
+<li>ZoKrates: Scalable Privacy-Preserving Off-Chain Computations. https://www.ise.tu-berlin.de/fileadmin/fg308/publications/2018/2018_eberhardt_ZoKrates.pdf</li>
+<li>ZoKrates Project Repository. https://github.com/JacobEberhardt/ZoKrates</li>
+<li>Joseph Stockermans. zkSNARKs: Driver’s Ed. https://github.com/jstoxrocky/zksnarks_example</li>
+<li>Christian Reitweissner - snarktest.solidity. https://gist.github.com/chriseth/f9be9d9391efc5beb9704255a8e2989d</li>
+</ol>
+<h5 id="notable-alternatives-to-zk-snarks---areas-of-ongoing-zero-knowledge-proof-research">
+<a href="#notable-alternatives-to-zk-snarks---areas-of-ongoing-zero-knowledge-proof-research" class="anchor-link"></a> Notable ‘alternatives’ to zk-SNARKs - areas of ongoing zero-knowledge proof research
+</h5>
+<ol>
+<li>Vitalik Buterin. STARKs. https://vitalik.ca/general/2017/11/09/starks_part_1.html</li>
+<li>Bu ̈nz, Bootle, Boneh, et. al. Bulletproofs. https://eprint.iacr.org/2017/1066.pdf</li>
+<li>Range Proofs. https://www.cosic.esat.kuleuven.be/ecrypt/provpriv2012/abstracts/canard.pdf</li>
+<li>Apple. Secure Enclaves. https://developer.apple.com/documentation/security/certificate_key_and_trust_services/keys/storing_keys_in_the_secure_enclave</li>
+<li>Intel Software Guard Extensions. https://software.intel.com/en-us/sgx</li>
+</ol>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#15787c767d7470793b767a7b7b7a6755607e3b706c3b767a78">Michael Connor</a>, <a href="/cdn-cgi/l/email-protection#1c7f747d75687d72657d32777372787d5c6977327965327f7371">Chaitanya Konda</a>, <a href="/cdn-cgi/l/email-protection#5236273c31333c7c253721263e333c361227397c372b7c313d3f">Duncan Westland</a>, "EIP-1923: zk-SNARK Verifier Registry Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1923, December 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1923.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1923: zk-SNARK Verifier Registry Standard [DRAFT]",
+    "author": "Michael Connor <michael.connor@uk.ey.com>, Chaitanya Konda <chaitanya.konda@uk.ey.com>, Duncan Westland <duncan.westland@uk.ey.com>",
+    "name": "EIP-1923: zk-SNARK Verifier Registry Standard [DRAFT]",
+    "dateCreated": "2018-12-22",
+    "datePublished": "2018-12-22",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1923",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

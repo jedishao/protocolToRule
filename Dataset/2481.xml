@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2481: eth/66: request identifier</title>
+<meta property="og:title" content="EIP-2481: eth/66: request identifier" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2481" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2481" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2481: eth/66: request identifier
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2481.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/cburgdorf">Christoph Burgdorf</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/2482">https://github.com/ethereum/EIPs/issues/2482</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2021-08-11</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Networking</td></tr>
+<tr><th>Created</th><td>2020-01-17</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2464">2464</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#test-cases">Test cases</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This document proposes a way to increase the efficiency of the <code class="language-plaintext highlighter-rouge">eth</code> networking protocol while at the same time reducing complexity in Ethereum node implementations. It does so by introducing a request id to all requests which their corresponding responses must include.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">eth</code> protocol defines various request and response commands that are used to exchange data between Ethereum nodes. For example, to ask a peer node for a specific set of headers, a node sends it the <a href="https://github.com/ethereum/devp2p/blob/master/caps/eth.md#getblockheaders-0x03"><code class="language-plaintext highlighter-rouge">GetBlockHeaders</code></a> command.</p>
+<p><em>Citing from the <a href="https://github.com/ethereum/devp2p/blob/master/caps/eth.md#getblockheaders-0x03"><code class="language-plaintext highlighter-rouge">GetBlockHeaders</code> spec definition</a>:</em></p>
+<blockquote>
+<p><code class="language-plaintext highlighter-rouge">[block: {P, B_32}, maxHeaders: P, skip: P, reverse: P in {0, 1}]</code></p>
+</blockquote>
+<blockquote>
+<p>Require peer to return a <code class="language-plaintext highlighter-rouge">BlockHeaders</code> message. Reply must contain a number of block
+headers, of rising number when <code class="language-plaintext highlighter-rouge">reverse</code> is <code class="language-plaintext highlighter-rouge">0</code>, falling when <code class="language-plaintext highlighter-rouge">1</code>, <code class="language-plaintext highlighter-rouge">skip</code> blocks apart,
+beginning at block <code class="language-plaintext highlighter-rouge">block</code> (denoted by either number or hash) in the canonical chain, and
+with at most <code class="language-plaintext highlighter-rouge">maxHeaders</code> items.</p>
+</blockquote>
+<p>The node that receives the <code class="language-plaintext highlighter-rouge">GetBlockHeaders</code> command should answer it with the <a href="https://github.com/ethereum/devp2p/blob/master/caps/eth.md#blockheaders-0x04"><code class="language-plaintext highlighter-rouge">BlockHeaders</code></a> response command accordingly.</p>
+<p><em>Citing from the <a href="https://github.com/ethereum/devp2p/blob/master/caps/eth.md#blockheaders-0x04"><code class="language-plaintext highlighter-rouge">BlockHeaders</code> spec definition</a>:</em></p>
+<blockquote>
+<p><code class="language-plaintext highlighter-rouge">[blockHeader_0, blockHeader_1, ...]</code></p>
+</blockquote>
+<blockquote>
+<p>Reply to <code class="language-plaintext highlighter-rouge">GetBlockHeaders</code>. The items in the list (following the message ID) are block
+headers in the format described in the main Ethereum specification, previously asked for
+in a GetBlockHeaders message. This may validly contain no block headers if none of the
+requested block headers were found. The number of headers that can be requested in a
+single message may be subject to implementation-defined limits.</p>
+</blockquote>
+<p>Let’s consider a client making many simultaneous requests for <code class="language-plaintext highlighter-rouge">GetBlockHeaders</code> to one of its peers. By nature it can not be guaranteed that the expected responses arrive in the same order as they were sent. For the client to associate the incoming responses to the correct requests it has to loop through all pending requests trying to match it with the incoming response based on its contents.</p>
+<p>This can be particular tricky for responses that are ambiguous such as empty responses.</p>
+<p>This EIP proposes to change the <code class="language-plaintext highlighter-rouge">GetBlockHeaders</code> and the <code class="language-plaintext highlighter-rouge">BlockHeaders</code> command to include a <code class="language-plaintext highlighter-rouge">request_id</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">request_id</code> is a 64-bit integer set by the client when it makes the request. On the responding side, the exact same <code class="language-plaintext highlighter-rouge">request_id</code> from the incoming request is put back into the response object.</p>
+<p>This change allows the requesting client to match incoming responses <strong>directly</strong> back to their pending requests without going through all of the pending requests to check if they might match based on the response data.</p>
+<p>The selected request/response pair serves as an example for many similar request/response pairs in the <code class="language-plaintext highlighter-rouge">eth</code> networking protocol.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The lack of request identifiers in the request / response paris of the <code class="language-plaintext highlighter-rouge">eth</code> protocol puts unnecessary burden of code complexity into every Ethereum client. It also makes the communication slightly less efficient. Another argument can be made that the addition of request identifiers makes the protocol more aligned with the <code class="language-plaintext highlighter-rouge">les</code> protocol which <strong>does</strong> already defines request identifiers for each request / response pair.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Change the following message types in the <code class="language-plaintext highlighter-rouge">eth</code> protocol:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">GetBlockHeaders (0x03)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[block: {P, B_32}, maxHeaders: P, skip: P, reverse: P in {0, 1}]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [block: {P, B_32}, maxHeaders: P, skip: P, reverse: P in {0, 1}]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">BlockHeaders (0x04)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[blockHeader_0, blockHeader_1, ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [blockHeader_0, blockHeader_1, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">GetBlockBodies (0x05)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[hash_0: B_32, hash_1: B_32, ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [hash_0: B_32, hash_1: B_32, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">GetPooledTransactions (0x09)</code>:
+<ul>
+<li><strong>Current (eth/65)</strong><code class="language-plaintext highlighter-rouge">[hash_0: B_32, hash_1: B_32, ...]</code></li>
+<li><strong>Then (eth/66)</strong><code class="language-plaintext highlighter-rouge">[request_id: P, [hash_0: B_32, hash_1: B_32, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">PooledTransactions (0x0a)</code>:
+<ul>
+<li><strong>Current (eth/65)</strong><code class="language-plaintext highlighter-rouge">[[nonce: P, receivingAddress: B_20, value: P, ...], ...]</code></li>
+<li><strong>Then (eth/66)</strong><code class="language-plaintext highlighter-rouge">[request_id: P, [[nonce: P, receivingAddress: B_20, value: P, ...], ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">BlockBodies (0x06)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[hash_0: B_32, hash_1: B_32, ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [hash_0: B_32, hash_1: B_32, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">GetNodeData (0x0d)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[hash_0: B_32, hash_1: B_32, ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [hash_0: B_32, hash_1: B_32, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">NodeData (0x0e)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[value_0: B, value_1: B, ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [value_0: B, value_1: B, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">GetReceipts (0x0f)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[blockHash_0: B_32, blockHash_1: B_32, ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [blockHash_0: B_32, blockHash_1: B_32, ...]]</code></li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">Receipts (0x10)</code>
+<ul>
+<li><strong>Current (eth/65):</strong> <code class="language-plaintext highlighter-rouge">[[receipt_0, receipt_1], ...]</code></li>
+<li><strong>Then (eth/66)</strong>: <code class="language-plaintext highlighter-rouge">[request_id: P, [[receipt_0, receipt_1], ...]]</code></li>
+</ul>
+</li>
+</ul>
+<p>To elaborate, each command is altered in the following way:</p>
+<ol>
+<li>Create a list with the <code class="language-plaintext highlighter-rouge">request_id</code> being the first element.</li>
+<li>Make the second element the list that defines the whole command in the current scheme.</li>
+</ol>
+<p>The <code class="language-plaintext highlighter-rouge">request_id</code> has the following characteristics:</p>
+<ul>
+<li>64 bit integer</li>
+<li>Doesn’t need to be sequential (can be random)</li>
+<li>Does allow duplicates</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p><strong>Q: The efficiency gains might encourage clients to flood their peers with too many simultaneous requests</strong></p>
+<p>Peers can always throttle or disconnect if they don’t feel treated well. This is the same as today.</p>
+<p><strong>Q: If <code class="language-plaintext highlighter-rouge">les</code> already defines the commands like this, why not just use the <code class="language-plaintext highlighter-rouge">les</code> protocol?</strong></p>
+<p>In practice, peers that serve the <code class="language-plaintext highlighter-rouge">les</code> protocol are much harder to find in the network. The reasons for this are varied but might boil down to client defaults, immature implementations or missing incentives.</p>
+<p><strong>Q: Networking works today, isn’t this just adding bloat?</strong></p>
+<p>This is adding a single integer per command while at the same time reducing code complexity and improving networking efficiency. The addition seems justified.</p>
+<p><strong>Q: Why not demand request ids to be sequential?</strong></p>
+<p>Assuming request ids start always to count from <code class="language-plaintext highlighter-rouge">0</code> upon connection, things will become messy when
+connections are lost and clients reconnect and start over with the same request ids that they had used
+in the previous session.</p>
+<p><strong>Q: Why allow duplicate request ids?</strong></p>
+<p>The main benefit is flexibility and simplicity on the implementation side. Clients could decide to share
+the same ids across multiple different request types since they are naturally separated anyway. Clients
+could even decide to not rely on request ids at all, therefore using the same constant request id across
+all requests.</p>
+<p><strong>Q: Why choose a 64-bit integer for the request ids</strong></p>
+<p>64-bit integer were chosen to keep compatibility with the <code class="language-plaintext highlighter-rouge">les</code> protocol.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP extends the <code class="language-plaintext highlighter-rouge">eth</code> protocol in a backwards incompatible way and requires rolling out a new version, <code class="language-plaintext highlighter-rouge">eth/66</code>. However, <code class="language-plaintext highlighter-rouge">devp2p</code> supports running multiple versions of the same wire protocol side-by-side, so rolling out <code class="language-plaintext highlighter-rouge">eth/66</code> does not require client coordination, since non-updated clients can keep using <code class="language-plaintext highlighter-rouge">eth/65</code>.</p>
+<p>This EIP does not change the consensus engine, thus does <em>not</em> require a hard fork.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Trinity has a <a href="https://github.com/ethereum/trinity/pull/1672">draft PR</a> with an implementation.
+Geth <a href="https://github.com/ethereum/go-ethereum/pull/22241">PR</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>None</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test cases
+</h2>
+<p>These testcases cover RLP-encoding of all the redefined messages types, where the <code class="language-plaintext highlighter-rouge">rlp</code> portion is the rlp-encoding of the message defined in the <code class="language-plaintext highlighter-rouge">data</code> portion.</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GetBlockHeadersPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xe8820457e4a000000000000000000000000000000000000000000000000000000000deadc0de050580"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Origin"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"Hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000deadc0de"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Number"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"Amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Skip"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Reverse"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GetBlockHeadersPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xca820457c682270f050580"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Origin"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"Hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"Number"</span><span class="p">:</span><span class="w"> </span><span class="mi">9999</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"Amount"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Skip"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Reverse"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BlockHeadersPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf90202820457f901fcf901f9a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a00000000000000000000000000000000000000000000000000000000000000000880000000000000000"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"BlockHeadersPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"parentHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"sha3Uncles"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"miner"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"stateRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"transactionsRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"receiptsRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"logsBloom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"difficulty"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x8ae"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xd05"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"gasLimit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x115c"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"gasUsed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x15b3"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1a0a"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"extraData"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x7788"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"mixHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x8c2f2af15b7b563b6ab1e09bed0e9caade7ed730aec98b70a993597a797579a9"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GetBlockBodiesPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"GetBlockBodiesPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000deadc0de"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"BlockBodiesPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf902dc820457f902d6f902d3f8d2f867088504a817c8088302e2489435353535353535353535353535353535353535358202008025a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10f867098504a817c809830334509435353535353535353535353535353535353535358202d98025a052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afba052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afbf901fcf901f9a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000940000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000a00000000000000000000000000000000000000000000000000000000000000000b90100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008208ae820d0582115c8215b3821a0a827788a00000000000000000000000000000000000000000000000000000000000000000880000000000000000"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"BlockBodiesPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"Transactions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x8"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"gasPrice"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x4a817c808"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"gas"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x2e248"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x3535353535353535353535353535353535353535"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x200"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"v"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x25"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"r"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x588df025c4c2d757d3e314bd3dfbfe352687324e6b8557ad1731585e96928aed"</span><span class="w">
+          </span><span class="p">},</span><span class="w">
+          </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x9"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"gasPrice"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x4a817c809"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"gas"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x33450"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x3535353535353535353535353535353535353535"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x2d9"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"v"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x25"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"r"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf39c7dac06a9f3abf09faf5e30439a349d3717611b3ed337cd52b0d192bc72da"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="nl">"Uncles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"parentHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"sha3Uncles"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"miner"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"stateRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"transactionsRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"receiptsRoot"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"logsBloom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"difficulty"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x8ae"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xd05"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"gasLimit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x115c"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"gasUsed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x15b3"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"timestamp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1a0a"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"extraData"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x7788"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"mixHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x8c2f2af15b7b563b6ab1e09bed0e9caade7ed730aec98b70a993597a797579a9"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GetNodeDataPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"GetNodeDataPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000deadc0de"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NodeDataPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xce820457ca84deadc0de84feedbeef"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"NodeDataPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"0xdeadc0de"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0xfeedbeef"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GetReceiptsPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"GetReceiptsPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000deadc0de"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ReceiptsPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf90172820457f9016cf90169f901668001b9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f85ff85d940000000000000000000000000000000000000011f842a0000000000000000000000000000000000000000000000000000000000000deada0000000000000000000000000000000000000000000000000000000000000beef830100ff"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ReceiptsPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"root"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"cumulativeGasUsed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"logsBloom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"logs"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="p">{</span><span class="w">
+              </span><span class="nl">"address"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000011"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"topics"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                </span><span class="s2">"0x000000000000000000000000000000000000000000000000000000000000dead"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"0x000000000000000000000000000000000000000000000000000000000000beef"</span><span class="w">
+              </span><span class="p">],</span><span class="w">
+              </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0100ff"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"blockNumber"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"transactionHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"transactionIndex"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"blockHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"logIndex"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="p">,</span><span class="w">
+              </span><span class="nl">"removed"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+          </span><span class="p">],</span><span class="w">
+          </span><span class="nl">"transactionHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000deadc0de"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"contractAddress"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000011111"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"gasUsed"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x1b207"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"blockHash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0000000000000000000000000000000000000000000000000000000000000000"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"transactionIndex"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x0"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GetPooledTransactionsPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf847820457f842a000000000000000000000000000000000000000000000000000000000deadc0dea000000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"GetPooledTransactionsPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000deadc0de"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"0x00000000000000000000000000000000000000000000000000000000feedbeef"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PooledTransactionsPacket66"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"rlp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf8d7820457f8d2f867088504a817c8088302e2489435353535353535353535353535353535353535358202008025a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12a064b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10f867098504a817c809830334509435353535353535353535353535353535353535358202d98025a052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afba052f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"RequestId"</span><span class="p">:</span><span class="w"> </span><span class="mi">1111</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"PooledTransactionsPacket"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x8"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"gasPrice"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x4a817c808"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"gas"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x2e248"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x3535353535353535353535353535353535353535"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x200"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"v"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x25"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"r"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c12"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x64b1702d9298fee62dfeccc57d322a463ad55ca201256d01f62b45b2e1c21c10"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x588df025c4c2d757d3e314bd3dfbfe352687324e6b8557ad1731585e96928aed"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"nonce"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x9"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"gasPrice"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x4a817c809"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"gas"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x33450"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x3535353535353535353535353535353535353535"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x2d9"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"input"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"v"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x25"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"r"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"s"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x52f8f61201b2b11a78d6e866abc9c3db2ae8631fa656bfe5cb53668255367afb"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0xf39c7dac06a9f3abf09faf5e30439a349d3717611b3ed337cd52b0d192bc72da"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/cburgdorf">Christoph Burgdorf</a>, "EIP-2481: eth/66: request identifier [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2481, January 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2481.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2481: eth/66: request identifier [DRAFT]",
+    "author": "Christoph Burgdorf (@cburgdorf)",
+    "name": "EIP-2481: eth/66: request identifier [DRAFT]",
+    "dateCreated": "2020-01-17",
+    "datePublished": "2020-01-17",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/2482",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

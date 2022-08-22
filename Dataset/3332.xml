@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3332: MEDGASPRICE Opcode</title>
+<meta property="og:title" content="EIP-3332: MEDGASPRICE Opcode" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3332" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3332" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="withdrawn">
+🛑 This EIP has been withdrawn.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3332: MEDGASPRICE Opcode
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3332.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/jchancehud">Justice Hudson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/medgasprice-opcode-eip/5480">https://ethereum-magicians.org/t/medgasprice-opcode-eip/5480</a></td></tr>
+<tr><th>Status</th><td>Withdrawn
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-03-05</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#forwards-compatibility">Forwards Compatibility</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#naming-note">Naming note</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>An opcode for getting the median gas price of the parent block.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Adds <code class="language-plaintext highlighter-rouge">MEDGASPRICE (0x46)</code> opcode that returns the median gas price for the parent block.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>With the emergence of rollups as core mechanisms in scaling Ethereum there are a number of common transactions that can be front-run. Optimistic rollups rely on the submission of fraud proofs to maintain the integrity of their systems. As a result actors submitting fraud proofs typically receive a financial reward for doing so. This opens a trivial front-running strategy of watching the mempool for fraud proof submissions and copying such transactions with a much higher gas price to reap the reward. Such front-runners do not perform validation independently and de-incentivize others from performing validation. Adding a mechanism enforcing an upper bound on gas prices for a transaction could be an effective defense against such front-running attacks.</p>
+<p>Consider a smart contract that wants to implement a first come first serve mechanism. Such a mechanism must defeat the inherently pay-to-win nature of the gas price market. Enforcing a maximum gas price for a transaction relies on the fact that transactions of the same gas price are generally processed in a first in first out way by Ethereum miners. A contract currently has few options for setting a max gas price:</p>
+<ul>
+<li>Set a constant value at a reasonable rate given the current gas prices</li>
+<li>Allow an individual or group of individuals to adjust a max gas price over time</li>
+</ul>
+<p>More elaborate schemes could likely be constructed but all would involve storing gas price information on chain increasing the number of transactions and costing Ether.</p>
+<p>Given a median gas price opcode a contract can set a maximum gas price as a function of the last blocks gas price. This can easily be implemented using a strategy such as the following:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Assume that block.medgasprice is bound to MEDGASPRICE (0x46)
+
+function submitFraudProof(bytes calldata proof) public {
+  require(tx.gasprice &lt;= maxGasPrice());
+  // process the fraud proof and provide a reward (if valid)
+}
+
+function maxGasPrice() public view returns (uint) {
+  return 3 * block.medgasprice;
+}
+</code></pre></div></div>
+<p>Given the contract implementation above a client would simply call <code class="language-plaintext highlighter-rouge">maxGasPrice</code> to determine the gas price to use when submitting a fraud proof. This particular implementation allows up to 3x the median gas price of the last block to be used.</p>
+<h3 id="forwards-compatibility">
+<a href="#forwards-compatibility" class="anchor-link"></a> Forwards Compatibility
+</h3>
+<p><a href="https://eips.ethereum.org/EIPS/eip-1559">EIP-1559</a> plans to change the fee market in a number of ways. Most notably is the creation of a base fee that is burned. In this context an “inclusion fee” still exists as a part of the total fee. Consider the following two cases:</p>
+<h4 id="block-sizes-are-increasing-all-available-gas-is-being-consumed">
+<a href="#block-sizes-are-increasing-all-available-gas-is-being-consumed" class="anchor-link"></a> Block sizes are increasing (all available gas is being consumed)
+</h4>
+<p>In this case there will be bidding contention in the inclusion fee to incentivize miners to include transactions. A median gas price operator would still be helpful as an attacker could supply a high inclusion fee to bump honest transactions.</p>
+<h4 id="block-sizes-are-decreasing-excess-gas-is-available">
+<a href="#block-sizes-are-decreasing-excess-gas-is-available" class="anchor-link"></a> Block sizes are decreasing (excess gas is available)
+</h4>
+<p>In this case an attacker could specify a high inclusion fee to incentivize miners to include their transaction early in the block. Miners are incentivized to do so as including expensive transactions first reduces the risk of a revert (and partial refund) occurring.</p>
+<p>Given these two cases this EIP seems relevant in the context of EIP-1559.</p>
+<p>Post EIP-1559 <code class="language-plaintext highlighter-rouge">MEDGASPRICE (0x46)</code> should return the median <code class="language-plaintext highlighter-rouge">effective_gas_price</code> of the previous block.</p>
+<p><a href="https://eips.ethereum.org/EIPS/eip-3198">EIP-3198</a> is required for the above strategies to be implemented. With the inclusion of <code class="language-plaintext highlighter-rouge">BASEFEE (0x48)</code> a contract can subtract the <code class="language-plaintext highlighter-rouge">base_fee_per_gas</code> from the <code class="language-plaintext highlighter-rouge">effective_gas_price</code> to determine the inclusion fee per gas being paid for the transaction and thus implement an upper bound.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>If <code class="language-plaintext highlighter-rouge">block.number &gt;= TBD</code>, add a new opcode <code class="language-plaintext highlighter-rouge">MEDGASPRICE (0x46)</code>:</p>
+<p>Pushes the median gas price of the parent block onto the stack.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center">Op</th>
+<th style="text-align: center">Input</th>
+<th style="text-align: center">Output</th>
+<th style="text-align: center">Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center">0x46</td>
+<td style="text-align: center">0</td>
+<td style="text-align: center">1</td>
+<td style="text-align: center">8</td>
+</tr>
+</tbody>
+</table>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Having access to the current gas price economy allows contracts to implement more robust and automated logic surrounding acceptable transaction gas prices.</p>
+<h3 id="naming-note">
+<a href="#naming-note" class="anchor-link"></a> Naming note
+</h3>
+<p>The name <code class="language-plaintext highlighter-rouge">MEDGASPRICE</code> was chosen because the median gas price of the network can only be calculated from the latest complete block. Thus transactions being executed should expect the median gas price to be calculated from the previous block.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>There are no known backwards incompabitility issues.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The strategy described for preventing front-running by setting an upper bound on the gas price of transactions has a few caveats:</p>
+<ol>
+<li>It relies on miners being impartial. Reordering transactions with the same gas price is a trivial means of defeating this strategy.</li>
+<li>The value returned by <code class="language-plaintext highlighter-rouge">MEDGASPRICE (0x46)</code> may fluctuate rapidly between blocks. If a transaction is not included immediately it may either fail (if the gas price drops) or become vulnerable to front-running (if the gas price increases).</li>
+</ol>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/jchancehud">Justice Hudson</a>, "EIP-3332: MEDGASPRICE Opcode [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3332, March 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3332.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3332: MEDGASPRICE Opcode [DRAFT]",
+    "author": "Justice Hudson (@jchancehud)",
+    "name": "EIP-3332: MEDGASPRICE Opcode [DRAFT]",
+    "dateCreated": "2021-03-05",
+    "datePublished": "2021-03-05",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/medgasprice-opcode-eip/5480",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

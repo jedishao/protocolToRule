@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2666: Repricing of precompiles and Keccak256 function</title>
+<meta property="og:title" content="EIP-2666: Repricing of precompiles and Keccak256 function" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2666" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2666" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2666: Repricing of precompiles and Keccak256 function
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2666.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/shamatar">Alex Vlasov</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip2666-global-precompiles-repricing-and-many-more-discussion-thread/4332">https://ethereum-magicians.org/t/eip2666-global-precompiles-repricing-and-many-more-discussion-thread/4332</a></td></tr>
+
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-05-22</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-1352">1352</a>,
+<a href="eip-2046">2046</a>,
+<a href="eip-2565">2565</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#detailed-summary-of-repricing-approach">Detailed summary of repricing approach</a></li>
+<li><a href="#benchmarks-on-the-most-popular-clients">Benchmarks on the most popular clients</a></li>
+<li><a href="#tooling-and-data">Tooling and data</a></li>
+<li><a href="#note-on-formulas-structure">Note on formulas structure</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This EIP tries to set prices of certain precompiles and built-in EVM function to be in line with their performance, consumed resources and newer changes in EVM itself.</p>
+<p>New price formulas are proposed for:</p>
+<ul>
+<li>SHA256 precompile (<code class="language-plaintext highlighter-rouge">0x02</code>)</li>
+<li>RIPEMD precompile (<code class="language-plaintext highlighter-rouge">0x03</code>)</li>
+<li>KECCAK256 opcode (<code class="language-plaintext highlighter-rouge">0x20</code>)</li>
+</ul>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Costs of many precompiles and built-in functions are invalid at the current state of the clients. This EIP contains a list of changes to the pricing formulas to better reflect underlying computations’ structure.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Historical pricing for these functions in EVM does not reflect inner structure of the underlying computations (inner structure of the hash functions).</p>
+<ul>
+<li>EIP-2046 changes a <code class="language-plaintext highlighter-rouge">STATICCALL (0xfa)</code> cost to precompile and it may be necessary to adjust costs of some precompiles that <em>may</em> have taken old large cost (<code class="language-plaintext highlighter-rouge">700</code> gas) into account and tried to compensate for it</li>
+<li>Some precompiles are overpriced and their pricing formulas do not reflect the structure of underlying functions</li>
+<li>Keccak256 built-in function (opcode) in EVM has pricing that does not reflect underlying hash function structure</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>If <code class="language-plaintext highlighter-rouge">block_number &gt;= X</code> set the gas cost of the following precompiles and Keccak256 opcode:</p>
+<ul>
+<li>SHA256 (precompile <code class="language-plaintext highlighter-rouge">0x02</code>): <code class="language-plaintext highlighter-rouge">10 + ((len(input) + 8)/64 + 1) * 9</code></li>
+<li>RIPEMD (precompile <code class="language-plaintext highlighter-rouge">0x03</code>): <code class="language-plaintext highlighter-rouge">6 + ((len(input) + 8)/64 + 1) * 12</code></li>
+<li>KECCAK256 (<code class="language-plaintext highlighter-rouge">0x20</code>): <code class="language-plaintext highlighter-rouge">13 + (len(input)/136 + 1)*15</code></li>
+</ul>
+<p>This EIP <em>ideally</em> requires that <code class="language-plaintext highlighter-rouge">MODEXP</code> repricing is <a href="/EIPS/eip-2565">implemented</a> to also accurately reflect that there is no implicit compensation for an old <code class="language-plaintext highlighter-rouge">STATICCALL (0xfa)</code> cost (pre-2046).</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Cost of functions being executed must accurately reflect real CPU time spent on computations, so benchmarking was performed for current precompiles and Keccak256 function to measure running time versus input parameters.</p>
+<h3 id="detailed-summary-of-repricing-approach">
+<a href="#detailed-summary-of-repricing-approach" class="anchor-link"></a> Detailed summary of repricing approach
+</h3>
+<p>This EIP relies on two facts:</p>
+<ul>
+<li>apriori knowledge of the inner strucute of the hash functions</li>
+<li>benchmarks provided by the client teams for some reasonable range of input lengths for random inputs (random byte strings of a given length)</li>
+</ul>
+<h3 id="benchmarks-on-the-most-popular-clients">
+<a href="#benchmarks-on-the-most-popular-clients" class="anchor-link"></a> Benchmarks on the most popular clients
+</h3>
+<p>Necessary benchmarks for EIP-2666 were provided by the clients and raw form is assembled in <a href="https://docs.google.com/spreadsheets/d/1aCQnk7prrp3Mbcf011BE5zZnkbc3Iw7QAixn6mLbKS0/edit?usp=sharing">here</a></p>
+<ul>
+<li>SHA256 precompile</li>
+</ul>
+<p>Currently it’s <code class="language-plaintext highlighter-rouge">60</code> gas + <code class="language-plaintext highlighter-rouge">12</code> gas per <code class="language-plaintext highlighter-rouge">32</code> byte word (number of words is <code class="language-plaintext highlighter-rouge">ceil(len(input)/word_len)</code> here and in similar places. If there is no <code class="language-plaintext highlighter-rouge">floor</code> or <code class="language-plaintext highlighter-rouge">ceil</code> specifier all divisions below are integer divisions (floor divisions)). Proposed formula is <code class="language-plaintext highlighter-rouge">A * ((len(input) + 8) / 64 + 1) + B</code>, with coefficients below</p>
+<table>
+<thead>
+<tr>
+<th> </th>
+<th> </th>
+<th>A</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Geth</td>
+<td> </td>
+<td>5</td>
+<td>3</td>
+</tr>
+<tr>
+<td>OE</td>
+<td> </td>
+<td>9</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Besu</td>
+<td> </td>
+<td>5</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Nethermind</td>
+<td> </td>
+<td>10</td>
+<td>5</td>
+</tr>
+</tbody>
+</table>
+<p>EIP-2666 proposes <code class="language-plaintext highlighter-rouge">A = 9</code>, <code class="language-plaintext highlighter-rouge">B = 10</code>. There are no large one-off costs in this precompile, so it’s EIP-2046 - safe.</p>
+<ul>
+<li>RIPEMD precompile</li>
+</ul>
+<p>Currently it’s <code class="language-plaintext highlighter-rouge">600</code> gas + <code class="language-plaintext highlighter-rouge">120</code> gas per <code class="language-plaintext highlighter-rouge">32</code> byte word. Proposed formula is <code class="language-plaintext highlighter-rouge">A * ((len(input) + 8) / 64 + 1) + B</code>, with coefficients below</p>
+<table>
+<thead>
+<tr>
+<th> </th>
+<th> </th>
+<th>A</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Geth</td>
+<td> </td>
+<td>12</td>
+<td>6</td>
+</tr>
+<tr>
+<td>OE</td>
+<td> </td>
+<td>8</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Besu</td>
+<td> </td>
+<td>29</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Nethermind</td>
+<td> </td>
+<td>10</td>
+<td>6</td>
+ </tr>
+</tbody>
+</table>
+<p>EIP-2666 proposes <code class="language-plaintext highlighter-rouge">A = 12</code>, <code class="language-plaintext highlighter-rouge">B = 6</code>. There are no large one-off costs in this precompile, so it’s EIP-2046 - safe. Besu expects to have performance improvements by the end of the year.</p>
+<ul>
+<li>Keccak256 performance</li>
+</ul>
+<p>Currently it’s <code class="language-plaintext highlighter-rouge">30</code> gas + <code class="language-plaintext highlighter-rouge">6</code> gas per <code class="language-plaintext highlighter-rouge">32</code> byte word. Proposed formula is <code class="language-plaintext highlighter-rouge">A * (len(input) / 136 + 1) + B</code>, with coefficients below</p>
+<table>
+<thead>
+<tr>
+<th> </th>
+<th> </th>
+<th>A</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Geth</td>
+<td> </td>
+<td>13</td>
+<td>13</td>
+</tr>
+<tr>
+<td>OE</td>
+<td> </td>
+<td>15</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Besu</td>
+<td> </td>
+<td>19</td>
+<td>28</td>
+</tr>
+<tr>
+<td>Nethermind</td>
+<td> </td>
+<td>16</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p>EIP-2666 proposes <code class="language-plaintext highlighter-rouge">A = 15</code>, <code class="language-plaintext highlighter-rouge">B = 13</code>. There are no large one-off costs in this precompile, so it’s EIP-2046 - safe. Besu expects to have performance improvements by the end of the year.</p>
+<h3 id="tooling-and-data">
+<a href="#tooling-and-data" class="anchor-link"></a> Tooling and data
+</h3>
+<p>Reference material (from benchmarks of different clients) with raw data can be found <a href="https://docs.google.com/spreadsheets/d/1aCQnk7prrp3Mbcf011BE5zZnkbc3Iw7QAixn6mLbKS0/edit?usp=sharing">here</a>.</p>
+<p>There is a repository available with inputs for benchmarking and precompiles testing <a href="https://github.com/shamatar/bench_precompiles">here</a> that can be used by client teams to perform all the necessary measurements.</p>
+<p>Raw Besu <a href="https://gist.github.com/shemnon/0ddba91be501fa23291bdec9107fe99a">benchmarks</a>.</p>
+<h3 id="note-on-formulas-structure">
+<a href="#note-on-formulas-structure" class="anchor-link"></a> Note on formulas structure
+</h3>
+<p>There are terms in formulas that look like <code class="language-plaintext highlighter-rouge">A * 1</code> and those are explicitly not combined to the <code class="language-plaintext highlighter-rouge">B</code> coefficient to reflect that hash of an empty byte array requires to perform a round of hashing anyway.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Precompile repricings has happened in a past and can be considered standard procedure. Gas costs of many contracts is expected to reduce that may break re-entrancy protection measures based on fixed gas costs. In any case, such protection should have never been considered good and final.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Let’s consider a simple example of Keccak256 hash of <code class="language-plaintext highlighter-rouge">0</code>, <code class="language-plaintext highlighter-rouge">64</code> and <code class="language-plaintext highlighter-rouge">160</code> bytes that can is a simple sanity check for implementation.</p>
+<ul>
+<li>Hash <code class="language-plaintext highlighter-rouge">0</code> bytes:
+<ul>
+<li>Old price: <code class="language-plaintext highlighter-rouge">30 + 6 * ceil(0 / 32) = 30</code> gas</li>
+<li>New price: <code class="language-plaintext highlighter-rouge">15 * (0/136 + 1) + 13 = 28</code> gas</li>
+</ul>
+</li>
+<li>Hash <code class="language-plaintext highlighter-rouge">64</code> bytes
+<ul>
+<li>Old price: <code class="language-plaintext highlighter-rouge">30 + 6 * ceil(64 / 32) = 42</code> gas</li>
+<li>New price: <code class="language-plaintext highlighter-rouge">15 * (64/136 + 1) + 13 = 28</code> gas</li>
+</ul>
+</li>
+<li>Hash <code class="language-plaintext highlighter-rouge">160</code> bytes
+<ul>
+<li>Old price: <code class="language-plaintext highlighter-rouge">30 + 6 * ceil(160 / 32) = 60</code> gas</li>
+<li>New price: <code class="language-plaintext highlighter-rouge">15 * (160/136 + 1) + 13 = 43</code> gas</li>
+</ul>
+</li>
+</ul>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>There is no reference implementation at the time of writing as it requires just a simple change of constants in major clients.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>As described in backward compatibility section in some cases reduction of cost may allow e.g. re-entrancy that was not expected before, but we think that re-entrancy protection based on fixed gas costs is anyway flawed design decision.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/shamatar">Alex Vlasov</a>, "EIP-2666: Repricing of precompiles and Keccak256 function [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2666, May 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2666.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2666: Repricing of precompiles and Keccak256 function [DRAFT]",
+    "author": "Alex Vlasov (@shamatar)",
+    "name": "EIP-2666: Repricing of precompiles and Keccak256 function [DRAFT]",
+    "dateCreated": "2020-05-22",
+    "datePublished": "2020-05-22",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip2666-global-precompiles-repricing-and-many-more-discussion-thread/4332",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

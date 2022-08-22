@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1175: Wallet &amp; shop standard for all tokens (erc20)</title>
+<meta property="og:title" content="EIP-1175: Wallet &amp; shop standard for all tokens (erc20)" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1175" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1175" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1175: Wallet &amp; shop standard for all tokens (erc20)
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1175.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/Nitro888">Jet Lim</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1182">https://github.com/ethereum/EIPs/issues/1182</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-06-21</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-20">20</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#all-tokens-go-to-heaven">All tokens go to heaven</a>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#walletcenter">WalletCenter</a>
+<ul>
+<li><a href="#methods">Methods</a></li>
+<li><a href="#events">Events</a></li>
+</ul>
+</li>
+<li><a href="#wallet-1">Wallet</a>
+<ul>
+<li><a href="#methods-1">Methods</a></li>
+<li><a href="#events-1">Events</a></li>
+</ul>
+</li>
+<li><a href="#shop-1">Shop</a>
+<ul>
+<li><a href="#methods-2">Methods</a></li>
+<li><a href="#events-2">Events</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#appendix">Appendix</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="all-tokens-go-to-heaven">
+<a href="#all-tokens-go-to-heaven" class="anchor-link"></a> All tokens go to heaven
+</h1>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Make wallets and shops created from certified contracts make erc20 tokens easy to use for commerce.</p>
+<p><img src="/assets/eip-1175/wallet.png" alt="wallet" /></p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The mutual trust between the wallet and the shop created by the authenticated contract allows you to pay for and purchase items at a simple process.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>New standards with improvements have been released, but the majority of tokens currently being developed are erc20 tokens. So I felt I needed a proposal to use old tokens in commerce.
+To use various erc20 tokens for trading, you need a custom contract. However, a single wallet with a variety of tokens, and a mutually trusted store, can make transactions that are simple and efficient. The erc20 token is traded through two calls, <code class="language-plaintext highlighter-rouge">approve (address _spender, uint256 _value)</code> and <code class="language-plaintext highlighter-rouge">transferFrom (address _from, address _to, uint256 _value)</code>, but when using the wallet contract, <code class="language-plaintext highlighter-rouge">paySafe (address _shop, uint256 _item)</code>will be traded only in one call.
+And if you only reuse the store interface, you can also trade using <code class="language-plaintext highlighter-rouge">payUnsafe (address _shop, uint256 _item)</code>.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p><img src="/assets/eip-1175/workflow.png" alt="workflow" /></p>
+<h2 id="walletcenter">
+<a href="#walletcenter" class="anchor-link"></a> WalletCenter
+</h2>
+<h3 id="methods">
+<a href="#methods" class="anchor-link"></a> Methods
+</h3>
+<h4 id="createwallet">
+<a href="#createwallet" class="anchor-link"></a> createWallet
+</h4>
+<p>Create wallet contract and add to list. Returns the address of new wallet.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">createWallet</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_wallet</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="iswallet">
+<a href="#iswallet" class="anchor-link"></a> isWallet
+</h4>
+<p>Returns true or false value for test this address is a created by createWallet.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">isWallet</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_wallet</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="createshop">
+<a href="#createshop" class="anchor-link"></a> createShop
+</h4>
+<p>Create Shop contract and add to list. Returns the address of new Shop with erc20 token address.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">createShop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="isshop">
+<a href="#isshop" class="anchor-link"></a> isShop
+</h4>
+<p>Returns true or false value for test this address is a created by createWallet.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">isShop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="events">
+<a href="#events" class="anchor-link"></a> Events
+</h3>
+<h4 id="wallet">
+<a href="#wallet" class="anchor-link"></a> Wallet
+</h4>
+<p>Search for my wallet.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Wallet</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_owner</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_wallet</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="shop">
+<a href="#shop" class="anchor-link"></a> Shop
+</h4>
+<p>Search for my shop.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Shop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_owner</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_erc20</span><span class="p">)</span>
+</code></pre></div></div>
+<h2 id="wallet-1">
+<a href="#wallet-1" class="anchor-link"></a> Wallet
+</h2>
+<p>Wallet must be created by wallet center.</p>
+<h3 id="methods-1">
+<a href="#methods-1" class="anchor-link"></a> Methods
+</h3>
+<h4 id="balanceof">
+<a href="#balanceof" class="anchor-link"></a> balanceOf
+</h4>
+<p>Returns the account balance of Wallet.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">balanceOf</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">balance</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="withdrawal">
+<a href="#withdrawal" class="anchor-link"></a> withdrawal
+</h4>
+<p>withdrawal <code class="language-plaintext highlighter-rouge">_value</code> amount of <code class="language-plaintext highlighter-rouge">_erc20</code> token to <code class="language-plaintext highlighter-rouge">_owner</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">withdrawal</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="paysafe">
+<a href="#paysafe" class="anchor-link"></a> paySafe
+</h4>
+<p>Pay for safe shop (created by contract) item with item index <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">paySafe</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="nx">onlyShop</span><span class="p">(</span><span class="nx">_shop</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="payunsafe">
+<a href="#payunsafe" class="anchor-link"></a> payUnsafe
+</h4>
+<p>Pay for unsafe shop (did not created by contract) item with item index <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">payUnsafe</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="paycancel">
+<a href="#paycancel" class="anchor-link"></a> payCancel
+</h4>
+<p>Cancel pay and refund. (only weekly model)</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">payCancel</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="refund">
+<a href="#refund" class="anchor-link"></a> refund
+</h4>
+<p>Refund from shop with item index <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">refund</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="events-1">
+<a href="#events-1" class="anchor-link"></a> Events
+</h3>
+<h4 id="pay">
+<a href="#pay" class="anchor-link"></a> Pay
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Pay</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="refund-1">
+<a href="#refund-1" class="anchor-link"></a> Refund
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Refund</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">)</span>
+</code></pre></div></div>
+<h2 id="shop-1">
+<a href="#shop-1" class="anchor-link"></a> Shop
+</h2>
+<p>Shop is created by wallet center or not. but Shop that created by wallet center is called safe shop.</p>
+<h3 id="methods-2">
+<a href="#methods-2" class="anchor-link"></a> Methods
+</h3>
+<h4 id="balanceof-1">
+<a href="#balanceof-1" class="anchor-link"></a> balanceOf
+</h4>
+<p>Returns the account balance of Shop.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">balanceOf</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">balance</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="withdrawal-1">
+<a href="#withdrawal-1" class="anchor-link"></a> withdrawal
+</h4>
+<p>withdrawal <code class="language-plaintext highlighter-rouge">_value</code> amount of <code class="language-plaintext highlighter-rouge">_erc20</code> token to <code class="language-plaintext highlighter-rouge">_owner</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">withdrawal</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="pay-1">
+<a href="#pay-1" class="anchor-link"></a> pay
+</h4>
+<p>Pay from buyer with item index <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">pay</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyWallet</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="refund-2">
+<a href="#refund-2" class="anchor-link"></a> refund
+</h4>
+<p>refund token to <code class="language-plaintext highlighter-rouge">_to</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">refund</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_buyer</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">onlyWallet</span><span class="p">(</span><span class="nx">_buyer</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="resister">
+<a href="#resister" class="anchor-link"></a> resister
+</h4>
+<p>Listing item for sell.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">resister</span><span class="p">(</span><span class="nx">uint8</span> <span class="nx">_category</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_price</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_stock</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">_itemId</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="update">
+<a href="#update" class="anchor-link"></a> update
+</h4>
+<p>Update item state for sell. (change item <code class="language-plaintext highlighter-rouge">_price</code> or add item <code class="language-plaintext highlighter-rouge">_stock</code>)</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_price</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_stock</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span>
+</code></pre></div></div>
+<h4 id="price">
+<a href="#price" class="anchor-link"></a> price
+</h4>
+<p>Get token address and price from buyer with item index <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">price</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="canbuy">
+<a href="#canbuy" class="anchor-link"></a> canBuy
+</h4>
+<p><code class="language-plaintext highlighter-rouge">_who</code> can Buy <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">canBuy</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">_canBuy</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="isbuyer">
+<a href="#isbuyer" class="anchor-link"></a> isBuyer
+</h4>
+<p><code class="language-plaintext highlighter-rouge">_who</code> is buyer of <code class="language-plaintext highlighter-rouge">_item</code>.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">isBuyer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">_buyer</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="info">
+<a href="#info" class="anchor-link"></a> info
+</h4>
+<p>Set shop information bytes.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">info</span><span class="p">(</span><span class="nx">bytes</span> <span class="nx">_msgPack</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="upvote">
+<a href="#upvote" class="anchor-link"></a> upVote
+</h4>
+<p>Up vote for this shop.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">upVote</span><span class="p">()</span>
+</code></pre></div></div>
+<h4 id="dnvote">
+<a href="#dnvote" class="anchor-link"></a> dnVote
+</h4>
+<p>Down vote for this shop.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">dnVote</span><span class="p">()</span>
+</code></pre></div></div>
+<h4 id="about">
+<a href="#about" class="anchor-link"></a> about
+</h4>
+<p>Get shop token, up vote and down vote.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">about</span><span class="p">()</span> <span class="nx">view</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_up</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_down</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="infoitem">
+<a href="#infoitem" class="anchor-link"></a> infoItem
+</h4>
+<p>Set item information bytes.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">infoItem</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">_msgPack</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="upvoteitem">
+<a href="#upvoteitem" class="anchor-link"></a> upVoteItem
+</h4>
+<p>Up vote for this item.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">upVoteItem</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="dnvoteitem">
+<a href="#dnvoteitem" class="anchor-link"></a> dnVoteItem
+</h4>
+<p>Down vote for this item.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">dnVoteItem</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="aboutitem">
+<a href="#aboutitem" class="anchor-link"></a> aboutItem
+</h4>
+<p>Get Item price, up vote and down vote.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">aboutItem</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">view</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">_price</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_up</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_down</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="events-2">
+<a href="#events-2" class="anchor-link"></a> Events
+</h3>
+<h4 id="pay-2">
+<a href="#pay-2" class="anchor-link"></a> Pay
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Pay</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_buyer</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="refund-3">
+<a href="#refund-3" class="anchor-link"></a> Refund
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Refund</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="item">
+<a href="#item" class="anchor-link"></a> Item
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Item</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_price</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="info-1">
+<a href="#info-1" class="anchor-link"></a> Info
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">Info</span><span class="p">(</span><span class="nx">bytes</span> <span class="nx">_msgPack</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="infoitem-1">
+<a href="#infoitem-1" class="anchor-link"></a> InfoItem
+</h4>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">InfoItem</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">bytes</span> <span class="nx">_msgPack</span><span class="p">)</span>
+</code></pre></div></div>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Sample token contract address is <a href="https://ropsten.etherscan.io/address/0x393dd70ce2ae7b30501aec94727968c517f90d52">0x393dd70ce2ae7b30501aec94727968c517f90d52</a></p>
+<p>WalletCenter contract address is <a href="https://ropsten.etherscan.io/address/0x1fe0862a4a8287d6c23904d61f02507b5044ea31">0x1fe0862a4a8287d6c23904d61f02507b5044ea31</a></p>
+<p>WalletCenter create shop contract address is <a href="https://ropsten.etherscan.io/address/0x59117730D02Ca3796121b7975796d479A5Fe54B0">0x59117730D02Ca3796121b7975796d479A5Fe54B0</a></p>
+<p>WalletCenter create wallet contract address is <a href="https://ropsten.etherscan.io/address/0x39da7111844df424e1d0a0226183533dd07bc5c6">0x39da7111844df424e1d0a0226183533dd07bc5c6</a></p>
+<h2 id="appendix">
+<a href="#appendix" class="anchor-link"></a> Appendix
+</h2>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.4</span><span class="p">.</span><span class="mi">24</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">ERC20Interface</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">totalSupply</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">balanceOf</span><span class="p">(</span><span class="nx">address</span> <span class="nx">tokenOwner</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">balance</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">allowance</span><span class="p">(</span><span class="nx">address</span> <span class="nx">tokenOwner</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">spender</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">remaining</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">transfer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokens</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">approve</span><span class="p">(</span><span class="nx">address</span> <span class="nx">spender</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokens</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">transferFrom</span><span class="p">(</span><span class="nx">address</span> <span class="k">from</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokens</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+
+    <span class="nx">event</span> <span class="nx">Transfer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="k">from</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokens</span><span class="p">);</span>
+    <span class="nx">event</span> <span class="nx">Approval</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">tokenOwner</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">spender</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">tokens</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">SafeMath</span> <span class="p">{</span>
+    <span class="kd">function</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">uint</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">b</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">pure</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span><span class="p">;</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">c</span> <span class="o">&gt;=</span> <span class="nx">a</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">safeSub</span><span class="p">(</span><span class="nx">uint</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">b</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">pure</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">b</span> <span class="o">&lt;=</span> <span class="nx">a</span><span class="p">);</span>
+        <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">-</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">safeMul</span><span class="p">(</span><span class="nx">uint</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">b</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">pure</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">*</span> <span class="nx">b</span><span class="p">;</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">a</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="nx">c</span> <span class="o">/</span> <span class="nx">a</span> <span class="o">==</span> <span class="nx">b</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">safeDiv</span><span class="p">(</span><span class="nx">uint</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">uint</span> <span class="nx">b</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">pure</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">b</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="nx">c</span> <span class="o">=</span> <span class="nx">a</span> <span class="o">/</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">_Base</span> <span class="p">{</span>
+    <span class="nx">address</span> <span class="nx">internal</span> <span class="nx">owner</span><span class="p">;</span>
+    <span class="nx">address</span> <span class="nx">internal</span> <span class="nx">walletCenter</span><span class="p">;</span>
+    
+    <span class="nx">modifier</span> <span class="nx">onlyOwner</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">owner</span> <span class="o">==</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">);</span>
+        <span class="nx">_</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">modifier</span> <span class="nx">onlyWallet</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_addr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">WalletCenter</span><span class="p">(</span><span class="nx">walletCenter</span><span class="p">).</span><span class="nx">isWallet</span><span class="p">(</span><span class="nx">_addr</span><span class="p">));</span>
+        <span class="nx">_</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nx">modifier</span> <span class="nx">onlyShop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_addr</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">WalletCenter</span><span class="p">(</span><span class="nx">walletCenter</span><span class="p">).</span><span class="nx">isShop</span><span class="p">(</span><span class="nx">_addr</span><span class="p">));</span>
+        <span class="nx">_</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">balanceOf</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">balance</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nx">address</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">balance</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">balanceOf</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">transfer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">internal</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">address</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">balance</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">balanceOf</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="o">&gt;=</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="nx">_to</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">approve</span><span class="p">(</span><span class="nx">_to</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">withdrawal</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">);</span>
+    
+    <span class="nx">event</span> <span class="nx">Pay</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">);</span>
+    <span class="nx">event</span> <span class="nx">Refund</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">);</span>
+    <span class="nx">event</span> <span class="nx">Prize</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">_Wallet</span> <span class="nx">is</span> <span class="nx">_Base</span> <span class="p">{</span>
+    <span class="kd">constructor</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_who</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="nx">owner</span>           <span class="o">=</span> <span class="nx">_who</span><span class="p">;</span>
+        <span class="nx">walletCenter</span>    <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">pay</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">private</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">_Shop</span><span class="p">(</span><span class="nx">_shop</span><span class="p">).</span><span class="nx">canBuy</span><span class="p">(</span><span class="k">this</span><span class="p">,</span><span class="nx">_item</span><span class="p">));</span>
+
+        <span class="nx">address</span> <span class="nx">_erc20</span><span class="p">;</span>
+        <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">;</span>
+        <span class="p">(</span><span class="nx">_erc20</span><span class="p">,</span><span class="nx">_value</span><span class="p">)</span> <span class="o">=</span> <span class="nx">_Shop</span><span class="p">(</span><span class="nx">_shop</span><span class="p">).</span><span class="nx">price</span><span class="p">(</span><span class="nx">_item</span><span class="p">);</span>
+        
+        <span class="nx">transfer</span><span class="p">(</span><span class="nx">_shop</span><span class="p">,</span><span class="nx">_erc20</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="nx">_Shop</span><span class="p">(</span><span class="nx">_shop</span><span class="p">).</span><span class="nx">pay</span><span class="p">(</span><span class="nx">_item</span><span class="p">);</span>
+        <span class="nx">emit</span> <span class="nx">Pay</span><span class="p">(</span><span class="nx">_shop</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">paySafe</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="nx">onlyShop</span><span class="p">(</span><span class="nx">_shop</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pay</span><span class="p">(</span><span class="nx">_shop</span><span class="p">,</span><span class="nx">_item</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">payUnsafe</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">pay</span><span class="p">(</span><span class="nx">_shop</span><span class="p">,</span><span class="nx">_item</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">payCancel</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">_Shop</span><span class="p">(</span><span class="nx">_shop</span><span class="p">).</span><span class="nx">payCancel</span><span class="p">(</span><span class="nx">_item</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kd">function</span> <span class="nx">refund</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">allowance</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="k">this</span><span class="p">))</span><span class="o">==</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">_erc20</span><span class="o">!=</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">transferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="k">this</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="nx">emit</span> <span class="nx">Refund</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">prize</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">allowance</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="k">this</span><span class="p">))</span><span class="o">==</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">_erc20</span><span class="o">!=</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">transferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="k">this</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="nx">emit</span> <span class="nx">Prize</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">withdrawal</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">address</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">balance</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">balanceOf</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="o">&gt;=</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="nx">owner</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">owner</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">_Shop</span> <span class="nx">is</span> <span class="nx">_Base</span><span class="p">,</span> <span class="nx">SafeMath</span><span class="p">{</span>
+    <span class="nx">address</span> <span class="nx">erc20</span><span class="p">;</span>
+    <span class="kd">constructor</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">_erc20</span><span class="p">)</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="nx">owner</span>           <span class="o">=</span> <span class="nx">_who</span><span class="p">;</span>
+        <span class="nx">walletCenter</span>    <span class="o">=</span> <span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">;</span>
+        <span class="nx">erc20</span>           <span class="o">=</span> <span class="nx">_erc20</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="nx">struct</span> <span class="nx">item</span> <span class="p">{</span>
+        <span class="nx">uint8</span>                       <span class="nx">category</span><span class="p">;</span>   <span class="c1">// 0 = disable, 1 = non Stock, non Expire, 2 = can Expire (after 1 week), 3 = stackable</span>
+        <span class="nx">uint256</span>                     <span class="nx">price</span><span class="p">;</span>
+        <span class="nx">uint256</span>                     <span class="nx">stockCount</span><span class="p">;</span>
+
+        <span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span><span class="o">=&gt;</span><span class="nx">uint256</span><span class="p">)</span>   <span class="nx">customer</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nx">uint</span>                    <span class="nx">index</span><span class="p">;</span>
+    <span class="nx">mapping</span><span class="p">(</span><span class="nx">uint256</span><span class="o">=&gt;</span><span class="nx">item</span><span class="p">)</span>  <span class="nx">items</span><span class="p">;</span>
+    
+    <span class="kd">function</span> <span class="nx">pay</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyWallet</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">canBuy</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">_item</span><span class="p">));</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">msg</span><span class="p">.</span><span class="nx">value</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">erc20</span><span class="p">).</span><span class="nx">allowance</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="k">this</span><span class="p">))</span><span class="o">==</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="nx">erc20</span><span class="o">!=</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">erc20</span><span class="p">).</span><span class="nx">transferFrom</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="k">this</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">1</span> <span class="o">||</span> <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="nx">now</span> <span class="o">&gt;</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">],</span> <span class="mi">1</span> <span class="nx">weeks</span><span class="p">))</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span>   <span class="o">=</span> <span class="nx">now</span><span class="p">;</span>
+        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="nx">now</span> <span class="o">&lt;</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">],</span> <span class="mi">1</span> <span class="nx">weeks</span><span class="p">)</span> <span class="p">)</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span>   <span class="o">=</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">],</span> <span class="mi">1</span> <span class="nx">weeks</span><span class="p">);</span>
+        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span>   <span class="o">=</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">],</span><span class="mi">1</span><span class="p">);</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">stockCount</span>             <span class="o">=</span> <span class="nx">safeSub</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">stockCount</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nx">emit</span> <span class="nx">Pay</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">payCancel</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyWallet</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span> <span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">2</span><span class="o">&amp;&amp;</span><span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">],</span><span class="mi">2</span> <span class="nx">weeks</span><span class="p">)</span><span class="o">&gt;</span><span class="nx">now</span><span class="o">&amp;&amp;</span><span class="nx">balanceOf</span><span class="p">(</span><span class="nx">erc20</span><span class="p">)</span><span class="o">&gt;=</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+
+        <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">safeSub</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">],</span><span class="mi">1</span> <span class="nx">weeks</span><span class="p">);</span>
+        <span class="nx">transfer</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span> <span class="nx">erc20</span><span class="p">,</span> <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+        <span class="nx">_Wallet</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">).</span><span class="nx">refund</span><span class="p">(</span><span class="nx">erc20</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+        <span class="nx">emit</span> <span class="nx">Refund</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">refund</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_to</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="nx">onlyWallet</span><span class="p">(</span><span class="nx">_to</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">payable</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">isBuyer</span><span class="p">(</span><span class="nx">_to</span><span class="p">,</span><span class="nx">_item</span><span class="p">)</span><span class="o">&amp;&amp;</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">&amp;&amp;</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">||</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">2</span><span class="o">&amp;&amp;</span><span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">],</span><span class="mi">2</span> <span class="nx">weeks</span><span class="p">)</span><span class="o">&gt;</span><span class="nx">now</span><span class="p">)));</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">address</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">balance</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">erc20</span><span class="p">).</span><span class="nx">balanceOf</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="o">&gt;=</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">]</span>  <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">safeSub</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">],</span><span class="mi">1</span> <span class="nx">weeks</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">]</span>  <span class="o">=</span> <span class="nx">safeSub</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_to</span><span class="p">],</span><span class="mi">1</span><span class="p">);</span>
+            
+        <span class="nx">transfer</span><span class="p">(</span><span class="nx">_to</span><span class="p">,</span> <span class="nx">erc20</span><span class="p">,</span> <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+        <span class="nx">_Wallet</span><span class="p">(</span><span class="nx">_to</span><span class="p">).</span><span class="nx">refund</span><span class="p">(</span><span class="nx">erc20</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+        <span class="nx">emit</span> <span class="nx">Refund</span><span class="p">(</span><span class="nx">_to</span><span class="p">,</span><span class="nx">_item</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="nx">event</span> <span class="nx">Item</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">indexed</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_price</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">resister</span><span class="p">(</span><span class="nx">uint8</span> <span class="nx">_category</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_price</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_stock</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">_itemId</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">_category</span><span class="o">&gt;</span><span class="mi">0</span><span class="o">&amp;&amp;</span><span class="nx">_category</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">);</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">_price</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">);</span>
+        <span class="nx">items</span><span class="p">[</span><span class="nx">index</span><span class="p">]</span>    <span class="o">=</span> <span class="nx">item</span><span class="p">(</span><span class="nx">_category</span><span class="p">,</span><span class="nx">_price</span><span class="p">,</span><span class="nx">_stock</span><span class="p">);</span>
+        <span class="nx">index</span> <span class="o">=</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+        <span class="nx">emit</span> <span class="nx">Item</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span><span class="nx">_price</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">safeSub</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">update</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_price</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_stock</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">);</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">_price</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">);</span>
+        <span class="nx">uint256</span> <span class="nx">temp</span> <span class="o">=</span> <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">;</span>
+        <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span>      <span class="o">=</span> <span class="nx">_price</span><span class="p">;</span>
+        <span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">stockCount</span> <span class="o">=</span> <span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">stockCount</span><span class="p">,</span><span class="nx">_stock</span><span class="p">);</span>
+        
+        <span class="k">if</span><span class="p">(</span><span class="nx">temp</span><span class="o">!=</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">)</span>
+            <span class="nx">emit</span> <span class="nx">Item</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">price</span><span class="p">(</span><span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nx">erc20</span><span class="p">,</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">price</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">canBuy</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">_canBuy</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span>  <span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+                <span class="o">!</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_who</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+                <span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">stockCount</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="kd">function</span> <span class="nx">isBuyer</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_who</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_item</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">_buyer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">1</span><span class="o">&amp;&amp;</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_who</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">||</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">2</span><span class="o">&amp;&amp;</span><span class="nx">safeAdd</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_who</span><span class="p">],</span><span class="mi">1</span> <span class="nx">weeks</span><span class="p">)</span><span class="o">&gt;</span><span class="nx">now</span><span class="p">)</span><span class="o">||</span><span class="p">(</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">category</span><span class="o">==</span><span class="mi">3</span><span class="o">&amp;&amp;</span><span class="nx">items</span><span class="p">[</span><span class="nx">_item</span><span class="p">].</span><span class="nx">customer</span><span class="p">[</span><span class="nx">_who</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="nx">uint</span> <span class="nx">lastWithdrawal</span><span class="p">;</span>
+    <span class="kd">function</span> <span class="nx">withdrawal</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">,</span> <span class="nx">uint256</span> <span class="nx">_value</span><span class="p">)</span> <span class="nx">onlyOwner</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">success</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">require</span><span class="p">(</span><span class="nx">safeAdd</span><span class="p">(</span><span class="nx">lastWithdrawal</span><span class="p">,</span><span class="mi">1</span> <span class="nx">weeks</span><span class="p">)</span><span class="o">&lt;=</span><span class="nx">now</span><span class="p">);</span>
+        <span class="nx">require</span><span class="p">((</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">)?</span><span class="nx">address</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">balance</span><span class="p">:</span><span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">balanceOf</span><span class="p">(</span><span class="k">this</span><span class="p">))</span><span class="o">&gt;=</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">_erc20</span><span class="o">==</span><span class="nx">address</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="nx">owner</span><span class="p">.</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="k">else</span>
+            <span class="nx">ERC20Interface</span><span class="p">(</span><span class="nx">_erc20</span><span class="p">).</span><span class="nx">transfer</span><span class="p">(</span><span class="nx">owner</span><span class="p">,</span><span class="nx">_value</span><span class="p">);</span>
+        <span class="nx">lastWithdrawal</span> <span class="o">=</span> <span class="nx">now</span><span class="p">;</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">contract</span> <span class="nx">WalletCenter</span> <span class="p">{</span>
+    <span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span><span class="o">=&gt;</span><span class="nx">bool</span><span class="p">)</span> <span class="kr">public</span>     <span class="nx">wallet</span><span class="p">;</span>
+    <span class="nx">event</span> <span class="nx">Wallet</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_owner</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_wallet</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">createWallet</span><span class="p">()</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_wallet</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">_wallet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">_Wallet</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">);</span>
+        <span class="nx">wallet</span><span class="p">[</span><span class="nx">_wallet</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="nx">emit</span> <span class="nx">Wallet</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_wallet</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">_wallet</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">isWallet</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_wallet</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">wallet</span><span class="p">[</span><span class="nx">_wallet</span><span class="p">];</span>
+    <span class="p">}</span>
+    <span class="nx">mapping</span><span class="p">(</span><span class="nx">address</span><span class="o">=&gt;</span><span class="nx">bool</span><span class="p">)</span> <span class="kr">public</span>     <span class="nx">shop</span><span class="p">;</span>
+    <span class="nx">event</span> <span class="nx">Shop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_owner</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_shop</span><span class="p">,</span> <span class="nx">address</span> <span class="nx">indexed</span> <span class="nx">_erc20</span><span class="p">);</span>
+    <span class="kd">function</span> <span class="nx">createShop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_erc20</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">_shop</span>   <span class="o">=</span> <span class="k">new</span> <span class="nx">_Shop</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_erc20</span><span class="p">);</span>
+        <span class="nx">shop</span><span class="p">[</span><span class="nx">_shop</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="nx">emit</span> <span class="nx">Shop</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">sender</span><span class="p">,</span><span class="nx">_shop</span><span class="p">,</span><span class="nx">_erc20</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">_shop</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">isShop</span><span class="p">(</span><span class="nx">address</span> <span class="nx">_shop</span><span class="p">)</span> <span class="kr">public</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">shop</span><span class="p">[</span><span class="nx">_shop</span><span class="p">];</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/Nitro888">Jet Lim</a>, "EIP-1175: Wallet &amp; shop standard for all tokens (erc20) [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1175, June 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1175.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1175: Wallet &amp; shop standard for all tokens (erc20) [DRAFT]",
+    "author": "Jet Lim (@Nitro888)",
+    "name": "EIP-1175: Wallet &amp; shop standard for all tokens (erc20) [DRAFT]",
+    "dateCreated": "2018-06-21",
+    "datePublished": "2018-06-21",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1182",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

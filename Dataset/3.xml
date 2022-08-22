@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3: Addition of CALLDEPTH opcode</title>
+<meta property="og:title" content="EIP-3: Addition of CALLDEPTH opcode" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="withdrawn">
+🛑 This EIP has been withdrawn.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3: Addition of CALLDEPTH opcode
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#b8d5d9caccd1d6f8cbcfddd6dcdd96cbdd">Martin Holst Swende</a></td></tr>
+<tr><th>Status</th><td>Withdrawn
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2015-11-19</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a></li>
+</ul>
+</div>
+<h1 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h1>
+<p>This is a proposal to add a new opcode, <code class="language-plaintext highlighter-rouge">CALLDEPTH</code>. The <code class="language-plaintext highlighter-rouge">CALLDEPTH</code> opcode would return the remaining available call stack depth.</p>
+<h1 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h1>
+<p>There is a limit specifying how deep contracts can call other contracts; the call stack. The limit is currently <code class="language-plaintext highlighter-rouge">256</code>. If a contract invokes another contract (either via <code class="language-plaintext highlighter-rouge">CALL</code> or <code class="language-plaintext highlighter-rouge">CALLCODE</code>), the operation will fail if the call stack depth limit has been reached.</p>
+<p>This behaviour makes it possible to subject a contract to a “call stack attack” [1]. In such an attack, an attacker first creates a suitable depth of the stack, e.g. by recursive calls. After this step, the attacker invokes the targeted contract. If the targeted calls another contract, that call will fail. If the return value is not properly checked to see if the call was successful, the consequences could be damaging.</p>
+<p>Example:</p>
+<ol>
+<li>Contract <code class="language-plaintext highlighter-rouge">A</code> wants to be invoked regularly, and pays Ether to the invoker in every block.</li>
+<li>When contract <code class="language-plaintext highlighter-rouge">A</code> is invoked, it calls contracts <code class="language-plaintext highlighter-rouge">B</code> and <code class="language-plaintext highlighter-rouge">C</code>, which consumes a lot of gas. After invocation, contract <code class="language-plaintext highlighter-rouge">A</code> pays Ether to the caller.</li>
+<li>Malicious user <code class="language-plaintext highlighter-rouge">X</code> ensures that the stack depth is shallow before invoking A. Both calls to <code class="language-plaintext highlighter-rouge">B</code> and <code class="language-plaintext highlighter-rouge">C</code> fail, but <code class="language-plaintext highlighter-rouge">X</code> can still collect the reward.</li>
+</ol>
+<p>It is possible to defend against this in two ways:</p>
+<ol>
+<li>Check return value after invocation.</li>
+<li>Check call stack depth experimentally. A library [2] by Piper Merriam exists for this purpose. This method is quite costly in gas.</li>
+</ol>
+<p>[1] a.k.a “shallow stack attack” and “stack attack”. However, to be precise, the word ‘‘stack’’ has a different meaning within the EVM, and is not to be confused with the ‘‘call stack’’.</p>
+<p>[2] https://github.com/pipermerriam/ethereum-stack-depth-lib</p>
+<h1 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h1>
+<p>The opcode <code class="language-plaintext highlighter-rouge">CALLDEPTH</code> should return the remaining call stack depth. A value of <code class="language-plaintext highlighter-rouge">0</code> means that the call stack is exhausted, and no further calls can be made.</p>
+<h1 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h1>
+<p>The actual call stack depth, as well as the call stack depth limit, are present in the EVM during execution, but just not available within the EVM. The implementation should be fairly simple and would provide a cheap and way to protect against call stack attacks.</p>
+<h1 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h1>
+<p>Not implemented.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#3e535f4c4a57507e4d495b505a5b104d5b">Martin Holst Swende</a>, "EIP-3: Addition of CALLDEPTH opcode [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3, November 2015. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3: Addition of CALLDEPTH opcode [DRAFT]",
+    "author": "Martin Holst Swende <martin@swende.se>",
+    "name": "EIP-3: Addition of CALLDEPTH opcode [DRAFT]",
+    "dateCreated": "2015-11-19",
+    "datePublished": "2015-11-19",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2015"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

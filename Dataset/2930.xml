@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2930: Optional access lists</title>
+<meta property="og:title" content="EIP-2930: Optional access lists" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2930" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2930" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-2930: Optional access lists
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2930.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2930-optional-access-lists/4561">https://ethereum-magicians.org/t/eip-2930-optional-access-lists/4561</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-08-29</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2718">2718</a>,
+<a href="eip-2929">2929</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#parameters">Parameters</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#charging-less-for-accesses-in-the-access-list">Charging less for accesses in the access list</a></li>
+<li><a href="#allowing-duplicates">Allowing duplicates</a></li>
+<li><a href="#signature-signs-over-the-transaction-type-as-well-as-the-transaction-data">Signature signs over the transaction type as well as the transaction data</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#access-list-generation">Access list generation</a></li>
+<li><a href="#transaction-size-bloating">Transaction size bloating</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Adds a transaction type which contains an access list, a list of addresses and storage keys that the transaction plans to access. Accesses outside the list are possible, but become more expensive.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>We introduce a new <a href="/EIPS/eip-2718">EIP-2718</a> transaction type, with the format <code class="language-plaintext highlighter-rouge">0x01 || rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, accessList, signatureYParity, signatureR, signatureS])</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">accessList</code> specifies a list of addresses and storage keys; these addresses and storage keys are added into the <code class="language-plaintext highlighter-rouge">accessed_addresses</code> and <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code> global sets (introduced in <a href="/EIPS/eip-2929">EIP-2929</a>). A gas cost is charged, though at a discount relative to the cost of accessing outside the list.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>This EIP serves two functions:</p>
+<ol>
+<li>Mitigates contract breakage risks introduced by <a href="/EIPS/eip-2929">EIP-2929</a>, as transactions could pre-specify and pre-pay for the accounts and storage slots that the transaction plans to access; as a result, in the actual execution, the SLOAD and EXT* opcodes would only cost 100 gas: low enough that it would not only prevent breakage due to that EIP but also “unstuck” any contracts that became stuck due to EIP 1884.</li>
+<li>Introduces the access list format and the logic for handling the format. This logic can later be repurposed for many other purposes, including block-wide witnesses, use in ReGenesis, moving toward static state access over time, and more.</li>
+</ol>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h3>
+<p><strong><code class="language-plaintext highlighter-rouge">TransactionType</code></strong> <code class="language-plaintext highlighter-rouge">1</code>. See <a href="/EIPS/eip-2718">EIP-2718</a></p>
+<p><strong><code class="language-plaintext highlighter-rouge">ChainId</code></strong> The transaction only valid on networks with this <code class="language-plaintext highlighter-rouge">chainID</code>.</p>
+<p><strong><code class="language-plaintext highlighter-rouge">YParity</code></strong> The parity (0 for even, 1 for odd) of the y-value of a secp256k1 signature.</p>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></td>
+<td>12244000</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">ACCESS_LIST_STORAGE_KEY_COST</code></td>
+<td>1900</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">ACCESS_LIST_ADDRESS_COST</code></td>
+<td>2400</td>
+</tr>
+</tbody>
+</table>
+<p>As of <code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUMBER</code>, a new <a href="/EIPS/eip-2718">EIP-2718</a> transaction is introduced with <code class="language-plaintext highlighter-rouge">TransactionType</code> <code class="language-plaintext highlighter-rouge">1</code>.</p>
+<p>The <a href="/EIPS/eip-2718">EIP-2718</a> <code class="language-plaintext highlighter-rouge">TransactionPayload</code> for this transaction is <code class="language-plaintext highlighter-rouge">rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, accessList, signatureYParity, signatureR, signatureS])</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">signatureYParity, signatureR, signatureS</code> elements of this transaction represent a secp256k1 signature over <code class="language-plaintext highlighter-rouge">keccak256(0x01 || rlp([chainId, nonce, gasPrice, gasLimit, to, value, data, accessList]))</code>.</p>
+<p>The <a href="/EIPS/eip-2718">EIP-2718</a> <code class="language-plaintext highlighter-rouge">ReceiptPayload</code> for this transaction is <code class="language-plaintext highlighter-rouge">rlp([status, cumulativeGasUsed, logsBloom, logs])</code>.</p>
+<p>For the transaction to be valid, <code class="language-plaintext highlighter-rouge">accessList</code> must be of type <code class="language-plaintext highlighter-rouge">[[{20 bytes}, [{32 bytes}...]]...]</code>, where <code class="language-plaintext highlighter-rouge">...</code> means “zero or more of the thing to the left”. For example, the following is a valid access list (all hex strings would in reality be in byte representation):</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[
+    [
+        "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae",
+        [
+            "0x0000000000000000000000000000000000000000000000000000000000000003",
+            "0x0000000000000000000000000000000000000000000000000000000000000007"
+        ]
+    ],
+    [
+        "0xbb9bc244d798123fde783fcc1c72d3bb8c189413",
+        []
+    ]
+]
+</code></pre></div></div>
+<p>At the beginning of execution (ie. at the same time as the <code class="language-plaintext highlighter-rouge">21000 + 4 * zeroes + 16 * nonzeroes</code> start gas is charged according to <a href="/EIPS/eip-2028">EIP-2028</a> rules), we charge additional gas for the access list: <code class="language-plaintext highlighter-rouge">ACCESS_LIST_ADDRESS_COST</code> gas per address and <code class="language-plaintext highlighter-rouge">ACCESS_LIST_STORAGE_KEY_COST</code> gas per storage key. For example, the above example would be charged <code class="language-plaintext highlighter-rouge">ACCESS_LIST_ADDRESS_COST * 2 + ACCESS_LIST_STORAGE_KEY_COST * 2</code> gas.</p>
+<p>Note that non-unique addresses and storage keys are not disallowed, though they will be charged for multiple times, and aside from the higher gas cost there is no other difference in execution flow or outcome from multiple-inclusion of a value as opposed to the recommended single-inclusion.</p>
+<p>The address and storage keys would be immediately loaded into the <code class="language-plaintext highlighter-rouge">accessed_addresses</code> and <code class="language-plaintext highlighter-rouge">accessed_storage_keys</code> global sets; this can be done using the following logic (which doubles as a specification-in-code of validation of the RLP-decoded access list)</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">process_access_list</span><span class="p">(</span><span class="n">access_list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="n">Address</span><span class="p">],</span> <span class="n">Set</span><span class="p">[</span><span class="n">Pair</span><span class="p">[</span><span class="n">Address</span><span class="p">,</span> <span class="n">Bytes32</span><span class="p">]]],</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="n">accessed_addresses</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">accessed_storage_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">gas_cost</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">access_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">access_list</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+        <span class="c1"># Validate and add the address
+</span>        <span class="n">address</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">address</span><span class="p">)</span> <span class="o">==</span> <span class="mi">20</span>
+        <span class="n">accessed_addresses</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
+        <span class="n">gas_cost</span> <span class="o">+=</span> <span class="n">ACCESS_LIST_ADDRESS_COST</span>
+        <span class="c1"># Validate and add the storage keys
+</span>        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">32</span>
+            <span class="n">accessed_storage_keys</span><span class="p">.</span><span class="n">add</span><span class="p">((</span><span class="n">address</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+            <span class="n">gas_cost</span> <span class="o">+=</span> <span class="n">ACCESS_LIST_STORAGE_KEY_COST</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">accessed_addresses</span><span class="p">,</span>
+        <span class="n">accessed_storage_keys</span><span class="p">,</span>
+        <span class="n">gas_cost</span>
+    <span class="p">)</span>
+</code></pre></div></div>
+<p>The access list is NOT charged per-byte fees like tx data is; the per-item costs described above are meant to cover the bandwidth costs of the access list data in addition to the costs of accessing those accounts and storage keys when evaluating the transaction.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="charging-less-for-accesses-in-the-access-list">
+<a href="#charging-less-for-accesses-in-the-access-list" class="anchor-link"></a> Charging less for accesses in the access list
+</h3>
+<p>This is done to encourage transactions to use the access list as much as possible, and because processing transactions is easier when their storage reads are predictable (because clients can pre-load the data from databases and/or ask for witnesses at the time the transaction is received, or at least load the data in parallel).</p>
+<h3 id="allowing-duplicates">
+<a href="#allowing-duplicates" class="anchor-link"></a> Allowing duplicates
+</h3>
+<p>This is done because it maximizes simplicity, avoiding questions of what to prevent duplication against: just between two addresses/keys in the access list, between the access list and the tx sender/recipient/newly created contract, other restrictions? Because gas is charged per item, there is no gain and only cost in including a value in the access list twice, so this should not lead to extra chain bloat in practice.</p>
+<h3 id="signature-signs-over-the-transaction-type-as-well-as-the-transaction-data">
+<a href="#signature-signs-over-the-transaction-type-as-well-as-the-transaction-data" class="anchor-link"></a> Signature signs over the transaction type as well as the transaction data
+</h3>
+<p>This is done to ensure that the transaction cannot be “re-interpreted” as a transaction of a different type.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP does make it more gas-expensive to perform “unexpected” SLOADs and account accesses. Because gas is prepaid and so does not affect fixed-gas local calls, it does not break contracts in the way that previous gas cost increases would risk. However, it does make applications that heavily rely on storage access much less economically viable.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="access-list-generation">
+<a href="#access-list-generation" class="anchor-link"></a> Access list generation
+</h3>
+<p>Access lists are difficult to construct in real-time in many situations, and this is exacerbated in environments where there is a high time lag between transaction generation and signing or simplicity of the transaction generator is highly valued (eg. either or both may apply in hardware wallets).</p>
+<p>However, this EIP proposes only a 10% initial discount to access lists, so there is almost no cost to not bothering with access list generation and only making a simple transaction. The cost of accessing state outside the access list is expected to be ramped up in future hard forks over time as tools are developed and access list generation becomes more mature.</p>
+<h3 id="transaction-size-bloating">
+<a href="#transaction-size-bloating" class="anchor-link"></a> Transaction size bloating
+</h3>
+<p>Average block size will increase as a result of access lists being used. However, the per-byte cost of access lists is <code class="language-plaintext highlighter-rouge">1900 / 32 = 59.375</code> for storage keys and <code class="language-plaintext highlighter-rouge">2400 / 20 = 120</code> for addresses, making it much more expensive than calldata; hence, worst-case block size will not increase. Additionally, increases in average block size will be partially compensated for by the ability to pre-fetch storage at time of receiving a transaction and/or load storage in parallel upon receiving a block.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/vbuterin">Vitalik Buterin</a>, <a href="https://github.com/holiman">Martin Swende</a>, "EIP-2930: Optional access lists," <em>Ethereum Improvement Proposals</em>, no. 2930, August 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2930.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2930: Optional access lists",
+    "author": "Vitalik Buterin (@vbuterin), Martin Swende (@holiman)",
+    "name": "EIP-2930: Optional access lists",
+    "dateCreated": "2020-08-29",
+    "datePublished": "2020-08-29",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2930-optional-access-lists/4561",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1153: Transient storage opcodes</title>
+<meta property="og:title" content="EIP-1153: Transient storage opcodes" />
+<meta name="description" content="Add opcodes for manipulating state that behaves identically to storage but is discarded after every transaction" />
+<meta property="og:description" content="Add opcodes for manipulating state that behaves identically to storage but is discarded after every transaction" />
+<meta name="twitter:description" content="Add opcodes for manipulating state that behaves identically to storage but is discarded after every transaction" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1153" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1153" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="review">
+📖 This EIP is in the review stage. It is subject to changes and feedback is appreciated.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1153: Transient storage opcodes
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1153.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Add opcodes for manipulating state that behaves identically to storage but is discarded after every transaction</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/AlexeyAkhunov">Alexey Akhunov</a>, <a href="https://github.com/moodysalem">Moody Salem</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-transient-storage-opcodes/553">https://ethereum-magicians.org/t/eip-transient-storage-opcodes/553</a></td></tr>
+<tr><th>Status</th><td>Review
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2018-06-15</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2200">2200</a>,
+<a href="eip-3529">3529</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal introduces transient storage opcodes, which manipulate state that behaves identically to storage, except that transient storage is discarded after every transaction. In other words, the values of transient storage are never deserialized from storage or serialized to storage. Thus transient storage is cheaper since it never requires disk access. Transient storage is accessible to smart contracts via 2 new opcodes, <code class="language-plaintext highlighter-rouge">TLOAD</code> and <code class="language-plaintext highlighter-rouge">TSTORE</code>, where “T” stands for “transient:”</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TLOAD  (0xb3)
+TSTORE (0xb4)
+</code></pre></div></div>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Running a transaction in Ethereum can generate multiple nested frames of execution, each created by <code class="language-plaintext highlighter-rouge">CALL</code> (or similar) instructions. Contracts can be re-entered during the same transaction, in which case there are more than one frame belonging to one contract. Currently, these frames can communicate in two ways: via inputs/outputs passed via <code class="language-plaintext highlighter-rouge">CALL</code> instructions, and via storage updates. If there is an intermediate frame belonging to another untrusted contract, communication via inputs/outputs is not secure. Notable example is a reentrancy lock which cannot rely on the intermediate frame to pass through the state of the lock. Communication via storage (<code class="language-plaintext highlighter-rouge">SSTORE</code>/<code class="language-plaintext highlighter-rouge">SLOAD</code>) is costly. Transient storage is a dedicated and gas efficient solution to the problem of inter frame communication.</p>
+<p>Storage refunds accumulated due to inter frame communication are also limited to 20% of gas spent by a transaction due to <a href="/EIPS/eip-3529">EIP-3529</a> (introduced in the London hard fork). This greatly reduces the refunds for transiently-set storage slots in otherwise low-cost transactions. For example, in order to receive the full refund of one re-entrancy lock, the transaction must spend ~80k gas on other operations.</p>
+<p>Language support could be added in relatively easy way. For example, in Solidity, a qualifier <code class="language-plaintext highlighter-rouge">transient</code> can be introduced (similar to the existing qualifiers <code class="language-plaintext highlighter-rouge">memory</code> and <code class="language-plaintext highlighter-rouge">storage</code>, and Java’s own <code class="language-plaintext highlighter-rouge">transient</code> keyword with a similar meaning). Since the addressing scheme of <code class="language-plaintext highlighter-rouge">TSTORE</code> and <code class="language-plaintext highlighter-rouge">TLOAD</code> is the same as for <code class="language-plaintext highlighter-rouge">SSTORE</code> and <code class="language-plaintext highlighter-rouge">SLOAD</code>, code generation routines that exist for storage variables, can be easily generalised to also support transient storage.</p>
+<p>Potential use cases enabled or improved by this EIP include:</p>
+<ol>
+<li>Reentrancy lock</li>
+<li>Constructor arguments loaded from the factory contract (for on-chain-computable CREATE2 addresses as in Uniswap V3)</li>
+<li>Single transaction ERC20 approvals, e.g. <code class="language-plaintext highlighter-rouge">#approveAndCall(address callee, uint256 amount, bytes memory data)</code></li>
+<li>More generic libraries that use callbacks, for example generalised sorting with functions <code class="language-plaintext highlighter-rouge">Less</code> and <code class="language-plaintext highlighter-rouge">Swap</code> defined.</li>
+<li>Contracts that require control before and after method execution (e.g. via callbacks)</li>
+<li>Shared memory (borrowed from early draft of similar EIP by @holiman). When implementing contract-proxies using <code class="language-plaintext highlighter-rouge">DELEGATECALL</code>, all direct arguments are relayed from the caller to the callee via the <code class="language-plaintext highlighter-rouge">CALLDATA</code>, leaving no room for meta-data between the proxy and the proxee. Also, the proxy must be careful about <code class="language-plaintext highlighter-rouge">storage</code> access to avoid collision with <code class="language-plaintext highlighter-rouge">target</code> <code class="language-plaintext highlighter-rouge">storage</code>-slots. Since <code class="language-plaintext highlighter-rouge">transient storage</code> would be shared, it would be possible to use <code class="language-plaintext highlighter-rouge">transient storage</code> to pass information between the <code class="language-plaintext highlighter-rouge">proxy</code> and the <code class="language-plaintext highlighter-rouge">target</code>.</li>
+</ol>
+<p>These opcodes are more efficient to execute than the <code class="language-plaintext highlighter-rouge">SSTORE</code> and <code class="language-plaintext highlighter-rouge">SLOAD</code> opcodes because the original value never needs to be loaded from storage (i.e. is always 0). The gas accounting rules are also simpler, since no refunds are required.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Two new opcodes are added to EVM, <code class="language-plaintext highlighter-rouge">TLOAD</code> (<code class="language-plaintext highlighter-rouge">0xb3</code>) and <code class="language-plaintext highlighter-rouge">TSTORE</code> (<code class="language-plaintext highlighter-rouge">0xb4</code>). Note that previous drafts of this EIP specified the values <code class="language-plaintext highlighter-rouge">0x5c</code> and <code class="language-plaintext highlighter-rouge">0x5d</code> for <code class="language-plaintext highlighter-rouge">TLOAD</code> and <code class="language-plaintext highlighter-rouge">TSTORE</code> respectively, but these have been modified so as not to conflict with other draft EIPs.</p>
+<p>They use the same arguments on stack as <code class="language-plaintext highlighter-rouge">SLOAD</code> (<code class="language-plaintext highlighter-rouge">0x54</code>) and <code class="language-plaintext highlighter-rouge">SSTORE</code> (<code class="language-plaintext highlighter-rouge">0x55</code>).</p>
+<p><code class="language-plaintext highlighter-rouge">TLOAD</code> pops one 32-byte word from the top of the stack, treats this value as the address, fetches 32-byte word from the transient storage at that address, and pops the value on top of the stack.</p>
+<p><code class="language-plaintext highlighter-rouge">TSTORE</code> pops two 32-byte words from the top of the stack. The word on the top is the address, and the next is the value. <code class="language-plaintext highlighter-rouge">TSTORE</code> saves the value at the given address in the transient storage.</p>
+<p>Addressing is the same as <code class="language-plaintext highlighter-rouge">SLOAD</code> and <code class="language-plaintext highlighter-rouge">SSTORE</code>. i.e. each 32-byte address points to a unique 32-byte word.</p>
+<p>Gas cost for <code class="language-plaintext highlighter-rouge">TSTORE</code> is the same as a warm <code class="language-plaintext highlighter-rouge">SSTORE</code> of a dirty slot (i.e. original value is not new value and is not current value, currently 100 gas), and gas cost of <code class="language-plaintext highlighter-rouge">TLOAD</code> is the same as a hot <code class="language-plaintext highlighter-rouge">SLOAD</code> (value has been read before, currently 100 gas). Gas cost cannot be on par with memory access due to transient storage’s interactions with reverts.</p>
+<p>All values in transient storage are discarded at the end of the transaction.</p>
+<p>Transient storage is private to the contract that owns it, in the same way as persistent storage. Only owning contract frames may access their transient storage. And when they do, all the frames access the same transient store, in the same way as persistent storage, but unlike memory.</p>
+<p>When transient storage is used in the context of <code class="language-plaintext highlighter-rouge">DELEGATECALL</code> or <code class="language-plaintext highlighter-rouge">CALLCODE</code>, then the owning contract of the transient storage is the contract that issued <code class="language-plaintext highlighter-rouge">DELEGATECALL</code> or <code class="language-plaintext highlighter-rouge">CALLCODE</code> instruction (the caller) as with persistent storage. When transient storage is used in the context of <code class="language-plaintext highlighter-rouge">CALL</code> or <code class="language-plaintext highlighter-rouge">STATICCALL</code>, then the owning contract of the transient storage is the contract that is the target of the <code class="language-plaintext highlighter-rouge">CALL</code> or <code class="language-plaintext highlighter-rouge">STATICCALL</code> instruction (the callee).</p>
+<p>If a frame reverts, all writes to transient storage that took place between entry to the frame and the return are reverted, including those that took place in inner calls. This mimics the behavior of persistent storage.</p>
+<p>If the <code class="language-plaintext highlighter-rouge">TSTORE</code> opcode is called within the context of a <code class="language-plaintext highlighter-rouge">STATICCALL</code>, the call must revert. <code class="language-plaintext highlighter-rouge">TLOAD</code> is allowed within the context of a <code class="language-plaintext highlighter-rouge">STATICCALL</code>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Another option to solve the problem of inter-frame communication is repricing the <code class="language-plaintext highlighter-rouge">SSTORE</code> and <code class="language-plaintext highlighter-rouge">SLOAD</code> opcodes to be cheaper for the transient storage use case. This has already been done as of <a href="/EIPS/eip-2200">EIP-2200</a>. However, <a href="/EIPS/eip-3529">EIP-3529</a> reduced the maximum refund to only 20% of the transaction gas cost, which means the use of transient storage is severely limited.</p>
+<p>Another approach is to keep the refund counter for transient storage separate from the refund counter for other storage uses, and remove the refund cap for transient storage. However, that approach is more complex to implement and understand. For example, the 20% refund cap must be applied to the gas used <em>after</em> subtracting the uncapped gas refund. Otherwise, the refund amount available subject to the 20% refund cap could be increased by executing transient storage writes. Thus it is preferable to have a separate mechanism that does not interact with the refund counter. Future hard forks can remove the complex refund behavior meant to support the transient storage use case, encouraging migration to contracts that are more efficient for the Ethereum clients to execute.</p>
+<p>Relative cons of this transient storage EIP:</p>
+<ul>
+<li>Does not address transient usages of storage in existing contracts</li>
+<li>New code in the clients</li>
+<li>New concept for the yellow paper (more to update)</li>
+</ul>
+<p>Relative pros of this transient storage EIP:</p>
+<ul>
+<li>Transient storage opcodes are considered separately in protocol upgrades and not inadvertently broken (e.g. <a href="/EIPS/eip-3529">EIP-3529</a>)</li>
+<li>Clients do not need to load the original value</li>
+<li>No upfront gas cost to account for non-transient writes</li>
+<li>Does not change the semantics of the existing operations</li>
+<li>No need to clear storage slots after usage</li>
+<li>Simpler gas accounting rules</li>
+<li>Future storage designs (e.g. Verkle tree) do not need to account for transient storage refunds</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP requires a hard fork to implement.</p>
+<p>Since this EIP does not change behavior of any existing opcodes, it is backwards compatible with all existing smart contracts.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>Because the transient storage must behave identically to storage within the context of a single transaction with regards to revert behavior, it is necessary to be able to revert to a previous state of transient storage within a transaction. At the same time reverts are exceptional cases and loads, stores and returns should be cheap.</p>
+<p>A map of current state plus a journal of all changes and a list of checkpoints is recommended. This has the following time complexities:</p>
+<ul>
+<li>On entry to a call frame, a call marker is added to the list - <code class="language-plaintext highlighter-rouge">O(1)</code></li>
+<li>New values are written to the current state, and the previous value is written to the journal - <code class="language-plaintext highlighter-rouge">O(1)</code></li>
+<li>When a call exits successfully, the marker to the journal index of when that call was entered is discarded - <code class="language-plaintext highlighter-rouge">O(1)</code></li>
+<li>On revert all entries are reverted up to the last checkpoint, in reverse - <code class="language-plaintext highlighter-rouge">O(N)</code> where <code class="language-plaintext highlighter-rouge">N</code> = number of journal entries since last checkpoint</li>
+</ul>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">JournalEntry</span> <span class="p">{</span>
+    <span class="nl">addr</span><span class="p">:</span> <span class="kr">string</span>
+    <span class="nx">key</span><span class="p">:</span> <span class="kr">string</span>
+    <span class="nx">prevValue</span><span class="p">:</span> <span class="kr">string</span>
+<span class="p">}</span>
+
+<span class="kd">type</span> <span class="nx">Journal</span> <span class="o">=</span> <span class="nx">JournalEntry</span><span class="p">[]</span>
+
+<span class="kd">type</span> <span class="nx">Checkpoints</span> <span class="o">=</span> <span class="nx">Journal</span><span class="p">[</span><span class="dl">'</span><span class="s1">length</span><span class="dl">'</span><span class="p">][]</span>
+
+<span class="kr">interface</span> <span class="nx">Current</span> <span class="p">{</span>
+    <span class="p">[</span><span class="nx">addr</span><span class="p">:</span> <span class="kr">string</span><span class="p">]:</span> <span class="p">{</span>
+        <span class="p">[</span><span class="nx">key</span><span class="p">:</span> <span class="kr">string</span><span class="p">]:</span> <span class="kr">string</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">EMPTY_VALUE</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">0x0000000000000000000000000000000000000000000000000000000000000000</span><span class="dl">'</span>
+
+<span class="kd">class</span> <span class="nx">TransientStorage</span> <span class="p">{</span>
+    <span class="cm">/**
+     * The current state of transient storage.
+     */</span>
+    <span class="k">private</span> <span class="nx">current</span><span class="p">:</span> <span class="nx">Current</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="cm">/**
+     * All changes are written to the journal. On revert, we apply the changes in reverse to the last checkpoint.
+     */</span>
+    <span class="k">private</span> <span class="nx">journal</span><span class="p">:</span> <span class="nx">Journal</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="cm">/**
+     * The length of the journal at the time of each checkpoint
+     */</span>
+    <span class="k">private</span> <span class="nx">checkpoints</span><span class="p">:</span> <span class="nx">Checkpoints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="cm">/**
+     * Returns the current value of the given contract address and key
+     * @param addr The address of the contract
+     * @param key The key of transient storage for the address
+     */</span>
+    <span class="k">public</span> <span class="kd">get</span><span class="p">(</span><span class="nx">addr</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">key</span><span class="p">:</span> <span class="kr">string</span><span class="p">):</span> <span class="kr">string</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">current</span><span class="p">[</span><span class="nx">addr</span><span class="p">]?.[</span><span class="nx">key</span><span class="p">]</span> <span class="o">??</span> <span class="nx">EMPTY_VALUE</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**
+     * Set the current value in the map
+     * @param addr the address of the contract for which the key is being set
+     * @param key the slot to set for the address
+     * @param value the new value of the slot to set
+     */</span>
+    <span class="k">public</span> <span class="nx">put</span><span class="p">(</span><span class="nx">addr</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">key</span><span class="p">:</span> <span class="kr">string</span><span class="p">,</span> <span class="nx">value</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">journal</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span>
+            <span class="nx">addr</span><span class="p">,</span>
+            <span class="nx">key</span><span class="p">,</span>
+            <span class="na">prevValue</span><span class="p">:</span> <span class="k">this</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="nx">addr</span><span class="p">,</span> <span class="nx">key</span><span class="p">),</span>
+        <span class="p">})</span>
+
+        <span class="k">this</span><span class="p">.</span><span class="nx">current</span><span class="p">[</span><span class="nx">addr</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">current</span><span class="p">[</span><span class="nx">addr</span><span class="p">]</span> <span class="o">??</span> <span class="p">{}</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">current</span><span class="p">[</span><span class="nx">addr</span><span class="p">][</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**
+     * Commit all the changes since the last checkpoint
+     */</span>
+    <span class="k">public</span> <span class="nx">commit</span><span class="p">():</span> <span class="k">void</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">checkpoints</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Nothing to commit</span><span class="dl">'</span><span class="p">)</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">checkpoints</span><span class="p">.</span><span class="nx">pop</span><span class="p">()</span> <span class="c1">// The last checkpoint is discarded.</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**
+     * To be called whenever entering a new context. If revert is called after checkpoint, all changes made after the latest checkpoint are reverted.
+     */</span>
+    <span class="k">public</span> <span class="nx">checkpoint</span><span class="p">():</span> <span class="k">void</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">checkpoints</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">journal</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="cm">/**
+     * Revert transient storage to the state from the last call to checkpoint
+     */</span>
+    <span class="k">public</span> <span class="nx">revert</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">const</span> <span class="nx">lastCheckpoint</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">checkpoints</span><span class="p">.</span><span class="nx">pop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">lastCheckpoint</span> <span class="o">===</span> <span class="dl">'</span><span class="s1">undefined</span><span class="dl">'</span><span class="p">)</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="dl">'</span><span class="s1">Nothing to revert</span><span class="dl">'</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">journal</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&gt;=</span> <span class="nx">lastCheckpoint</span><span class="p">;</span> <span class="nx">i</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">const</span> <span class="p">{</span><span class="nx">addr</span><span class="p">,</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">prevValue</span><span class="p">}</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">journal</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+            <span class="c1">// we can assume it exists, since it was written in the journal</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">current</span><span class="p">[</span><span class="nx">addr</span><span class="p">][</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="nx">prevValue</span>
+        <span class="p">}</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">journal</span><span class="p">.</span><span class="nx">splice</span><span class="p">(</span><span class="nx">lastCheckpoint</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">journal</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">lastCheckpoint</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The worst case time complexity can be produced by writing the maximum number of keys that can fit in one block, and then reverting. In this case, the client is required to do twice as many writes to apply all the entries in the journal. However, the same case applies to the state journaling implementation of existing clients, and cannot be DOS’d with the following code.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">=</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">13</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">TryDOS</span> <span class="p">{</span>
+    <span class="kt">uint256</span> <span class="n">slot</span><span class="p">;</span>
+
+    <span class="k">constructor</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">slot</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">tryDOS</span><span class="p">()</span> <span class="k">external</span> <span class="p">{</span>
+        <span class="kt">uint256</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nb">gasleft</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">5000</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kr">unchecked</span> <span class="p">{</span>
+                <span class="n">slot</span> <span class="o">=</span> <span class="n">i</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="nb">revert</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p><code class="language-plaintext highlighter-rouge">TSTORE</code> presents a new way to allocate memory on a node with linear cost. In other words, each TSTORE allows the developer to store 32 bytes for 100 gas, excluding any other required operations to prepare the stack. Given 30 million gas, the maximum amount of memory that can be allocated using TSTORE is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>30M gas * 1 TSTORE / 100 gas * 32 bytes / 1 TSTORE * 1MB / 2^20 bytes ~= 9.15MB
+</code></pre></div></div>
+<p>Given the same amount of gas, the maximum amount of memory that can be allocated in a single context by <code class="language-plaintext highlighter-rouge">MSTORE</code> is ~3.75MB:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>30M gas = 3x + x^2 / 512 =&gt; x = ~123,169 32-byte words
+~123,169 words * 32 bytes/word * 1MB / 2^20 bytes = 3.75MB
+</code></pre></div></div>
+<p>However, if you only spend 1M gas allocating memory in each context, and make calls to reset the memory expansion cost, you can allocate ~700KB per million gas, for a total of ~20MB of memory allocated:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1M gas = 3x + x^2 / 512 =&gt; x = ~21,872 32-byte words
+30M gas * ~21,872 words / 1M gas * 32 bytes/word * 1MB / 2^20 bytes = ~20MB
+</code></pre></div></div>
+<p>For smart contract developers, there are no security considerations for existing contracts because they do not contain the new <code class="language-plaintext highlighter-rouge">TSTORE</code> or <code class="language-plaintext highlighter-rouge">TLOAD</code> opcodes. New contracts that do use the <code class="language-plaintext highlighter-rouge">TSTORE</code> and <code class="language-plaintext highlighter-rouge">TLOAD</code> opcodes operate under all the same assumptions as with storage. This EIP introduces no additional mental overhead for the developer. In some cases, transient storage simplifies contracts in that contract transient storage does not need to be cleared at the end of every transaction, e.g. in the ERC20 temporary approvals use case.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/AlexeyAkhunov">Alexey Akhunov</a>, <a href="https://github.com/moodysalem">Moody Salem</a>, "EIP-1153: Transient storage opcodes [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1153, June 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1153.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1153: Transient storage opcodes [DRAFT]",
+    "author": "Alexey Akhunov (@AlexeyAkhunov), Moody Salem (@moodysalem)",
+    "name": "EIP-1153: Transient storage opcodes [DRAFT]",
+    "dateCreated": "2018-06-15",
+    "datePublished": "2018-06-15",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-transient-storage-opcodes/553",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

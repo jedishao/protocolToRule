@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2982: Serenity Phase 0</title>
+<meta property="og:title" content="EIP-2982: Serenity Phase 0" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2982" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2982" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2982: Serenity Phase 0
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2982.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/djrtwo">Danny Ryan</a>, <a href="https://github.com/vbuterin">Vitalik Buterin</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/serenity-phase-0-eip/4621">https://ethereum-magicians.org/t/serenity-phase-0-eip/4621</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2021-09-09</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Informational</td></tr>
+<tr><th>Created</th><td>2020-09-15</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#scaling-through-sharding">Scaling through sharding</a></li>
+<li><a href="#decentralization-and-economic-finality-through-proof-of-stake">Decentralization and economic finality through proof-of-stake</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#parameters">Parameters</a></li>
+<li><a href="#validator-deposit-contract">Validator deposit contract</a></li>
+<li><a href="#beacon-chain-and-validator-mechanics">Beacon chain and validator mechanics</a></li>
+<li><a href="#issuance">Issuance</a></li>
+<li><a href="#initial-punitive-parameters">Initial punitive parameters</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Serenity, aka eth2, is the <a href="https://blog.ethereum.org/2015/03/03/ethereum-launch-process">long-planned</a> upgrade of Ethereum to a scalable, proof-of-stake (PoS) consensus. Specifications, development, and releases are divided into phases to iteratively manage the complexity of the upgrade. This EIP addresses Phase 0 of the release schedule.</p>
+<p>Early phases of eth2 are executed without any breaking consensus changes on current Ethereum mainnet. This EIP serves to document the bootstrapping of this consensus mechanism and note the path for eth2 to supplant Ethereum’s current proof-of-work (PoW) consensus.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP specifies Phase 0 of Serenity (eth2), a multi-phased upgrade to the consensus mechanism for Ethereum mainnet. In Phase 0, the existing PoW chain and mechanics are entirely unaffected, while a PoS chain – the beacon chain – is built in parallel to serve as the core of the upgraded consensus. In subsequent phases, the beacon chain is enhanced to support and secure the consensus of a number of parallel shard chains, ultimately incorporating current Ethereum mainnet as one of those shards.</p>
+<p>At the core of the beacon chain is a proof of stake consensus mechanism called Casper the Friendly Finality Gadget (FFG) and a fork-choice rule called Latest Message Driven Greedy Heaviest Observed Sub-Tree (LMD-GHOST). Phase 0 is centered primarily around the mechanics and incentives of validators executing these algorithms. The detailed specifications for eth2 are contained in an <a href="https://github.com/ethereum/eth2.0-specs">independent repository</a> from this EIP, and safety and liveness proofs can be found in the <a href="https://arxiv.org/abs/2003.03052">Combining GHOST and Casper</a> paper. To avoid duplication, this EIP just references relevant spec files and releases.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Eth2 aims to fulfill the <a href="https://blog.ethereum.org/2015/03/03/ethereum-launch-process/">original vision</a> of Ethereum to support an efficient, global-scale, general-purpose transactional platform while retaining high cryptoeconomic security and decentralization.</p>
+<p>Today, Ethereum blocks are consistently full due to increasingly high demand for decentralized applications. Ever since the first serious spikes in adoption in 2017 (cryptokitties), the Ethereum community has consistently and vocally demanded scaling solutions.</p>
+<p>Since day 0 of Ethereum, the investigation and expectation in scaling solutions has been two-pronged – scale from both Layer 1 upgrades and Layer 2 adoption. This EIP represents the start to a multi-phased rollout of the former.</p>
+<h3 id="scaling-through-sharding">
+<a href="#scaling-through-sharding" class="anchor-link"></a> Scaling through sharding
+</h3>
+<p>As the Ethereum network and the applications built upon it have seen increasing usage over the past 5 years, blocks have become regularly full and the gas price market continues to climb. Simple increases to the block gas-limit of the current Ethereum chain are unable to account for the increase in demand of the system without inducing an unsustainably high resource burden (in the form of bandwidth, computational, and disk resources) on consumer nodes. To retain decentralization while scaling up the Ethereum network, another path must be taken.</p>
+<p>To provide more scale to Ethereum, while not inducing a restrictively high burden on both consumer and consensus nodes, eth2 introduces a “sharded” solution in which a number of blockchain shards – each of similar capacity to Ethereum mainnet today – run in parallel under a unified consensus mechanism. The core consensus (the beacon chain) and a small number of these shards can be processed via a single consumer machine, while the aggregate of the system provides much higher capacity.</p>
+<p>See the <a href="https://eth.wiki/sharding/Sharding-FAQs">Ethereum wiki sharding FAQ</a> for an excellent introduction and discussion of scaling through sharding.</p>
+<h3 id="decentralization-and-economic-finality-through-proof-of-stake">
+<a href="#decentralization-and-economic-finality-through-proof-of-stake" class="anchor-link"></a> Decentralization and economic finality through proof-of-stake
+</h3>
+<p>Since the <a href="https://blog.ethereum.org/2015/12/28/understanding-serenity-part-2-casper/">early days</a> of Ethereum, proof-of-stake has been a long-awaited desideratum for the following:</p>
+<ul>
+<li>Increased decentralization of the core consensus by lowering the barrier to entry and technical requirements of participation</li>
+<li>Increased cryptoeconomic security via in-protocol penalties for misbehaviour and the addition of economic finality</li>
+<li>Elimination of the energy hungry mining of the current PoW consensus mechanism</li>
+</ul>
+<p>In addition to the above, PoS has synergies with the sharding scaling solution. Due to the random sampling requirement of sharding, PoS provides a more simple and direct access to the <a href="https://eth.wiki/sharding/Sharding-FAQs#how-do-you-actually-do-this-sampling-in-proof-of-work-and-in-proof-of-stake">“active validator set”</a> than PoW and thus allows for a more direct sharded protocol construction.</p>
+<p>See the <a href="https://eth.wiki/en/concepts/proof-of-stake-faqs">Ethereum wiki proof-of-stake FAQ</a> for an excellent introduction and discussion of proof-of-stake consensus.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Phase 0 is designed to require <em>no breaking consensus changes</em> to existing Ethereum mainnet. Instead, this is the bootstraping a new PoS consensus that can, once stable, supplant the current PoW consensus.</p>
+<p>Phase 0 specifications are maintained in a <a href="https://github.com/ethereum/eth2.0-specs">repository</a> independent of this EIP. <code class="language-plaintext highlighter-rouge">SPEC_RELEASE_VERSION</code> release of the specs at <code class="language-plaintext highlighter-rouge">SPEC_RELEASE_COMMIT</code> are considered the canonical Phase 0 specs for this EIP.</p>
+<p>This EIP provides a high level view on the Phase 0 mechanisms, especially those that are relevant to Ethereum mainnet (e.g. the deposit contract) and users (e.g. validator mechanics and eth2 issuance). The extended and low level details remain in the <a href="https://github.com/ethereum/eth2.0-specs">specs repository</a>.</p>
+<h3 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">SPEC_RELEASE_VERSION</code></td>
+<td><code class="language-plaintext highlighter-rouge">v1.0.0</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">SPEC_RELEASE_COMMIT</code></td>
+<td><code class="language-plaintext highlighter-rouge">579da6d2dc734b269dbf67aa1004b54bb9449784</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">DEPOSIT_CONTRACT_ADDRESS</code></td>
+<td><code class="language-plaintext highlighter-rouge">0x00000000219ab540356cBB839Cbe05303d7705Fa</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MIN_GENESIS_TIME</code></td>
+<td><code class="language-plaintext highlighter-rouge">1606824000</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">BASE_REWARD_FACTOR</code></td>
+<td><code class="language-plaintext highlighter-rouge">2**6</code> (64)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">INACTIVITY_PENALTY_QUOTIENT</code></td>
+<td><code class="language-plaintext highlighter-rouge">2**26</code> (67,108,864)</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">PROPORTIONAL_SLASHING_MULTIPLIER</code></td>
+<td><code class="language-plaintext highlighter-rouge">1</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">MIN_SLASHING_PENALTY_QUOTIENT</code></td>
+<td><code class="language-plaintext highlighter-rouge">2**7</code> (128)</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note:</em> Eth2 has many more <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/configs/mainnet/phase0.yaml">Phase 0 configuration parameters</a> but the majority are left out of this EIP for brevity.</p>
+<h3 id="validator-deposit-contract">
+<a href="#validator-deposit-contract" class="anchor-link"></a> Validator deposit contract
+</h3>
+<p>In Phase 0, eth2 uses a contract deployed on Ethereum mainnet – the <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/deposit-contract.md">Deposit Contract</a> – at <code class="language-plaintext highlighter-rouge">DEPOSIT_CONTRACT_ADDRESS</code> to onboard validators into the PoS consensus of the beacon chain.</p>
+<p>To participate in the PoS consensus, users submit validator deposits to the deposit contract. The beacon chain comes to consensus on the state of this contract and processes new validator deposits. This uni-directional deposit mechanism is the only technical link between the two components of the system (Ethereum mainnet and beacon chain) in Phase 0.</p>
+<p>More on this mechanism:</p>
+<ul>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/deposit-contract.md">Deposit Contract</a></li>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/beacon-chain.md#deposits">Beacon Chain – <code class="language-plaintext highlighter-rouge">Deposit</code> processing</a></li>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/validator.md#becoming-a-validator">Validator – Becoming a validator</a></li>
+</ul>
+<h3 id="beacon-chain-and-validator-mechanics">
+<a href="#beacon-chain-and-validator-mechanics" class="anchor-link"></a> Beacon chain and validator mechanics
+</h3>
+<p>Users who choose to participate in eth2 consensus deposit ETH collateral into the <a href="https://github.com/ethereum/eth2.0-specs/blob/v1.0.0/specs/phase0/deposit-contract.md">deposit contract</a> in order to be inducted into the beacon chain validator set. From there, these validators are responsible for constructing the <strong>beacon chain</strong> (note that these consensus participants in PoS are akin to miners in PoW).</p>
+<p>The beacon chain is a pure PoS chain that in Phase 0 is primarily concerned with maintaining its own consensus and managing the registry of validators. The consensus rules define <em>roles</em> (e.g. block proposal, block attesting) that validators are expected to participate in; validators who perform their roles well are rewarded, and validators who perform their roles poorly or are offline are penalized. Phase 0 does not yet include any ETH transfer, sharding or smart contract / VM execution capabilities.</p>
+<p>In subsequent phases, additional mechanisms and validator responsibilities will be added to the beacon chain to manage the consensus of a number of parallel shard chains (“Phase 1”), to integrate the existing Ethereum system (“Phase 1.5”) and to add full support for sharded smart contract execution (“Phase 2”).</p>
+<p>More on the beacon chain and validator mechanics:</p>
+<ul>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#beacon-chain-state-transition-function">Beacon Chain – State transition function</a></li>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#operations">Beacon chain – Operations</a></li>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/beacon-chain.md#rewards-and-penalties-1">Beacon chain – Rewards and Penalties</a></li>
+<li><a href="https://github.com/ethereum/eth2.0-specs/blob/dev/specs/phase0/validator.md#beacon-chain-responsibilities">Validator – Beacon chain responsibilities</a></li>
+</ul>
+<h3 id="issuance">
+<a href="#issuance" class="anchor-link"></a> Issuance
+</h3>
+<p>To incentivize validators to deposit ether collateral and participate in the eth2 consensus, we propose that rewards (in the form of Ethereum’s native asset, ether) be regularly issued to consensus participants. Due to the beacon chain operating in parallel to the existing PoW chain in early phases of eth2, this issuance is <em>in addition to</em> any PoW rewards until the existing chain is merged into eth2 as a shard.</p>
+<p>The amount of ether issued to validators on the beacon chain is proportional to the square root of the total ether deposited. This issuance curve was chosen as a more stable and sustainable curve to the two obvious alternatives – fixed total issuance and fixed issuance per ether staked. For a more technical discussion on this choice see <a href="https://github.com/ethereum/research/blob/master/papers/discouragement/discouragement.pdf">here</a>.</p>
+<p>In eth2, this curve is parameterized by <code class="language-plaintext highlighter-rouge">BASE_REWARD_FACTOR</code> in the context of slot time and epoch length. Below is the issuance curve as a function of ether staked, along with a table of examples for illustration. Note, all figures shown are annualized.</p>
+<p><img src="https://storage.googleapis.com/ethereum-hackmd/upload_953c502d09928c0b306cc078268945c1.png" alt="" /></p>
+<table>
+<thead>
+<tr>
+<th>Active Deposits</th>
+<th style="text-align: right">Max Annual Validator Reward*</th>
+<th style="text-align: right">Max Annual ETH Issued*</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.5M ETH</td>
+<td style="text-align: right">23.50%</td>
+<td style="text-align: right">117,527</td>
+</tr>
+<tr>
+<td>1M ETH</td>
+<td style="text-align: right">16.60%</td>
+<td style="text-align: right">166,208</td>
+</tr>
+<tr>
+<td>2M ETH</td>
+<td style="text-align: right">11.75%</td>
+<td style="text-align: right">235,052</td>
+</tr>
+<tr>
+<td>4M ETH</td>
+<td style="text-align: right">8.31%</td>
+ <td style="text-align: right">332,411</td>
+</tr>
+<tr>
+<td>8M ETH</td>
+<td style="text-align: right">5.88%</td>
+<td style="text-align: right">470,104</td>
+</tr>
+<tr>
+<td>16M ETH</td>
+<td style="text-align: right">4.16%</td>
+<td style="text-align: right">664,801</td>
+</tr>
+<tr>
+<td>32M ETH</td>
+<td style="text-align: right">2.94%</td>
+<td style="text-align: right">940,167</td>
+</tr>
+<tr>
+<td>64M ETH</td>
+<td style="text-align: right">2.08%</td>
+<td style="text-align: right">1,329,603</td>
+</tr>
+<tr>
+<td>128M ETH</td>
+<td style="text-align: right">1.47%</td>
+<td style="text-align: right">1,880,334</td>
+</tr>
+</tbody>
+</table>
+<p><em>*Assuming validators are online 100% of the time and behaving optimally. Suboptimal validator behavior will lead to reduced rewards and/or penalties that reduce total issuance.</em></p>
+<p>For more details, see this <a href="https://docs.google.com/spreadsheets/d/15tmPOvOgi3wKxJw7KQJKoUe-uonbYR6HF7u83LR5Mj4/edit#gid=842896204">eth2 calculator</a> maintained by <em>ConsenSys Activate</em>.</p>
+<h3 id="initial-punitive-parameters">
+<a href="#initial-punitive-parameters" class="anchor-link"></a> Initial punitive parameters
+</h3>
+<p>For PoS protocols to be crypto-economically secure, in-protocol penalties are required (see discussion of <a href="https://blog.ethereum.org/2014/11/25/proof-stake-learned-love-weak-subjectivity/">“Nothing at Stake”</a>). Small offline penalties incentivize validator liveness, whereas (potentially) much larger penalties provide protocol security in the event of tail-risk scenarios.</p>
+<p>Specifically, the following significant penalties exist:</p>
+<ul>
+<li><strong>Inactivity Leak</strong>: an offline penalty that increases each epoch is applied to validators during extended times of no finality (e.g. if one-third or more are offline or not on the canonical chain). This ensures the chain can eventually regain finality even under catastrophic conditions.</li>
+<li><strong>Slashing</strong>: a penalty applied to validators that sign <em>explicitly malicious</em> messages that could lead to the construction and finalization of two conflicting chains (e.g. two blocks or attestations in the same slot). This penalty is designed to scale up in proportion to the number of slashable validators in the same time period such that if a critical number (wrt chain safety) of slashings have occurred, validators are <em>maximally</em> punished.</li>
+</ul>
+<p>For the initial launch of Phase 0, the parameters defining the magnitude of these penalties – <code class="language-plaintext highlighter-rouge">INACTIVITY_PENALTY_QUOTIENT</code>, <code class="language-plaintext highlighter-rouge">PROPORTIONAL_SLASHING_MULTIPLIER</code>, and <code class="language-plaintext highlighter-rouge">MIN_SLASHING_PENALTY_QUOTIENT</code> – have been tuned to be less punitive than their final intended values. This provides a more forgiving environment for early validators and client software in an effort to encourage validation in this early, higher technical-risk stage.</p>
+<p><em><code class="language-plaintext highlighter-rouge">INACTIVITY_PENALTY_QUOTIENT</code> is configured initially to four times its final value</em>. This results in a slower inactivity leak during times of non-finality, which means the chain is less responsive to such an event. If there is an extended time of non-finality during the early months of eth2, it is far more likely to be due to technical issues with client software rather than some sort of global catastrophic event.</p>
+<p><em><code class="language-plaintext highlighter-rouge">PROPORTIONAL_SLASHING_MULTIPLIER</code> is configured initially to one-third of its final value</em>. This results in a lower accountable safety margin in the event of an attack. If any validators are slashed in the early months of eth2, it is far more likely to be the result of user mismanagement of keys and/or issues with client software than an organized attack.</p>
+<p><em><code class="language-plaintext highlighter-rouge">MIN_SLASHING_PENALTY_QUOTIENT</code> configured initially to four times its final value</em>. This results in a lower guaranteed minimum penalty for a slashable offense and thus reduces the baseline punitive incentive to keep an individual validator’s system secure. As with <code class="language-plaintext highlighter-rouge">PROPORTIONAL_SLASHING_MULTIPLIER</code>, slashings during the early months of eth2 are far more likely to be due to user mismanagement, or issues with client software, than an organized attack.</p>
+<p><strong><em>A hard fork of the eth2 beacon chain is planned for 5 months after genesis. This hard fork will adjust <code class="language-plaintext highlighter-rouge">INACTIVITY_PENALTY_QUOTIENT</code>, <code class="language-plaintext highlighter-rouge">PROPORTIONAL_SLASHING_MULTIPLIER</code>, and <code class="language-plaintext highlighter-rouge">MIN_SLASHING_PENALTY_QUOTIENT</code> to their final, more secure values.</em></strong></p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>For details regarding specification design rationale and decisions, see the following:</p>
+<ul>
+<li><a href="https://notes.ethereum.org/@vbuterin/rkhCgQteN">Serenity Design Rationale</a></li>
+<li><a href="https://benjaminion.xyz/eth2-annotated-spec/">Ben Edgington’s Eth2 Annotated Spec</a></li>
+<li><a href="https://github.com/ethereum/annotated-spec/blob/master/phase0/beacon-chain.md">Vitalik Buterin’s Eth2 Annotated Spec</a></li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Although this EIP does not introduce any immediate changes to the current Ethereum mainnet, this EIP lays the groundwork for future backwards incompatibilities through the introduction of the new eth2 consensus mechanism in which Ethereum will be integrated in subsequent phases. To secure this mechanism, users move ether into the beacon chain and additional ether is issued. This EIP is a commitment to this path being canonical, as well as directly informing the future and roadmap of Ethereum mainnet.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>The following implementations of eth2 Phase 0 exist. At the time of writing at least five are near production-ready and in testnet/audit phase:</p>
+<ul>
+<li><a href="https://github.com/NethermindEth/cortex">Cortex</a> (.net)</li>
+<li><a href="https://github.com/sigp/lighthouse">Lighthouse</a> (rust)</li>
+<li><a href="https://github.com/ChainSafe/lodestar">Lodestar</a> (javascript)</li>
+<li><a href="https://github.com/status-im/nim-beacon-chain">Nimbus</a> (nim)</li>
+<li><a href="https://github.com/prysmaticlabs/prysm/">Prysm</a> (go)</li>
+<li><a href="https://github.com/pegasyseng/teku">Teku</a> (java)</li>
+<li><a href="https://github.com/ethereum/trinity/">Trinity</a> (python)</li>
+</ul>
+<p>In addition to implementations of the spec, the deposit contract is <a href="">implemented in Solidity</a>, along with a <a href="https://github.com/runtimeverification/verified-smart-contracts/blob/master/deposit/deposit-formal-verification.pdf">formal verification</a> of the bytecode.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Eth2 is a major overhaul of the Ethereum’s core consensus from PoW to a sharded PoS. There are inherent risks in this migration but there is extensive research literature analyzing security and trade-offs. <em>The following only represents a high level selection of the resources available:</em></p>
+<ul>
+<li><a href="https://arxiv.org/abs/1710.09437">Casper FFG</a></li>
+<li><a href="https://arxiv.org/abs/2003.03052">Combining GHOST and Casper</a></li>
+<li><a href="https://eth.wiki/sharding/Sharding-FAQs">Sharding FAQ</a></li>
+<li><a href="https://eth.wiki/en/concepts/proof-of-stake-faqs">PoS FAQ</a></li>
+<li><a href="https://notes.ethereum.org/@serenity/H1PGqDhpm?type=view">Eth2 research compendium</a></li>
+</ul>
+<p>In addition to the research supporting this path, a number of audits and formal verification of specs, cryptography, and client implementations have been performed. <em>Many client and utility library audits are currently in progress and will be appended here upon completion.</em></p>
+<ul>
+<li><a href="https://leastauthority.com/blog/ethereum-2-0-specifications/">Eth2 Phase 0 Spec audit by Least Authority</a></li>
+<li><a href="https://leastauthority.com/blog/audit-of-gossipsub-v1-1-protocol-design-implementation-for-protocol-labs/">Gossipsub v1.1 audit by Least Authority</a></li>
+<li><a href="https://leastauthority.com/blog/audit-of-gossipsub-v1-1-protocol-design-implementation-for-protocol-labs/">Discv5 audit by Least Authority</a></li>
+<li><a href="https://runtimeverification.com/blog/formally-verifying-finality-in-gasper-the-core-of-the-beacon-chain/">Formal Verification of Finality in eth2 by Runtime Verification</a></li>
+<li><a href="https://github.com/runtimeverification/deposit-contract-verification/blob/master/deposit-contract-verification.pdf">Formal Verification of Deposit Contract by Runtime Verification</a></li>
+<li><a href="https://quantstamp.com/blog/ethereum-2-0-moves-closer-to-launch-with-quantstamp-audit-of-prysm">Prysm client audit by Quantstamp</a> and <a href="https://medium.com/prysmatic-labs/quantstamp-security-audit-results-for-the-prysm-eth2-client-7f949c6c866f">the results</a></li>
+<li><a href="https://leastauthority.com/blog/audit-of-chainsafe-utility-libraries/">Lodestar utility libraries audit by Least Authority</a></li>
+</ul>
+<p>Finally, the EF maintains bounty programs for the eth2 spec, attacknets, and clients.</p>
+<ul>
+<li><a href="https://notes.ethereum.org/@djrtwo/phase0-bounty">Eth2 Phase 0 bug bounty program</a></li>
+<li><a href="https://github.com/ethresearch/public-attacknets">Eth2 public attacknets</a></li>
+<li><em>Eth2 Client Bounty Program to be released soon</em></li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/djrtwo">Danny Ryan</a>, <a href="https://github.com/vbuterin">Vitalik Buterin</a>, "EIP-2982: Serenity Phase 0 [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2982, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2982.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2982: Serenity Phase 0 [DRAFT]",
+    "author": "Danny Ryan (@djrtwo), Vitalik Buterin (@vbuterin)",
+    "name": "EIP-2982: Serenity Phase 0 [DRAFT]",
+    "dateCreated": "2020-09-15",
+    "datePublished": "2020-09-15",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/serenity-phase-0-eip/4621",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

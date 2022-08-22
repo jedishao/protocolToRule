@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4: EIP Classification</title>
+<meta property="og:title" content="EIP-4: EIP Classification" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-4: EIP Classification
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/ethers">Joseph Chow</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Meta</td></tr>
+<tr><th>Created</th><td>2015-11-17</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#1-consensus-layer">1. Consensus Layer</a>
+<ul>
+<li><a href="#soft-forks">Soft Forks</a></li>
+<li><a href="#hard-forks">Hard Forks</a></li>
+</ul>
+</li>
+<li><a href="#2-networking-layer">2. Networking Layer</a></li>
+<li><a href="#3-apirpc-layer">3. API/RPC Layer</a></li>
+<li><a href="#4-applications-layer">4. Applications Layer</a></li>
+</ul>
+</div>
+<h1 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h1>
+<p>This document describes a classification scheme for EIPs, adapted from <a href="https://github.com/bitcoin/bips/blob/master/bip-0123.mediawiki">BIP 123</a>.</p>
+<p>EIPs are classified by system layers with lower numbered layers involving more intricate interoperability requirements.</p>
+<p>The specification defines the layers and sets forth specific criteria for deciding to which layer a particular standards EIP belongs.</p>
+<h1 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h1>
+<p>Ethereum is a system involving a number of different standards. Some standards are absolute requirements for interoperability while others can be considered optional, giving implementors a choice of whether to support them.</p>
+<p>In order to have a EIP process which more closely reflects the interoperability requirements, it is necessary to categorize EIPs accordingly. Lower layers present considerably greater challenges in getting standards accepted and deployed.</p>
+<h1 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h1>
+<p>Standards EIPs are placed in one of four layers:</p>
+<ol>
+<li>Consensus</li>
+<li>Networking</li>
+<li>API/RPC</li>
+<li>Applications</li>
+</ol>
+<h1 id="1-consensus-layer">
+<a href="#1-consensus-layer" class="anchor-link"></a> 1. Consensus Layer
+</h1>
+<p>The consensus layer defines cryptographic commitment structures. Its purpose is ensuring that anyone can locally evaluate whether a particular state and history is valid, providing settlement guarantees, and assuring eventual convergence.</p>
+<p>The consensus layer is not concerned with how messages are propagated on a network.</p>
+<p>Disagreements over the consensus layer can result in network partitioning, or forks, where different nodes might end up accepting different incompatible histories. We further subdivide consensus layer changes into soft forks and hard forks.</p>
+<h2 id="soft-forks">
+<a href="#soft-forks" class="anchor-link"></a> Soft Forks
+</h2>
+<p>In a soft fork, some structures that were valid under the old rules are no longer valid under the new rules. Structures that were invalid under the old rules continue to be invalid under the new rules.</p>
+<h2 id="hard-forks">
+<a href="#hard-forks" class="anchor-link"></a> Hard Forks
+</h2>
+<p>In a hard fork, structures that were invalid under the old rules become valid under the new rules.</p>
+<h1 id="2-networking-layer">
+<a href="#2-networking-layer" class="anchor-link"></a> 2. Networking Layer
+</h1>
+<p>The networking layer specifies the Ethereum wire protocol (eth) and the Light Ethereum Subprotocol (les). RLPx is excluded and tracked in the [https://github.com/ethereum/devp2p devp2p repository].</p>
+<p>Only a subset of subprotocols are required for basic node interoperability. Nodes can support further optional extensions.</p>
+<p>It is always possible to add new subprotocols without breaking compatibility with existing protocols, then gradually deprecate older protocols. In this manner, the entire network can be upgraded without serious risks of service disruption.</p>
+<h1 id="3-apirpc-layer">
+<a href="#3-apirpc-layer" class="anchor-link"></a> 3. API/RPC Layer
+</h1>
+<p>The API/RPC layer specifies higher level calls accessible to applications. Support for these EIPs is not required for basic network interoperability but might be expected by some client applications.</p>
+<p>There’s room at this layer to allow for competing standards without breaking basic network interoperability.</p>
+<h1 id="4-applications-layer">
+<a href="#4-applications-layer" class="anchor-link"></a> 4. Applications Layer
+</h1>
+<p>The applications layer specifies high level structures, abstractions, and conventions that allow different applications to support similar features and share data.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/ethers">Joseph Chow</a>, "EIP-4: EIP Classification," <em>Ethereum Improvement Proposals</em>, no. 4, November 2015. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4: EIP Classification",
+    "author": "Joseph Chow (@ethers)",
+    "name": "EIP-4: EIP Classification",
+    "dateCreated": "2015-11-17",
+    "datePublished": "2015-11-17",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2015"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

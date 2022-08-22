@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO</title>
+<meta property="og:title" content="EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO" />
+<meta name="description" content="Expose beacon chain randomness in the EVM by supplanting DIFFICULTY opcode semantics" />
+<meta property="og:description" content="Expose beacon chain randomness in the EVM by supplanting DIFFICULTY opcode semantics" />
+<meta name="twitter:description" content="Expose beacon chain randomness in the EVM by supplanting DIFFICULTY opcode semantics" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4399" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4399" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4399.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Expose beacon chain randomness in the EVM by supplanting DIFFICULTY opcode semantics</h3>
+ <table>
+<tr><th>Author</th><td><a href="https://github.com/mkalinin">Mikhail Kalinin</a>, <a href="https://github.com/djrtwo">Danny Ryan</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4399-supplant-difficulty-opcode-with-random/7368">https://ethereum-magicians.org/t/eip-4399-supplant-difficulty-opcode-with-random/7368</a></td></tr>
+<tr><th>Status</th><td>Last Call
+<tr><th>Last Call Deadline</th><td>2022-08-31</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-10-30</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3675">3675</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#block-structure">Block structure</a></li>
+<li><a href="#evm">EVM</a></li>
+<li><a href="#renaming">Renaming</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#including-randao-output-in-the-block-header">Including RANDAO output in the block header</a></li>
+<li><a href="#using-mixhash-field-instead-of-difficulty">Using mixHash field instead of difficulty</a></li>
+<li><a href="#reusing-existing-field-instead-of-appending-a-new-one">Reusing existing field instead of appending a new one</a></li>
+<li><a href="#reusing-the-difficulty-opcode-instead-of-introducing-a-new-one">Reusing the DIFFICULTY opcode instead of introducing a new one</a></li>
+<li><a href="#renaming-the-field-and-the-opcode">Renaming the field and the opcode</a></li>
+<li><a href="#using-transition_block-rather-than-a-block-or-slot-number">Using TRANSITION_BLOCK rather than a block or slot number</a></li>
+<li><a href="#using-264-threshold-to-determine-pos-blocks">Using 2**64 threshold to determine PoS blocks</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#biasability">Biasability</a></li>
+<li><a href="#predictability">Predictability</a></li>
+<li><a href="#tips-for-application-developers">Tips for application developers</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP supplants the semantics of the return value of existing <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> opcode and renames the opcode to <code class="language-plaintext highlighter-rouge">PREVRANDAO (0x44)</code>.</p>
+<p>The return value of the <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> instruction after this change is the output of the randomness beacon provided by the beacon chain.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Applications may benefit from using the randomness accumulated by the beacon chain. Thus, randomness outputs produced by the beacon chain should be accessible in the EVM.</p>
+<p>At the point of <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> of the Proof-of-Stake (PoS) upgrade described in <a href="/EIPS/eip-3675">EIP-3675</a>, the <code class="language-plaintext highlighter-rouge">difficulty</code> block field <strong>MUST</strong> be <code class="language-plaintext highlighter-rouge">0</code> thereafter because there is no longer any Proof-of-Work (PoW) seal on the block. This means that the <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> instruction no longer has it’s previous semantic meaning, nor a clear “correct” value to return.</p>
+<p>Given prior analysis on the usage of <code class="language-plaintext highlighter-rouge">DIFFICULTY</code>, the value returned by the instruction mixed with other values is a common pattern used by smart contracts to obtain randomness. The instruction with the same number as the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> opcode returning outputs of the beacon chain RANDAO implementation makes the upgrade to PoS backwards compatible for existing smart contracts obtaining randomness from the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> instruction.</p>
+<p>Additionally, changes proposed by this EIP allow for smart contracts to determine whether the upgrade to the PoS has already happened. This can be done by analyzing the return value of the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> instruction. A value greater than <code class="language-plaintext highlighter-rouge">2**64</code> indicates that the transaction is being executed in the PoS block. Decompilers and other similar tooling may also use this trick to discern the new semantics of the instruction if data of the block including the transaction in question is available.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h3>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code></strong> The definition of this block can be found in the Definitions section of <a href="/EIPS/eip-3675#definitions">EIP-3675</a>.</li>
+</ul>
+<h3 id="block-structure">
+<a href="#block-structure" class="anchor-link"></a> Block structure
+</h3>
+<p>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, client software <strong>MUST</strong> set the value of the <code class="language-plaintext highlighter-rouge">mixHash</code>, i.e. the field with the number <code class="language-plaintext highlighter-rouge">13</code> (0-indexed) in a block header, to the latest RANDAO mix of the post beacon state of the previous block.</p>
+<h3 id="evm">
+<a href="#evm" class="anchor-link"></a> EVM
+</h3>
+<p>Beginning with <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code>, the <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> instruction <strong>MUST</strong> return the value of the <code class="language-plaintext highlighter-rouge">mixHash</code> field.</p>
+<p><em>Note</em>: The gas cost of the <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> opcode remains unchanged.</p>
+<h3 id="renaming">
+<a href="#renaming" class="anchor-link"></a> Renaming
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">mixHash</code> field <strong>SHOULD</strong> further be renamed to <code class="language-plaintext highlighter-rouge">prevRandao</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> opcode <strong>SHOULD</strong> further be renamed to <code class="language-plaintext highlighter-rouge">PREVRANDAO (0x44)</code>.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="including-randao-output-in-the-block-header">
+<a href="#including-randao-output-in-the-block-header" class="anchor-link"></a> Including RANDAO output in the block header
+</h3>
+<p>Including a RANDAO output in the block header provides a straightforward method of accessing it from inside of the EVM as block header data is already available in the EVM context.</p>
+<p>Additionally, this ensures that the execution layer can be fully executed with the block alone rather than requiring extra inputs from the PoS consensus layer.</p>
+<p>Mixing the randomness into a block header may contribute to uniqueness of the block hash in the case when values of other fields of the block header match the corresponding values of the header of another block.</p>
+<h3 id="using-mixhash-field-instead-of-difficulty">
+<a href="#using-mixhash-field-instead-of-difficulty" class="anchor-link"></a> Using <code class="language-plaintext highlighter-rouge">mixHash</code> field instead of <code class="language-plaintext highlighter-rouge">difficulty</code>
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">mixHash</code> header field is used instead of <code class="language-plaintext highlighter-rouge">difficulty</code> to avoid a class of hidden forkchoice bugs after the PoS upgrade.</p>
+<p>Client software implementing pre-EIP-3675 logic heavily depends on the <code class="language-plaintext highlighter-rouge">difficulty</code> value as total difficulty computation is the basis of the PoW fork choice rule. Setting the <code class="language-plaintext highlighter-rouge">difficulty</code> field to <code class="language-plaintext highlighter-rouge">0</code> at the PoS upgrade aims to reduce the surface of bugs related to the total difficulty value growing after the upgrade.</p>
+<p>Additionally, any latent total difficulty computation after the PoS upgrade would become overflow prone if the randomness output supplanted the value of the <code class="language-plaintext highlighter-rouge">difficulty</code> field.</p>
+<h3 id="reusing-existing-field-instead-of-appending-a-new-one">
+<a href="#reusing-existing-field-instead-of-appending-a-new-one" class="anchor-link"></a> Reusing existing field instead of appending a new one
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">mixHash</code> field is deprecated at the PoS upgrade and set to zero bytes array thereafter. Reusing an existing field as a place for the randomness output saves 32 bytes per block and effectively removes the deprecation of one of the fields induced by the upgrade.</p>
+<h3 id="reusing-the-difficulty-opcode-instead-of-introducing-a-new-one">
+<a href="#reusing-the-difficulty-opcode-instead-of-introducing-a-new-one" class="anchor-link"></a> Reusing the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> opcode instead of introducing a new one
+</h3>
+<p>See the <a href="#motivation">Motivation</a>.</p>
+<h3 id="renaming-the-field-and-the-opcode">
+<a href="#renaming-the-field-and-the-opcode" class="anchor-link"></a> Renaming the field and the opcode
+</h3>
+<p>The renaming should be done to make the field and the opcode names semantically sound.</p>
+<h3 id="using-transition_block-rather-than-a-block-or-slot-number">
+<a href="#using-transition_block-rather-than-a-block-or-slot-number" class="anchor-link"></a> Using <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> rather than a block or slot number
+</h3>
+<p>By utilizing <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> to trigger the change in logic defined in this EIP rather than a block or slot number, this EIP is tightly coupled to the PoS upgrade defined by <a href="/EIPS/eip-3675">EIP-3675</a>.</p>
+<p>By tightly coupling to the PoS upgrade, we ensure that there is no discontinuity for the usecase of this opcode for randomness – the primary <a href="#motivation">motivation</a> for re-using <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> rather than creating a new opcode.</p>
+<h3 id="using-264-threshold-to-determine-pos-blocks">
+<a href="#using-264-threshold-to-determine-pos-blocks" class="anchor-link"></a> Using <code class="language-plaintext highlighter-rouge">2**64</code> threshold to determine PoS blocks
+</h3>
+<p>The probability of RANDAO value to fall into the range between <code class="language-plaintext highlighter-rouge">0</code> and <code class="language-plaintext highlighter-rouge">2**64</code> and, thus, to be mixed with PoW difficulty values, is drastically low. Though, proposed threshold might seem to have insufficient distance from difficulty values on Ethereum Mainnet (they are currently around <code class="language-plaintext highlighter-rouge">2**54</code>), it requires a thousand times increase of the hashrate to make this threshold insecure. Such an increase is considered impossible to occur before the upcoming consensus upgrade.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP introduces backward incompatible changes to the execution and validation of EVM state transitions. As written, this EIP utilizes <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> and is thus tightly coupled with the PoS upgrade introduced in <a href="/EIPS/eip-3675">EIP-3675</a>. If this EIP is to be adopted, it <strong>MUST</strong> be scheduled at the same time as EIP-3675.</p>
+<p>Additionally, the changes proposed might be backward incompatible for the following categories of applications:</p>
+<ul>
+<li>Applications that use the value returned by the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> opcode as the PoW <code class="language-plaintext highlighter-rouge">difficulty</code> parameter</li>
+<li>Applications with logic that depends on the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> opcode returning a relatively small number with respect to the full 256-bit size of the field.</li>
+</ul>
+<p>The first category is already affected by switching the consensus mechanism to PoS and no additional breaking changes are introduced by this specification.</p>
+<p>The second category is comprised of applications that use the return value of the <code class="language-plaintext highlighter-rouge">DIFFICULTY</code> opcode in operations that might cause either overflow or underflow errors. While it is theoretically possible to author an application where a change in the range of possible values this opcode may return could lead to a security vulnerability, the chances of that are negligible.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<ul>
+<li>In one of ancestors of <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> deploy a contract that stores return value of <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> to the state</li>
+<li>Check that value returned by <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> in transaction executed within the parent of <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> equals <code class="language-plaintext highlighter-rouge">difficulty</code> field value</li>
+<li>Check that value returned by <code class="language-plaintext highlighter-rouge">PREVRANDAO (0x44)</code> in transaction executed within <code class="language-plaintext highlighter-rouge">TRANSITION_BLOCK</code> equals <code class="language-plaintext highlighter-rouge">prevRandao</code> field value</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">PREVRANDAO (0x44)</code> opcode in PoS Ethereum (based on the beacon chain RANDAO implementation) is a source of randomness with different properties to the randomness supplied by <code class="language-plaintext highlighter-rouge">BLOCKHASH (0x40)</code> or <code class="language-plaintext highlighter-rouge">DIFFICULTY (0x44)</code> opcodes in the PoW network.</p>
+<h3 id="biasability">
+<a href="#biasability" class="anchor-link"></a> Biasability
+</h3>
+<p>The beacon chain RANDAO implementation gives every block proposer 1 bit of influence power per slot. Proposer may deliberately refuse to propose a block on the opportunity cost of proposer and transaction fees to prevent beacon chain randomness (a RANDAO mix) from being updated in a particular slot.</p>
+<p>An effect of proposer’s influence power is limited in time and lasts until the first honest RANDAO reveal is made afterwards. This limitation does also exist in the case when proposers of <code class="language-plaintext highlighter-rouge">n</code> consecutive slots are colluding to get <code class="language-plaintext highlighter-rouge">n</code> bits of influence power. Simply speaking, one honest block proposal is enough to unbias the RANDAO even if it was biased during several slots in a row.</p>
+<p>Additionally, semantics of the <code class="language-plaintext highlighter-rouge">PREVRANDAO (0x44)</code> instruction gives proposers another way to gain 1 bit of influence power on applications. Biased proposer may censor a rolling the dice transaction to force it to be included into the next block, thus, force it to use a RANDAO mix that the proposer knows in advance. The opportunity cost in this case would be negligible.</p>
+<h3 id="predictability">
+<a href="#predictability" class="anchor-link"></a> Predictability
+</h3>
+<p>Obviously, historical randomness provided by any decentralized oracle is 100% predictable. On the contrary, the randomness that is revealed in the future is predictable up to a limited extent.</p>
+<p>A list of inputs influencing future randomness on the beacon chain consists of but is not limited to the following items:</p>
+<ul>
+<li><strong>Accumulated randomness.</strong> A RANDAO mix produced by the beacon chain in the last slot of epoch <code class="language-plaintext highlighter-rouge">N</code> is the main input to the function defining block proposers in each slot of epoch <code class="language-plaintext highlighter-rouge">N + MIN_SEED_LOOKAHEAD + 1</code>, i.e. it is the main factor defining future RANDAO revealers.</li>
+<li><strong>Number of active validators.</strong> A number of active validators throughout an epoch is another input to the block proposer function.</li>
+<li><strong>Effective balance.</strong> All else being equal, the lower the effective balance of a validator the lower the chance this validator has to be designated as a proposer in a slot.</li>
+<li><strong>Accidentally missed proposals.</strong> Network conditions and other factors that are resulting in accidentally missed proposals is a source of highly qualitative entropy that impacts RANDAO mixes. Usual rate of missed proposals on the Mainnet is about <code class="language-plaintext highlighter-rouge">1%</code>.</li>
+</ul>
+<p>These inputs may be predictable and malleable on a short range of slots but the longer the attempted lookahead the more entropy is accumulated by the beacon chain.</p>
+<h3 id="tips-for-application-developers">
+<a href="#tips-for-application-developers" class="anchor-link"></a> Tips for application developers
+</h3>
+<p>The following tips attempt to reduce predictability and biasability of randomness outputs returned by <code class="language-plaintext highlighter-rouge">PREVRANDAO (0x44)</code>:</p>
+<ol>
+<li>Make your applications rely on the future randomness with a reasonably high lookahead. For example, an application stops accepting bids at the end of epoch <code class="language-plaintext highlighter-rouge">K</code> and uses a RANDAO mix produced in slot <code class="language-plaintext highlighter-rouge">K + N + ε</code> to roll the dice, where <code class="language-plaintext highlighter-rouge">N</code> is a lookahead in epochs and <code class="language-plaintext highlighter-rouge">ε</code> is a few slots into epoch <code class="language-plaintext highlighter-rouge">N + 1</code>.</li>
+<li>At least four epochs of lookahead results in the following outcome:
+<ul>
+<li>A proposer set of epoch <code class="language-plaintext highlighter-rouge">N + 1</code> isn’t known at the end of epoch <code class="language-plaintext highlighter-rouge">K</code> breaking a direct link between bidders and dice rollers</li>
+<li>A number of active validators is updated at the end of each epoch affecting a set of proposers of next epochs, thus, impacting a RANDAO mix used by the application to roll the dice</li>
+<li>Due to Mainnet statistics, there is about a <code class="language-plaintext highlighter-rouge">100%</code> chance for the network to accidentally miss a proposal during this period of time which reduces predictability of a RANDAO mix used to roll the dice.</li>
+</ul>
+</li>
+<li>Setting <code class="language-plaintext highlighter-rouge">ε</code> to a small number, e.g. 2 or 4 slots, gives a third party a little time to gain influence power on the future randomness that is being used to roll the dice. This amount of time is defined by <code class="language-plaintext highlighter-rouge">MIN_SEED_LOOKAHEAD</code> parameter and is about 6 minutes on the Mainnet.</li>
+</ol>
+<p>A reasonably high distance between bidding and rolling the dice attempts to leave low chance for bidders controlling a subset of validators to directly exploit their influence power. Ultimately, this chance depends on the type of the game and on a number of controlled validators. For instance, a chance of a single validator to affect a one-time game is negligible, and becomes bigger for multiple validators in a repeated game scenario.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/mkalinin">Mikhail Kalinin</a>, <a href="https://github.com/djrtwo">Danny Ryan</a>, "EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4399, October 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4399.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO [DRAFT]",
+    "author": "Mikhail Kalinin (@mkalinin), Danny Ryan (@djrtwo)",
+    "name": "EIP-4399: Supplant DIFFICULTY opcode with PREVRANDAO [DRAFT]",
+    "dateCreated": "2021-10-30",
+    "datePublished": "2021-10-30",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4399-supplant-difficulty-opcode-with-random/7368",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

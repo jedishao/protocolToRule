@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3607: Reject transactions from senders with deployed code</title>
+<meta property="og:title" content="EIP-3607: Reject transactions from senders with deployed code" />
+<meta name="description" content="Do not allow transactions for which `tx.sender` has any code deployed." />
+<meta property="og:description" content="Do not allow transactions for which `tx.sender` has any code deployed." />
+<meta name="twitter:description" content="Do not allow transactions for which `tx.sender` has any code deployed." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3607" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3607" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-3607: Reject transactions from senders with deployed code
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3607.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Do not allow transactions for which `tx.sender` has any code deployed.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/dankrad">Dankrad Feist</a>, <a href="https://github.com/khovratovich">Dmitry Khovratovich</a>, <a href="https://github.com/MariusVanDerWijden">Marius van der Wijden</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/3608">https://github.com/ethereum/EIPs/issues/3608</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-06-10</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#generating-address-collisions">Generating address collisions</a></li>
+<li><a href="#background">Background</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Ethereum addresses are currently only 160 bits long. This means it is possible to create a collision between a contract account and an Externally Owned Account (EOA) using an estimated <code class="language-plaintext highlighter-rouge">2**80</code> computing operations, which is feasible now given a large budget (ca. 10 billion USD). The fix in this EIP prevents the worst possible attack, where a safe looking contract (e.g. a token wrapper or an AMM-type contract) is deployed to attract user funds, which can then be spent using the EOA key for the same address. The fix is to never allow to use an address that already has code deployed as an EOA address.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<h3 id="generating-address-collisions">
+<a href="#generating-address-collisions" class="anchor-link"></a> Generating address collisions
+</h3>
+<p>By creating keys for <code class="language-plaintext highlighter-rouge">2**80</code> EOAs and simulating the deployment of <code class="language-plaintext highlighter-rouge">2**80</code> contracts from these EOAs (one each), one expects to find about one collision where an EOA has the same address as one contract.</p>
+<p>This very simple form of the attack requires the storage of <code class="language-plaintext highlighter-rouge">2**80</code> addresses, which is a practical barrier: It would require <code class="language-plaintext highlighter-rouge">2.4*10**25</code> bytes of memory (24 Yottabyte). However, there are cycle finding algorithms that can perform the collision search without requiring large amounts of storage. An estimate for the complexity has been made <a href="https://hackmd.io/Vzhp5YJyTT-LhWm_s0JQpA">here</a>. We estimate that a collision between a contract and an EOA could be found in about one year with an investment of ca. US$10 billion in hardware and electricity.</p>
+<h3 id="background">
+<a href="#background" class="anchor-link"></a> Background
+</h3>
+<p>There is currently a discussion to move to 256-bit addresses on Ethereum, which would increase collision resistance to a complexity of <code class="language-plaintext highlighter-rouge">2**128</code> which is currently thought infeasible for the foreseeable future. However, with 160 bit addresses, the collision problem can be effectively solved now, as demonstrated above.</p>
+<p>Most attacks that can occur via address collisions are quite impractical: They involve users sending funds to an address before a contract is deployed. This is a very rare application in practice and users can easily circumvent the attack by never sending funds to a contract until it has been safely deployed with enough confirmations.</p>
+<p>However, the yellow paper does not explicitly specify how a client should handle the case where a transaction is sent from an account that already has contract code deployed; presumably because this was considered infeasible at the time. The assumption is that most client would allow this transaction in their current state.</p>
+<p>This EIP is to specify this behaviour to always forbid such transactions. This fixes most realistic or serious attacks due to address collisions.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Any transaction where <code class="language-plaintext highlighter-rouge">tx.sender</code> has a <code class="language-plaintext highlighter-rouge">CODEHASH != EMPTYCODEHASH</code> MUST be rejected as invalid, where <code class="language-plaintext highlighter-rouge">EMPTYCODEHASH = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470</code>.
+The invalid transaction MUST be rejected by the client and not be included in a block.
+A block containing such a transaction MUST be considered invalid.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>We note that it was always the expected that a contract account’s behaviour is constrainted by the code in that contract – which means that the account’s funds should not suddenly be spendable by some private key. It was just implicitly assumed in the past that a 160 bit address length is enough to provide collision resistance, and thus that this case could never occur. In that sense, this EIP should be seen as a clarification of protocol behaviour in a previously undefined case rather than an explicit upgrade of consensus rules.</p>
+<p>This does not exclude all possible attack vectors, only the most serious one. Further possible attack vectors via address collisions between contracts and EOAs are:</p>
+<ol>
+<li>An attacker can convince a user to send funds to an account before it is deployed. Some applications require this behaviour (e.g. state channels).</li>
+<li>A chain reorg can happen after a contract is deployed. If the reorg removes the contract deployment transaction the funds can still be accessed using the private key.</li>
+<li>A contract can self desctruct, with the stated intention that ERC20s (or other tokens) in the contract would be burned. However, they can now be accessed by a key for that address.</li>
+</ol>
+<p>All these scenarios are much harder to exploit for an attacker, and likely have much lower yield making the attacks unlikely to be economically viable.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>It is unlikely that an attack like this has already occurred on the Ethereum mainnet, or we would very likely have heard of it. It is inconceivable that someone would use this as a “feature” to make a contract an EOA at the same time, when they could simply do this by adding some methods to the contract instead of spending billions on building hardware to find hash collisions.</p>
+<p>Private networks may have deployed contracts which also work as EOAs at genesis and should check that this upgrade does not impact their workflows.</p>
+<p>Clients might choose to disable this rule for RPC calls like <code class="language-plaintext highlighter-rouge">eth_call</code> and <code class="language-plaintext highlighter-rouge">eth_estimateGas</code> as some Multi-Sig contracts use these calls to create transactions as if they originated from the multisig contract itself.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Given a genesis allocation of</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Address: 0x71562b71999873DB5b286dF957af199Ec94617F7
+Balance: 1000000000000000000 // 1 ether
+Nonce:   0,
+Code:    0xB0B0FACE",
+</code></pre></div></div>
+<p>Every transaction sent by the private key corresponding to <code class="language-plaintext highlighter-rouge">0x715656...</code> (
+<code class="language-plaintext highlighter-rouge">b71c71a67e1177ad4e901695e1b4b9ee17ae16c6668d313eac2f96dbcda3f291</code>) should be rejected.
+These transaction must be rejected and not included in a block.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>The following check must be added to the state transition checks after checking that the nonce of the sender is correct.
+The sender is the address recovered from the signature of the transaction.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// Make sure the sender is an EOA
+Set ch to the CodeHash of the sender account
+if ch is not equal to EmptyCodeHash then
+	return ErrSenderNoEOA
+end if
+</code></pre></div></div>
+<p>A diff to implement EIP-3607 in go-ethereum can be found <a href="/assets/eip-3607/geth.diff">here</a></p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>This EIP is a strict security upgrade: It simply makes some transactions that were formerly valid now invalid. There is no legitimate use for such transactions, so there should be no security downsides.</p>
+<p>This EIP can be implemented as a soft fork because the new validity rules are a strict superset of the previous validity rules.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/dankrad">Dankrad Feist</a>, <a href="https://github.com/khovratovich">Dmitry Khovratovich</a>, <a href="https://github.com/MariusVanDerWijden">Marius van der Wijden</a>, "EIP-3607: Reject transactions from senders with deployed code," <em>Ethereum Improvement Proposals</em>, no. 3607, June 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3607.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3607: Reject transactions from senders with deployed code",
+    "author": "Dankrad Feist (@dankrad), Dmitry Khovratovich (@khovratovich), Marius van der Wijden (@MariusVanDerWijden)",
+    "name": "EIP-3607: Reject transactions from senders with deployed code",
+    "dateCreated": "2021-06-10",
+    "datePublished": "2021-06-10",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/3608",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5247: Smart Proposal</title>
+<meta property="og:title" content="EIP-5247: Smart Proposal" />
+<meta name="description" content="An interface of &quot;proposals&quot; that is submitted to, recorded on and possibly executed and enforced onchain." />
+<meta property="og:description" content="An interface of &quot;proposals&quot; that is submitted to, recorded on and possibly executed and enforced onchain." />
+<meta name="twitter:description" content="An interface of &quot;proposals&quot; that is submitted to, recorded on and possibly executed and enforced onchain." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5247" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5247" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5247: Smart Proposal
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5247.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An interface of &quot;proposals&quot; that is submitted to, recorded on and possibly executed and enforced onchain.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-5247-executable-proposal-standard/9938">https://ethereum-magicians.org/t/erc-5247-executable-proposal-standard/9938</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-07-13</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-7">7</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP presents an interface for “smart proposals”: proposals that are submitted to, recorded on, and possibly executed on-chain. When a smart proposal is on-chain executable, it contains information on smart-contract calls, including addresses, ether values, call data, and other metadata information.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>It is oftentimes necessary to separate the code that is to be executed from the actual execution of the code.</p>
+<p>A typical use case for this EIP is in a Decentralized Autonomous Organization (DAO). A proposer will create a smart proposal and advocate for it. Members will then choose whether or not to endorse the proposal and vote accordingly (see <a href="/EIPS/eip-1202">EIP-1202</a>). Finallym when consensus has been formed, the proposal is executed.</p>
+<p>A second typical use-case is that one could have someone who they trust, such as a delegator, trustee, or an attorney-in-fact, or any bilateral collaboration format, where a smart proposal will be first composed, discussed, approved in some way, and then put into execution.</p>
+<p>A third use-case is that a person could make an “offer” to a second person, potentially with conditions. The smart proposal can be presented as an offer and the second person can execute it if they choose to accept this proposal.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">interface</span> <span class="n">IERC5247SmartProposal</span> <span class="p">{</span>
+    <span class="k">event</span> <span class="n">ProposalCreated</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="n">proposalUri</span><span class="p">,</span>
+        <span class="kt">uint8</span><span class="p">[]</span> <span class="n">optionIds</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">proposer</span><span class="p">,</span>
+        <span class="kt">address</span><span class="p">[][]</span> <span class="n">targets</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[][]</span> <span class="n">values</span><span class="p">,</span>
+        <span class="kt">string</span><span class="p">[][]</span> <span class="n">signatures</span><span class="p">,</span>
+        <span class="kt">bytes</span><span class="p">[][]</span> <span class="n">calldatas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">startBlock</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">endBlock</span>
+    <span class="p">);</span>
+    <span class="k">event</span> <span class="n">ProposalExecuted</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">);</span>
+    <span class="c1">// TODO: add Proposal Cancel/Edit/Withdraw Event and Functions?
+</span>
+    <span class="c1">// TODO: decide whether we require generating ProposalId in the method or not?
+</span>    <span class="c1">// TODO: if require generating ProposalId internally, can it be incremental hash-generated?
+</span>    <span class="c1">// TODO: what if proposal need to demonstrate sufficient support? How to input quorum?
+</span>    <span class="k">function</span> <span class="n">createProposal</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">proposalId</span><span class="p">,</span>
+        <span class="kt">string</span> <span class="k">calldata</span> <span class="n">proposalUri</span><span class="p">,</span>
+        <span class="kt">uint8</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">optionIds</span><span class="p">,</span>
+        <span class="kt">address</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">targets</span><span class="p">,</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">values</span><span class="p">,</span>
+        <span class="kt">bytes</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">calldatas</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">startblock</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">endblock</span><span class="p">,</span>
+        <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">extraParams</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">registeredProposalId</span><span class="p">);</span>
+
+    <span class="c1">// TODO: what's most proper way to update the voting period?
+</span>    <span class="c1">// TODO: do we want to include cancel or withdraw?
+</span>    <span class="c1">// TODO: what's the best way to include weight scheme?
+</span><span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<ul>
+<li>Originally, this interface was part of part of <a href="/EIPS/eip-1202">EIP-1202</a>. However, the proposal itself can potentially have many use cases outside of voting. It is possible that voting may not need to be upon a proposal in any particular format. Hence, we decide to <em>decouple the voting interface and proposal interface</em>.</li>
+<li>Arrays were used for <code class="language-plaintext highlighter-rouge">target</code>s, <code class="language-plaintext highlighter-rouge">value</code>s, <code class="language-plaintext highlighter-rouge">calldata</code>s instead of single variables, allowing a proposal to carry arbitrarily long multiple functional calls.</li>
+<li><code class="language-plaintext highlighter-rouge">registeredProposalId</code> is returned in <code class="language-plaintext highlighter-rouge">createProposal</code> so the standard can support implementation to decide their own format of proposal id.</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Needs discussion.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/xinbenlv">Zainan Victor Zhou</a>, "EIP-5247: Smart Proposal [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5247, July 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5247.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5247: Smart Proposal [DRAFT]",
+    "author": "Zainan Victor Zhou (@xinbenlv)",
+    "name": "EIP-5247: Smart Proposal [DRAFT]",
+    "dateCreated": "2022-07-13",
+    "datePublished": "2022-07-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-5247-executable-proposal-standard/9938",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

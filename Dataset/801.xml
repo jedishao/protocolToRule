@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-801: Canary Standard</title>
+<meta property="og:title" content="EIP-801: Canary Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-801" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-801" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-801: Canary Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-801.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#86eaefe1efc6eaefe1efa8e2e3">ligi</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2017-12-16</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#methods">Methods</a></li>
+<li><a href="#events">Events</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard interface for canary contracts.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following standard allows the implementation of canaries within contracts.
+This standard provides basic functionality to check if a canary is alive, keeping the canary alive and optionally manage feeders.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The canary can e.g. be used as a <a href="https://en.wikipedia.org/wiki/Warrant_canary">warrant canary</a>.
+A standard interface allows other applications to easily interface with canaries on Ethereum - e.g. for visualizing the state, automated alarms, applications to feed the canary or contracts (e.g. insurance) that use the state.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="methods">
+<a href="#methods" class="anchor-link"></a> Methods
+</h3>
+<h4 id="isalive">
+<a href="#isalive" class="anchor-link"></a> isAlive()
+</h4>
+<p>Returns if the canary was fed properly to signal e.g. that no warrant was received.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">isAlive</span><span class="p">()</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">bool</span> <span class="nx">alive</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="getblockofdeath">
+<a href="#getblockofdeath" class="anchor-link"></a> getBlockOfDeath()
+</h4>
+<p>Returns the block the canary died.
+Throws if the canary is alive.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getBlockOfDeath</span><span class="p">()</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint256</span> <span class="nx">block</span><span class="p">)</span>
+</code></pre></div></div>
+<h4 id="gettype">
+<a href="#gettype" class="anchor-link"></a> getType()
+</h4>
+<p>Returns the type of the canary:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">1</code> = Simple (just the pure interface as defined in this ERC)</li>
+<li><code class="language-plaintext highlighter-rouge">2</code> = Single feeder (as defined in ERC-TBD)</li>
+<li><code class="language-plaintext highlighter-rouge">3</code> = Single feeder with bad food (as defined in ERC-TBD)</li>
+<li><code class="language-plaintext highlighter-rouge">4</code> = Multiple feeders (as defined in ERC-TBD)</li>
+<li><code class="language-plaintext highlighter-rouge">5</code> = Multiple mandatory feeders (as defined in ERC-TBD)</li>
+<li><code class="language-plaintext highlighter-rouge">6</code> = IOT (as defined in ERC-TBD)</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">1</code> might also be used for a special purpose contract that does not need a special type but still wants to expose the functions and provide events as defined in this ERC.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">function</span> <span class="nx">getType</span><span class="p">()</span> <span class="nx">constant</span> <span class="nx">returns</span> <span class="p">(</span><span class="nx">uint8</span> <span class="nx">type</span><span class="p">)</span>
+</code></pre></div></div>
+<h3 id="events">
+<a href="#events" class="anchor-link"></a> Events
+</h3>
+<h4 id="rip">
+<a href="#rip" class="anchor-link"></a> RIP
+</h4>
+<p>MUST trigger when the contract is called the first time after the canary died.</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">event</span> <span class="nx">RIP</span><span class="p">()</span>
+</code></pre></div></div>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>TODO</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#d8b4b1bfb198b4b1bfb1f6bcbd">ligi</a>, "EIP-801: Canary Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 801, December 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-801.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-801: Canary Standard [DRAFT]",
+    "author": "ligi <ligi@ligi.de>",
+    "name": "EIP-801: Canary Standard [DRAFT]",
+    "dateCreated": "2017-12-16",
+    "datePublished": "2017-12-16",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

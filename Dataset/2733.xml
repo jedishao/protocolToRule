@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2733: Transaction Package</title>
+<meta property="og:title" content="EIP-2733: Transaction Package" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2733" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2733" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="withdrawn">
+🛑 This EIP has been withdrawn.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2733: Transaction Package
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2733.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/lightclient">Matt Garnett</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-transaction-package/4365">https://ethereum-magicians.org/t/eip-transaction-package/4365</a></td></tr>
+<tr><th>Status</th><td>Withdrawn
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-06-16</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2718">2718</a>
+</td></tr>
+<tr><th>Withdrawal reason</th><td>I have decided to pursue EIP-3074 as the preferred solution to transaction packages.</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#validity">Validity</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#intrinsic-cost">Intrinsic Cost</a></li>
+<li><a href="#execution">Execution</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#each-child-has-its-own-signature">Each Child has its own signature</a></li>
+<li><a href="#childpackage-specifies-max_gas_price-instead-of-gas_price">ChildPackage specifies max_gas_price instead of gas_price</a></li>
+<li><a href="#childpackage-is-also-typed">ChildPackage is also typed</a></li>
+<li><a href="#the-flags-and-extra-fields-arent-used">The flags and extra fields aren’t used</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#managing-packages-efficiently-in-the-mempool">Managing packages efficiently in the mempool</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Creates a new transaction type which executes a package of one or more
+transactions, while passing status information to subsequent transactions.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Introduce a new transaction type which includes a list of transactions that
+must be executed serially by clients. Execution information (e.g. success,
+gas_used, etc.) will be propagated forward to the next transaction.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Onboarding new users to Ethereum has been notoriously difficult due to the need
+for new users to acquire enough ether to pay for their transactions. This
+hurdle has seen a significant allocation of resources over the years to solve.
+Today, that solution is meta-transactions. This is, unfortunately, a brittle
+solution that requires signatures to be recovered within a smart contract to
+authenticate the message. This EIP aims to provide a flexible framework for
+relayers to “sponsor” many transactions at once, trustlessly.</p>
+<p>Meta-transactions often use relay contracts to maintain nonces and allow users
+to pay for gas using alternative assets. They have historically been designed
+to catch reversions in their inner transactions by only passing a portion of
+the available gas to the subcall. This allows them to be certain the outer call
+will have enough gas to complete any required account, like processing a gas
+payment. This type of subcall has been considered bad practice for a long time,
+but in the case of where you don’t trust the subcalls, it is the only available
+solution.</p>
+<p>Transaction packages are an alternative that allow multiple transactions to be
+bundled into one package and executed atomically, similarly to how relay
+contracts operate. Transactions are able to pass their result to subsequent
+transactions. This allows for conditional workflows based on the outcome of
+previous transactions. Although this functionality is already possible as
+described above, workflows using transaction packages are more robust, because
+they are protected from future changes to the gas schedule.</p>
+<p>An important byproduct of this EIP is that it also facilitates bundling
+transactions for single users.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Introduce a new <a href="/EIPS/eip-2718">EIP-2718</a> transaction type where <code class="language-plaintext highlighter-rouge">id = 2</code>.</p>
+<h4 id="structure">
+<a href="#structure" class="anchor-link"></a> Structure
+</h4>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct TransactionPackage {
+    chain_id: u256,
+    children: [ChildPackage],
+    nonce: u64,
+    gas_price: u256,
+    v: u256,
+    r: u256,
+    s: u256
+}
+</code></pre></div></div>
+<h5 id="hash">
+<a href="#hash" class="anchor-link"></a> Hash
+</h5>
+<p><code class="language-plaintext highlighter-rouge">keccak256(rlp([2, chain_id, children, nonce, gas_price, v, r, s])</code></p>
+<h5 id="signature-hash">
+<a href="#signature-hash" class="anchor-link"></a> Signature Hash
+</h5>
+<p><code class="language-plaintext highlighter-rouge">keccak256(rlp([2, chain_id, children, nonce, gas_price])</code></p>
+<h5 id="receipt">
+<a href="#receipt" class="anchor-link"></a> Receipt
+</h5>
+<p>Each <code class="language-plaintext highlighter-rouge">ChildTransaction</code> transaction will generate a <code class="language-plaintext highlighter-rouge">ChildReceipt</code> after execution. Each
+of these receipts will be aggregated into a <code class="language-plaintext highlighter-rouge">Receipt</code>.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>type Receipt = [ChildReceipt]
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct ChildReceipt {
+    status: u256,
+    cumulative_gas_used: u256,
+    logs_bloom: [u8; 256],
+    logs: [u8]
+}
+</code></pre></div></div>
+<h4 id="child-transaction">
+<a href="#child-transaction" class="anchor-link"></a> Child Transaction
+</h4>
+<p>Let <code class="language-plaintext highlighter-rouge">ChildPackage</code> be interpreted as follows.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct ChildPackage {
+    type: u8,
+    nonce: u64,
+    transactions: [ChildTransaction],
+    max_gas_price: u256,
+    v: u256,
+    r: u256,
+    s: u256
+}
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct ChildTransaction {
+    flags: u8,
+    to: Address,
+    value: u256,
+    data: [u8],
+    extra: [u8],
+    gas_limit: u256
+}
+</code></pre></div></div>
+<h5 id="types">
+<a href="#types" class="anchor-link"></a> Types
+</h5>
+<p>The <code class="language-plaintext highlighter-rouge">type</code> field is used to denote whether the <code class="language-plaintext highlighter-rouge">Child</code> signer wishes to
+delegate the <code class="language-plaintext highlighter-rouge">max_gas_price</code> and <code class="language-plaintext highlighter-rouge">gas_limit</code> choice to the <code class="language-plaintext highlighter-rouge">TransactionPackage</code>
+signer.</p>
+<table>
+<thead>
+<tr>
+<th>type</th>
+<th>signature hash</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x00</code></td>
+<td><code class="language-plaintext highlighter-rouge">keccak256(rlp([0, nonce, transactions, max_gas_price])</code></td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x01</code></td>
+<td><code class="language-plaintext highlighter-rouge">keccak256(rlp([1, nonce, transactions_without_gas_limit])</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="validity">
+<a href="#validity" class="anchor-link"></a> Validity
+</h3>
+<p>A <code class="language-plaintext highlighter-rouge">TransactionPackage</code> can be deemed valid or invalid as follows.</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">is_valid</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">Config</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="o">&amp;</span><span class="n">State</span><span class="p">,</span> <span class="n">tx</span><span class="p">:</span> <span class="n">TransactionPackage</span><span class="p">)</span> <span class="nb">bool</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">config</span><span class="nf">.chain_id</span><span class="p">()</span> <span class="o">!=</span> <span class="n">tx</span><span class="py">.chain_id</span> <span class="p">||</span>
+        <span class="n">tx</span><span class="py">.children</span><span class="nf">.len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">||</span>
+        <span class="n">state</span><span class="nf">.nonce</span><span class="p">(</span><span class="n">tx</span><span class="nf">.from</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">!=</span> <span class="n">tx</span><span class="py">.nonce</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">let</span> <span class="n">cum_limit</span> <span class="o">=</span> <span class="n">tx</span><span class="py">.children</span><span class="nf">.map</span><span class="p">(|</span><span class="n">x</span><span class="p">|</span> <span class="n">x</span><span class="py">.gas_limit</span><span class="p">)</span><span class="nf">.sum</span><span class="p">();</span>
+    <span class="k">if</span> <span class="n">state</span><span class="nf">.balance</span><span class="p">(</span><span class="n">tx</span><span class="nf">.from</span><span class="p">())</span> <span class="o">&lt;</span> <span class="n">cum_limit</span> <span class="o">*</span> <span class="n">tx</span><span class="py">.gas_price</span> <span class="o">+</span> <span class="nf">intrinsic_gas</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">child</span> <span class="n">in</span> <span class="n">tx</span><span class="py">.children</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">child</span><span class="py">.nonce</span> <span class="o">!=</span> <span class="n">state</span><span class="nf">.nonce</span><span class="p">(</span><span class="n">child</span><span class="nf">.from</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">||</span>
+            <span class="n">child</span><span class="py">.value</span> <span class="o">&gt;</span> <span class="n">state</span><span class="nf">.balance</span><span class="p">(</span><span class="n">child</span><span class="nf">.from</span><span class="p">())</span> <span class="p">||</span>
+            <span class="n">child</span><span class="py">.max_gas_price</span> <span class="o">&lt;</span> <span class="n">tx</span><span class="py">.gas_price</span>
+        <span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+        
+        <span class="k">for</span> <span class="n">tx</span> <span class="n">in</span> <span class="n">child</span><span class="py">.txs</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">tx</span><span class="py">.flags</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">||</span>
+                <span class="n">tx</span><span class="py">.extra</span><span class="nf">.len</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">||</span>
+                <span class="n">tx</span><span class="py">.gas_limit</span> <span class="o">&lt;</span> <span class="nf">intrinsic_gas</span><span class="p">(</span><span class="n">tx</span><span class="p">)</span>
+            <span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    
+    <span class="k">true</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="results">
+<a href="#results" class="anchor-link"></a> Results
+</h3>
+<p>Subsequent <code class="language-plaintext highlighter-rouge">ChildTransaction</code>s will be able to receive the result of the
+previous <code class="language-plaintext highlighter-rouge">ChildTransaction</code> via <code class="language-plaintext highlighter-rouge">RETURNDATACOPY (0x3E)</code> in first frame of
+execution, before making any subcalls. Each element, except the last, will be
+<code class="language-plaintext highlighter-rouge">0</code>-padded left to 32 bytes.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>struct Result {
+    // Status of the previous transaction
+    success: bool,
+    
+    // Total gas used by the previous transaction
+    gas_used: u256,
+    
+    // Cumulative gas used by previous transactions
+    cum_gas_used: u256,
+    
+    // The size of the return value
+    return_size: u256,
+    
+    // The return value of the previous transaction
+    return_value: [u8]
+}
+</code></pre></div></div>
+<h3 id="intrinsic-cost">
+<a href="#intrinsic-cost" class="anchor-link"></a> Intrinsic Cost
+</h3>
+<p>Let the intrinsic cost of the transaction package be defined as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>fn intrinsic_gas(tx: TransactionPackage) u256 {
+    let data_gas = tx.children.map(|c| c.txs.map(|t| data_cost(&amp;c.data)).sum()).sum();
+    17000 + 8000 * tx.children.len() + data_gas
+}
+</code></pre></div></div>
+<h3 id="execution">
+<a href="#execution" class="anchor-link"></a> Execution
+</h3>
+<p>Transaction packages should be executed as follows:</p>
+<ol>
+<li>Deduct the cumulative cost from the outer signer’s balance.</li>
+<li>Load the first child package, and execute the first child transaction.</li>
+<li>Record all state changes, logs, the receipt, and refund any unused gas.</li>
+<li>If there are no more child transactions, goto <code class="language-plaintext highlighter-rouge">8</code>.</li>
+<li>Compute <code class="language-plaintext highlighter-rouge">Result</code> for the previously executed transaction.</li>
+<li>Prepare <code class="language-plaintext highlighter-rouge">Result</code> to be available via return opcodes in the next
+transaction’s first frame.</li>
+<li>Execute the next transaction, then goto <code class="language-plaintext highlighter-rouge">3</code>.</li>
+<li>Load the next child package, then goto <code class="language-plaintext highlighter-rouge">7</code>.</li>
+</ol>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="each-child-has-its-own-signature">
+<a href="#each-child-has-its-own-signature" class="anchor-link"></a> Each <code class="language-plaintext highlighter-rouge">Child</code> has its own signature
+</h3>
+<p>For simplicity, the author has chosen to require each child package to specify
+its own signature, even if the signer is the same as the package signer. This
+choice is made to allow for maximum flexibility, with minimal client changes.
+This transaction can still be used by a single user at the cost of only one
+additional signature recovery.</p>
+<h3 id="childpackage-specifies-max_gas_price-instead-of-gas_price">
+<a href="#childpackage-specifies-max_gas_price-instead-of-gas_price" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ChildPackage</code> specifies <code class="language-plaintext highlighter-rouge">max_gas_price</code> instead of <code class="language-plaintext highlighter-rouge">gas_price</code>
+</h3>
+<p>Allowing child packages to specify a range of acceptable gas prices is
+strictly more versatile than a static price. It gives relayers more flexibility
+in terms of building transaction bundles, and it makes it possible for relayers
+to try and achieve the best price for the transaction sender. With a fixed
+price, the relayer may require the user to sign multiple different
+transactions, with varying prices. This can be avoided by specifying a max
+price, and communicating out-of-band how the urgency of the transaction (e.g.
+the relayer should package it with the max price immediately vs. slowly
+increasing the gas price).
+A future transaction type can be specified with only a single
+signature, if such an optimization is desired.</p>
+<h3 id="childpackage-is-also-typed">
+<a href="#childpackage-is-also-typed" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">ChildPackage</code> is also typed
+</h3>
+<p>The type element serves a modest role in the transaction type, denoting whether
+the transaction signer wishes to delegate control of the gas price and gas
+limit to the outer signer. This is a useful UX improvement when interacting
+with a trusted relayer, as once the user decides to make a transaction the
+relayer can ensure it is included on chain by choosing the best gas price and
+limit.</p>
+<h3 id="the-flags-and-extra-fields-arent-used">
+<a href="#the-flags-and-extra-fields-arent-used" class="anchor-link"></a> The <code class="language-plaintext highlighter-rouge">flags</code> and <code class="language-plaintext highlighter-rouge">extra</code> fields aren’t used
+</h3>
+<p>These fields are included to better support future changes to the transaction
+type. This would likely be used in conjunction with the <code class="language-plaintext highlighter-rouge">flags</code> and <code class="language-plaintext highlighter-rouge">type</code>
+fields. A benefit of explicitly defining them is that specialized serialization
+of RLP can be avoided, simplifing clients and downstream infrastructure. The
+author believe the cost of 2 bytes per transaction is acceptable for smoother
+integration of future features.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Contracts which rely on <code class="language-plaintext highlighter-rouge">ORIGIN (0x32) == CALLER (0x33) &amp;&amp; RETURNDATASIZE
+(0x3D) == 0x00</code> will now always fail in transaction packages, unless they are
+the first executed transaction. It’s unknown if any contracts conduct this
+check.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TBD</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>TBD</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="managing-packages-efficiently-in-the-mempool">
+<a href="#managing-packages-efficiently-in-the-mempool" class="anchor-link"></a> Managing packages efficiently in the mempool
+</h3>
+<p>The introduction of a new transaction type brings along new concerns regarding
+the mempool. Done naively, it could turn into a DDoS vector for clients. This
+EIP has been written to reduce as much validation complexity as possible.</p>
+<p>An existing invariant in the mempool that is desirable for new transactions to
+maintain, is that transactions can be validated in constant time. This is also
+possible for packaged transactions. There is an inherent 10Mb limit for RLPx
+frames, so that would be the upper bound on transactions that could be included
+in a package. On the other hand, clients can also just configure their own
+bound locally (e.g. packages must be less than 1Mb). Validity can then be
+determined by using the function above.</p>
+<p>Once a package has been validated, it must continuously be monitored for nonce
+invalidations within its package. One potential way to achieve this efficiently
+is to modify the mempool to operate on thin pointers to the underlying
+transaction. This will allow packages to ingest as many “single” transactions,
+simplifying the facilities for monitoring changes. These “parts” of the package
+can maintain a pointer to a structure with pointers to all the parts of the
+package. This way, as soon as one part becomes invalid, it can request the
+parent to invalidate all outstanding parts of the package.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/lightclient">Matt Garnett</a>, "EIP-2733: Transaction Package [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2733, June 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2733.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2733: Transaction Package [DRAFT]",
+    "author": "Matt Garnett (@lightclient)",
+    "name": "EIP-2733: Transaction Package [DRAFT]",
+    "dateCreated": "2020-06-16",
+    "datePublished": "2020-06-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-transaction-package/4365",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

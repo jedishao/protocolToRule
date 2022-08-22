@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3779: Safer Control Flow for the EVM</title>
+<meta property="og:title" content="EIP-3779: Safer Control Flow for the EVM" />
+<meta name="description" content="Ensure an essential level of safety for EVM code." />
+<meta property="og:description" content="Ensure an essential level of safety for EVM code." />
+<meta name="twitter:description" content="Ensure an essential level of safety for EVM code." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3779" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3779" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="withdrawn">
+🛑 This EIP has been withdrawn.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3779: Safer Control Flow for the EVM
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3779.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Ensure an essential level of safety for EVM code.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gcolvin">Greg Colvin</a>, <a href="/cdn-cgi/l/email-protection#197e6b7c7e597a76756f707737766b7e">Greg Colvin</a>, <a href="https://github.com/expede">Brooklyn Zelenka</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3779-safe-control-flow-for-the-evm/6975">https://ethereum-magicians.org/t/eip-3779-safe-control-flow-for-the-evm/6975</a></td></tr>
+<tr><th>Status</th><td>Withdrawn
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-08-30</td></tr>
+<tr><th>Withdrawal reason</th><td>material moved to EIP-2315</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#safety">Safety</a></li>
+<li><a href="#performance">Performance</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#validity">Validity</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a>
+<ul>
+<li><a href="#validation-function">Validation Function</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>We define a safe EVM contract as one that cannot encounter an exceptional halting state. In general, we cannot prove safety for Turing-complete programs. But we can prove a useful subset.</p>
+<p>This EIP specifies validity rules to ensure that:</p>
+<blockquote>
+<p>Valid contracts will not halt with an exception unless they either</p>
+<ul>
+<li>throw <code class="language-plaintext highlighter-rouge">out of gas</code> or</li>
+<li>recursively overflow stack.</li>
+</ul>
+</blockquote>
+<p>This EIP does not introduce any new opcodes. Rather, it restricts the use of existing and proposed control-flow instructions. The restrictions must be validated at contract initialization time – not at runtime – by the provided algorithm or its equivalent. This algorithm must take time and space near-linear in the size of the contract, so as not to be a denial of service vulnerability.</p>
+<p>This specification is entirely semantic. It imposes no further syntax on bytecode, as none is required to ensure the specified level of safety. Ethereum Virtual Machine bytecode is just that – a sequence of bytes that when executed causes a sequence of changes to the machine state. The safety we seek here is simply to not, as it were, jam up the gears.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<h3 id="safety">
+<a href="#safety" class="anchor-link"></a> Safety
+</h3>
+<p>For our purposes we define a safe EVM contract as one that cannot encounter an exceptional halting state. From the standpoint of security it would be best if unsafe contracts were never placed on the blockchain. Unsafe code can attempt to overflow stack, underflow stack, execute invalid instructions, and jump to invalid locations.</p>
+<p>Unsafe contracts are exploits waiting to happen.</p>
+<p>Validating contract safety requires traversing the contract code. So in order to prevent denial of service attacks all jumps, including the existing <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code>, and also the other proposed jumps – <code class="language-plaintext highlighter-rouge">RJUMP</code>, <code class="language-plaintext highlighter-rouge">RJUMPI</code>, <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> and <code class="language-plaintext highlighter-rouge">RETURNSUB</code> – must be validated at initialization time, and in time and space linear in the size of the code.</p>
+<h4 id="static-jumps-and-subroutines">
+<a href="#static-jumps-and-subroutines" class="anchor-link"></a> Static Jumps and Subroutines
+</h4>
+<p>The relative jumps of <a href="./eip-4200">EIP-4200</a> and the simple subroutines of <a href="./eip-2315">EIP-2315</a> provide a complete set of static control flow instructions:</p>
+<blockquote>
+<p><code class="language-plaintext highlighter-rouge">RJUMP</code> <em>offset</em></p>
+<ul>
+<li>Jumps to <em>IP+offset</em>.
+<code class="language-plaintext highlighter-rouge">RJUMPI</code> <em>offset</em></li>
+<li>Jumps if the top of stack is non-zero.
+<code class="language-plaintext highlighter-rouge">RJUMPSUB</code> offset</li>
+<li>Pushes <em>IP+1</em> on the return stack and jumps to <em>IP+offest</em>.
+<code class="language-plaintext highlighter-rouge">RETURNSUB</code></li>
+<li>Jumps to the address popped off the return stack.</li>
+</ul>
+</blockquote>
+<p>Note that each jump creates at most two paths of control through the code, such that the complexity of traversing the entire control-flow graph is linear in the size of the code.</p>
+<h4 id="dynamic-jumps">
+<a href="#dynamic-jumps" class="anchor-link"></a> <em>Dynamic Jumps</em>
+</h4>
+<p>Dynamic jumps, where the destination of a <code class="language-plaintext highlighter-rouge">JUMP</code> or <code class="language-plaintext highlighter-rouge">JUMPI</code> is not known until runtime, are an obstacle to proving validity in linear time – any jump can be to any destination in the code, potentially requiring time quadratic in the size of code. For this reason we have two real choices.</p>
+<ol>
+<li>Deprecate dynamic jumps. This is easily done:</li>
+</ol>
+<blockquote>
+<p>Define <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code> as <code class="language-plaintext highlighter-rouge">INVALID</code> for the purposes of EOF Code Validation</p>
+</blockquote>
+<ol>
+<li>Constrain dynamic jumps. This requires static analysis.</li>
+</ol>
+<p>Consider the simplest and most common case.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PUSH address
+JUMP
+</code></pre></div></div>
+<p>This is effectively a static jump.</p>
+<p>Another important use of <code class="language-plaintext highlighter-rouge">JUMP</code> is to implement the return jump from a subroutine. So consider this example of calling and returning from a minimal subroutine:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TEST_SQUARE:
+    jumpdest
+    push RTN_SQUARE 
+    0x02
+    push SQUARE
+    jump
+RTN_SQUARE
+    jumpdest
+    swap1
+    jump
+
+SQUARE:
+    jumpdest
+    dup1
+    mul
+    swap1
+    jump
+</code></pre></div></div>
+<p>The return address -<code class="language-plaintext highlighter-rouge">RTN_SQUARE</code> - and the destination address - <code class="language-plaintext highlighter-rouge">SQUARE</code> - are pushed on the stack as constants and remain unchanged as they move on the stack, such that only those constants are passed to each <code class="language-plaintext highlighter-rouge">JUMP</code>. They are effectively static. We can track the motion of constants on the <code class="language-plaintext highlighter-rouge">data stack</code> at validation time, so <em>we do not need unconstrained dynamic jumps to implement subroutines.</em></p>
+<p><em>The above is the simplest analysis that suffices. A more powerful analysis that takes in more use cases is possible – slower, but still linear-time.</em></p>
+<h4 id="validation">
+<a href="#validation" class="anchor-link"></a> Validation
+</h4>
+<p>We can validate the safety of contracts with a static analysis that takes time and space linear in the size of the <em>code</em>, as shown below. And since we can, we should.</p>
+<h3 id="performance">
+<a href="#performance" class="anchor-link"></a> Performance
+</h3>
+<p>Validating safe control flow at initialization time has potential performance advantages.</p>
+<ul>
+<li>Static jumps do not need to be checked at runtime.</li>
+<li>Stack underflow does not need to be checked for at runtime.</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="validity">
+<a href="#validity" class="anchor-link"></a> Validity
+</h3>
+<blockquote>
+<p>In theory, theory and practice are the same. In practice, they’re not. – Albert Einstein</p>
+</blockquote>
+<p>We define a <em>safe</em> EVM contract as one that cannot encounter an exceptional halting state. We validate <em>safety</em> at initialization time to the extent practical.</p>
+<h4 id="exceptional-halting-states">
+<a href="#exceptional-halting-states" class="anchor-link"></a> <em>Exceptional Halting States</em>
+</h4>
+<p>The <em>execution</em> of each instruction is defined in the Yellow Paper as a change to the EVM state that preserves the invariants of EVM state. At runtime, if the execution of an instruction would violate an invariant the EVM is in an exceptional halting state. The Yellow Paper defined five such states.</p>
+<ol>
+<li>Insufficient gas</li>
+<li>More than 1024 stack items</li>
+<li>Insufficient stack items</li>
+<li>Invalid jump destination</li>
+<li>Invalid instruction</li>
+</ol>
+<p><em>A program is safe iff no execution can lead to an exceptional halting state.</em></p>
+<p><em>We would like to consider EVM programs valid iff they are safe.</em></p>
+<p><em>In practice</em>, we must be able to validate <em>code</em> in linear time to avoid denial of service attacks. And we must support dynamically-priced instructions, loops, and recursion, which can use arbitrary amounts of gas and stack.</p>
+<p>Thus our validation cannot consider concrete computations – it only performs a limited symbolic execution of the <em>code</em>. This means we will reject programs if we detect any invalid execution paths, even if those paths are not reachable at runtime. And we will count as valid programs that may not always produce correct results.</p>
+<p>We can detect only <em>non-recursive</em> stack overflows at <em>validation time</em>, so we must check for the first two states at <em>runtime</em>:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">out of gas</code> and</li>
+<li>stack overflow.</li>
+</ul>
+<p>The remaining three states we can check at <em>validation time</em>:</p>
+<ul>
+<li>stack underflow,</li>
+<li>invalid jump, and</li>
+<li>invalid instruction.</li>
+</ul>
+<p>That is to say:</p>
+<blockquote>
+<p>Valid contracts will not halt with an exception unless they either</p>
+<ul>
+<li>throw <code class="language-plaintext highlighter-rouge">out of gas</code> or</li>
+<li>recursively overflow stack.</li>
+</ul>
+</blockquote>
+<h4 id="constraints-on-valid-code">
+<a href="#constraints-on-valid-code" class="anchor-link"></a> <em>Constraints on Valid Code</em>
+</h4>
+<ul>
+<li>Every instruction is valid.</li>
+<li>Every jump is valid:
+<ul>
+<li>Every<code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code> is <em>static</em>.</li>
+<li>No <code class="language-plaintext highlighter-rouge">JUMP</code>, <code class="language-plaintext highlighter-rouge">JUMPI</code>, <code class="language-plaintext highlighter-rouge">RJUMP</code>, <code class="language-plaintext highlighter-rouge">RJUMPI</code>, or <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> addresses immediate data.</li>
+</ul>
+</li>
+<li>The stacks are always valid:
+<ul>
+<li>The <em>number</em> of items on the <code class="language-plaintext highlighter-rouge">data stack</code> is always positive, and at most 1024.</li>
+<li>The <em>number</em> of items on the <code class="language-plaintext highlighter-rouge">return stack</code> is always positive, and at most 1024.</li>
+</ul>
+</li>
+<li>The data stack is consistently aligned:
+<ul>
+<li>The <em>number</em> of items on the <code class="language-plaintext highlighter-rouge">data stack</code> between the current <code class="language-plaintext highlighter-rouge">stack pointer</code> and the <code class="language-plaintext highlighter-rouge">stack pointer</code> on entry to the most recent basic block is the same for each <em>execution</em> of a <em>byte_code</em>.</li>
+</ul>
+</li>
+</ul>
+<p>We define a <code class="language-plaintext highlighter-rouge">JUMP</code> or <code class="language-plaintext highlighter-rouge">JUMPI</code> instruction to be <em>static</em> if its <code class="language-plaintext highlighter-rouge">jumpsrc</code> argument was first placed on the stack via a <code class="language-plaintext highlighter-rouge">PUSH…</code> and that value has not changed since, though it may have been copied via a <code class="language-plaintext highlighter-rouge">DUP…</code> or <code class="language-plaintext highlighter-rouge">SWAP…</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">RJUMP</code>, <code class="language-plaintext highlighter-rouge">RJUMPI</code> and <code class="language-plaintext highlighter-rouge">RJUMPSUB</code>instructions take their destination as an immediate argument, so they are <em>static</em>.</p>
+<p>Taken together, these rules allow for code to be validated by traversing the control-flow graph, in time and space linear in the size of the code, following each edge only once.</p>
+<p><em>Note: The definition of ‘static’ for <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code> is the bare minimum needed to implement subroutines. Deeper analyses could be proposed that would validate a larger and probably more useful set of jumps, at the cost of more expensive (but still linear) validation.</em></p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Demanding <em>static</em> destinations for all jumps means that all jump destinations can be validated at initialization time, not runtime.</p>
+<p>Bounding the stack pointers catches all <code class="language-plaintext highlighter-rouge">data stack</code> and non-recursive<code class="language-plaintext highlighter-rouge">return stack</code> overflows.</p>
+<p>Requiring a consistently aligned<code class="language-plaintext highlighter-rouge">data stack</code> prevents stack underflow. It can also catch such errors as misaligned stacks due to irreducible control flows and calls to subroutines with the wrong number of arguments.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>These changes affect the semantics of EVM code – the use of <code class="language-plaintext highlighter-rouge">JUMP</code>, <code class="language-plaintext highlighter-rouge">JUMPI</code>, and the stack are restricted, such that some <em>code</em> that would otherwise run correctly will nonetheless be invalid EVM <em>code</em>.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>The following is a pseudo-Go implementation of an algorithm for predicating code validity. An equivalent algorithm must be run at initialization time.</p>
+<p>This algorithm performs a symbolic execution of the program that recursively traverses the <em>code</em>, emulating its control flow and stack use and checking for violations of the rules above.</p>
+<p>It runs in time equal to <code class="language-plaintext highlighter-rouge">O(vertices + edges)</code> in the program’s control-flow graph, where edges represent control flow and the vertices represent <em>basic blocks</em> – thus the algorithm takes time proportional to the size of the <em>code</em>.</p>
+<p><em>Note: All valid code has a control-flow graph that can be traversed in time and space linear in the length of the code. That means that some other static analyses and code transformations that might otherwise require quadratic time can also be written to run in near-linear time, including one-pass and streaming compilers.</em></p>
+<h3 id="validation-function">
+<a href="#validation-function" class="anchor-link"></a> Validation Function
+</h3>
+<p><em><strong>Note:</strong> This function is a work in progress, and the version below is known to be incorrect.</em></p>
+<p>For simplicity’s sake we assume that <em>jumpdest analysis</em> has been done and that we have some helper functions.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">isValidInstruction(pc)</code> returns true if <code class="language-plaintext highlighter-rouge">pc</code> points at a valid instruction</li>
+<li><code class="language-plaintext highlighter-rouge">isValidJumpdest(dest)</code> returns true if <code class="language-plaintext highlighter-rouge">dest</code> is a valid jumpdest</li>
+<li><code class="language-plaintext highlighter-rouge">immediateData(pc)</code> returns the immediate data for the instruction at <code class="language-plaintext highlighter-rouge">pc</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">advancePC(pc)</code> returns next <code class="language-plaintext highlighter-rouge">pc</code>, skipping any immediate data.</li>
+<li><code class="language-plaintext highlighter-rouge">removed_items(pc)</code> returns the number of items removed from the <code class="language-plaintext highlighter-rouge">dataStack</code> by the instruction at <code class="language-plaintext highlighter-rouge">pc</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">added_items(pc)</code> returns the number of items added to the <code class="language-plaintext highlighter-rouge">dataStack</code> by the instruction at <code class="language-plaintext highlighter-rouge">pc</code>.</li>
+</ul>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var bytecode      [codeLen]byte
+var subMin        [codeLen]int
+var subMax        [codeLen]int
+var subDelta      [codeLen]int
+var visited       [codeLen]bool
+var dataStack     [1024]int
+
+// validate a path through the control flow of the bytecode at pc
+// and return the maximum number of stack items used down that path
+// or else the PC and an error
+//
+// by starting at pc:=0 the entire program is recursively evaluated
+//
+func validate(pc := 0, sp := 0, rp := 0) int, error {
+   minStack := 0 
+   maxStack := 0 
+   deltaStack := 0 
+   for pc &lt; codeLen {
+      if !isValidInstruction(pc) {
+         return 0,0,0,invalid_instruction
+      }
+      
+      // if we have jumped here before return to break cycle
+      if visited[pc] {
+
+          // stack is not aligned if deltas not the same
+          if ??? {
+            return 0,0,0,invalid_stack
+          }
+          return minStack, maxStack, sp
+      }
+      visited[pc] = true
+      switch bytecode[pc] {
+
+      // successful termination
+      case STOP:
+         return minStack, maxStack, sp
+      case RETURN:
+         return minStack, maxStack, sp
+
+      case SELFDESTRUCT:
+         return minStack, maxStack, sp
+      case REVERT:
+         return minStack, maxStack, sp
+      case INVALID:
+         return 0,0,0,invalid_instruction
+    
+      case RJUMP:
+
+         // check for valid jump destination
+         if !isValidJumpdest(jumpdest) {
+            return 0,0,0,invalid_destination
+         }
+         
+         // reset pc to destination of jump
+         pc += immediateData(pc)
+
+      case RJUMPI:
+      
+         // recurse to validate true side of conditional
+         jumpdest = pc + immediateData(pc)
+         if !isValidJumpdest(pc + jumpdest) {
+            return 0,0,0,invalid_destination
+         }
+         minRight, maxLeft, deltaRight, err =
+            validate(jumpdest, sp, rp)
+  
+     err {
+            return 0,0,0,err
+         }
+         
+         // recurse to validate false side of conditional
+         pc = advancePC(pc)
+         minRight, maxRight, deltaRight, err =
+            validate(pc, sp, rp)
+         if err {
+            return 0,0,0,err
+         }
+         
+         // both paths valid, so return max
+         minStack = min(minStack, min(minLeft, minRight))
+         maxStack += max(maxLeft, maxRight)
+         deltaStack += max(deltaLeft, deltaRight)
+         return minStack, maxStack, deltaStack
+
+      case RJUMPSUB:
+
+         // check for valid jump destination
+         jumpdest = immediateData(pc)
+         if !isValidJumpdest(pc + jumpdest) {
+            return 0,0,0,invalid_destination
+         }
+
+         pc += jumpdest
+
+         // recurse to validate subroutine call
+         minSub, maxSub, deltaSub, err = validate(jumpdest, sp, rp)
+         if err {
+            return 0,0,0,err
+         }
+         subMin[pc] = minSub
+         subMax[pc] = maxSub
+         subDelta[pc] = deltaSub
+         minStack = min(minStack, sp)
+         maxStack = max(maxStack, sp)
+         pc = advancePC(pc)
+
+      case RETURNSUB:
+      
+         maxStack = max(maxStack, sp)
+         return minStack, maxStack, sp, nil
+
+      /////////////////////////////////////////////////////
+      //
+      // The following are to be included only if we take
+      //
+      //    Option 2
+      //
+      // and do not deprecate JUMP and JUMPI
+      //
+      case JUMP:
+         // pop jump destination
+         jumpdest = dataStack[--sp]
+         if !valid_jumpdest(jumpdest) {
+            return 0,0,0,invalid_destination
+         }
+         pc = jumpdest
+      case JUMPI:
+         // pop jump destination and conditional
+         jumpdest = dataStack[--sp]
+         jumpif = dataStack[--sp]
+         if sp &lt; 0 {}
+            return 0,0,0,stack_underflow
+         }
+         if !valid_jumpdest(jumpdest) {
+            return 0,0,0,invalid_destination
+         }
+
+         // recurse to validate true side of conditional
+         if !isValidJumpdest(jumpdest) {
+            return 0,0,0,invalid_destination
+         }
+         maxLeft, err = validate(jumpdest, sp, rp)
+         if err {
+            return 0,0,0,err
+         }
+         
+         // recurse to validate false side of conditional
+         pc = advance_pc(pc)
+         maxRight, err = validate(pc, sp, rp)
+         if err {
+            return 0,0,0,err
+         }
+         
+         // both sides valid, return max
+         maxStack += max(maxLeft, maxRight)
+         return minStack, maxStack, sp
+      case PUSH1 &lt;= bytecode[pc] &amp;&amp; bytecode[pc] &lt;= PUSH32 {
+         sp++
+         if (sp &gt; 1023) {
+            return 0,0,0,stack_overflow
+         }
+         maxStack = max(maxStack, sp)
+         dataStack[sp] = immediateData(pc)
+         pc = advancePC(pc)
+      case DUP1 &lt;= bytecode[pc] &amp;&amp; bytecode[pc] &lt;= DUP32 {
+         dup = sp - (bytecode[pc] - DUP1)
+         if dup &lt; 0 {
+            return 0,0,0,stack_underflow
+         }
+         sp++
+         if (sp &gt; 1023) {
+            return 0,0,0,stack_overflow
+         }
+         maxStack = max(maxStack, sp)
+         dataStack[sp] = dataStack[dup]
+         pc = advancePC(pc)
+      case SWAP1 &lt;= bytecode[pc] &amp;&amp; bytecode[pc] &lt;= SWAP32 {
+         swap = sp - (bytecode[pc] - SWAP1)
+         if swap &lt; 0 {
+            return 0,0,0,stack_underflow
+         }
+         temp := dataStack[swap]
+         dataStack[swap] = dataStack[0]
+         dataStack[0] = temp
+         pc = advancePC(pc)
+      //
+      /////////////////////////////////////////////////////
+
+      default:
+
+         // apply other instructions to stack pointer
+         sp -= removed_items(pc)
+         if (sp &lt; 0) {
+            return 0,0,0,stack_underflow
+         }
+         minStack = min(minStack, sp)
+         sp += added_items(pc)
+         if (sp &gt; 1023) {
+            return 0,0,0,stack_overflow
+         }
+         maxStack = max(maxStack, sp)
+         pc = advancePC(pc)
+      }
+   }
+
+   // successful termination
+   return minStack, maxStack, sp
+}
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>This EIP is intended to ensure an essential level of safety for EVM code deployed on the blockchain.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gcolvin">Greg Colvin</a>, <a href="/cdn-cgi/l/email-protection#4e293c2b290e2d212238272060213c29">Greg Colvin</a>, <a href="https://github.com/expede">Brooklyn Zelenka</a>, "EIP-3779: Safer Control Flow for the EVM [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3779, August 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3779.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3779: Safer Control Flow for the EVM [DRAFT]",
+    "author": "Greg Colvin (@gcolvin), Greg Colvin <greg@colvin.org>, Brooklyn Zelenka (@expede)",
+    "name": "EIP-3779: Safer Control Flow for the EVM [DRAFT]",
+    "dateCreated": "2021-08-30",
+    "datePublished": "2021-08-30",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3779-safe-control-flow-for-the-evm/6975",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

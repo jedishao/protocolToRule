@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1418: Blockchain Storage Rent Payment</title>
+<meta property="og:title" content="EIP-1418: Blockchain Storage Rent Payment" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1418" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1418" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1418: Blockchain Storage Rent Payment
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1418.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/fulldecent">William Entriken</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1418">https://github.com/ethereum/EIPs/issues/1418</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2018-09-16</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#rationale--economics--constants">Rationale – economics &amp; constants</a></li>
+<li><a href="#backwards-compatibility">Backwards compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h1 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h1>
+<p>At each block, deduct an amount of value from every account based on the quantity of storage used by that account.</p>
+<h1 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h1>
+<p>The naive implementation is to simply loop through every account on each block and deduct a certain fee.</p>
+<p>We also show an equivalent technique that is easier to implement. Also we review practical considerations of switching to a fee-based rent system.</p>
+<p>In other words, <code class="language-plaintext highlighter-rouge">product=0; while(factor1--) product+= factor2;</code> is slow, but equivalently <code class="language-plaintext highlighter-rouge">product = factor1 * factor2</code> is fast. And we can reason about both at the same time.</p>
+<h1 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h1>
+<p>Ethereum is a public utility and we are underpricing the long-term costs of storage. Storage cost can be approximately modeled as bytes × time.</p>
+<h1 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h1>
+<p><strong>New state variables (per account)</strong></p>
+<ul>
+<li><strong>σ[a]_rent</strong> – an amount of value, in Wei</li>
+<li><strong>σ[a]_storageWords</strong> – number of words in storage</li>
+</ul>
+<p><strong>Recommended implementation variables (per account)</strong></p>
+<ul>
+<li><strong>σ[a]_rentLastPaid</strong> – a block number that is set when:
+<ul>
+<li>Value is transferred into an account (<code class="language-plaintext highlighter-rouge">CREATE</code>, <code class="language-plaintext highlighter-rouge">CALL</code>, <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>)</li>
+<li>Code is set for an account (<code class="language-plaintext highlighter-rouge">CREATE</code>)</li>
+<li>An account’s storage is updated (<code class="language-plaintext highlighter-rouge">SSTORE</code>)</li>
+</ul>
+</li>
+<li><strong>σ[a]_rentEvictBlock</strong> – the block number when this account will be destructed</li>
+</ul>
+<p><strong>New constants</strong></p>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">RENT_WORD_COST</code></strong> – The rent cost, in Wei, paid for each word-block</li>
+<li><strong><code class="language-plaintext highlighter-rouge">RENT_ACCOUNT_COST</code></strong> – The rent cost, in Wei, paid for each account-block</li>
+<li><strong><code class="language-plaintext highlighter-rouge">RENT_STIPEND</code></strong> – A small amount of rent created during transactions</li>
+<li><strong><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></strong> – When implementation starts</li>
+<li><strong><code class="language-plaintext highlighter-rouge">RENT_EVICTIONS_START</code></strong> – First block with evictions</li>
+</ul>
+<p><strong>New opcodes</strong></p>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">RENTBALANCE(address)</code></strong> – G_BALANCE – Similar to <code class="language-plaintext highlighter-rouge">BALANCE</code>
+<ul>
+<li>This returns the logical <code class="language-plaintext highlighter-rouge">σ[a]_rent</code> value which is defined to reduce each block. The implementation may however instead simply store <code class="language-plaintext highlighter-rouge">σ[a]_rentBalanceWhenLastPaid</code> and subtract to get the updated value.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">SENDRENT(address, amount)</code></strong> – G_BASE – Convert value to rent and send to account
+<ol>
+<li>σ[account]_rent += amount</li>
+<li>σ[msg.sender]_balance -= amount</li>
+</ol>
+</li>
+</ul>
+<p><strong>Updated opcodes</strong></p>
+<p>A new subroutine, paying for rent, is established as such:</p>
+<pre><code class="language-pseudocode">PAYRENT(account)
+    
+    ASSERT(σ[account]_rentEviction &gt;= NUMBER) // TODO: I'm not sure if should be &gt; or &gt;=
+    blocks_to_pay = NUMBER - σ[account]_rentLastPaid
+    cost_per_block = RENT_ACCOUNT_COST + RENT_WORD_COST * (⌈∥σ[account]_code∥ / 32⌉ + * σ[a]_storageWords)
+    rent_to_pay = blocks_to_pay * cost_per_block
+    σ[account]_rent -= rent_to_pay
+    σ[account]_rentLastPaid = NUMBER
+    σ[account]_rentEvictBlock = NUMBER + ⌊σ[account]_rent / cost_per_block⌋
+END PAYRENT
+</code></pre>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">SSTORE(account, key, value)</code></strong>
+<ul>
+<li>Perform PAYRENT(account)</li>
+<li>Do normal SSTORE operation</li>
+<li>If the old value was zero for this [account, key] and the new value is non-zero, then <code class="language-plaintext highlighter-rouge">σ[account]_storageWord++</code></li>
+<li>If the old value was non-zero for this [account, key] and the new value is zero, then <code class="language-plaintext highlighter-rouge">σ[account]_storageWords--</code></li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">CALL (and derivatives)</code></strong>
+<ul>
+<li>If value &gt; 0 then perform PAYRENT(account)</li>
+<li>Do normal CALL operation</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">CREATE</code></strong>
+<ul>
+<li>Set σ[account]_rentLastPaid = NUMBER</li>
+<li>Do normal CREATE operation</li>
+<li>Note: it is possible there is a pre-existing rent balance here</li>
+</ul>
+</li>
+</ul>
+<p><strong>Updated substate</strong></p>
+<p>The substate tuple is defined as:</p>
+<blockquote>
+<p>A ≡ (As, Al, At, Ar)</p>
+</blockquote>
+<p>This includes A_t, “the set of touched accounts, of which the empty ones are deleted at the end of a transaction”.</p>
+<p>This definition is updated to: “the set of touched accounts, of which the empty ones or evicted ones (BLOCK &gt;= σ[a]_rentEvictBlock) are deleted at the end of a transaction”</p>
+<p>// TODO: I’m not sure if that should be &gt; or &gt;=</p>
+<p><strong>New built-in contract</strong></p>
+<ul>
+<li>PAYRENT(address, amount) – Calls PAYRENT opcode</li>
+</ul>
+<p><em>This is a convenience for humans to send Ether from their accounts and turn it into rent. Note that simple accounts (CODESIZE == 0) cannot call arbitrary opcodes, they can only call CREATE or CALL.</em></p>
+<p>The gas cost of PAYRENT will be 10,000.</p>
+<p><strong>No changes to current opcode gas costs.</strong></p>
+<h1 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h1>
+<p><strong>No call</strong></p>
+<p>A contract will not know or react to the receipt of rent. This is okay. Workaround: if a contract really needed to know who provided rent payments then it could create a function in its ABI to attribute these payments. It is already possible to send payments to a contract without attribution by using <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>.</p>
+<p><strong>Eviction responsibility / lazy evaluation</strong></p>
+<p>The specification gives responsibility for eviction to the consensus clients. This is the most predictable behavior because it happens exactly when it should. Also there need not be any incentive mechanism (refund gas, bounty) for outside participants (off chain) to monitor accounts and request removal.</p>
+<p>It is possible that an arbitrary number of accounts will be evicted in one block. That doesn’t matter. Client implementations do not need to track which accounts are evicted, consensus is achieved just by agreeing on the conditions under which an account would be evicted.</p>
+<p><strong>No converting rent to value</strong></p>
+<p>Ether converted to rent cannot be converted back. Anybody that works in accounting and knows about gifts cards should tell you this is a good idea. It makes reasoning about the system much easier.</p>
+<p><strong>Accounts pay rent</strong></p>
+<p>Yes, they pay rent. It costs money to keep their balances so we charge them rent.</p>
+<p><strong>Shouldn’t we spend value (Ether balance) when rent is depleted?</strong></p>
+<p>Yes. This is a draft, I didn’t add this in yet. But basically:</p>
+<ul>
+<li>Rename <code class="language-plaintext highlighter-rouge">rentEvictBlock</code> to <code class="language-plaintext highlighter-rouge">rentUsingValueBlock</code></li>
+<li>Update eviction calculation to include <code class="language-plaintext highlighter-rouge">RENT</code> + <code class="language-plaintext highlighter-rouge">VALUE</code>. Also update <code class="language-plaintext highlighter-rouge">CALL</code> (and friends) operations to recalculate eviction date when value is transferred. This is the new <code class="language-plaintext highlighter-rouge">rentEvictBlock</code>.</li>
+<li>Update <code class="language-plaintext highlighter-rouge">CALL</code> (and friends), <code class="language-plaintext highlighter-rouge">RENTBALANCE</code> and <code class="language-plaintext highlighter-rouge">SENDRENT</code> operations. If <code class="language-plaintext highlighter-rouge">NUMBER</code> &gt;= <code class="language-plaintext highlighter-rouge">rentUsingValueBlock</code> then proceed as if rent started paying using value.</li>
+</ul>
+<p><strong>Your contract can be evicted and disappeared</strong></p>
+<p>Yes, if you do not pay rent for your account or contract then you lose it all. User education is required.</p>
+<p><strong>Why do you need a separate rent account?</strong></p>
+<p>Because anybody/everybody can contribute to the rent account. If you depend on a contract, you should contribute to its rent.</p>
+<p>But the contract can spend all of its value.</p>
+<p>By maintaining a separate rent and value balance, this allows people to contribute to the rent while being confident that this is allowing the contract to stay around.</p>
+<p><strong>Permanent removal</strong></p>
+<p>All state about an account is destructed during eviction. The data cannot be recovered. That’s the point.</p>
+<p>Hint to implementers: make sure this works:</p>
+<ol>
+<li>Send value to a new account (gets stipend)</li>
+<li>Pay rent to that account</li>
+<li>Wait until after the rent expires (account is gone)</li>
+<li>Send value to that account (gets stipend again)</li>
+<li>Deploy a contract (CREATE) to that account (stipend gets topped off)</li>
+</ol>
+<h1 id="rationale--economics--constants">
+<a href="#rationale--economics--constants" class="anchor-link"></a> Rationale – economics &amp; constants
+</h1>
+<p>An <code class="language-plaintext highlighter-rouge">SSTORE</code> executed in 2015 cost 20,000 gas and has survived about 6 million blocks. The gas price has been around 1 ~ 50 Gwei. So basically 4,000 Wei per block per word so far. Maybe storing an account is 10 times more intensive than storing a word. But actually <code class="language-plaintext highlighter-rouge">G_transaction</code> is 21,000 and <code class="language-plaintext highlighter-rouge">G_sstore</code> is 20,000 so these are similar and they can both create new accounts / words.</p>
+<p>How about:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">RENT_WORD_COST</code> – 4,000 Wei</li>
+<li><code class="language-plaintext highlighter-rouge">RENT_ACCOUNT_COST</code> – 4,000 Wei</li>
+<li><code class="language-plaintext highlighter-rouge">FORK_BLOCK</code> – when implementation starts</li>
+<li><code class="language-plaintext highlighter-rouge">RENT_EVICTIONS_START</code> – a block about 360 days after <code class="language-plaintext highlighter-rouge">FORK_BLOCK</code></li>
+</ul>
+<p>The rent is priced in cold, hard Ether. It is not negotiated by clients, it is not dynamic. It is linear. Why is this a good idea? Because right now Ethereum is a system with multiple free variables – Ether/gas price, gas/opcodes costs, Ether/block reward. [Add some note here about reducing a system of equations…] So the end result is that we can peg one of the values and it will be okay.</p>
+<p>Q: There is a finite-ish amount of Ether and this proposal introduces a word-price in Ether, do math for me. A: The current size of Ethereum is about ~1 TB, maybe half of that is branch nodes. So that’s like 15B words. There is about 100M Ether mined. The answer is that all the Ether can be spent on 400 terabyte-years of storage. I’m not sure if it is helpful to look at it that way.</p>
+<h1 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards compatibility
+</h1>
+<p>There is a 360-day transition period (related to <code class="language-plaintext highlighter-rouge">RENT_STIPEND</code>). On the block of the fork, every account is immediately funded with enough rent to pay for ~ 360 days’ worth of their current storage requirements. The formal implementation is that this new rule is applied if any existing account has σ[account]_rentLastPaid = 0. Therefore this can be implemented by clients lazily or eagerly.</p>
+<p>Preexisting accounts which increase their storage needs will evict sooner than 360 days.</p>
+<p>Users will need to be educated.</p>
+<h1 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h1>
+<p>TO BE ADDED</p>
+<h1 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h1>
+<p>TO BE ADDED</p>
+<h1 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h1>
+<p>Copyright and related rights waived via CC0.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/fulldecent">William Entriken</a>, "EIP-1418: Blockchain Storage Rent Payment [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1418, September 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1418.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1418: Blockchain Storage Rent Payment [DRAFT]",
+    "author": "William Entriken (@fulldecent)",
+    "name": "EIP-1418: Blockchain Storage Rent Payment [DRAFT]",
+    "dateCreated": "2018-09-16",
+    "datePublished": "2018-09-16",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1418",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

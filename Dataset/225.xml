@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-225: Clique proof-of-authority consensus protocol</title>
+<meta property="og:title" content="EIP-225: Clique proof-of-authority consensus protocol" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-225" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-225" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-225: Clique proof-of-authority consensus protocol
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-225.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#ef9f8a9b8a9d848aaf88828e8683c18c8082">Péter Szilágyi</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/225">https://github.com/ethereum/EIPs/issues/225</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2017-03-06</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#standardized-proof-of-authority">Standardized proof-of-authority</a></li>
+</ul>
+</li>
+<li><a href="#design-constraints">Design constraints</a>
+<ul>
+<li><a href="#repurposing-header-fields-for-signing-and-voting">Repurposing header fields for signing and voting</a></li>
+<li><a href="#attack-vector-malicious-signer">Attack vector: Malicious signer</a></li>
+<li><a href="#attack-vector-censoring-signer">Attack vector: Censoring signer</a></li>
+<li><a href="#attack-vector-spamming-signer">Attack vector: Spamming signer</a></li>
+<li><a href="#attack-vector-concurrent-blocks">Attack vector: Concurrent blocks</a></li>
+</ul>
+</li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#authorizing-a-block">Authorizing a block</a></li>
+<li><a href="#voting-on-signers">Voting on signers</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Clique is a proof-of-authority consensus protocol. It shadows the design of Ethereum mainnet, so it can be added to any client with minimal effort.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Ethereum’s first official testnet was Morden. It ran from July 2015 to about November 2016, when due to the accumulated junk and some testnet consensus issues between Geth and Parity, it was finally laid to rest in favor of a testnet reboot.</p>
+<p>Ropsten was thus born, clearing out all the junk and starting with a clean slate. This ran well until the end of February 2017, when malicious actors decided to abuse the low PoW and gradually inflate the block gas limits to 9 billion (from the normal 4.7 million), at which point sending in gigantic transactions crippling the entire network. Even before that, attackers attempted multiple extremely long reorgs, causing network splits between different clients, and even different versions.</p>
+<p>The root cause of these attacks is that a PoW network is only as secure as the computing capacity placed behind it. Restarting a new testnet from zero wouldn’t solve anything, since the attacker can mount the same attack over and over again. The Parity team decided to go with an emergency solution of rolling back a significant number of blocks, and enacting a soft-fork rule that disallows gas limits above a certain threshold.</p>
+<p>While this solution may work in the short term:</p>
+<ul>
+<li>It’s not elegant: Ethereum supposed to have dynamic block limits</li>
+<li>It’s not portable: other clients need to implement new fork logic themselves</li>
+<li>It’s not compatible with sync modes: fast and light clients are both out of luck</li>
+<li>It’s just prolonging the attacks: junk can still be steadily pushed in ad infinitum</li>
+</ul>
+<p>Parity’s solution although not perfect, is nonetheless workable. I’d like to propose a longer term alternative solution, which is more involved, yet should be simple enough to allow rolling out in a reasonable amount of time.</p>
+<h3 id="standardized-proof-of-authority">
+<a href="#standardized-proof-of-authority" class="anchor-link"></a> Standardized proof-of-authority
+</h3>
+<p>As reasoned above, proof-of-work cannot work securely in a network with no value. Ethereum has its long term goal of proof-of-stake based on Casper, but that is heavy research so we cannot rely on that any time soon to fix today’s problems. One solution however is easy enough to implement, yet effective enough to fix the testnet properly, namely a proof-of-authority scheme.</p>
+<p>The main design goals of the PoA protocol described here is that it should be very simple to implement and embed into any existing Ethereum client, while at the same time allow using existing sync technologies (fast, light, warp) without needing client developers to add custom logic to critical software.</p>
+<h2 id="design-constraints">
+<a href="#design-constraints" class="anchor-link"></a> Design constraints
+</h2>
+<p>There are two approaches to syncing a blockchain in general:</p>
+<ul>
+<li>The classical approach is to take the genesis block and crunch through all the transactions one by one. This is tried and proven, but in Ethereum complexity networks quickly turns out to be very costly computationally.</li>
+<li>The other is to only download the chain of block headers and verify their validity, after which point an arbitrary recent state may be downloaded from the network and checked against recent headers.</li>
+</ul>
+<p>A PoA scheme is based on the idea that blocks may only be minted by trusted signers. As such, every block (or header) that a client sees can be matched against the list of trusted signers. The challenge here is how to maintain a list of authorized signers that can change in time? The obvious answer (store it in an Ethereum contract) is also the wrong answer: fast, light and warp sync don’t have access to the state during syncing.</p>
+<p><strong>The protocol of maintaining the list of authorized signers must be fully contained in the block headers.</strong></p>
+<p>The next obvious idea would be to change the structure of the block headers so it drops the notions of PoW, and introduces new fields to cater for voting mechanisms. This is also the wrong answer: changing such a core data structure in multiple implementations would be a nightmare development, maintenance and security wise.</p>
+<p><strong>The protocol of maintaining the list of authorized signers must fit fully into the current data models.</strong></p>
+<p>So, according to the above, we can’t use the EVM for voting, rather have to resort to headers. And we can’t change header fields, rather have to resort to the currently available ones. Not much wiggle room.</p>
+<h3 id="repurposing-header-fields-for-signing-and-voting">
+<a href="#repurposing-header-fields-for-signing-and-voting" class="anchor-link"></a> Repurposing header fields for signing and voting
+</h3>
+<p>The most obvious field that currently is used solely as <em>fun metadata</em> is the 32 byte <strong>extra-data</strong> section in block headers. Miners usually place their client and version in there, but some fill it with alternative “messages”. The protocol would extend this field <del>to</del> with 65 bytes with the purpose of a secp256k1 miner signature. This would allow anyone obtaining a block to verify it against a list of authorized signers. It also makes the <strong>miner</strong> section in block headers obsolete (since the address can be derived from the signature).</p>
+<p><em>Note, changing the length of a header field is a non invasive operation as all code (such as RLP encoding, hashing) is agnostic to that, so clients wouldn’t need custom logic.</em></p>
+<p>The above is enough to validate a chain, but how can we update a dynamic list of signers. The answer is that we can repurpose the newly obsoleted <strong>miner</strong> field and the PoA obsoleted <strong>nonce</strong> field to create a voting protocol:</p>
+<ul>
+<li>During regular blocks, both of these fields would be set to zero.</li>
+<li>If a signer wishes to enact a change to the list of authorized signers, it will:
+<ul>
+<li>Set the <strong>miner</strong> to the signer it wishes to vote about</li>
+<li>Set the <strong>nonce</strong> to <code class="language-plaintext highlighter-rouge">0</code> or <code class="language-plaintext highlighter-rouge">0xff...f</code> to vote in favor of adding or kicking out</li>
+</ul>
+</li>
+</ul>
+<p>Any clients syncing the chain can “tally” up the votes during block processing, and maintain a dynamically changing list of authorized signers by popular vote.</p>
+<p>To avoid having an infinite window to tally up votes in, and also to allow periodically flushing stale proposals, we can reuse the concept of an epoch from ethash, where every epoch transition flushes all pending votes. Furthermore, these epoch transitions can also act as stateless checkpoints containing the list of current authorized signers within the header extra-data. This permits clients to sync up based only on a checkpoint hash without having to replay all the voting that was done on the chain up to that point. It also allows the genesis header to fully define the chain, containing the list of initial signers.</p>
+<h3 id="attack-vector-malicious-signer">
+<a href="#attack-vector-malicious-signer" class="anchor-link"></a> Attack vector: Malicious signer
+</h3>
+<p>It may happen that a malicious user gets added to the list of signers, or that a signer key/machine is compromised. In such a scenario the protocol needs to be able to defend itself against reorganizations and spamming. The proposed solution is that given a list of N authorized signers, any signer may only mint 1 block out of every K. This ensures that damage is limited, and the remainder of the miners can vote out the malicious user.</p>
+<h3 id="attack-vector-censoring-signer">
+<a href="#attack-vector-censoring-signer" class="anchor-link"></a> Attack vector: Censoring signer
+</h3>
+<p>Another interesting attack vector is if a signer (or group of signers) attempts to censor out blocks that vote on removing them from the authorization list. To work around this, we restrict the allowed minting frequency of signers to 1 out of N/2. This ensures that malicious signers need to control at least 51% of signing accounts, at which case it’s game over anyway.</p>
+<h3 id="attack-vector-spamming-signer">
+<a href="#attack-vector-spamming-signer" class="anchor-link"></a> Attack vector: Spamming signer
+</h3>
+<p>A final small attack vector is that of malicious signers injecting new vote proposals inside every block they mint. Since nodes need to tally up all votes to create the actual list of authorized signers, they need to track all votes through time. Without placing a limit on the vote window, this could grow slowly, yet unbounded. The solution is to place a <del>moving</del> window of W blocks after which votes are considered stale. <del>A sane window might be 1-2 epochs.</del> We’ll call this an epoch.</p>
+<h3 id="attack-vector-concurrent-blocks">
+<a href="#attack-vector-concurrent-blocks" class="anchor-link"></a> Attack vector: Concurrent blocks
+</h3>
+<p>If the number of authorized signers are N, and we allow each signer to mint 1 block out of K, then at any point in time N-K+1 miners are allowed to mint. To avoid these racing for blocks, every signer would add a small random “offset” to the time it releases a new block. This ensures that small forks are rare, but occasionally still happen (as on the main net). If a signer is caught abusing it’s authority and causing chaos, it can be voted out.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>We define the following constants:</p>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">EPOCH_LENGTH</code></strong>: Number of blocks after which to checkpoint and reset the pending votes.
+<ul>
+<li>Suggested <code class="language-plaintext highlighter-rouge">30000</code> for the testnet to remain analogous to the mainnet <code class="language-plaintext highlighter-rouge">ethash</code> epoch.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">BLOCK_PERIOD</code></strong>: Minimum difference between two consecutive block’s timestamps.
+ <ul>
+<li>Suggested <code class="language-plaintext highlighter-rouge">15s</code> for the testnet to remain analogous to the mainnet <code class="language-plaintext highlighter-rouge">ethash</code> target.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">EXTRA_VANITY</code></strong>: Fixed number of extra-data prefix bytes reserved for signer <em>vanity</em>.
+<ul>
+<li>Suggested <code class="language-plaintext highlighter-rouge">32 bytes</code> to retain the current extra-data allowance and/or use.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">EXTRA_SEAL</code></strong>: Fixed number of extra-data suffix bytes reserved for signer seal.
+<ul>
+<li><code class="language-plaintext highlighter-rouge">65 bytes</code> fixed as signatures are based on the standard <code class="language-plaintext highlighter-rouge">secp256k1</code> curve.</li>
+<li>Filled with zeros on genesis block.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">NONCE_AUTH</code></strong>: Magic nonce number <code class="language-plaintext highlighter-rouge">0xffffffffffffffff</code> to vote on adding a new signer.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">NONCE_DROP</code></strong>: Magic nonce number <code class="language-plaintext highlighter-rouge">0x0000000000000000</code> to vote on removing a signer.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">UNCLE_HASH</code></strong>: Always <code class="language-plaintext highlighter-rouge">Keccak256(RLP([]))</code> as uncles are meaningless outside of PoW.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">DIFF_NOTURN</code></strong>: Block score (difficulty) for blocks containing out-of-turn signatures.
+<ul>
+<li>Suggested <code class="language-plaintext highlighter-rouge">1</code> since it just needs to be an arbitrary baseline constant.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">DIFF_INTURN</code></strong>: Block score (difficulty) for blocks containing in-turn signatures.
+<ul>
+<li>Suggested <code class="language-plaintext highlighter-rouge">2</code> to show a slight preference over out-of-turn signatures.</li>
+</ul>
+</li>
+</ul>
+<p>We also define the following per-block constants:</p>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">BLOCK_NUMBER</code></strong>: Block height in the chain, where the height of the genesis is block <code class="language-plaintext highlighter-rouge">0</code>.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">SIGNER_COUNT</code></strong>: Number of authorized signers valid at a particular instance in the chain.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">SIGNER_INDEX</code></strong>: Zero-based index of the block signer in the sorted list of current authorized signers.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">SIGNER_LIMIT</code></strong>: Number of consecutive blocks out of which a signer may only sign one.
+<ul>
+<li>Must be <code class="language-plaintext highlighter-rouge">floor(SIGNER_COUNT / 2) + 1</code> to enforce majority consensus on a chain.</li>
+</ul>
+</li>
+</ul>
+<p>We repurpose the <code class="language-plaintext highlighter-rouge">ethash</code> header fields as follows:</p>
+<ul>
+<li><strong><code class="language-plaintext highlighter-rouge">beneficiary</code></strong> / <strong><code class="language-plaintext highlighter-rouge">miner</code></strong>: Address to propose modifying the list of authorized signers with.
+<ul>
+<li>Should be filled with zeroes normally, modified only while voting.</li>
+<li>Arbitrary values are permitted nonetheless (even meaningless ones such as voting out non signers) to avoid extra complexity in implementations around voting mechanics.</li>
+<li><strong>Must</strong> be filled with zeroes on checkpoint (i.e. epoch transition) blocks.</li>
+<li>Transaction execution <strong>must</strong> use the actual block signer (see <code class="language-plaintext highlighter-rouge">extraData</code>) for the <code class="language-plaintext highlighter-rouge">COINBASE</code> opcode and transaction fees <strong>must</strong> be attributed to the signer account.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">nonce</code></strong>: Signer proposal regarding the account defined by the <code class="language-plaintext highlighter-rouge">beneficiary</code> field.
+<ul>
+<li>Should be <strong><code class="language-plaintext highlighter-rouge">NONCE_DROP</code></strong> to propose deauthorizing <code class="language-plaintext highlighter-rouge">beneficiary</code> as an existing signer.</li>
+<li>Should be <strong><code class="language-plaintext highlighter-rouge">NONCE_AUTH</code></strong> to propose authorizing <code class="language-plaintext highlighter-rouge">beneficiary</code> as a new signer.</li>
+<li><strong>Must</strong> be filled with zeroes on checkpoint (i.e. epoch transition) blocks.</li>
+<li><strong>Must</strong> not take up any other value apart from the two above (for now).</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">extraData</code></strong>: Combined field for signer vanity, checkpointing and signer signatures.
+<ul>
+<li>First <strong><code class="language-plaintext highlighter-rouge">EXTRA_VANITY</code></strong> bytes (fixed) may contain arbitrary signer vanity data.</li>
+<li>Last <strong><code class="language-plaintext highlighter-rouge">EXTRA_SEAL</code></strong> bytes (fixed) is the signer’s signature sealing the header.</li>
+<li>Checkpoint blocks <strong>must</strong> contain a list of signers (<code class="language-plaintext highlighter-rouge">N*20 bytes</code>) in between, <strong>omitted</strong> otherwise.</li>
+<li>The list of signers in checkpoint block extra-data sections <strong>must</strong> be sorted in ascending byte order.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">mixHash</code></strong>: Reserved for fork protection logic, similar to the extra-data during the DAO.
+<ul>
+<li><strong>Must</strong> be filled with zeroes during normal operation.</li>
+</ul>
+</li>
+<li><strong><code class="language-plaintext highlighter-rouge">ommersHash</code></strong>: <strong>Must</strong> be <strong><code class="language-plaintext highlighter-rouge">UNCLE_HASH</code></strong> as uncles are meaningless outside of PoW.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">timestamp</code></strong>: <strong>Must</strong> be at least the parent timestamp + <strong><code class="language-plaintext highlighter-rouge">BLOCK_PERIOD</code></strong>.</li>
+<li><strong><code class="language-plaintext highlighter-rouge">difficulty</code></strong>: Contains the standalone score of the block to derive the quality of a chain.
+<ul>
+<li><strong>Must</strong> be <strong><code class="language-plaintext highlighter-rouge">DIFF_NOTURN</code></strong> if <code class="language-plaintext highlighter-rouge">BLOCK_NUMBER % SIGNER_COUNT != SIGNER_INDEX</code></li>
+<li><strong>Must</strong> be <strong><code class="language-plaintext highlighter-rouge">DIFF_INTURN</code></strong> if <code class="language-plaintext highlighter-rouge">BLOCK_NUMBER % SIGNER_COUNT == SIGNER_INDEX</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="authorizing-a-block">
+<a href="#authorizing-a-block" class="anchor-link"></a> Authorizing a block
+</h3>
+<p>To authorize a block for the network, the signer needs to sign the block’s sighash containing <strong>everything except the signature itself</strong>. This means that this hash contains every field of the header (<code class="language-plaintext highlighter-rouge">nonce</code> and <code class="language-plaintext highlighter-rouge">mixDigest</code> included), and also the <code class="language-plaintext highlighter-rouge">extraData</code> with the exception of the 65 byte signature suffix. The fields are hashed in the order of their definition in the yellow paper. Note that this sighash differs from the final block hash which also includes the signature.</p>
+<p>The sighash is signed using the standard <code class="language-plaintext highlighter-rouge">secp256k1</code> curve, and the resulting 65 byte signature (<code class="language-plaintext highlighter-rouge">R</code>, <code class="language-plaintext highlighter-rouge">S</code>, <code class="language-plaintext highlighter-rouge">V</code>, where <code class="language-plaintext highlighter-rouge">V</code> is <code class="language-plaintext highlighter-rouge">0</code> or <code class="language-plaintext highlighter-rouge">1</code>) is embedded into the <code class="language-plaintext highlighter-rouge">extraData</code> as the trailing 65 byte suffix.</p>
+<p>To ensure malicious signers (loss of signing key) cannot wreck havoc in the network, each singer is allowed to sign <strong>maximum one</strong> out of <strong><code class="language-plaintext highlighter-rouge">SIGNER_LIMIT</code></strong> consecutive blocks. The order is not fixed, but in-turn signing weighs more (<strong><code class="language-plaintext highlighter-rouge">DIFF_INTURN</code></strong>) than out of turn one (<strong><code class="language-plaintext highlighter-rouge">DIFF_NOTURN</code></strong>).</p>
+<h4 id="authorization-strategies">
+<a href="#authorization-strategies" class="anchor-link"></a> Authorization strategies
+</h4>
+<p>As long as signers conform to the above specs, they can authorize and distribute blocks as they see fit. The following suggested strategy will however reduce network traffic and small forks, so it’s a suggested feature:</p>
+<ul>
+<li>If a signer is allowed to sign a block (is on the authorized list and didn’t sign recently).
+<ul>
+<li>Calculate the optimal signing time of the next block (parent + <strong><code class="language-plaintext highlighter-rouge">BLOCK_PERIOD</code></strong>).</li>
+<li>If the signer is in-turn, wait for the exact time to arrive, sign and broadcast immediately.</li>
+<li>If the signer is out-of-turn, delay signing by <code class="language-plaintext highlighter-rouge">rand(SIGNER_COUNT * 500ms)</code>.</li>
+</ul>
+</li>
+</ul>
+<p>This small strategy will ensure that the in-turn signer (who’s block weighs more) has a slight advantage to sign and propagate versus the out-of-turn signers. Also the scheme allows a bit of scale with the increase of the number of signers.</p>
+<h3 id="voting-on-signers">
+<a href="#voting-on-signers" class="anchor-link"></a> Voting on signers
+</h3>
+<p>Every epoch transition (genesis block included) acts as a stateless checkpoint, from which capable clients should be able to sync without requiring any previous state. This means epoch headers <strong>must not</strong> contain votes, all non settled votes are discarded, and tallying starts from scratch.</p>
+<p>For all non-epoch transition blocks:</p>
+<ul>
+<li>Signers may cast one vote per own block to propose a change to the authorization list.</li>
+<li>Only the latest proposal per target beneficiary is kept from a single signer.</li>
+<li>Votes are tallied live as the chain progresses (concurrent proposals allowed).</li>
+<li>Proposals reaching majority consensus <strong><code class="language-plaintext highlighter-rouge">SIGNER_LIMIT</code></strong> come into effect immediately.</li>
+<li>Invalid proposals are <strong>not</strong> to be penalized for client implementation simplicity.</li>
+</ul>
+<p><strong>A proposal coming into effect entails discarding all pending votes for that proposal (both for and against) and starting with a clean slate.</strong></p>
+<h4 id="cascading-votes">
+<a href="#cascading-votes" class="anchor-link"></a> Cascading votes
+</h4>
+<p>A complex corner case may arise during signer deauthorization. When a previously authorized signer is dropped, the number of signers required to approve a proposal might decrease by one. This might cause one or more pending proposals to reach majority consensus, the execution of which might further cascade into new proposals passing.</p>
+<p>Handling this scenario is non obvious when multiple conflicting proposals pass simultaneously (e.g. add a new signer vs. drop an existing one), where the evaluation order might drastically change the outcome of the final authorization list. Since signers may invert their own votes in every block they mint, it’s not so obvious which proposal would be “first”.</p>
+<p>To avoid the pitfalls cascading executions would entail, the Clique proposal explicitly forbids cascading effects. In other words: <strong>Only the <code class="language-plaintext highlighter-rouge">beneficiary</code> of the current header/vote may be added to/dropped from the authorization list. If that causes other proposals to reach consensus, those will be executed when their respective beneficiaries are “touched” again (given that majority consensus still holds at that point).</strong></p>
+<h4 id="voting-strategies">
+<a href="#voting-strategies" class="anchor-link"></a> Voting strategies
+</h4>
+<p>Since the blockchain can have small reorgs, a naive voting mechanism of “cast-and-forget” may not be optimal, since a block containing a singleton vote may not end up on the final chain.</p>
+<p>A simplistic but working strategy is to allow users to configure “proposals” on the signers (e.g. “add 0x…”, “drop 0x…”). The signing code can then pick a random proposal for every block it signs and inject it. This ensures that multiple concurrent proposals as well as reorgs get eventually noted on the chain.</p>
+<p>This list may be expired after a certain number of blocks / epochs, but it’s important to realize that “seeing” a proposal pass doesn’t mean it won’t get reorged, so it should not be immediately dropped when the proposal passes.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// block represents a single block signed by a parcitular account, where</span>
+<span class="c">// the account may or may not have cast a Clique vote.</span>
+<span class="k">type</span> <span class="n">block</span> <span class="k">struct</span> <span class="p">{</span>
+  <span class="n">signer</span>     <span class="kt">string</span>   <span class="c">// Account that signed this particular block</span>
+  <span class="n">voted</span>      <span class="kt">string</span>   <span class="c">// Optional value if the signer voted on adding/removing someone</span>
+  <span class="n">auth</span>       <span class="kt">bool</span>     <span class="c">// Whether the vote was to authorize (or deauthorize)</span>
+  <span class="n">checkpoint</span> <span class="p">[]</span><span class="kt">string</span> <span class="c">// List of authorized signers if this is an epoch block</span>
+<span class="p">}</span>
+
+<span class="c">// Define the various voting scenarios to test</span>
+<span class="n">tests</span> <span class="o">:=</span> <span class="p">[]</span><span class="k">struct</span> <span class="p">{</span>
+  <span class="n">epoch</span>   <span class="kt">uint64</span>   <span class="c">// Number of blocks in an epoch (unset = 30000)</span>
+  <span class="n">signers</span> <span class="p">[]</span><span class="kt">string</span> <span class="c">// Initial list of authorized signers in the genesis</span>
+  <span class="n">blocks</span>  <span class="p">[]</span><span class="n">block</span>  <span class="c">// Chain of signed blocks, potentially influencing auths</span>
+  <span class="n">results</span> <span class="p">[]</span><span class="kt">string</span> <span class="c">// Final list of authorized signers after all blocks</span>
+  <span class="n">failure</span> <span class="kt">error</span>    <span class="c">// Failure if some block is invalid according to the rules</span>
+<span class="p">}{</span>
+  <span class="p">{</span>
+    <span class="c">// Single signer, no votes cast</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">}</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Single signer, voting to add two others (only accept first, second needs 2 votes)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Two signers, voting to add three others (only accept first two, third needs 3 votes already)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"E"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"E"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Single signer, dropping itself (weird, but one less cornercase by explicitly allowing this)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Two signers, actually needing mutual consent to drop either of them (not fulfilled)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Two signers, actually needing mutual consent to drop either of them (fulfilled)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Three signers, two of them deciding to drop the third</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Four signers, consensus of two not being enough to drop anyone</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Four signers, consensus of three already being enough to drop someone</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Authorizations are counted once per signer per target</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Authorizing multiple accounts concurrently is permitted</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Deauthorizations are counted once per signer per target</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Deauthorizing multiple accounts concurrently is permitted</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Votes from deauthorized signers are discarded immediately (deauth votes)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Votes from deauthorized signers are discarded immediately (auth votes)</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Cascading changes are not allowed, only the account being voted on may change</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Changes reaching consensus out of bounds (via a deauth) execute on touch</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Changes reaching consensus out of bounds (via a deauth) may go out of consensus on first touch</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Ensure that pending votes don't survive authorization status changes. This</span>
+    <span class="c">// corner case can only appear if a signer is quickly added, removed and then</span>
+    <span class="c">// readded (or the inverse), while one of the original voters dropped. If a</span>
+    <span class="c">// past vote is left cached in the system somewhere, this will interfere with</span>
+    <span class="c">// the final signer outcome.</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">,</span> <span class="s">"E"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span> <span class="c">// Authorize F, 3 votes needed</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span> <span class="c">// Deauthorize F, 4 votes needed (leave A's previous vote "unchanged")</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"E"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span> <span class="c">// Almost authorize F, 2/3 votes needed</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"E"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span> <span class="c">// Deauthorize A, 3 votes needed</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"D"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">false</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"F"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span> <span class="c">// Finish authorizing F, 3/3 votes needed</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">,</span> <span class="s">"D"</span><span class="p">,</span> <span class="s">"E"</span><span class="p">,</span> <span class="s">"F"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Epoch transitions reset all votes to allow chain checkpointing</span>
+    <span class="n">epoch</span><span class="o">:</span>   <span class="m">3</span><span class="p">,</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">}},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">,</span> <span class="n">voted</span><span class="o">:</span> <span class="s">"C"</span><span class="p">,</span> <span class="n">auth</span><span class="o">:</span> <span class="no">true</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">results</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// An unauthorized signer should not be able to sign blocks</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">failure</span><span class="o">:</span> <span class="n">errUnauthorizedSigner</span><span class="p">,</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// An authorized signer that signed recenty should not be able to sign again</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">},</span>
+  <span class="n">blocks</span> <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">failure</span><span class="o">:</span> <span class="n">errRecentlySigned</span><span class="p">,</span>
+  <span class="p">},</span> <span class="p">{</span>
+    <span class="c">// Recent signatures should not reset on checkpoint blocks imported in a batch</span>
+    <span class="n">epoch</span><span class="o">:</span>   <span class="m">3</span><span class="p">,</span>
+    <span class="n">signers</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">},</span>
+    <span class="n">blocks</span><span class="o">:</span>  <span class="p">[]</span><span class="n">block</span><span class="p">{</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"B"</span><span class="p">},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">,</span> <span class="n">checkpoint</span><span class="o">:</span> <span class="p">[]</span><span class="kt">string</span><span class="p">{</span><span class="s">"A"</span><span class="p">,</span> <span class="s">"B"</span><span class="p">,</span> <span class="s">"C"</span><span class="p">}},</span>
+      <span class="p">{</span><span class="n">signer</span><span class="o">:</span> <span class="s">"A"</span><span class="p">},</span>
+    <span class="p">},</span>
+    <span class="n">failure</span><span class="o">:</span> <span class="n">errRecentlySigned</span><span class="p">,</span>
+  <span class="p">},,</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>A reference implementation is part of <a href="https://github.com/ethereum/go-ethereum/tree/master/consensus/clique">go-ethereum</a> and has been functioning as the consensus engine behind the <a href="https://www.rinkeby.io">Rinkeby</a> testnet since April, 2017.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#87f7e2f3e2f5ece2c7e0eae6eeeba9e4e8ea">Péter Szilágyi</a>, "EIP-225: Clique proof-of-authority consensus protocol," <em>Ethereum Improvement Proposals</em>, no. 225, March 2017. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-225.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-225: Clique proof-of-authority consensus protocol",
+    "author": "Péter Szilágyi <peterke@gmail.com>",
+    "name": "EIP-225: Clique proof-of-authority consensus protocol",
+    "dateCreated": "2017-03-06",
+    "datePublished": "2017-03-06",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/225",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2017"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

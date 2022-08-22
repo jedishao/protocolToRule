@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2315: Simple Subroutines for the EVM</title>
+<meta property="og:title" content="EIP-2315: Simple Subroutines for the EVM" />
+<meta name="description" content="Two opcodes for static, safe, and efficient subroutines." />
+<meta property="og:description" content="Two opcodes for static, safe, and efficient subroutines." />
+<meta name="twitter:description" content="Two opcodes for static, safe, and efficient subroutines." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2315" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2315" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2315: Simple Subroutines for the EVM
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2315.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Two opcodes for static, safe, and efficient subroutines.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/gcolvin">Greg Colvin</a>, <a href="/cdn-cgi/l/email-protection#9afde8fffddaf9f5f6ecf3f4b4f5e8fd">Greg Colvin</a>, <a href="https://github.com/holiman">Martin Holst Swende</a>, <a href="https://github.com/expede">Brooklyn Zelenka</a>, <a href="/cdn-cgi/l/email-protection#f88b939994949d8ab891968c9d8a96979c9dd69796d6969d8c">John Skaller</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2315-simple-subroutines-for-the-evm/3941">https://ethereum-magicians.org/t/eip-2315-simple-subroutines-for-the-evm/3941</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2019-10-17</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3540">3540</a>,
+<a href="eip-3670">3670</a>,
+<a href="eip-4200">4200</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#opcodes">Opcodes</a></li>
+<li><a href="#code-validation">Code Validation</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#validation">Validation</a></li>
+<li><a href="#alternative-designs">Alternative Designs</a></li>
+<li><a href="#efficiency">Efficiency</a></li>
+<li><a href="#costs">Costs</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a>
+<ul>
+<li><a href="#simple-routine">Simple routine</a></li>
+<li><a href="#two-levels-of-subroutines">Two levels of subroutines</a></li>
+<li><a href="#failure-1-invalid-jump">Failure 1: invalid jump</a></li>
+<li><a href="#failure-2-shallow-return-stack">Failure 2: shallow return stack</a></li>
+<li><a href="#subroutine-at-end-of-code">Subroutine at end of code</a></li>
+</ul>
+</li>
+<li><a href="#reference-implementation">Reference Implementation</a>
+<ul>
+<li><a href="#validation-function">Validation Function</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This proposal provides a <em>static</em>, <em>complete</em>, <em>efficient</em>, and <em>safe</em> control-flow facility.</p>
+<p>It deprecates <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code>.</p>
+<p>It introduces two opcodes to support simple subroutines:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">RJUMPSUB destination</code>– call to subroutine</li>
+<li><code class="language-plaintext highlighter-rouge">RETURNSUB</code> – return from call</li>
+</ul>
+<p>It depends on the two opcodes proposed by <a href="/EIPS/eip-4200">EIP-4200</a>:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">RJUMP destination</code> – relative jump</li>
+<li><code class="language-plaintext highlighter-rouge">RJUMPI destination</code> – conditional relative jump</li>
+</ul>
+<p>It places constraints on valid code and gives an algorithm for static validation that code will not underflow stack, jump to invalid locations, or execute invalid instructions.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Subroutines were first proposed by Alan Turing in 1945 as a means of structuring code for his Automatic Computing Engine:</p>
+<blockquote>
+<p>“We also wish to be able to arrange for the splitting up of operations into subsidiary operations … To start on a subsidiary operation we need only make a note of where we left off the major operation and then apply the first instruction of the subsidiary. When the subsidiary is over we look up the note and continue with the major operation.”</p>
+<p>– Alan Turing – <em>cf. B.E. Carpenter, R.W. Doran, “The other Turing machine.” The Computer Journal, Volume 20, Issue 3, January 1977.</em></p>
+</blockquote>
+<p>The details vary, but operations for calling and returning from subroutines have proven their value for efficient implementation and straightforward coding of subroutines across a long line of machines going back over 75 years. This includes most all of the machines we have programmed or implemented – physical machines including the Burroughs 5000, CDC 7600, IBM 360, PDP-11, VAX, M68000, Sun SPARC, ARM, and Intel x86s as well as virtual machines for Scheme, Forth, Pascal, Java, Wasm, and others.</p>
+<p>The Ethereum Virtual Machine does not provide subroutine operations. Instead, subroutines can be synthesized by pushing the return address and subroutine address on the data stack and executing a dynamic <code class="language-plaintext highlighter-rouge">JUMP</code> to the subroutine; returns can be synthesized by swapping the return address to the top of the stack and executing another dynamic <code class="language-plaintext highlighter-rouge">JUMP</code> back to the caller. These (or other) conventions cost gas, increase program size, and use resources unnecessarily. And they create unnecessary complexity that is borne by the humans and programs writing, reading, and analyzing EVM code.</p>
+<p><strong>We propose</strong> to replace dynamic jumps with a <em>complete, static, efficient</em> and <em>safe</em> control-flow facility.</p>
+<ul>
+<li><em>Complete</em>. Jumps, conditional jumps, subroutine calls and returns.</li>
+<li><em>Static</em>. All control paths are known at contract validation time.</li>
+<li><em>Efficient</em>. Substantial reductions in the costs and complexity of calling and optimizing simple subroutines are possible.</li>
+<li><em>Safe</em>. Valid code will not underflow stack, jump to invalid locations, or execute invalid instructions. The control flow of valid code will be reducible, with consistent numbers of inputs and outputs for subroutines.</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="opcodes">
+<a href="#opcodes" class="anchor-link"></a> Opcodes
+</h3>
+<h4 id="rjumpsub-0x5f-jmpdest-uint16">
+<a href="#rjumpsub-0x5f-jmpdest-uint16" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">RJUMPSUB (0x5f) jmpdest: uint16</code>
+</h4>
+<p>Transfers control to a subroutine.</p>
+<ol>
+<li>Decode the <code class="language-plaintext highlighter-rouge">destination</code> from the immediate data at <code class="language-plaintext highlighter-rouge">PC</code>.</li>
+<li>Push the current <code class="language-plaintext highlighter-rouge">PC + 3</code> to the <code class="language-plaintext highlighter-rouge">return stack</code>.</li>
+<li>Set <code class="language-plaintext highlighter-rouge">PC</code> to <code class="language-plaintext highlighter-rouge">destination</code>.</li>
+</ol>
+<p>The gas cost is <em>low</em>.</p>
+<h4 id="returnsub-0x5e">
+<a href="#returnsub-0x5e" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">RETURNSUB (0x5e)</code>
+</h4>
+<p>Returns control to the caller of a subroutine.</p>
+<ol>
+<li>Pop the <code class="language-plaintext highlighter-rouge">return stack</code> to <code class="language-plaintext highlighter-rouge">PC</code>.</li>
+</ol>
+<p>The destination address is relative to the current PC. The address is encoded as a two-byte, twos-complement signed integer, stored MSB-first.</p>
+<p>The gas cost is <em>verylow</em>.</p>
+<p><em>Notes:</em></p>
+<ul>
+<li><em>Values popped off the <code class="language-plaintext highlighter-rouge">return stack</code> do not need to be validated, since they are alterable only by <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> and <code class="language-plaintext highlighter-rouge">RETURNSUB</code>.</em></li>
+<li><em>The description above lays out the semantics of these instructions in terms of a <code class="language-plaintext highlighter-rouge">return stack</code>. But the actual state of the <code class="language-plaintext highlighter-rouge">return stack</code> is not observable by EVM code or consensus-critical to the protocol. (For example, a node implementer may code <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> to unobservably push <code class="language-plaintext highlighter-rouge">PC</code> on the <code class="language-plaintext highlighter-rouge">return stack</code> rather than <code class="language-plaintext highlighter-rouge">PC + 1</code>, which is allowed so long as <code class="language-plaintext highlighter-rouge">RETURNSUB</code> observably returns control to the `PC + 3 location.)</em></li>
+</ul>
+<h3 id="code-validation">
+<a href="#code-validation" class="anchor-link"></a> Code Validation
+</h3>
+<p>If the execution of an instruction would violate a condition, then the execution is in an exceptional halting state. The Yellow Paper defines five such states.</p>
+<ol>
+<li>Insufficient gas</li>
+<li>More than 1024 stack items</li>
+<li>Insufficient stack items</li>
+<li>Invalid jump destination</li>
+<li>Invalid instruction</li>
+</ol>
+<p>We would like to consider EVM code valid iff no execution of the program can lead to an exceptional halting state. In practice, we must test at runtime for conditions 1 and 2 —- sufficient gas and sufficient stack. We don’t know how much gas there will be, we don’t know how deep a recursion may go, and analysis of stack depth even for non-recursive programs is nontrivial. All of the remaining conditions MUST be validated statically, in time and space quasi-linear in the size of the code.</p>
+<h4 id="constraints-on-valid-code">
+<a href="#constraints-on-valid-code" class="anchor-link"></a> Constraints on Valid Code
+</h4>
+<ul>
+<li>Every instruction MUST be valid.
+<ul>
+<li>The <code class="language-plaintext highlighter-rouge">JUMP</code> and <code class="language-plaintext highlighter-rouge">JUMPI</code> instructions ARE NOT valid.</li>
+</ul>
+</li>
+<li>Every jump MUST be valid:
+<ul>
+<li>The <code class="language-plaintext highlighter-rouge">RJUMP</code>, <code class="language-plaintext highlighter-rouge">RJUMPI</code>, or <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> instructions MUST NOT address immediate data.</li>
+</ul>
+</li>
+<li>The stacks MUST always be valid:
+<ul>
+<li>The number of items on the <code class="language-plaintext highlighter-rouge">data stack</code> MUST always be positive, and at most 1024.</li>
+<li>The number of items on the <code class="language-plaintext highlighter-rouge">return stack</code>MUST always be positive, and at most 1024.</li>
+</ul>
+</li>
+<li>The data stack MUST be consistently aligned:
+<ul>
+<li>The number of items on the <code class="language-plaintext highlighter-rouge">data stack</code> between the current <code class="language-plaintext highlighter-rouge">stack pointer</code> and the <code class="language-plaintext highlighter-rouge">stack pointer</code> on entry to the most recent subroutine MUST be the same for each <em>execution</em> of a <em>byte_code</em>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This is a purely semantic specification, placing no constraints on the syntax of code sections beyond being a sequence of opcodes and immediate data. This allows for optimizations at the machine-code level, but cannot make all the guarantees that a structured computer language can. It only promises that valid code will not, as it were, jam up the gears of the machine.</p>
+<h3 id="validation">
+<a href="#validation" class="anchor-link"></a> Validation
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">RJUMP</code>, <code class="language-plaintext highlighter-rouge">RJUMPI</code> and <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> instructions take their destination as an immediate argument, which cannot change at runtime. Having constant destinations for all jumps means that all jump destinations can be validated at initialization time, not runtime.</p>
+<p>Requiring a consistently aligned<code class="language-plaintext highlighter-rouge">data stack</code> prevents stack underflow. It also prevents irreducible control flows and inconsistent numbers of inputs to or outputs from subroutines.</p>
+<p>Taken together, these rules allow for EVM code to be validated by traversing its control-flow graph, in time and space linear in the size of the code, following each edge only once. This in turn is required to prevent the validation phase from being a quadratic denial of service vulnerability.</p>
+<p><em>Note: These rules also allow some other static analyses and code transformations that might otherwise require quadratic time to run in linear time, including linear-time complilers and streaming machine code generators.</em></p>
+<h3 id="alternative-designs">
+<a href="#alternative-designs" class="anchor-link"></a> Alternative Designs
+</h3>
+<p>There are a few major designs for a subroutine facility, two of which are considered here. The others are mostly not appropriate for the EVM, such as self-modifying code that writes return addresses into called subroutines.</p>
+<p><em>1. Keep return addresses on a dedicated return stack.</em> Turing’s design is often used in stack machines, including those for Forth, Java, Wasm, and others. The data stack is almost entirely used for computation, with a dedicated stack for return addresses. A single instruction suffices to call, and another to return from a routine.</p>
+<p><em>2. Keep return addresses on the data stack.</em> This design is used by most all of the register machines we have programmed. The registers are used primarily for computation, and the stack maintains call frames for return addresses, arguments, and local variables. On the EVM this approach requires awkward pushes and swaps of addresses on the data stack, as shown below.</p>
+<h4 id="we-prefer-the-dedicated-return-stack">
+<a href="#we-prefer-the-dedicated-return-stack" class="anchor-link"></a> We prefer the dedicated return stack.
+</h4>
+<ul>
+<li>It maintains a clear separation between calculation and flow of control:
+<ul>
+<li>the data stack is free of vulnerable return addresses and</li>
+<li>it’s impossible to overwrite the return stack.</li>
+</ul>
+</li>
+<li>It improves efficiency:
+<ul>
+<li>uses native arithmetic rather than 256-bit EVM instructions for the return address,</li>
+<li>doesn’t use a <code class="language-plaintext highlighter-rouge">data stack</code> slot for the return address and</li>
+<li>needs less motion of 256-bit data on the stack.</li>
+</ul>
+</li>
+</ul>
+<h4 id="we-cannot-safely-use-the-data-stack">
+<a href="#we-cannot-safely-use-the-data-stack" class="anchor-link"></a> We cannot safely use the data stack.
+</h4>
+<ul>
+<li>We propose a validation algorithm that must have quasi-linear complexity to avoid being a DoS vulnerability. But at runtime dynamic jumps can be to any destination in the code, so quadratic “path explosions” are possible when attempting symbolic execution. Code validation requires that program control flow be static and that subroutine calls be distinguisable from ordinary jumps. We cannot safely use <code class="language-plaintext highlighter-rouge">JUMP</code> to code subroutines.</li>
+</ul>
+<h3 id="efficiency">
+<a href="#efficiency" class="anchor-link"></a> Efficiency
+</h3>
+<p>We illustrate here how subroutine instructions can be used to reduce the complexity and gas costs of both ordinary and optimized subroutine calls compared to using <code class="language-plaintext highlighter-rouge">JUMP</code>.</p>
+<h4 id="simple-subroutine-call">
+<a href="#simple-subroutine-call" class="anchor-link"></a> <strong>Simple Subroutine Call</strong>
+</h4>
+<p>Consider these examples of a fairly minimal subroutine, including the code to call it.</p>
+<p>Subroutine call, using <code class="language-plaintext highlighter-rouge">RJUMPSUB</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TEST_SQUARE:
+    0x02            ; 3 gas
+    rjumpsub SQUARE ; 5 gas
+    returnsub       ; 3 gas
+
+SQUARE:
+    dup1            ; 3 gas
+    mul             ; 5 gas
+    returnsub       ; 3 gas
+</code></pre></div></div>
+<p><em>Total gas: 22</em></p>
+<p>Subroutine call, using <code class="language-plaintext highlighter-rouge">JUMP</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TEST_SQUARE:
+    jumpdest        ; 1 gas
+    push 0x02       ; 3 gas
+    push RTN_SQUARE ; 3 gas
+    push SQUARE     ; 3 gas
+    jump            ; 8 gas
+RTN_SQUARE:
+    jumpdest        ; 1 gas
+    swap1           ; 3 gas
+    jump            ; 8 gas
+
+SQUARE:
+    jumpdest        ; 1 gas
+    swap1           ; 3 gas
+    dup1            ; 3 gas
+    mul             ; 5 gas
+    jump            ; 8 gas
+</code></pre></div></div>
+<p><em>Total: 50 gas</em>.</p>
+<p>Using <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> versus <code class="language-plaintext highlighter-rouge">JUMP</code> saves <em>50 - 22 = 28 gas</em> – a <em>56%</em> improvement.</p>
+<h4 id="tail-call-optimization">
+<a href="#tail-call-optimization" class="anchor-link"></a> <strong>Tail Call Optimization</strong>
+</h4>
+<p>Of course in cases like this one we can optimize the tail call, so that the return from <code class="language-plaintext highlighter-rouge">SQUARE</code> actually returns from <code class="language-plaintext highlighter-rouge">TEST_SQUARE</code>.</p>
+<p>Tail call optimization, using <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> and <code class="language-plaintext highlighter-rouge">RETURNSUB</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TEST_SQUARE:
+    push 0x02       ; 3 gas
+    rjump SQUARE    ; 3 gas
+
+SQUARE:
+    dup1            ; 3 gas
+    mul             ; 5 gas
+    returnsub       ; 3 gas
+</code></pre></div></div>
+<p><em>Total: 17 gas</em></p>
+<p>Tail call optimization, using <code class="language-plaintext highlighter-rouge">JUMP</code>:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TEST_SQUARE:
+    jumpdest        ; 1 gas
+    push 0x02       ; 3 gas
+    SQUARE          ; 3 gas
+    jump            ; 8 gas
+
+SQUARE:
+    jumpdest        ; 1 gas
+    swap1           ; 3 gas
+    dup1            ; 3 gas
+    mul             ; 5 gas
+    swap1           ; 3 gas
+    jump            ; 8 gas
+</code></pre></div></div>
+<p><em>Total: 33 gas</em></p>
+<p>Using <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> versus <code class="language-plaintext highlighter-rouge">JUMP</code> saves <em>33 - 17 = 16</em> gas – a <em>48%</em> improvement.</p>
+<h4 id="efficiency-caveats">
+<a href="#efficiency-caveats" class="anchor-link"></a> Efficiency Caveats
+</h4>
+<p>We can see that these instructions provide a simpler and more gas-efficient subroutine mechanism than using <code class="language-plaintext highlighter-rouge">JUMP</code> – in our examples they cut gas use by half.</p>
+<p>Clearly, the benefits of these efficiencies are greater for programs that have been factored into smaller subroutines. How small? A subroutine could use <em>90</em> more gas than our first, <em>22</em> gas example and <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> would still use better than <em>20% less total gas</em> than <code class="language-plaintext highlighter-rouge">JUMP</code>.</p>
+<h3 id="costs">
+<a href="#costs" class="anchor-link"></a> Costs
+</h3>
+<p>The <em>low</em> cost of <code class="language-plaintext highlighter-rouge">RJUMPSUB</code> versus the <em>mid</em> cost of <code class="language-plaintext highlighter-rouge">JUMP</code> is justified by needing only to decode the immediate two byte destination to the <code class="language-plaintext highlighter-rouge">PC</code> and push the return address on the <code class="language-plaintext highlighter-rouge">return stack</code>, all using native arithmetric, versus using the data stack with emulated 256-bit instructions.</p>
+<p>The <em>verylow</em> cost of <code class="language-plaintext highlighter-rouge">RETURNSUB</code> is justified by needing only to pop the <code class="language-plaintext highlighter-rouge">return stack</code> into the <code class="language-plaintext highlighter-rouge">PC</code>. Benchmarking will be needed to tell if the costs are well-balanced.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>These changes affect the semantics of existing EVM code: bytes that would have been interpreted as valid jump destinations may now be interpreted as immediate data. Since this proposal depends on the Ethereum Object Format to signal the change this is not a practical issue.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<h3 id="simple-routine">
+<a href="#simple-routine" class="anchor-link"></a> Simple routine
+</h3>
+<p>This should jump into a subroutine, back out and stop.</p>
+<p>Bytecode: <code class="language-plaintext highlighter-rouge">0x5f0003005e</code> (<code class="language-plaintext highlighter-rouge">RJUMPSUB 3, RETURNSUB, STOP</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Pc</th>
+<th>Op</th>
+<th>Cost</th>
+<th>Stack</th>
+<th>RStack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>RJUMPSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>2</td>
+<td>STOP</td>
+<td>0</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>3</td>
+<td>RETURNSUB</td>
+<td>3</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+</tbody>
+</table>
+<p>Output: 0x
+Consumed gas: <code class="language-plaintext highlighter-rouge">10</code></p>
+<h3 id="two-levels-of-subroutines">
+<a href="#two-levels-of-subroutines" class="anchor-link"></a> Two levels of subroutines
+</h3>
+<p>This should execute fine, going into one two depths of subroutines</p>
+<p>Bytecode: <code class="language-plaintext highlighter-rouge">0x5f00045F00025200</code> (<code class="language-plaintext highlighter-rouge">RJUMPSUB 4, RJUMPSUB 2, RETURNSUB, RETURNSUB, STOP</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Pc</th>
+<th>Op</th>
+<th>Cost</th>
+<th>Stack</th>
+<th>RStack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>RJUMPSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>3</td>
+<td>RJUMPSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>4</td>
+<td>RETURNSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>5</td>
+<td>RETURNSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>6</td>
+<td>STOP</td>
+<td>0</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+</tbody>
+</table>
+<p>Consumed gas: <code class="language-plaintext highlighter-rouge">20</code></p>
+<h3 id="failure-1-invalid-jump">
+<a href="#failure-1-invalid-jump" class="anchor-link"></a> Failure 1: invalid jump
+</h3>
+<p>This should fail, since the given location is outside of the code-range.</p>
+<p>Bytecode: ‘0X5fff’(<code class="language-plaintext highlighter-rouge">RJUMPSUB -1</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Pc</th>
+<th>Op</th>
+<th>Cost</th>
+<th>Stack</th>
+<th>RStack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>RJUMPSUB</td>
+<td>10</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+</tbody>
+</table>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error: at pc=0, op=RJUMPSUB: invalid jump destination
+</code></pre></div></div>
+<h3 id="failure-2-shallow-return-stack">
+<a href="#failure-2-shallow-return-stack" class="anchor-link"></a> Failure 2: shallow <code class="language-plaintext highlighter-rouge">return stack</code>
+</h3>
+<p>This should fail at first opcode, due to shallow <code class="language-plaintext highlighter-rouge">return_stack</code></p>
+<p>Bytecode: <code class="language-plaintext highlighter-rouge">0x5e</code> (<code class="language-plaintext highlighter-rouge">RETURNSUB</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Pc</th>
+<th>Op</th>
+<th>Cost</th>
+<th>Stack</th>
+<th>RStack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>RETURNSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+</tbody>
+</table>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Error: at pc=0, op=RETURNSUB: invalid retsub
+</code></pre></div></div>
+<h3 id="subroutine-at-end-of-code">
+<a href="#subroutine-at-end-of-code" class="anchor-link"></a> Subroutine at end of code
+</h3>
+<p>In this example the RJUMPSUB is on the last byte of code. When the subroutine returns, it should hit the ‘virtual stop’ <em>after</em> the bytecode, and not exit with error</p>
+<p>Bytecode: <code class="language-plaintext highlighter-rouge">0x5c035e5ff</code> (<code class="language-plaintext highlighter-rouge">RJUMP 3, RETURNSUB, RJUMPSUB -1</code>)</p>
+<table>
+<thead>
+<tr>
+<th>Pc</th>
+<th>Op</th>
+<th>Cost</th>
+<th>Stack</th>
+<th>RStack</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>RJUMP</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>2</td>
+<td>RETURNSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>3</td>
+<td>RJUMPSUB</td>
+<td>5</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+<tr>
+<td>5</td>
+<td>STOP</td>
+<td>0</td>
+<td>[]</td>
+<td>[]</td>
+</tr>
+</tbody>
+</table>
+<p>Consumed gas: <code class="language-plaintext highlighter-rouge">15</code></p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>The following is a pseudo-Go implementation of an algorithm for predicating code validity. An equivalent algorithm must be run at initialization time.</p>
+<p>This algorithm performs a symbolic execution of the program that recursively traverses the <em>code</em>, emulating its control flow and stack use and checking for violations of the rules above.</p>
+<p>It runs in time equal to <code class="language-plaintext highlighter-rouge">O(vertices + edges)</code> in the program’s control-flow graph, where edges represent control flow and the vertices represent <em>basic blocks</em> – thus the algorithm takes time proportional to the size of the <em>code</em>. It uses recursion to maintain a stack of continuations for conditional jumps, the size of which is at most proportional to the size of the <em>code</em></p>
+<h3 id="validation-function">
+<a href="#validation-function" class="anchor-link"></a> Validation Function
+</h3>
+<p>For simplicity’s sake we assume that <em>jumpdest analysis</em> has been done and that we have some helper functions.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">is_valid_instruction(pc)</code> returns true if <code class="language-plaintext highlighter-rouge">pc</code> points at a valid instruction.</li>
+<li><code class="language-plaintext highlighter-rouge">is_valid_jumpdest(dest)</code> returns true if <code class="language-plaintext highlighter-rouge">dest</code> is a valid jumpdest.</li>
+<li><code class="language-plaintext highlighter-rouge">immediate_data(pc)</code> returns the immediate data for the instruction at <code class="language-plaintext highlighter-rouge">pc</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">advance_pc(pc)</code> advances to and returns the next <code class="language-plaintext highlighter-rouge">pc</code>, skipping any immediate data.</li>
+<li><code class="language-plaintext highlighter-rouge">remove_items(pc,sp)</code> returns the number of items removed from the <code class="language-plaintext highlighter-rouge">data_stack</code> by the instruction at <code class="language-plaintext highlighter-rouge">pc</code>.</li>
+<li><code class="language-plaintext highlighter-rouge">add_items(pc,sp)</code> returns the number of items added to the <code class="language-plaintext highlighter-rouge">data_stack</code> by the instruction at <code class="language-plaintext highlighter-rouge">pc</code>.</li>
+</ul>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>// emulated machine state
+var code          [code_len]byte
+var avail_items   [code_len]int
+var return_stack  []int
+var data_stack    []uint256
+
+// return nil or an error
+func validate(pc := 0, sp := 0, bp := 0) error {
+
+   for pc &lt; code_len {
+      if !is_valid_instruction(pc) {
+         return invalid_instruction
+      }
+      
+      // if available items on stack for `pc` are non-zero
+      //    we have been here before
+      //    so return to break cycle
+      if avail_items[pc] != 0 {
+
+          // invalid if available items not the same
+          if avail_items[pc] != sp - bp {
+            return invalid_stack
+          }
+      }
+      avail_items[pc] = sp - bp
+      if avail_items[pc] &lt; 0 {
+         return stack_underflow
+      }
+      
+      switch code[pc] {
+
+      // successful termination
+      case STOP:
+         return nil
+      case RETURN:
+         return nil
+      case SELFDESTRUCT:
+         return nil
+      case REVERT:
+         return nil
+      case INVALID:
+         return invalid_instruction
+
+      // track constants pushed on data stack
+      case PUSH1 &lt;= code[pc] &amp;&amp; code[pc] &lt;= PUSH32 {
+         sp = push(sp, immediate_data(pc))
+         pc = advance_pc(pc)
+          
+      case RJUMP:
+
+         // check for valid jump destination
+         if !is_valid_jumpdest(jumpdest) {
+            return pc, invalid_destination
+         }
+         
+         // reset pc to destination of jump
+         pc += immediate_data(pc)
+
+      case RJUMPI:
+
+         // recurse to validate true side of conditional
+         jumpdest = pc + immediate_data(pc)
+         if !is_valid_jumpdest(pc + jumpdest) {
+            return pc, invalid_destination
+         }
+         err = validate(jumpdest, sp, bp)
+         if err {
+            return err
+         }
+         
+         // continue to validate false side of conditional
+         pc = advance_pc(pc)
+         err = validate(pc, sp, bp)
+         if err {
+            return err
+         }
+
+      case RJUMPSUB:
+
+         // check for valid jump destination
+         jumpdest = pc + imm_data(pc)
+         if !is_valid_jumpdest(jumpdest) {
+            return invalid_destination
+         }
+
+         // will enter subroutine at destination
+         bp = sp
+
+         // push return address and reset pc to destination
+         pc = advance_pc(pc)
+         push(return_stack, pc)
+         pc = jumpdest
+
+      case RETURNSUB:
+      
+         // will return to subroutine at destination
+         bp = sp
+
+         // pop return address and check for valid destination
+         pc = pop(return_stack)
+         if !code[pc - 1] == RJUMPSUB {
+            return invalid_destination
+
+      default:
+      
+         pc = advance_pc(pc)
+
+         // apply other instructions to stack
+         sp -= remove_items(pc, sp)
+         if (sp &lt; 0) {
+            return stack_underflow
+         }
+         sp += add_items(pc, sp)
+      }
+   }
+
+   // successful termination
+   return nil
+}
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>These changes introduce new flow control instructions. They do not introduce any new security considerations. This EIP is intended to improve security by validating a higher level of safety for EVM code deployed on the blockchain.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/gcolvin">Greg Colvin</a>, <a href="/cdn-cgi/l/email-protection#a4c3d6c1c3e4c7cbc8d2cdca8acbd6c3">Greg Colvin</a>, <a href="https://github.com/holiman">Martin Holst Swende</a>, <a href="https://github.com/expede">Brooklyn Zelenka</a>, <a href="/cdn-cgi/l/email-protection#f98a929895959c8bb990978d9c8b97969d9cd79697d7979c8d">John Skaller</a>, "EIP-2315: Simple Subroutines for the EVM [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2315, October 2019. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2315.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2315: Simple Subroutines for the EVM [DRAFT]",
+    "author": "Greg Colvin (@gcolvin), Greg Colvin <greg@colvin.org>, Martin Holst Swende (@holiman), Brooklyn Zelenka (@expede), John Skaller <skaller@internode.on.net>",
+    "name": "EIP-2315: Simple Subroutines for the EVM [DRAFT]",
+    "dateCreated": "2019-10-17",
+    "datePublished": "2019-10-17",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2315-simple-subroutines-for-the-evm/3941",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2019"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2583: Penalty for account trie misses</title>
+<meta property="og:title" content="EIP-2583: Penalty for account trie misses" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2583" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2583" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2583: Penalty for account trie misses
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2583.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/holiman">Martin Holst Swende</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2583-penalties-for-trie-misses/4190">https://ethereum-magicians.org/t/eip-2583-penalties-for-trie-misses/4190</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2020-02-21</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#detailed-specification">Detailed specification</a></li>
+<li><a href="#notes-on-call-derivatives">Notes on Call-derivatives</a></li>
+<li><a href="#note-on-selfdestruct">Note on SELFDESTRUCT</a></li>
+<li><a href="#clarifications">Clarifications:</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#determining-the-penalty">Determining the penalty</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a>
+<ul>
+<li><a href="#ether-transfers">Ether transfers</a></li>
+<li><a href="#layer-2">Layer 2</a></li>
+<li><a href="#other">Other</a></li>
+</ul>
+</li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#alternative-variants">Alternative variants</a>
+<ul>
+<li><a href="#alt-1-insta-refunds">Alt 1: Insta-refunds</a></li>
+<li><a href="#alt-2-parent-bail">Alt 2: Parent bail</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This EIP introduces a gas penalty for opcodes which access the account for trie non-existent accounts.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP adds a gas penalty for accesses to the account trie, where the address being looked up does not exist. Non-existing accounts can be used in
+DoS attacks, since they bypass cache mechanisms, thus creating a large discrepancy between ‘normal’ mode of execution and ‘worst-case’ execution of an opcode.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>As the ethereum trie becomes more and more saturated, the number of disk lookups that a node is required to do in order to access a piece of state increases too. This means that checking e.g. <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code> of an account at block <code class="language-plaintext highlighter-rouge">5</code> was <em>inherently</em> a cheaper operation that it is at, say <code class="language-plaintext highlighter-rouge">8.5M</code>.</p>
+<p>From an implementation perspective, a node can (and does) use various caching mechanisms to cope with the problem, but there’s an inherent problem with caches: when they yield a ‘hit’, they’re great, but when they ‘miss’, they’re useless.</p>
+<p>This is attackable. By forcing a node to lookup non-existent keys, an attacker can maximize the number of disk lookups.
+Sidenote: even if the ‘non-existence’ is cached, it’s trivial to use a new non-existent key the next time, and never hit the same non-existent key again. Thus, caching ‘non-existence’ might be dangerous, since it will evict ‘good’ entries.</p>
+<p>So far, the attempts to handle this problem has been in raising the gas cost, e.g. <a href="/EIPS/eip-150">EIP-150</a>, <a href="/EIPS/eip-1884">EIP-1884</a>.</p>
+<p>However, when determining gas-costs, a secondary problem that arises due to the large discrepancy between ‘happy-path’ and ‘notorious path’ – how do we determine the pricing?</p>
+<ul>
+<li>The ‘happy-path’, assuming all items are cached?
+<ul>
+<li>Doing so would that would underprice all trie-accesses, and could be DoS-attacked.</li>
+</ul>
+</li>
+<li>The ‘normal’ usage, based on benchmarks of actual usage?
+<ul>
+<li>This is basically what we do now, but that means that intentionally notorious executions are underpriced – which constitutes a DoS vulnerability.</li>
+</ul>
+</li>
+<li>The ‘paranoid’ case: price everything as if caching did not exist?
+<ul>
+<li>This would severely harm basically every contract due to the gas-cost increase. Also, if the gas limits were raised in order to allow the same amount of computation as before, the notorious case could again be used for DoS attacks.</li>
+</ul>
+</li>
+</ul>
+<p>From an engineering point of view, a node implementor is left with few options:</p>
+<ul>
+<li>Implement bloom filters for existence. This is difficult, not least because of the problems of reorgs, and the fact that it’s difficult to undo bloom filter modifications.</li>
+<li>Implement flattened account databases. This is also difficult, both because of reorgs and also because it needs to be an <em>additional</em> data structure aside from the <code class="language-plaintext highlighter-rouge">trie</code> – we need the <code class="language-plaintext highlighter-rouge">trie</code> for consensus. So it’s an extra data structure of around <code class="language-plaintext highlighter-rouge">15G</code> that needs to be kept in check. This is currently being pursued by the Geth-team.</li>
+</ul>
+<p>This EIP proposes a mechanism to alleviate the situation.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>We define the constant <code class="language-plaintext highlighter-rouge">penalty</code> as <code class="language-plaintext highlighter-rouge">TBD</code> (suggested <code class="language-plaintext highlighter-rouge">2000</code> gas).</p>
+<p>For opcodes which access the account trie, whenever the operation is invoked targeting an <code class="language-plaintext highlighter-rouge">address</code> which does not exist in the trie, then <code class="language-plaintext highlighter-rouge">penalty</code> gas is deducted from the available <code class="language-plaintext highlighter-rouge">gas</code>.</p>
+<h3 id="detailed-specification">
+<a href="#detailed-specification" class="anchor-link"></a> Detailed specification
+</h3>
+<p>These are the opcodes which triggers lookup into the main account trie:</p>
+<table>
+<thead>
+<tr>
+<th>Opcode</th>
+<th>Affected</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BALANCE</td>
+<td>Yes</td>
+<td><code class="language-plaintext highlighter-rouge">balance(nonexistent_addr)</code> would incur <code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>EXTCODEHASH</td>
+<td>Yes</td>
+<td><code class="language-plaintext highlighter-rouge">extcodehash(nonexistent_addr)</code> would incur <code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>EXTCODECOPY</td>
+<td>Yes</td>
+<td><code class="language-plaintext highlighter-rouge">extcodecopy(nonexistent_addr)</code> would incur <code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>EXTCODESIZE</td>
+<td>Yes</td>
+<td><code class="language-plaintext highlighter-rouge">extcodesize(nonexistent_addr)</code> would incur <code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>CALL</td>
+<td>Yes</td>
+<td>See details below about call variants</td>
+</tr>
+<tr>
+<td>CALLCODE</td>
+<td>Yes</td>
+<td>See details below about call variants</td>
+</tr>
+<tr>
+<td>DELEGATECALL</td>
+<td>Yes</td>
+<td>See details below about call variants</td>
+</tr>
+<tr>
+<td>STATICCALL</td>
+<td>Yes</td>
+<td>See details below about call variants</td>
+</tr>
+<tr>
+<td>SELFDESTRUCT</td>
+<td>No</td>
+ <td>See details below.</td>
+</tr>
+<tr>
+<td>CREATE</td>
+<td>No</td>
+<td>Create destination not explicitly settable, and assumed to be nonexistent already.</td>
+</tr>
+<tr>
+<td>CREATE2</td>
+<td>No</td>
+<td>Create destination not explicitly settable, and assumed to be nonexistent already.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="notes-on-call-derivatives">
+<a href="#notes-on-call-derivatives" class="anchor-link"></a> Notes on Call-derivatives
+</h3>
+<p>A <code class="language-plaintext highlighter-rouge">CALL</code> triggers a lookup of the <code class="language-plaintext highlighter-rouge">CALL</code> destination address. The base cost for <code class="language-plaintext highlighter-rouge">CALL</code> is at <code class="language-plaintext highlighter-rouge">700</code> gas. A few other characteristics determine the actual gas cost of a call:</p>
+<ol>
+<li>If the <code class="language-plaintext highlighter-rouge">CALL</code> (or <code class="language-plaintext highlighter-rouge">CALLCODE</code>) transfers value, an additional <code class="language-plaintext highlighter-rouge">9K</code> is added as cost.
+1.1 If the <code class="language-plaintext highlighter-rouge">CALL</code> destination did not previously exist, an additional <code class="language-plaintext highlighter-rouge">25K</code> gas is added to the cost.</li>
+</ol>
+<p>This EIP adds a second rule in the following way:</p>
+<ol>
+<li>If the call does <em>not</em> transfer value and the callee does <em>not</em> exist, then <code class="language-plaintext highlighter-rouge">penalty</code> gas is added to the cost.</li>
+</ol>
+<p>In the table below,</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">value</code> means non-zero value transfer,</li>
+<li><code class="language-plaintext highlighter-rouge">!value</code> means zero value transfer,</li>
+<li><code class="language-plaintext highlighter-rouge">dest</code> means destination already exists, or is a <code class="language-plaintext highlighter-rouge">precompile</code></li>
+<li><code class="language-plaintext highlighter-rouge">!dest</code> means destination does not exist and is not a <code class="language-plaintext highlighter-rouge">precompile</code></li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Op</th>
+<th>value,dest</th>
+<th>value, !dest</th>
+<th>!value, dest</th>
+<th>!value, !dest</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CALL</td>
+<td>no change</td>
+<td>no change</td>
+<td>no change</td>
+<td><code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>CALLCODE</td>
+<td>no change</td>
+<td>no change</td>
+<td>no change</td>
+<td><code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>DELEGATECALL</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>no change</td>
+<td><code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+<tr>
+<td>STATICCALL</td>
+<td>N/A</td>
+<td>N/A</td>
+<td>no change</td>
+<td><code class="language-plaintext highlighter-rouge">penalty</code></td>
+</tr>
+</tbody>
+</table>
+<p>Whether the rules of this EIP is to be applied for regular ether-sends in <code class="language-plaintext highlighter-rouge">transactions</code> is TBD. See the ‘Backwards Compatibility’-section for some more discussion on that topic.</p>
+<h3 id="note-on-selfdestruct">
+<a href="#note-on-selfdestruct" class="anchor-link"></a> Note on <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code>
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> opcode also triggers an account trie lookup of the <code class="language-plaintext highlighter-rouge">beneficiary</code>. However, due to the following reasons, it has been omitted from having a <code class="language-plaintext highlighter-rouge">penalty</code> since it already costs <code class="language-plaintext highlighter-rouge">5K</code> gas.</p>
+<h3 id="clarifications">
+<a href="#clarifications" class="anchor-link"></a> Clarifications:
+</h3>
+<ul>
+<li>The <code class="language-plaintext highlighter-rouge">base</code> costs of any opcodes are not modified by the EIP.</li>
+<li>The opcode <code class="language-plaintext highlighter-rouge">SELFBALANCE</code> is not modified by this EIP, regardless of whether the <code class="language-plaintext highlighter-rouge">self</code> address exists or not.</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>With this scheme, we could continue to price these operations based on the ‘normal’ usage, but gain protection from attacks that try to maximize disk lookups/cache misses.
+This EIP does not modify anything regarding storage trie accesses, which might be relevant for a future EIP. However, there are a few crucial differences.</p>
+<ol>
+<li>Storage tries are typically small, and there’s a high cost to populate a storage trie with sufficient density for it to be in the same league as the account trie.</li>
+<li>If an attacker wants to use an existing large storage trie, e.g. some popular token, he would typically have to make a <code class="language-plaintext highlighter-rouge">CALL</code> to cause a lookup in that token – something like <code class="language-plaintext highlighter-rouge">token.balanceOf(&lt;nonexistent-address&gt;)</code>.
+That adds quite a lot of extra gas-impediments, as each <code class="language-plaintext highlighter-rouge">CALL</code> is another <code class="language-plaintext highlighter-rouge">700</code> gas, plus gas for arguments to the <code class="language-plaintext highlighter-rouge">CALL</code>.</li>
+</ol>
+<h3 id="determining-the-penalty">
+<a href="#determining-the-penalty" class="anchor-link"></a> Determining the <code class="language-plaintext highlighter-rouge">penalty</code>
+</h3>
+<p>A transaction with <code class="language-plaintext highlighter-rouge">10M</code> gas can today cause ~<code class="language-plaintext highlighter-rouge">14K</code> trie lookups.</p>
+<ul>
+<li>A <code class="language-plaintext highlighter-rouge">penalty</code> of <code class="language-plaintext highlighter-rouge">1000</code>would lower the number to ~<code class="language-plaintext highlighter-rouge">5800</code> lookups, <code class="language-plaintext highlighter-rouge">41%</code> of the original.</li>
+<li>A <code class="language-plaintext highlighter-rouge">penalty</code> of <code class="language-plaintext highlighter-rouge">2000</code>would lower the number to ~<code class="language-plaintext highlighter-rouge">3700</code> lookups, <code class="language-plaintext highlighter-rouge">26%</code> of the original.</li>
+<li>A <code class="language-plaintext highlighter-rouge">penalty</code> of <code class="language-plaintext highlighter-rouge">3000</code>would lower the number to ~<code class="language-plaintext highlighter-rouge">2700</code> lookups, <code class="language-plaintext highlighter-rouge">20%</code> of the original.</li>
+<li>A <code class="language-plaintext highlighter-rouge">penalty</code> of <code class="language-plaintext highlighter-rouge">4000</code>would lower the number to ~<code class="language-plaintext highlighter-rouge">2100</code> lookups, <code class="language-plaintext highlighter-rouge">15%</code> of the original.</li>
+</ul>
+<p>There exists a roofing function for the <code class="language-plaintext highlighter-rouge">penalty</code>. Since the <code class="language-plaintext highlighter-rouge">penalty</code> is deducted from <code class="language-plaintext highlighter-rouge">gas</code>, that means that a malicious contract can always invoke a malicious relay to perform the trie lookup. Let’s refer to this as the ‘shielded relay’ attack.</p>
+<p>In such a scenario, the <code class="language-plaintext highlighter-rouge">malicious</code> would spend <code class="language-plaintext highlighter-rouge">~750</code> gas each call to <code class="language-plaintext highlighter-rouge">relay</code>, and would need to provide the <code class="language-plaintext highlighter-rouge">relay</code> with at least <code class="language-plaintext highlighter-rouge">700</code> gas to do a trie access.</p>
+<p>Thus, the effective <code class="language-plaintext highlighter-rouge">cost</code> would be on the order of <code class="language-plaintext highlighter-rouge">1500</code>. It can thus be argued that <code class="language-plaintext highlighter-rouge">penalty</code> above <code class="language-plaintext highlighter-rouge">~800</code> would not achieve better protection against trie-miss attacks.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP requires a hard-fork.</p>
+<h3 id="ether-transfers">
+<a href="#ether-transfers" class="anchor-link"></a> Ether transfers
+</h3>
+<p>A regular <code class="language-plaintext highlighter-rouge">transaction</code> from one EOA to another, with value, is not affected.</p>
+<p>A <code class="language-plaintext highlighter-rouge">transaction</code> with <code class="language-plaintext highlighter-rouge">0</code> value, to a destination which does not exist, would be. This scenario is highly unlikely to matter, since such a <code class="language-plaintext highlighter-rouge">transaction</code> is useless – even during success, all it would accomplish would be to spend some <code class="language-plaintext highlighter-rouge">gas</code>. With this EIP, it would potentially spend some more gas.</p>
+<h3 id="layer-2">
+<a href="#layer-2" class="anchor-link"></a> Layer 2
+</h3>
+<p>Regarding layer-2 backward compatibility, this EIP is a lot less disruptive than EIPs which modify the <code class="language-plaintext highlighter-rouge">base</code> cost of an opcode. For state accesses, there are
+seldom legitimate scenarios where</p>
+<ol>
+<li>A contract checks <code class="language-plaintext highlighter-rouge">BALANCE</code>/<code class="language-plaintext highlighter-rouge">EXTCODEHASH</code>/<code class="language-plaintext highlighter-rouge">EXTCODECOPY</code>/<code class="language-plaintext highlighter-rouge">EXTCODESIZE</code> of another contract <code class="language-plaintext highlighter-rouge">b</code>, <em>and</em>,</li>
+<li>If such <code class="language-plaintext highlighter-rouge">b</code> does not exist, continues the execution</li>
+</ol>
+<h4 id="solidity-remote-calls">
+<a href="#solidity-remote-calls" class="anchor-link"></a> Solidity remote calls
+</h4>
+<p>Example: When a remote call is made in Solidity:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    recipient.invokeMethod(1)
+</code></pre></div></div>
+<ul>
+<li>Solidity does a pre-flight <code class="language-plaintext highlighter-rouge">EXTCODESIZE</code> on <code class="language-plaintext highlighter-rouge">recipient</code>.</li>
+<li>If the pre-flight check returns <code class="language-plaintext highlighter-rouge">0</code>, then <code class="language-plaintext highlighter-rouge">revert(0,0)</code> is executed, to stop the execution.</li>
+<li>If the pre-flight check returns non-zero, then the execution continues and the <code class="language-plaintext highlighter-rouge">CALL</code> is made.</li>
+</ul>
+<p>With this EIP in place, the ‘happy-path’ would work as previously, and the ‘notorious’-path where <code class="language-plaintext highlighter-rouge">recipient</code> does not exist would cost an extra <code class="language-plaintext highlighter-rouge">penalty</code> gas, but the actual execution-flow would be unchanged.</p>
+<h4 id="erc223">
+
+<a href="#erc223" class="anchor-link"></a> ERC223
+</h4>
+<p><a href="https://github.com/ethereum/EIPs/issues/223">ERC223 Token Standard</a> is, at the time of writing, marked as ‘Draft’, but is deployed and in use on mainnet today.</p>
+<p>The ERC specifies that when a token <code class="language-plaintext highlighter-rouge">transfer(_to,...)</code> method is invoked, then:</p>
+<blockquote>
+<p>This function must transfer tokens and invoke the function <code class="language-plaintext highlighter-rouge">tokenFallback (address, uint256, bytes)</code> in <code class="language-plaintext highlighter-rouge">_to</code>, if <code class="language-plaintext highlighter-rouge">_to</code> is a contract.
+…
+NOTE: The recommended way to check whether the <code class="language-plaintext highlighter-rouge">_to</code> is a contract or an address is to assemble the code of <code class="language-plaintext highlighter-rouge">_to</code>. If there is no code in <code class="language-plaintext highlighter-rouge">_to</code>, then this is an externally owned address, otherwise it’s a contract.</p>
+</blockquote>
+<p>The reference implementations from <a href="https://github.com/Dexaran/ERC223-token-standard/tree/development/token/ERC223">Dexaran</a> and <a href="https://github.com/OpenZeppelin/openzeppelin-contracts/blob/1bc923b6a222e79a90f20305a459b0ee779eb918/contracts/token/ERC721/ERC721.sol#L499">OpenZeppelin</a> both implement the <code class="language-plaintext highlighter-rouge">isContract</code> check using an <code class="language-plaintext highlighter-rouge">EXTCODESIZE</code> invocation.</p>
+<p>This scenario <em>could</em> be affected, but in practice should not be. Let’s consider the possibilities:</p>
+<ol>
+<li>The <code class="language-plaintext highlighter-rouge">_to</code> is a contract: Then <code class="language-plaintext highlighter-rouge">ERC223</code> specifies that the function <code class="language-plaintext highlighter-rouge">tokenFallback(...)</code> is invoked.
+<ul>
+<li>The gas expenditure for that call is at least<code class="language-plaintext highlighter-rouge">700</code> gas.</li>
+<li>In order for the <code class="language-plaintext highlighter-rouge">callee</code> to be able to perform any action, best practice it to ensure that it has at least <code class="language-plaintext highlighter-rouge">2300</code> gas along with the call.</li>
+<li>In summary: this path requires there to be least <code class="language-plaintext highlighter-rouge">3000</code> extra gas available (which is not due to any <code class="language-plaintext highlighter-rouge">penalty</code>)</li>
+</ul>
+</li>
+<li>The <code class="language-plaintext highlighter-rouge">_to</code> exists, but is no contract. The flow exits here, and is not affected by this EIP</li>
+<li>The <code class="language-plaintext highlighter-rouge">_to</code> does not exist: A <code class="language-plaintext highlighter-rouge">penalty</code> is deducted.</li>
+</ol>
+<p>In summary, it would seem that <code class="language-plaintext highlighter-rouge">ERC223</code> should not be affected, as long as the <code class="language-plaintext highlighter-rouge">penalty</code> does not go above around <code class="language-plaintext highlighter-rouge">3000</code> gas.</p>
+<h3 id="other">
+<a href="#other" class="anchor-link"></a> Other
+</h3>
+<p>The contract <a href="https://etherscan.io/address/0x08d32b0da63e2c3bcf8019c9c5d849d7a9d791e6#code"><code class="language-plaintext highlighter-rouge">Dentacoin</code></a> would be affected.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    function transfer(address _to, uint256 _value) returns (bool success) {
+    ... // omitted for brevity
+        if (balances[msg.sender] &gt;= _value &amp;&amp; balances[_to] + _value &gt; balances[_to]) {               // Check if sender has enough and for overflows
+            balances[msg.sender] = safeSub(balances[msg.sender], _value);   // Subtract DCN from the sender
+
+            if (msg.sender.balance &gt;= minBalanceForAccounts &amp;&amp; _to.balance &gt;= minBalanceForAccounts) {    // Check if sender can pay gas and if recipient could
+                balances[_to] = safeAdd(balances[_to], _value);             // Add the same amount of DCN to the recipient
+                Transfer(msg.sender, _to, _value);                          // Notify anyone listening that this transfer took place
+                return true;
+            } else {
+                balances[this] = safeAdd(balances[this], DCNForGas);        // Pay DCNForGas to the contract
+                balances[_to] = safeAdd(balances[_to], safeSub(_value, DCNForGas));  // Recipient balance -DCNForGas
+                Transfer(msg.sender, _to, safeSub(_value, DCNForGas));      // Notify anyone listening that this transfer took place
+
+                if(msg.sender.balance &lt; minBalanceForAccounts) {
+                    if(!msg.sender.send(gasForDCN)) throw;                  // Send eth to sender
+                  }
+                if(_to.balance &lt; minBalanceForAccounts) {
+                    if(!_to.send(gasForDCN)) throw;                         // Send eth to recipient
+                }
+            }
+        } else { throw; }
+    }
+</code></pre></div></div>
+<p>The contract checks <code class="language-plaintext highlighter-rouge">_to.balance &gt;= minBalanceForAccounts</code>, and if the <code class="language-plaintext highlighter-rouge">balance</code> is too low, some <code class="language-plaintext highlighter-rouge">DCN</code> is converted to <code class="language-plaintext highlighter-rouge">ether</code> and sent to the <code class="language-plaintext highlighter-rouge">_to</code>. This is a mechanism to ease on-boarding, whereby a new user who has received some <code class="language-plaintext highlighter-rouge">DCN</code> can immediately create a transaction.</p>
+<p>Before this EIP:</p>
+<ul>
+<li>When sending <code class="language-plaintext highlighter-rouge">DCN</code> to a non-existing address, the additional <code class="language-plaintext highlighter-rouge">gas</code> expenditure would be:
+<ul>
+<li><code class="language-plaintext highlighter-rouge">9000</code> for an ether-transfer</li>
+<li><code class="language-plaintext highlighter-rouge">25000</code> for a new account-creation</li>
+<li>(<code class="language-plaintext highlighter-rouge">2300</code> would be refunded to the caller later)</li>
+<li>A total runtime <code class="language-plaintext highlighter-rouge">gas</code>-cost of <code class="language-plaintext highlighter-rouge">34K</code> gas would be required to handle this case.</li>
+</ul>
+</li>
+</ul>
+<p>After this EIP:</p>
+<ul>
+<li>In addition to the <code class="language-plaintext highlighter-rouge">34K</code> an additional <code class="language-plaintext highlighter-rouge">penalty</code> would be added.
+<ul>
+<li>Possibly two, since the reference implementation does the balance-check twice, but it’s unclear whether the compiled code would indeed perform the check twice.</li>
+</ul>
+</li>
+<li>A total runtime <code class="language-plaintext highlighter-rouge">gas</code>-cost of <code class="language-plaintext highlighter-rouge">34K+penalty</code> (or <code class="language-plaintext highlighter-rouge">34K + 2 * penalty</code>) would be required to handle this case.</li>
+</ul>
+<p>It can be argued that the extra penalty of <code class="language-plaintext highlighter-rouge">2-3K</code> gas can be considered marginal in relation to the other <code class="language-plaintext highlighter-rouge">34K</code> gas already required to handle this.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>The following cases need to be considered and tested:</p>
+<ul>
+<li>That during creation of a brand new contract, within the constructor, the <code class="language-plaintext highlighter-rouge">penalty</code> should not be applied for calls concerning the self-address.</li>
+<li>TBD: How the <code class="language-plaintext highlighter-rouge">penalty</code> is applied in the case of a contract which has performed a <code class="language-plaintext highlighter-rouge">selfdestruct</code>
+<ul>
+<li>a) previously in the same call-context,</li>
+<li>b) previously in the same transaction,</li>
+<li>c) previously in the same block,
+For any variant of <code class="language-plaintext highlighter-rouge">EXTCODEHASH(destructed)</code>, <code class="language-plaintext highlighter-rouge">CALL(destructed)</code>, <code class="language-plaintext highlighter-rouge">CALLCODE(destructed)</code> etc.</li>
+</ul>
+</li>
+<li>The effects on a <code class="language-plaintext highlighter-rouge">transaction</code> with <code class="language-plaintext highlighter-rouge">0</code> value going to a non-existent account.</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>See ‘Backwards Compatibility’</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>Not yet available.</p>
+<h2 id="alternative-variants">
+<a href="#alternative-variants" class="anchor-link"></a> Alternative variants
+</h2>
+<h3 id="alt-1-insta-refunds">
+<a href="#alt-1-insta-refunds" class="anchor-link"></a> Alt 1: Insta-refunds
+</h3>
+<p>Bump all trie accesses with <code class="language-plaintext highlighter-rouge">penalty</code>. <code class="language-plaintext highlighter-rouge">EXTCODEHASH</code> becomes <code class="language-plaintext highlighter-rouge">2700</code> instead of <code class="language-plaintext highlighter-rouge">700</code>.</p>
+<ul>
+<li>If a trie access hit an existing item, immediately refund penalty (<code class="language-plaintext highlighter-rouge">2K</code> )</li>
+</ul>
+<p>Upside:</p>
+<ul>
+<li>This eliminates the ‘shielded relay’ attack</li>
+</ul>
+<p>Downside:</p>
+<ul>
+<li>This increases the up-front cost of many ops (CALL/EXTCODEHASH/EXTCODESIZE/STATICCALL/EXTCODESIZE etc)
+<ul>
+<li>Which may break many contracts.</li>
+</ul>
+</li>
+</ul>
+<h3 id="alt-2-parent-bail">
+<a href="#alt-2-parent-bail" class="anchor-link"></a> Alt 2: Parent bail
+</h3>
+<p>Use <code class="language-plaintext highlighter-rouge">penalty</code> as described, but if a child context goes OOG on the <code class="language-plaintext highlighter-rouge">penalty</code>, then the remainder is subtracted from the
+parent context (recursively).</p>
+<p>Upside:</p>
+<ul>
+<li>This eliminates the ‘shielded relay’ attack</li>
+</ul>
+<p>Downside:</p>
+<ul>
+<li>This breaks the current invariant that a child context is limited by whatever <code class="language-plaintext highlighter-rouge">gas</code> was allocated for it.
+<ul>
+<li>However, the invariant is not <em>totally</em> thrown out, the new invariant becomes that it is limited to <code class="language-plaintext highlighter-rouge">gas + penalty</code>.</li>
+</ul>
+</li>
+<li>This can be seen as ‘messy’ – since only <em>some</em> types of OOG (penalties) becomes passed up the call chain, but not others, e.g. OOG due to trying
+to allocate too much memory. There is a distinction, however:
+<ul>
+<li>Gas-costs which arise due to not-yet-consumed resources do not get passed to parent. For example: a huge allocation is not actually performed if there is insufficient gas.</li>
+<li>Whereas gas-costs which arise due to already-consumed resources <em>do</em> get passed to parent; in this case the penalty is paid post-facto for a trie iteration.</li>
+</ul>
+</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/holiman">Martin Holst Swende</a>, "EIP-2583: Penalty for account trie misses [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2583, February 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2583.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2583: Penalty for account trie misses [DRAFT]",
+    "author": "Martin Holst Swende (@holiman)",
+    "name": "EIP-2583: Penalty for account trie misses [DRAFT]",
+    "dateCreated": "2020-02-21",
+    "datePublished": "2020-02-21",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2583-penalties-for-trie-misses/4190",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

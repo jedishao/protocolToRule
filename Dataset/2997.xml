@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2997: IMPERSONATECALL Opcode</title>
+<meta property="og:title" content="EIP-2997: IMPERSONATECALL Opcode" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2997" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2997" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2997: IMPERSONATECALL Opcode
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2997.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/SergioDemianLerner">Sergio Demian Lerner</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethresear.ch/t/impersonatecall-opcode/8020">https://ethresear.ch/t/impersonatecall-opcode/8020</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+ <tr><th>Created</th><td>2020-09-24</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#computation-of-impersonated-sender">Computation of impersonated sender</a></li>
+<li><a href="#notes">Notes</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#clarifications">Clarifications</a></li>
+<li><a href="#backward-compatibility">Backward Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Add a new opcode, <code class="language-plaintext highlighter-rouge">IMPERSONATECALL</code> at <code class="language-plaintext highlighter-rouge">0xf6</code>, which is similar in idea to <code class="language-plaintext highlighter-rouge">CALL (0xF1)</code>, except that it impersonates a sender, i.e. the callee sees a sender different from the real caller. The impersonated sender address is derived from the real caller address and a salt.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>This proposal enables native multi-user wallets (wallets that serve multiple users) that can be commanded by EIP-712 based messages and therefore enable meta-transactions. Multi-user wallets also enable the aggregation of transfer operations in batches similar to rollups, but maintaining the same address space as normal onchain transactions, so the sender’s wallet does not need to be upgraded to support sinding ether or tokens to a user of a multi-user wallet.
+Additionally, many times a sponsor company wants to deploy non-custodial smart wallets for all its users. The sponsor does not want to pay the deployment cost of each user contract in advance. Counterfactual contract creation enables this, yet it forces the sponsor to create the smart wallet (or a proxy contract to it) when the user wants to transfer ether or tokens out of his/her account for the first time. This proposal avoids this extra cost, which is at least 42000 gas per user.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p><code class="language-plaintext highlighter-rouge">IMPERSONATECALL</code>: <code class="language-plaintext highlighter-rouge">0xf6</code>, takes 7 operands:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">gas</code>: the amount of gas the code may use in order to execute;</li>
+<li><code class="language-plaintext highlighter-rouge">to</code>: the destination address whose code is to be executed;</li>
+<li><code class="language-plaintext highlighter-rouge">in_offset</code>: the offset into memory of the input;</li>
+<li><code class="language-plaintext highlighter-rouge">in_size</code>: the size of the input in bytes;</li>
+<li><code class="language-plaintext highlighter-rouge">ret_offset</code>: the offset into memory of the output;</li>
+<li><code class="language-plaintext highlighter-rouge">ret_size</code>: the size of the scratch pad for the output.</li>
+<li><code class="language-plaintext highlighter-rouge">salt</code> is a <code class="language-plaintext highlighter-rouge">32</code> bytes value (a stack item).</li>
+</ul>
+<h3 id="computation-of-impersonated-sender">
+<a href="#computation-of-impersonated-sender" class="anchor-link"></a> Computation of impersonated sender
+</h3>
+<p>The impersonated sender address is computed as <code class="language-plaintext highlighter-rouge">keccak256( 0xff ++ address ++ salt ++ zeros32)[12:]</code>.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">0xff</code> is a single byte,</li>
+<li><code class="language-plaintext highlighter-rouge">address</code> is always <code class="language-plaintext highlighter-rouge">20</code> bytes, and represents the address of the real caller contract.</li>
+<li>
+<p><code class="language-plaintext highlighter-rouge">salt</code> is always <code class="language-plaintext highlighter-rouge">32</code> bytes.</p>
+</li>
+<li>The field zeros32 corresponds to 32 zero bytes.</li>
+</ul>
+<p>This scheme emulates <code class="language-plaintext highlighter-rouge">CREATE2</code> address derivation, but it cannot practically collude with the <code class="language-plaintext highlighter-rouge">CREATE2</code> address space.</p>
+<h3 id="notes">
+<a href="#notes" class="anchor-link"></a> Notes
+</h3>
+<ul>
+<li>The opcode behaves exactly as <code class="language-plaintext highlighter-rouge">CALL</code> in terms of gas consumption.</li>
+<li>In the called context <code class="language-plaintext highlighter-rouge">CALLER (0x33)</code> returns the impersonated address.</li>
+<li>If value transfer is non-zero in the call, the value is transferred from the impersonated account, and not from the real caller. This can be used to transfer ether out of an impersonated account.</li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Even if <code class="language-plaintext highlighter-rouge">IMPERSONATECALL</code> requires hashing 3 words, implying an additional cost of 180 gas, we think the benefit of accounting for hashing doesn’t not compensate increasing the complexity of the implementation.</p>
+<p>We use the zeros32 field to base address derivation in a pre-image of similar size than CREATE2 and reuse the existing address derivation functions. We also avoid worrying about address collisions between EOA derivation (65 bytes pre-image), CREATE derivation (from 23 to 27 bytes pre-image, for a 32bit nonce) and CREATE2 derivation (85 bytes pre-image).</p>
+<p>An option is to omit the zeros32 field: the resulting length of the Keccak pre-image for IMPERSONATECALL address is 53 bytes , which does not generate address collision.</p>
+<p>While the same functionality could be provided in a pre-compiled contract, we believe using a new opcode is a cleaner solution.</p>
+<h2 id="clarifications">
+<a href="#clarifications" class="anchor-link"></a> Clarifications
+</h2>
+<ul>
+<li>
+<p>This EIP makes address collisions possible, yet practically impossible.</p>
+</li>
+<li>
+<p>If a contract already exists with an impersonated address, the <code class="language-plaintext highlighter-rouge">IMPERSONATECALL</code> is executed in the same way, and the existing code will not be executed. It should be noted that <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> (<code class="language-plaintext highlighter-rouge">0xff</code>) cannot be executed directly with <code class="language-plaintext highlighter-rouge">IMPERSONATECALL</code> as no opcode is executed in the context of the impersonated account.</p>
+</li>
+</ul>
+<h2 id="backward-compatibility">
+<a href="#backward-compatibility" class="anchor-link"></a> Backward Compatibility
+</h2>
+<p>The opcode number <code class="language-plaintext highlighter-rouge">0xf6</code> is currently unused and results in an out-of-gas (OOG) exception. Solidity uses the <code class="language-plaintext highlighter-rouge">INVALID (0xfe)</code> opcode (called <code class="language-plaintext highlighter-rouge">ABORT</code> by EIP-1803) to raise OOG exceptions, so the <code class="language-plaintext highlighter-rouge">0xf6</code> opcode does not appear in normal Solidity programs. Programmers are already advised not to include this opcode in contracts written in EVM assembly. Therefore is does not pose any backward compatibility risk.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>We present 4 examples of impersonated address derivation:</p>
+<p>Example 0</p>
+<ul>
+<li>address <code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000</code></li>
+<li>salt <code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000000000000000000000000000</code></li>
+<li>result: <code class="language-plaintext highlighter-rouge">0xFFC4F52F884A02BCD5716744CD622127366F2EDF</code></li>
+</ul>
+<p>Example 1</p>
+<ul>
+<li>address <code class="language-plaintext highlighter-rouge">0xdeadbeef00000000000000000000000000000000</code></li>
+<li>salt <code class="language-plaintext highlighter-rouge">0x0000000000000000000000000000000000000000000000000000000000000000</code></li>
+<li>result: <code class="language-plaintext highlighter-rouge">0x85F15E045E1244AC03289B48448249DC0A34AA30</code></li>
+</ul>
+<p>Example 2</p>
+<ul>
+<li>address <code class="language-plaintext highlighter-rouge">0xdeadbeef00000000000000000000000000000000</code></li>
+<li>salt <code class="language-plaintext highlighter-rouge">0x000000000000000000000000feed000000000000000000000000000000000000</code></li>
+<li>result: <code class="language-plaintext highlighter-rouge">0x2DB27D1D6BE32C9ABFA484BA3D591101881D4B9F</code></li>
+</ul>
+<p>Example 3</p>
+<ul>
+<li>address <code class="language-plaintext highlighter-rouge">0x00000000000000000000000000000000deadbeef</code></li>
+<li>salt <code class="language-plaintext highlighter-rouge">0x00000000000000000000000000000000000000000000000000000000cafebabe</code></li>
+<li>result: <code class="language-plaintext highlighter-rouge">0x5004E448F43EFE3C7BF32F94B83B843D03901457</code></li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The address derivation scheme prevents address collision with another deployed contract or an externally owned account, as the impersonated sender address is derived from the real caller address and a salt.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/SergioDemianLerner">Sergio Demian Lerner</a>, "EIP-2997: IMPERSONATECALL Opcode [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2997, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2997.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2997: IMPERSONATECALL Opcode [DRAFT]",
+    "author": "Sergio Demian Lerner (@SergioDemianLerner)",
+    "name": "EIP-2997: IMPERSONATECALL Opcode [DRAFT]",
+    "dateCreated": "2020-09-24",
+    "datePublished": "2020-09-24",
+
+    "discussionUrl": "https://ethresear.ch/t/impersonatecall-opcode/8020",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

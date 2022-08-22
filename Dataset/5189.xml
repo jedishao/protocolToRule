@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5189: Account Abstraction via Endorsed Operations</title>
+<meta property="og:title" content="EIP-5189: Account Abstraction via Endorsed Operations" />
+<meta name="description" content="An account abstraction proposal that avoids protocol changes while maintaining compatibility with existing smart contract wallets." />
+<meta property="og:description" content="An account abstraction proposal that avoids protocol changes while maintaining compatibility with existing smart contract wallets." />
+<meta name="twitter:description" content="An account abstraction proposal that avoids protocol changes while maintaining compatibility with existing smart contract wallets." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5189" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5189" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5189: Account Abstraction via Endorsed Operations
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5189.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An account abstraction proposal that avoids protocol changes while maintaining compatibility with existing smart contract wallets.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/agusx1211">Agustín Aguilar</a>, <a href="https://github.com/phabc">Philippe Castonguay</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-account-abstraction-via-endorsed-operations/9799">https://ethereum-magicians.org/t/erc-account-abstraction-via-endorsed-operations/9799</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-06-29</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#misbehavior-detection">Misbehavior detection</a></li>
+<li><a href="#client-behavior-upon-receiving-an-operation">Client behavior upon receiving an operation</a></li>
+<li><a href="#endorser-registry">Endorser registry</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP proposes a form of account abstraction that ensures compatibility with existing smart contract wallets and provides flexibility for alternative designs while avoiding introducing changes to the consensus layer. Instead of defining a strict structure for meta-transactions, this proposal introduces the figure of <code class="language-plaintext highlighter-rouge">endorser</code> contracts. These smart contract instances are tasked with determining the quality of the submitted meta-transactions, thus safely helping bundlers determine if a meta-transaction should be kept in the mempool or not. Developers that intend to make their smart contract wallet compatible with this EIP must create and deploy an instance of an <code class="language-plaintext highlighter-rouge">endorser</code>; this instance must be seeded with a small amount of ETH to be burnt that incentivizes its good behavior.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>This account abstraction proposal aims to implement a generalized system for executing meta-transactions while maintaining the following goals:</p>
+<ul>
+<li><strong>Achieve the primary goal of account abstraction:</strong> allow users to use smart contract wallets containing arbitrary verification and execution logic instead of EOAs as their primary account.</li>
+<li><strong>Decentralization:</strong></li>
+<li>
+<ul>
+<li>Allow any bundler to participate in the process of including meta-transactions.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Work with all activity happening over a public mempool without having to concentrate transactions on centralized relayers.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Define structures that help maintain a healthy mempool without risking its participants from getting flooded with invalid or malicious payloads.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Avoid trust assumptions between bundlers, developers, and wallets.</li>
+</ul>
+</li>
+<li><strong>Support existing smart contract wallet implementations:</strong> Work with all the smart contract wallets already deployed and active while avoiding forcing each wallet instance to be manually upgraded.</li>
+<li><strong>Provide an unrestrictive framework:</strong> Smart contract wallets are very different in design, limitations, and capabilities from one another; the proposal is designed to accommodate almost all possible variations.</li>
+<li><strong>No overhead:</strong> Smart contract wallets already have a cost overhead compared to EOA alternatives, the proposal does not worsen the current situation.</li>
+<li><strong>Support other use cases:</strong></li>
+<li>
+<ul>
+<li>Privacy-preserving applications.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Atomic multi-operations (similar to EIP-3074).</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Payment of transaction fees using ERC-20 tokens.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Scheduled execution of smart contracts without any user input.</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Applications that require a generalistic relayer.</li>
+</ul>
+</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>To avoid Ethereum consensus changes, we do not attempt to create new transaction types for account-abstracted transactions. Instead, meta-transactions are packed up in a struct called <code class="language-plaintext highlighter-rouge">Operation</code>, operations are structs composed by the following fields:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>entrypoint</td>
+<td>address</td>
+<td>contract address that must be called with <code class="language-plaintext highlighter-rouge">callData</code> to execute the <code class="language-plaintext highlighter-rouge">operation</code>.</td>
+</tr>
+<tr>
+<td>callData</td>
+<td>bytes</td>
+<td>data that must be passed to the <code class="language-plaintext highlighter-rouge">entrypoint</code> call to execute the <code class="language-plaintext highlighter-rouge">operation</code>.</td>
+</tr>
+<tr>
+<td>gasLimit</td>
+<td>uint64</td>
+<td>minimum gasLimit that must be passed when executing the <code class="language-plaintext highlighter-rouge">operation</code>.</td>
+</tr>
+<tr>
+<td>endorser</td>
+<td>address</td>
+<td>address of the endorser contract that should be used to validate the <code class="language-plaintext highlighter-rouge">operation</code>.</td>
+</tr>
+<tr>
+<td>endorserGasLimit</td>
+<td>uint64</td>
+<td>amount of gas that should be passed to the endorser when validating the <code class="language-plaintext highlighter-rouge">operation</code>.</td>
+</tr>
+<tr>
+<td>maxFeePerGas</td>
+<td>uint256</td>
+<td>max amount of basefee that the <code class="language-plaintext highlighter-rouge">operation</code> execution is expected to pay, (similar to EIP-1559 <code class="language-plaintext highlighter-rouge">max_fee_per_gas</code>)</td>
+</tr>
+<tr>
+<td>priorityFeePerGas</td>
+<td>uint256</td>
+<td>fixed amount of fees that the <code class="language-plaintext highlighter-rouge">operation</code> execution is expected to pay to the bundler (similar to EIP-1559 <code class="language-plaintext highlighter-rouge">max_priority_fee_per_gas</code>).</td>
+</tr>
+</tbody>
+</table>
+<p>These <code class="language-plaintext highlighter-rouge">Operation</code> objects can be sent to a dedicated operations mempool. A specialized class of actors called bundlers (either miners running special-purpose code, or just users that can relay transactions to miners) listen for operations on the mempool and execute these transactions.</p>
+<p>Transactions are executed by calling the <code class="language-plaintext highlighter-rouge">entrypoint</code> with the provided <code class="language-plaintext highlighter-rouge">callData</code>. The <code class="language-plaintext highlighter-rouge">entrypoint</code> can be any contract, but most commonly it will be the wallet contract itself, alternatively it can be an intermediary utility that deploys the wallet and then performs the transaction.</p>
+<h4 id="endorser-functionality">
+<a href="#endorser-functionality" class="anchor-link"></a> Endorser functionality
+</h4>
+<p>Mempool participants need to be able to able to filter “good operations” (operations that pay the bundler the defined fee) from “bad operations” (operations that either miss payment or revert altogether).</p>
+<p>This categorization is facilitated by the <code class="language-plaintext highlighter-rouge">endorser</code>; the endorser must be a deployed smart contract that implements the following interface:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">Endorser</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">Dependency</span> <span class="p">{</span>
+    <span class="kt">address</span> <span class="n">addr</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="nb">balance</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">code</span><span class="p">;</span>
+    <span class="kt">bool</span> <span class="n">nonce</span><span class="p">;</span>
+    <span class="kt">bytes32</span><span class="p">[]</span> <span class="n">slots</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">function</span> <span class="n">isOperationReady</span><span class="p">(</span>
+    <span class="kt">address</span> <span class="n">_entrypoint</span><span class="p">,</span>
+    <span class="kt">bytes</span> <span class="k">calldata</span> <span class="n">_data</span><span class="p">,</span>
+    <span class="kt">uint256</span> <span class="n">_gasLimit</span><span class="p">,</span>
+    <span class="kt">uint256</span> <span class="n">_maxFeePerGas</span><span class="p">,</span>
+    <span class="kt">uint256</span> <span class="n">_maxPriorityFeePerGas</span>
+  <span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span>
+    <span class="kt">bool</span> <span class="n">readiness</span><span class="p">,</span>
+    <span class="n">Dependency</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">dependencies</span>
+  <span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>It should also be registered in the <code class="language-plaintext highlighter-rouge">EndorserRegistry</code> with a minimum amount of burned ETH (Mempool operators are free to accept operations from endorsers without any burn, but they would increase their risk exposing themselves to denial of service attacks).</p>
+<p>When the <code class="language-plaintext highlighter-rouge">isOperationReady</code> method is called, the endorser must return this information:</p>
+<ul>
+<li><strong>readiness:</strong> when returning<code class="language-plaintext highlighter-rouge">true</code>, it means the transaction WILL be executed correctly and the bundler WILL be paid the offered gas fees (even if the underlying intent of the operation fails).</li>
+<li><strong>dependencies:</strong> a comprehensive list of addresses and storage slots that must be monitored; any state change in these dependencies MUST trigger a re-evaluation of the operation’s readiness.</li>
+</ul>
+<p>The information provided by the endorser helps the mempool operator maintain a pool of “good” meta-transactions that behave correctly; it DOES NOT guarantee that such transactions will be able to be executed correctly. Bundlers must always simulate the result of the execution before including a transaction in a block.</p>
+<h4 id="dependencies">
+<a href="#dependencies" class="anchor-link"></a> Dependencies
+</h4>
+<p>| Field | Type | Description |
+| ——– | ——– | ——– |
+| addr | address | Contract address of the dependencies entry <em>(only one entry per address should be allowed)</em>. |
+| balance | bool | <code class="language-plaintext highlighter-rouge">true</code> if the balance of <code class="language-plaintext highlighter-rouge">addr</code> should be considered a dependency of the <code class="language-plaintext highlighter-rouge">operation</code>. |
+| code | bool | <code class="language-plaintext highlighter-rouge">true</code> if the code of <code class="language-plaintext highlighter-rouge">addr</code> should be considered a dependency of the <code class="language-plaintext highlighter-rouge">operation</code>. |
+| nonce | bool | <code class="language-plaintext highlighter-rouge">true</code> if the nonce of <code class="language-plaintext highlighter-rouge">addr</code> should be considered a dependency of the <code class="language-plaintext highlighter-rouge">operation</code>. |
+| slots | bytes32[] | List of all storage slots of <code class="language-plaintext highlighter-rouge">addr</code> that should be considered dependencies of <code class="language-plaintext highlighter-rouge">operation</code>. |</p>
+<p>The <code class="language-plaintext highlighter-rouge">endorser</code> does not need to include all accessed storage slots on the dependencies list, it only needs to include storage slots that after a change may also result in a change of readiness.</p>
+<blockquote>
+<p>E.g. A wallet may pay fees using funds stored as WETH. During <code class="language-plaintext highlighter-rouge">isValidOperation()</code>, the endorser contract may call the <code class="language-plaintext highlighter-rouge">balanceOf</code> method of the <code class="language-plaintext highlighter-rouge">WETH</code> contract to determine if the wallet has enough <code class="language-plaintext highlighter-rouge">WETH</code> balance. Even though the ETH balance of the WETH contract and the code of the WETH contract are being accessed, the endorser only cares about the user’s WETH balance for this operation and hence does not include these as dependencies.</p>
+</blockquote>
+<h3 id="misbehavior-detection">
+<a href="#misbehavior-detection" class="anchor-link"></a> Misbehavior detection
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">endorser</code> contracts may behave maliciously or erratically in the following ways:</p>
+<ul>
+<li>(1) It may consider an operation <code class="language-plaintext highlighter-rouge">ready</code>, but when the operation is executed it transfers less than the agreed-upon fees to the bundler.</li>
+<li>(2) It may consider an operation <code class="language-plaintext highlighter-rouge">ready</code>, but when the operation is executed the top-level call fails.</li>
+<li>(3) It may change the status from <code class="language-plaintext highlighter-rouge">ready</code> to <code class="language-plaintext highlighter-rouge">not-ready</code> while none of the dependencies register any change.</li>
+</ul>
+<p>The bundler must always discard and re-evaluate the readiness status after a change on any of the dependencies of the <code class="language-plaintext highlighter-rouge">operation</code>, meaning that only operations considered <code class="language-plaintext highlighter-rouge">ready</code> are candidates for constructing the next block.</p>
+<p>If, when simulating the final inclusion of the operation, the bundler discovers that it does not result in correct payment (either because the transaction fails, or transferred amount is below the defined fee), then it should proceed to ban the <code class="language-plaintext highlighter-rouge">endorser</code> for one of the following reasons:</p>
+<p>1) The <code class="language-plaintext highlighter-rouge">endorser</code> returns <code class="language-plaintext highlighter-rouge">isOperationReady == true</code> even though the <code class="language-plaintext highlighter-rouge">operation</code> is not healthy to be included in a block.
+2) The <code class="language-plaintext highlighter-rouge">operation</code> changed readiness status from <code class="language-plaintext highlighter-rouge">true</code> to <code class="language-plaintext highlighter-rouge">false</code> while all dependencies remained unchanged.</p>
+<p>After an <code class="language-plaintext highlighter-rouge">endorser</code> is banned, the mempool operator should drop all <code class="language-plaintext highlighter-rouge">operations</code> related to such endorser.</p>
+<blockquote>
+<p>Notice: The mempool operator could call one last time <code class="language-plaintext highlighter-rouge">isOperationReady</code> to determine if the <code class="language-plaintext highlighter-rouge">endorser</code> should be banned because <code class="language-plaintext highlighter-rouge">(1)</code> or <code class="language-plaintext highlighter-rouge">(2)</code>, but this step is not strictly necessary since both scenarios lead to the <code class="language-plaintext highlighter-rouge">endoser</code> being banned.</p>
+</blockquote>
+<h3 id="client-behavior-upon-receiving-an-operation">
+<a href="#client-behavior-upon-receiving-an-operation" class="anchor-link"></a> Client behavior upon receiving an operation
+</h3>
+<p>When a client receives an <code class="language-plaintext highlighter-rouge">operation</code>, it must first run some basic sanity checks, namely that:</p>
+<ul>
+<li>The <code class="language-plaintext highlighter-rouge">endorserGasLimit</code> is sufficiently low (&lt;= <code class="language-plaintext highlighter-rouge">MAX_ENDORSER_GAS</code>).</li>
+<li>The endorser (i) is registered and has enough burn (&gt;= <code class="language-plaintext highlighter-rouge">MIN_ENDORSER_BURN</code>), and (ii) it has not been internally flagged as banned.</li>
+<li>The <code class="language-plaintext highlighter-rouge">gasLimit</code> is at least the cost of a <code class="language-plaintext highlighter-rouge">CALL</code> with a non-zero value.</li>
+<li>The <code class="language-plaintext highlighter-rouge">maxFeePerGas</code> and <code class="language-plaintext highlighter-rouge">priorityPerGas</code> are above a configurable minimum value the client is willing to accept.</li>
+<li>If another operation exists in the mempool with the exact same dependency set AND the same endorser address, the <code class="language-plaintext highlighter-rouge">maxFeePerGas</code> and <code class="language-plaintext highlighter-rouge">priorityFeePerGas</code> of the newly received operation MUST be 12% higher than the one on the mempool to replace it. (Similar with how EOA with same nonce work)</li>
+</ul>
+<p>If the <code class="language-plaintext highlighter-rouge">operation</code> passes these checks, then the client MUST call <code class="language-plaintext highlighter-rouge">isOperationReady()</code> on the <code class="language-plaintext highlighter-rouge">endorser</code>. If the endorser considers the operation ready, then the client MUST add the operation to the mempool. Otherwise, the operation MUST discarded.</p>
+<p>The <code class="language-plaintext highlighter-rouge">endorser</code> result MUST be invalidated and its readiness be re-evaluated if any of the values of the provided dependencies change. If the operation readiness changes to <code class="language-plaintext highlighter-rouge">false</code>, the operation MUST be discarded.</p>
+<p>Before including the operation in a block, a last simulation MUST be performed, this time without calling the <code class="language-plaintext highlighter-rouge">endorser</code>, but by constructing the block and probing the result. All transactions in the block listed <strong>before</strong> the operation must be simulated and the endorser must be queried again there for readiness in-case some dependencies changed.</p>
+<p>If the operation fails during simulation, the endorser must be banned because (i) it returned a bad readiness state or (ii) it changed the operation readiness independently from the dependencies.</p>
+<p>Additional events that must invalidate the readiness are:</p>
+<ul>
+<li>A transaction or operation modifies the same storage slots (as the dependencies) is queued before the given operation.</li>
+</ul>
+<h4 id="optional-rules">
+
+<a href="#optional-rules" class="anchor-link"></a> Optional rules
+</h4>
+<p>Mempool clients could implement additional rules to further protect against maliciously constructed transactions.</p>
+<ul>
+<li>Limit the size of accepted dependencies to <code class="language-plaintext highlighter-rouge">MAX_OPERATION_DEPENDENCIES</code>, dropping operations that cross the boundary.</li>
+<li>Limit the number of times an operation may trigger a re-evaluation to <code class="language-plaintext highlighter-rouge">MAX_OPERATION_REEVALS</code>, dropping operations that cross the boundary.</li>
+<li>Limit the number of operations in the mempool that depend on the same dependency slots.</li>
+</ul>
+<p>If these rules are widely adopted, wallet developers should keep usage of dependencies to the lowest possible levels.</p>
+<h4 id="evaluation">
+<a href="#evaluation" class="anchor-link"></a> Evaluation
+</h4>
+<p>To evaluate an <code class="language-plaintext highlighter-rouge">operation</code>, the client must call the <code class="language-plaintext highlighter-rouge">isOperationReady</code> method, with a <code class="language-plaintext highlighter-rouge">gasLimit</code> above or equal to <code class="language-plaintext highlighter-rouge">endorserGasLimit</code>.</p>
+<p>If the call fails, or the <code class="language-plaintext highlighter-rouge">endorser</code> returns <code class="language-plaintext highlighter-rouge">ready == false</code>, then the operation must be dropped from the mempool.</p>
+<p>If the call succeeds and returns <code class="language-plaintext highlighter-rouge">ready == true</code>, then the operation can be kept in the mempool and used when constructing the next block. The client must keep track of all fields returned as <code class="language-plaintext highlighter-rouge">dependencies</code>. If any of these register a change, then readiness should be reevaluated.</p>
+<h4 id="after-operation-inclusion">
+<a href="#after-operation-inclusion" class="anchor-link"></a> After operation inclusion
+</h4>
+<p>There is no limit in-place that defines that an operation can only be executed once.</p>
+<p>The bundler MUST NOT drop an <code class="language-plaintext highlighter-rouge">operation</code> after successfully including such operation in a block, the <code class="language-plaintext highlighter-rouge">operation</code> must remain in the mempool and a last <code class="language-plaintext highlighter-rouge">isOperationReady</code> call must be performed.</p>
+<p>If the <code class="language-plaintext highlighter-rouge">endorser</code> still returns <code class="language-plaintext highlighter-rouge">readiness == true</code> (after inclusion) then the operation SHOULD be treated as any other healthy operation, and thus it COULD be kept in the mempool.</p>
+<h3 id="endorser-registry">
+<a href="#endorser-registry" class="anchor-link"></a> Endorser registry
+</h3>
+<p>The endorser registry serves as a place to register the burn of each endorser, anyone can increase the burn of any endorser by calling the <code class="language-plaintext highlighter-rouge">addBurn</code> function.</p>
+<p>All burn is effectively locked forever; slashing can’t be reliably proved on-chain without protocol alterations, so it remains a virtual event on which mempool operators will ignore the deposited ETH.</p>
+<h4 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h4>
+<p>(EXAMPLE)</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: UNLICENSED
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">15</span><span class="p">;</span>
+
+
+<span class="k">contract</span> <span class="n">EndorserRegistry</span> <span class="p">{</span>
+  <span class="k">event</span> <span class="n">Burned</span><span class="p">(</span>
+      <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_endorser</span><span class="p">,</span>
+      <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_sender</span><span class="p">,</span>
+      <span class="kt">uint256</span> <span class="n">_new</span><span class="p">,</span>
+      <span class="kt">uint256</span> <span class="n">_total</span>
+  <span class="p">);</span>
+
+  <span class="k">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">uint256</span><span class="p">)</span> <span class="k">public</span> <span class="n">burn</span><span class="p">;</span>
+
+  <span class="k">function</span> <span class="n">addBurn</span><span class="p">(</span><span class="kt">address</span> <span class="n">_endorser</span><span class="p">)</span> <span class="k">external</span> <span class="k">payable</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">uint256</span> <span class="n">total</span> <span class="o">=</span> <span class="n">burn</span><span class="p">[</span><span class="n">_endorser</span><span class="p">]</span> <span class="o">+</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">;</span>
+    <span class="n">burn</span><span class="p">[</span><span class="n">_endorser</span><span class="p">]</span> <span class="o">=</span> <span class="n">total</span><span class="p">;</span>
+
+    <span class="k">emit</span> <span class="n">Burned</span><span class="p">(</span><span class="n">_endorser</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">value</span><span class="p">,</span> <span class="n">total</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">total</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The main challenge with a purely smart contract wallet-based account abstraction system is DoS safety: how can a bundler that includes an operation make sure that it will pay fees without executing the entire operation?</p>
+<p>Bundlers could execute the entire operation to determine if it is healthy or not, but this operation may be expensive and complex for the following reasons:</p>
+<ul>
+<li>The bundler does not have a way to simulate the transaction with a reduced amount of gas; it has to use the whole <code class="language-plaintext highlighter-rouge">gasLimit</code>, exposing itself to a higher level of griefing.</li>
+<li>The bundler does not have a way to know if a change to the state will affect the operation or not, and thus it has to re-evaluate the operation after every single change.</li>
+<li>The bundler does not have a way to know if a change to the state will invalidate a large portion of the mempool.</li>
+</ul>
+<p>In this proposal, we add the <code class="language-plaintext highlighter-rouge">endorser</code> as a tool for the bundlers to validate arbitrary operations in a controlled manner, without the bundler having to know any of the inner workings of such operation.</p>
+<p>In effect, we move the responsibility from the wallet to the wallet developer; the developer must code, deploy and burn ETH for the <code class="language-plaintext highlighter-rouge">endorser</code>; this is a nearly ideal scenario because developers know how their wallet operations work, and thus they can build tools to evaluate these operations efficiently.</p>
+<p>Additionally, the specification is kept as simple as possible as enforcing a highly structured behavior and schema for smart contract wallet transactions may stagnate the adoption of more innovative types of wallets and the adoption of a shared standard among them.</p>
+<h4 id="differences-with-alternative-proposals">
+<a href="#differences-with-alternative-proposals" class="anchor-link"></a> Differences with alternative proposals
+</h4>
+<p>1) This proposal does not require monitoring for forbidden opcodes or storage access boundaries. Wallets have complete freedom to use any EVM capabilities during validation and execution.
+2) This proposal does not specify any replay protection logic since all existing smart contract wallets already have their own, and designs can vary among them. Nonces can be communicated to the bundler using a <code class="language-plaintext highlighter-rouge">dependency</code>.
+3) This proposal does not specify a pre-deployment logic because it can be handled directly by the entrypoint.
+4) This proposal does not require wallets to accept <code class="language-plaintext highlighter-rouge">execution</code> transactions from a trusted entrypoint contract, reducing overhead and allowing existing wallets to be compatible with the proposal.
+5) This proposal does not distinguish between <code class="language-plaintext highlighter-rouge">execution</code> and <code class="language-plaintext highlighter-rouge">signature</code> payloads, this distinction remains implementation-specific.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP does not change he consensus layer, nor does impose changes on existing smart contract wallets, so there are no backwards compatibility issues.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/agusx1211">Agustín Aguilar</a>, <a href="https://github.com/phabc">Philippe Castonguay</a>, "EIP-5189: Account Abstraction via Endorsed Operations [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5189, June 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5189.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5189: Account Abstraction via Endorsed Operations [DRAFT]",
+    "author": "Agustín Aguilar (@agusx1211), Philippe Castonguay (@phabc)",
+    "name": "EIP-5189: Account Abstraction via Endorsed Operations [DRAFT]",
+    "dateCreated": "2022-06-29",
+    "datePublished": "2022-06-29",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-account-abstraction-via-endorsed-operations/9799",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

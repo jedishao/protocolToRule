@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3520: Transaction Destination Opcode</title>
+<meta property="og:title" content="EIP-3520: Transaction Destination Opcode" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3520" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3520" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3520: Transaction Destination Opcode
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3520.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/alex-ppg">Alex Papageorgiou</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3520-transaction-destination-opcode/6058">https://ethereum-magicians.org/t/eip-3520-transaction-destination-opcode/6058</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+<tr><th>Created</th><td>2021-04-16</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-3508">3508</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#entrypoint-0x4a">ENTRYPOINT (0x4a)</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#authcall-0xf7-interaction">AUTHCALL (0xf7) Interaction</a></li>
+<li><a href="#naming-conventions">Naming Conventions</a></li>
+<li><a href="#instruction-address-space">Instruction Address Space</a></li>
+<li><a href="#gas-cost">Gas Cost</a></li>
+<li><a href="#dependency-on-eip-3508">Dependency on EIP-3508</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#introspective-contracts">Introspective Contracts</a></li>
+<li><a href="#caller-discrimination">Caller Discrimination</a></li>
+<li><a href="#contract-creation-behaviour">Contract Creation Behaviour</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Provide access to the original recipient of a transaction.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP introduces the following EVM instruction: <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code>.</p>
+<p>This instruction is meant to provide access to the original recipient of the transaction, the <code class="language-plaintext highlighter-rouge">to</code> address, enabling new ways of introspection to be applied in conjunction with <a href="/EIPS/eip-3508">EIP-3508</a>.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>It is undeniable that smart contracts are becoming more interconnected than ever. Up until this point, smart contracts have entirely relied on compliant interfaces and introspection to introduce a new step in the call chain of a complex multi-contract interaction. However, this presents a forwards-only approach which limits the types of interactions that can manifest.</p>
+<p>The purpose of this EIP is to provide a way via which a contract is able to identify the entry-point of a transaction on the blockchain and deduce what was the original intention of the transaction by applying introspection on the original transaction data itself.</p>
+<p>This EIP enables the development of new types of smart contracts as it can open new pathways for <a href="./eip-721">EIP-721</a> NFTs and <a href="./eip-20">EIP-20</a> tokens to detect which action their transaction is part of, such as detecting a liquidity provision to a decentralized exchange or a loan within a collateralized lending protocol.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="entrypoint-0x4a">
+<a href="#entrypoint-0x4a" class="anchor-link"></a> ENTRYPOINT (<code class="language-plaintext highlighter-rouge">0x4a</code>)
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> instruction uses 0 stack arguments and pushes the original <code class="language-plaintext highlighter-rouge">to</code> member of the transaction onto the stack. The address yielded by the instruction is a 160-bit value padded to 256-bits. The operation costs <code class="language-plaintext highlighter-rouge">G_base</code> to execute, similarly to <code class="language-plaintext highlighter-rouge">ORIGIN</code> (<code class="language-plaintext highlighter-rouge">0x32</code>).</p>
+<p>The address returned by the <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> opcode will be equivalent to the <code class="language-plaintext highlighter-rouge">to</code> address parameter specified in the nearest <code class="language-plaintext highlighter-rouge">AUTHCALL</code> up the stack. If there is no <code class="language-plaintext highlighter-rouge">AUTHCALL</code> in the stack then <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> will retrieve the original transaction’s <code class="language-plaintext highlighter-rouge">to</code> field.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="authcall-0xf7-interaction">
+<a href="#authcall-0xf7-interaction" class="anchor-link"></a> AUTHCALL (<code class="language-plaintext highlighter-rouge">0xf7</code>) Interaction
+</h3>
+<p>The <a href="/EIPS/eip-3074">EIP-3074</a> introduced a new call instruction called <code class="language-plaintext highlighter-rouge">AUTHCALL</code> (<code class="language-plaintext highlighter-rouge">0xf7</code>) that will replace a transaction’s <code class="language-plaintext highlighter-rouge">ORIGIN</code> (<code class="language-plaintext highlighter-rouge">0x32</code>) with the context variable <code class="language-plaintext highlighter-rouge">authorized</code>. The intention of <code class="language-plaintext highlighter-rouge">AUTHCALL</code> is to prevent discrimination between smart contracts and EOAs which <code class="language-plaintext highlighter-rouge">ORIGIN</code> initially facilitated. The <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> opcode by itself re-introduces discrimination into the system as it indirectly allows one to evaluate whether the smart contract code being executed is done so by an EOA by validating that <code class="language-plaintext highlighter-rouge">ENTRYPOINT == ADDRESS</code> where <code class="language-plaintext highlighter-rouge">ADDRESS</code> (<code class="language-plaintext highlighter-rouge">0x30</code>) retrieves the currently executing account address. Therefore, it is sensible also replace the values retrieved by the <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> opcode to the target of an <code class="language-plaintext highlighter-rouge">AUTHCALL</code>.</p>
+<p>This interaction ensures full compatibility with <a href="/EIPS/eip-3074">EIP-3074</a> and ensures that no form of discrimination is introduced back into the system by this EIP.</p>
+<h3 id="naming-conventions">
+<a href="#naming-conventions" class="anchor-link"></a> Naming Conventions
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> instruction came to be by defining a sensible name that immediately and clearly depicts what it is meant to achieve by signaling the first interaction of a particular call, i.e. the entry-point.</p>
+<h3 id="instruction-address-space">
+<a href="#instruction-address-space" class="anchor-link"></a> Instruction Address Space
+</h3>
+<p>Equivalent to <a href="./eip-3508">EIP-3508</a>.</p>
+<h3 id="gas-cost">
+<a href="#gas-cost" class="anchor-link"></a> Gas Cost
+</h3>
+<p>The opcode ENTRYPOINT (<code class="language-plaintext highlighter-rouge">0x4a</code>) essentially performs the same thing as the opcode ORIGIN (<code class="language-plaintext highlighter-rouge">0x32</code>) and thus shares the exact same gas cost.</p>
+<h3 id="dependency-on-eip-3508">
+<a href="#dependency-on-eip-3508" class="anchor-link"></a> Dependency on EIP-3508
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> (<code class="language-plaintext highlighter-rouge">0x4a</code>) instruction alone has no perceivable benefit as it can be replaced by the <code class="language-plaintext highlighter-rouge">AUTHCALL</code> (<code class="language-plaintext highlighter-rouge">0xf7</code>) instruction and as such should solely be introduced to the system in conjunction with the <code class="language-plaintext highlighter-rouge">ORIGINDATA*</code> opcodes defined in <a href="/EIPS/eip-3508">EIP-3508</a>.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>The EIP does not alter or adjust existing functionality provided by the EVM and as such, no known issues exist.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>TODO.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="introspective-contracts">
+<a href="#introspective-contracts" class="anchor-link"></a> Introspective Contracts
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> instruction allows the association of the <code class="language-plaintext highlighter-rouge">ORIGINDATALOAD</code> and <code class="language-plaintext highlighter-rouge">ORIGINDATACOPY</code> values with a particular smart contract address and interface, enabling introspection to be applied based on the function signature invoked and the arguments provided to reliably deduce the call-path via which a particular smart contract was invoked and allowing a more granular level of interaction to be defined in such special cases.</p>
+<p>However, this type of introspection should solely be applied on pre-approved contracts rather than user-defined ones as the value stemming from this type of introspection entirely relies on a contract’s code immutability and proper function, both of which a user supplied contract can easily bypass.</p>
+<h3 id="caller-discrimination">
+<a href="#caller-discrimination" class="anchor-link"></a> Caller Discrimination
+</h3>
+<p>The instructions of this EIP should not be utilized as a way to discriminate between EOA callers and smart contracts, as this type of differentiation can be broken by an <code class="language-plaintext highlighter-rouge">AUTHCALL</code> as defined in the specification chapter.</p>
+<h3 id="contract-creation-behaviour">
+<a href="#contract-creation-behaviour" class="anchor-link"></a> Contract Creation Behaviour
+</h3>
+<p>The behaviour of the <code class="language-plaintext highlighter-rouge">ENTRYPOINT</code> opcode during a contract creation will result in the opcode yielding the zero-address as the first address interacted with in the transaction. This should be taken into account by contract implementations in a similar fashion to how <code class="language-plaintext highlighter-rouge">ecrecover</code> invalid signatures are handled to prevent software misbehaviours from arising.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/alex-ppg">Alex Papageorgiou</a>, "EIP-3520: Transaction Destination Opcode [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3520, April 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3520.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3520: Transaction Destination Opcode [DRAFT]",
+    "author": "Alex Papageorgiou (@alex-ppg)",
+    "name": "EIP-3520: Transaction Destination Opcode [DRAFT]",
+    "dateCreated": "2021-04-16",
+    "datePublished": "2021-04-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3520-transaction-destination-opcode/6058",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

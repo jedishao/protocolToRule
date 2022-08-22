@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4444: Bound Historical Data in Execution Clients</title>
+<meta property="og:title" content="EIP-4444: Bound Historical Data in Execution Clients" />
+<meta name="description" content="Prune historical data in clients older than one year" />
+<meta property="og:description" content="Prune historical data in clients older than one year" />
+<meta name="twitter:description" content="Prune historical data in clients older than one year" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4444" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4444" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4444: Bound Historical Data in Execution Clients
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4444.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Prune historical data in clients older than one year</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/asn-d6">George Kadianakis</a>, <a href="https://github.com/lightclient">lightclient</a>, <a href="https://github.com/ralexstokes">Alex Stokes</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4444-bound-historical-data-in-execution-clients/7450">https://ethereum-magicians.org/t/eip-4444-bound-historical-data-in-execution-clients/7450</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Networking</td></tr>
+<tr><th>Created</th><td>2021-11-02</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#why-a-year">Why a year?</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a>
+<ul>
+<li><a href="#preserving-historical-data">Preserving historical data</a></li>
+<li><a href="#full-syncing-from-genesis">Full syncing from genesis</a></li>
+<li><a href="#user-experience">User experience</a></li>
+<li><a href="#json-rpc-changes">JSON-RPC changes</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#relying-on-weak-subjectivity">Relying on weak subjectivity</a></li>
+<li><a href="#centralizationcensorship-risk">Centralization/censorship risk</a></li>
+<li><a href="#confusion-with-other-proposals">Confusion with other proposals</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Clients must stop serving historical headers, bodies, and receipts older than one year on the p2p layer. Clients may locally prune this historical data.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Historical blocks and receipts currently occupy more than 400GB of disk space (and growing!). Therefore, to validate the chain, users must typically have a 1TB disk.</p>
+<p>Historical data is not necessary for validating new blocks, so once a client has synced the tip of the chain, historical data is only retrieved when requested explicitly over the JSON-RPC or when a peer attempts to sync the chain. By pruning the history, this proposal reduces the disk requirements for users. Pruning history also allows clients to remove code that processes historical blocks. This means that execution clients don’t need to maintain code paths that deal with each upgrade’s compounding changes.</p>
+<p>Finally, this change will result in less bandwidth usage on the network as clients adopt more lightweight sync strategies based on the PoS weak subjectivity assumption.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">HISTORY_PRUNE_EPOCHS</code></td>
+<td>82125</td>
+<td>A year in beacon chain epochs</td>
+</tr>
+</tbody>
+</table>
+<p>Clients SHOULD NOT serve headers, block bodies, and receipts that are older than <code class="language-plaintext highlighter-rouge">HISTORY_PRUNE_EPOCHS</code> epochs on the p2p network.</p>
+<p>Clients MAY locally prune headers, block bodies, and receipts that is older than <code class="language-plaintext highlighter-rouge">HISTORY_PRUNE_EPOCHS</code> epochs.</p>
+<h4 id="bootstrapping-and-syncing">
+<a href="#bootstrapping-and-syncing" class="anchor-link"></a> Bootstrapping and syncing
+</h4>
+<p>This EIP impacts the way clients bootstrap and sync. Clients will not be able to full sync using devp2p since historical data will no longer be served.</p>
+<p>Clients MUST use a valid Weak Subjectivity Checkpoint to bootstrap from a more recent view of the chain. For the purpose of syncing, clients treat weak subjectivity checkpoints as the genesis block. We call this method “checkpoint sync”.</p>
+<p>For the purposes of this proposal, we assume clients always start with a configured and valid weak subjectivity checkpoint. The way this is achieved is out-of-scope for this proposal.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This proposal forces clients to stop serving old historical data over p2p. We make this explicit to force clients to seek historical data from other sources, instead of relying on the optional behavior of some clients which would result in quality degradation.</p>
+<h3 id="why-a-year">
+<a href="#why-a-year" class="anchor-link"></a> Why a year?
+</h3>
+<p>This proposal sets <code class="language-plaintext highlighter-rouge">HISTORY_PRUNE_EPOCHS</code> to 82125 epochs (one earth year). This constant is large enough to provide sufficient room for the Weak Subjectivity Period to grow, and it’s also small enough so as to not occupy too much disk space.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<h3 id="preserving-historical-data">
+<a href="#preserving-historical-data" class="anchor-link"></a> Preserving historical data
+</h3>
+<p>This proposal impacts nodes that make use of historical data (e.g. web3 applications that display history of blocks, transactions or accounts). Preserving the history of Ethereum is fundamental and we believe there are various out-of-band ways to achieve this.</p>
+<p>Historical data can be packaged and shared via torrent magnet links or over networks like IPFS. Furthermore, systems like the Portal Network or The Graph can be used to acquire historical data.</p>
+<p>Clients should allow importing and exporting of historical data. Clients can provide scripts that fetch/verify data and automatically import them.</p>
+<h3 id="full-syncing-from-genesis">
+<a href="#full-syncing-from-genesis" class="anchor-link"></a> Full syncing from genesis
+</h3>
+<p>Full syncing will no longer be possible over the p2p network. However, we do want to allow interested parties to do so on their own.</p>
+<p>We suggest that a specialized “full sync” client is built. The client is a shim that pieces together different releases of execution engines and can import historical blocks to validate the entire Ethereum chain from genesis and generate all other historical data.</p>
+<p>It’s important to also note that although archive nodes with “state sync” functionality are in development, full sync is currently the only reliable way to bootstrap them. Clients that wish to continue providing archive support would need the ability to import historical blocks retrieved out-of-band and retain support for each historical upgrade of the network.</p>
+<h3 id="user-experience">
+<a href="#user-experience" class="anchor-link"></a> User experience
+</h3>
+<p>This proposal impacts the UX for setting up applications that use historical data. Hence we suggest that clients introduce this change in two phases:</p>
+<p>In the first phase, clients don’t prune historical data by default. They introduce a command line option similar to geth’s <code class="language-plaintext highlighter-rouge">--txlookuplimit</code> that users can use if they want to prune historical data.</p>
+<p>In the second phase, history is pruned by default and the command line option is removed. Clients assume that users will find and import data in an out-of-band way.</p>
+<h3 id="json-rpc-changes">
+
+<a href="#json-rpc-changes" class="anchor-link"></a> JSON-RPC changes
+</h3>
+<p>After this proposal is implemented, certain JSON-RPC endpoints (e.g. like <code class="language-plaintext highlighter-rouge">getBlockByHash</code>) won’t be able to tell whether a given hash is invalid or just too old. Other endpoints like <code class="language-plaintext highlighter-rouge">getLogs</code> will simply no longer have the data the user is requesting. The way this regression should be handled by applications or clients is out-of-scope for this proposal.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="relying-on-weak-subjectivity">
+<a href="#relying-on-weak-subjectivity" class="anchor-link"></a> Relying on weak subjectivity
+</h3>
+<p>With the move to PoS, it’s essential for security to use valid weak subjectivity checkpoints because of long-range attacks.</p>
+<p>This proposal relies on the weak subjectivity assumption and assumes that clients will not bootstrap with an invalid or old WS checkpoint.</p>
+<p>This proposal also assumes that the weak subjectivity period will never be longer than <code class="language-plaintext highlighter-rouge">HISTORY_PRUNE_EPOCHS</code>. If that were to happen, clients with an old weak subjectivity checkpoint would never be able to “checkpoint sync” since the p2p network would not be able to provide the required data.</p>
+<h3 id="centralizationcensorship-risk">
+<a href="#centralizationcensorship-risk" class="anchor-link"></a> Centralization/censorship risk
+</h3>
+<p>There are censorship/availability risks if there is a lack of incentives to keep historical data.</p>
+<p>It’s important that Ethereum historical data are preserved and seeded by independent organizations, and their availability should be checked frequently. We consider these mechanisms as out-of-scope for this proposal.</p>
+<p>Furthermore, there is a risk that more dapps will rely on centralized services for acquiring historical data because it will be harder to setup a full node.</p>
+<h3 id="confusion-with-other-proposals">
+<a href="#confusion-with-other-proposals" class="anchor-link"></a> Confusion with other proposals
+</h3>
+<p>Because there are a number of alternative proposals for reducing the execution client’s footprint on disk, we’ve decided to enforce a specific pronouncination of the EIP. When pronouncing the EIP number, it <strong>MUST</strong> be pronounced EIP “four fours”. All other pronounciations are incorrect.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/asn-d6">George Kadianakis</a>, <a href="https://github.com/lightclient">lightclient</a>, <a href="https://github.com/ralexstokes">Alex Stokes</a>, "EIP-4444: Bound Historical Data in Execution Clients [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4444, November 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4444.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4444: Bound Historical Data in Execution Clients [DRAFT]",
+    "author": "George Kadianakis (@asn-d6), lightclient (@lightclient), Alex Stokes (@ralexstokes)",
+    "name": "EIP-4444: Bound Historical Data in Execution Clients [DRAFT]",
+    "dateCreated": "2021-11-02",
+    "datePublished": "2021-11-02",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4444-bound-historical-data-in-execution-clients/7450",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

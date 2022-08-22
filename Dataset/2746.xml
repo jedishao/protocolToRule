@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2746: Rules Engine Standard</title>
+<meta property="og:title" content="EIP-2746: Rules Engine Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2746" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2746" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2746: Rules Engine Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2746.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/jaerith">Aaron Kendall</a>, <a href="https://github.com/juanfranblanco">Juan Blanco</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2746-rules-engine-interface/4435">https://ethereum-magicians.org/t/eip-2746-rules-engine-interface/4435</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-06-20</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#considerations">Considerations</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#attributes">Attributes</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#right-hand-value">Right-Hand Value</a></li>
+</ul>
+</li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>An interface for using a smart contract as a rules engine. A single deployed contract can register a data domain, create sets of rules that perform actions on that domain, and then invoke a set as an atomic transaction.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard proposes an interface that will allow the creation of hierarchal sets of rules (i.e., RuleTrees) that can be invoked to evaluate and manipulate a registered data domain. At the time of this draft, all intentions to insert additional functionality onto the blockchain requires the coding and creation of a newly deployed contract. However, this standard will allow users to deploy a contract just once, one which will then allow them to create (and invoke) pipelines of commands within that contract.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>At the time of this draft, all development for Ethereum requires writing the code that forms smart contracts and then deploying those contracts to Ethereum. In order to create a proper contract, many considerations must be taken into account when designing and implementing the code, especially in terms of efficiency (i.e., gas cost) and security. Even the simplest contracts require a certain amount of vigilance and examination, before and after deployment. These requirements pertain to all cases, even for simple cases of examining a value and/or altering it.</p>
+<p>These technical challenges might form an obstacle for many others who might wish to create software around Ethereum. Less technical companies and users might also want to configure and deploy simple functionality onto the chain, without knowing the relevant languages or details necessary. By having the data domain and the predefined actions (i.e., types of rules) implemented along with this interface, a deployed instance of such a rules engine contract can provide efficient and safe functionality to no-code or little-code clients, allowing more users of various technical proficiency to interact with the Ethereum ecosystem.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>For the clarification of terminology, an Attribute is a registered data point within the data domain, representing data that exists either in the rules engine contract or elsewhere. A Rule is an predefined action that occurs upon a single data point (i.e., Attribute) in the predefined data domain. For example, a Rule could check whether the Attribute ‘TokenAmt’ has a value less than the RHL (i.e., right-hand value) of 10. A RuleSet is a collection of Rules, where their collection invocation creates a boolean result that determines the navigational flow of execution between RuleSets. A RuleTree is a collection of RuleSets that are organized within a hierarchy, where RuleSets can contain other RuleSets.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.6</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/**
+    @title ERC-2746 Rules Engine Standard
+    @dev See https://eips.ethereum.org/EIPS/eip-2746
+ */</span>
+ <span class="k">interface</span> <span class="n">ERCRulesEngine</span> <span class="p">{</span>
+
+    <span class="cm">/**
+        @dev Should emit when a RuleTree is invoked.
+        The `ruler` is the ID and owner of the RuleTree being invoked.  It is also likely msg.sender.
+    */</span>
+    <span class="k">event</span> <span class="n">CallRuleTree</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">ruler</span>
+    <span class="p">);</span>
+
+    <span class="cm">/**
+        @dev Should emit when a RuleSet is invoked.
+        The `ruler` is the ID and owner of the RuleTree in which the RuleSet is stored.  It is also likely msg.sender.
+        The 'ruleSetId' is the ID of the RuleSet being invoked.
+    */</span>
+    <span class="k">event</span> <span class="n">CallRuleSet</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">ruler</span><span class="p">,</span>
+        <span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">tmpRuleSetId</span>
+    <span class="p">);</span>
+
+    <span class="cm">/**
+        @dev Should emit when a Rule is invoked.
+        The `ruler` is the ID and owner of the RuleTree in which the RuleSet is stored.  It is also likely msg.sender.
+        The 'ruleSetId' is the ID of the RuleSet being invoked.
+        The 'ruleId' is the ID of the Rule being invoked.
+        The 'ruleType' is the type of the rule being invoked.        
+    */</span>
+    <span class="k">event</span> <span class="n">CallRule</span><span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">ruler</span><span class="p">,</span>
+        <span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">ruleSetId</span><span class="p">,</span>
+        <span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">ruleId</span><span class="p">,</span>
+        <span class="kt">uint</span> <span class="n">ruleType</span>
+    <span class="p">);</span>
+
+    <span class="cm">/**
+        @dev Should emit when a RuleSet fails.
+        The `ruler` is the ID and owner of the RuleTree in which the RuleSet is stored.  It is also likely msg.sender.
+        The 'ruleSetId' is the ID of the RuleSet being invoked.
+        The 'severeFailure' is the indicator of whether or not the RuleSet is a leaf with a 'severe' error flag.
+    */</span>
+    <span class="k">event</span> <span class="n">RuleSetError</span> <span class="p">(</span>
+        <span class="kt">address</span> <span class="k">indexed</span> <span class="n">ruler</span><span class="p">,</span>
+        <span class="kt">bytes32</span> <span class="k">indexed</span> <span class="n">ruleSetId</span><span class="p">,</span>
+        <span class="kt">bool</span> <span class="n">severeFailure</span>
+    <span class="p">);</span>	
+
+    <span class="cm">/**
+        @notice Adds a new Attribute to the data domain.
+        @dev Caller should be the deployer/owner of the rules engine contract.  An Attribute value can be an optional alternative if it's not a string or numeric.
+        @param _attrName    Name/ID of the Attribute
+        @param _maxLen      Maximum length of the Attribute (if it is a string)
+        @param _maxNumVal   Maximum numeric value of the Attribute (if it is numeric)
+        @param _defaultVal  The default value for the Attribute (if one is not found from the source)
+        @param _isString    Indicator of whether or not the Attribute is a string
+        @param _isNumeric   Indicator of whether or not the Attribute is numeric
+    */</span>    
+    <span class="k">function</span> <span class="n">addAttribute</span><span class="p">(</span><span class="kt">bytes32</span> <span class="n">_attrName</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_maxLen</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_maxNumVal</span><span class="p">,</span> <span class="kt">string</span> <span class="k">calldata</span> <span class="n">_defaultVal</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_isString</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_isNumeric</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="cm">/**
+        @notice Adds a new RuleTree.
+        @param _owner          Owner/ID of the RuleTree
+        @param _ruleTreeName   Name of the RuleTree
+        @param _desc           Verbose description of the RuleTree's purpose
+    */</span>
+    <span class="k">function</span> <span class="n">addRuleTree</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_ruleTreeName</span><span class="p">,</span> <span class="kt">string</span> <span class="k">calldata</span> <span class="n">_desc</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="cm">/**
+        @notice Adds a new RuleSet onto the hierarchy of a RuleTree.
+        @dev RuleSets can have child RuleSets, but they will only be called if the parent's Rules execute to create boolean 'true'.
+        @param _owner           Owner/ID of the RuleTree
+        @param _ruleSetName     ID/Name of the RuleSet
+        @param _desc            Verbose description of the RuleSet
+        @param _parentRSName    ID/Name of the parent RuleSet, to which this will be added as a child
+        @param _severalFailFlag Indicator of whether or not the RuleSet's execution (as failure) will result in a failure of the RuleTree.  (This flag only applies to leaves in the RuleTree.)
+        @param _useAndOp        Indicator of whether or not the rules in the RuleSet will execute with 'AND' between them.  (Otherwise, it will be 'OR'.)
+        @param _failQuickFlag   Indicator of whether or not the RuleSet's execution (as failure) should immediately stop the RuleTree.
+    */</span>    
+    <span class="k">function</span> <span class="n">addRuleSet</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_ruleSetName</span><span class="p">,</span> <span class="kt">string</span> <span class="k">calldata</span> <span class="n">_desc</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_parentRSName</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_severalFailFlag</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_useAndOp</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_failQuickFlag</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="cm">/**
+        @notice Adds a new Rule into a RuleSet.
+        @dev Rule types can be implemented as any type of action (greater than, less than, etc.)
+        @param _owner           Owner/ID of the RuleTree
+        @param _ruleSetName     ID/Name of the RuleSet to which the Rule will be added
+        @param _ruleName        ID/Name of the Rule being added
+        @param _attrName        ID/Name of the Attribute upon which the Rule is invoked
+        @param _ruleType        ID of the type of Rule
+        @param _rightHandValue  The registered value to be used by the Rule when performing its action upon the Attribute
+        @param _notFlag         Indicator of whether or not the NOT operator should be performed on this Rule.
+    */</span>    
+    <span class="k">function</span> <span class="n">addRule</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_ruleSetName</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_ruleName</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_attrName</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_ruleType</span><span class="p">,</span> <span class="kt">string</span> <span class="k">calldata</span> <span class="n">_rightHandValue</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_notFlag</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="cm">/**
+        @notice Executes a RuleTree.
+        @param _owner           Owner/ID of the RuleTree
+    */</span>
+    <span class="k">function</span> <span class="n">executeRuleTree</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+    
+    <span class="cm">/**
+        @notice Retrieves the properties of a Rule.
+        @param _owner           Owner/ID of the RuleTree
+        @param _ruleSetName     ID/Name of the RuleSet where the Rule resides
+        @param _ruleIdx         Index of the rule in the RuleSet's listing 
+        @return bytes32         ID/Name of Rule
+        @return uint            Type of Rule
+        @return bytes32         Target Attribute of Rule
+        @return string          Value mentioned in Rule
+        @return bool            Flag for NOT operator in Rule
+        @return bytes32[]       Values that should be provided in delegated call (if Rule is custom operator)
+    */</span>
+    <span class="k">function</span> <span class="n">getRuleProps</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_ruleSetName</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">_ruleIdx</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">,</span> <span class="kt">uint</span><span class="p">,</span> <span class="kt">bytes32</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span><span class="p">,</span> <span class="kt">bool</span><span class="p">,</span> <span class="kt">bytes32</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="cm">/**
+        @notice Retrieves the properties of a RuleSet
+        @param _owner        Owner/ID of the RuleTree
+        @param _ruleSetName  ID/Name of the RuleSet
+        @return string       Verbose description of the RuleSet
+        @return bool         Flag that indicates whether this RuleSet's failure (if a leaf) will cause the RuleTree to fail
+        @return bool         Flag that indicates whether this RuleSet uses the AND operator when executing rules collectively
+        @return uint         Indicates the number of rules hosted by this RuleSet
+        @return bytes32[]    The list of RuleSets that are children of this RuleSet
+    */</span>
+    <span class="k">function</span> <span class="n">getRuleSetProps</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">_ruleSetName</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">string</span> <span class="k">memory</span><span class="p">,</span> <span class="kt">bool</span><span class="p">,</span> <span class="kt">bool</span><span class="p">,</span> <span class="kt">uint</span><span class="p">,</span> <span class="kt">uint</span><span class="p">,</span> <span class="kt">bytes32</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="cm">/**
+        @notice Retrieves the properties of a RuleSet
+        @param _owner        Owner/ID of the RuleTree
+        @return bytes32      Name of the RuleTree
+        @return string       Verbose description of the RuleTree
+        @return bytes32      ID/Name of the RuleSet that serves as the root node for the RuleTree
+    */</span>
+    <span class="k">function</span> <span class="n">getRuleTreeProps</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span><span class="p">,</span> <span class="kt">bytes32</span><span class="p">);</span>
+    
+    <span class="cm">/**
+        @notice Removes a RuleTree.
+        @param _owner           Owner/ID of the RuleTree
+    */</span>
+    <span class="k">function</span> <span class="n">removeRuleTree</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>    
+<span class="p">}</span>
+</code></pre></div></div>
+<h3 id="considerations">
+<a href="#considerations" class="anchor-link"></a> Considerations
+</h3>
+<p>An argument could be made for interface functions that allow a RuleTree’s owner to include others users as executors of the RuleTree.</p>
+<p>Another argument could be made for interface functions that allow an administrator to configure the origin point of an Attribute, such as whether the Attribute’s value comes from a data structure (internal to the rules engine contract) or from calling a contract method (like an implementation of the <a href="https://github.com/ethereum/EIPs/issues/2535">Diamond Standard</a>).</p>
+<p>Yet another argument could be made for interface functions that allow an administrator to extend the functionality catalog provided by the rules engine, by allowing other contracts’ methods to be added as a rule operation.</p>
+<p>Also, an argument could be made for functions that calculate and report the range of potential cost for invoking a RuleTree. Unlike the normal execution of a contract method, the Ethereum transaction costs of invoking a RuleTree are more dynamic, depending on its depth/breadth and the navigational flow during invocation. Since the general cost of a RuleTree is unknown until the time of invocation, these functions could report the minimal amount of gas for a transaction (i.e., none of the Rules in a RuleTree are invoked) and the maximum amount for a transaction (i.e., all Rules in a RuleTree are invoked).</p>
+<h3 id="example">
+<a href="#example" class="anchor-link"></a> Example
+</h3>
+<p>A company wishes to deploy a contract with data points and functionality that are predefined and/or under the control of an administrator, and it aims to build a no-code client that will allow less-technical users to define actions within the rules engine contract. In this example, the company wants one of its users to write the rules in a proprietary markup language, in order for the calculation of a VAT to be determined. For the sake of transparency, <a href="https://ipfs.infura.io/ipfs/QmPrZ9959c7SzzqdLkVgX28xM7ZrqLeT3ydvRAHCaL1Hsn">these rules</a> are published onto IPFS, so that they are accessible to auditors and possibly government officials. The no-code client will then know how to parse the rules from the markup and communicate with the rules engine contract, establishing the RuleTree to be invoked later by the company’s user(s) or off-chain programs.</p>
+<p>In order to calculate the value of the VAT, these provided rules invoke simple mathematical operations that can perform the calculation. However, the implementation of the rules engine contract could possess other functionality called by rules, ones that could execute more complicated logic or call the methods of other contracts.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="attributes">
+<a href="#attributes" class="anchor-link"></a> Attributes
+</h3>
+<p>The data points are abstracted in order to let the implementation provide the mechanism for retrieving/populating the data. Data can be held by an internal data structure, another contract’s method, or any number of other options.</p>
+<h3 id="events">
+<a href="#events" class="anchor-link"></a> Events
+</h3>
+<p>The events specified will help the caller of the RuleTree after execution, so that they may ascertain the navigational flow of RuleSet execution within the RuleTree and so that they may understand which RuleSets failed.</p>
+<h3 id="right-hand-value">
+<a href="#right-hand-value" class="anchor-link"></a> Right-Hand Value
+</h3>
+<p>In the function addRule(), the data type for the right-hand value is ‘string’ since the rule’s action depends on its type, meaning that the value must be provided in a generic form. In the case of a Rule that performs numerical operations, the provided value could be transformed into a number when stored in the Rule.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<ul>
+<li><a href="https://github.com/Nethereum/Wonka/tree/master/Solidity/WonkaEngine">Wonka</a></li>
+<li><a href="https://github.com/jaerith/WonkaRulesBlazorEditor">Wonka Rules Editor</a></li>
+</ul>
+<p>The Wonka implementation supports this proposed interface and also implements all of the additional considerations mentioned above.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The deployer of the contract should be the owner and administrator, allowing for the addition of Attributes and RuleTrees. Since a RuleTree is owned by a particular EOA (or contract address), the only accounts that should be able to execute the RuleTree should be its owner or the contract’s owner/administrator. If Attributes are defined to exist as data within other contracts, the implementation must take into account the possibility that RuleTree owners must have the security to access the data in those contracts.</p>
+<h2 id="references">
+<a href="#references" class="anchor-link"></a> References
+</h2>
+<p><strong>Standards</strong></p>
+<ul>
+<li><a href="/EIPS/eip-2535">EIP-2535 Diamond Standard</a></li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/jaerith">Aaron Kendall</a>, <a href="https://github.com/juanfranblanco">Juan Blanco</a>, "EIP-2746: Rules Engine Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2746, June 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2746.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2746: Rules Engine Standard [DRAFT]",
+    "author": "Aaron Kendall (@jaerith), Juan Blanco (@juanfranblanco)",
+    "name": "EIP-2746: Rules Engine Standard [DRAFT]",
+    "dateCreated": "2020-06-20",
+    "datePublished": "2020-06-20",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2746-rules-engine-interface/4435",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

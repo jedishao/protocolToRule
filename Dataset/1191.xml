@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1191: Add chain id to mixed-case checksum address encoding</title>
+<meta property="og:title" content="EIP-1191: Add chain id to mixed-case checksum address encoding" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1191" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1191" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="lastcall">
+📢 This EIP is in the last call for review stage. The authors wish to finalize the EIP and appreciate feedback.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-1191: Add chain id to mixed-case checksum address encoding
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1191.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/juli">Juliano Rizzo</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1121">https://github.com/ethereum/EIPs/issues/1121</a></td></tr>
+<tr><th>Status</th><td>Last Call
+ <tr><th>Last Call Deadline</th><td>2019-11-18</td></tr>
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-03-18</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-55">55</a>,
+<a href="eip-155">155</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#usage">Usage</a>
+<ul>
+<li><a href="#usage--table">Usage Table</a></li>
+<li><a href="#implementation-table">Implementation Table</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>This EIP extends EIP-55 by optionally adding a chain id defined by EIP-155 to the checksum calculation.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The EIP-55 was created to prevent users from losing funds by sending them to invalid addresses. This EIP extends EIP-55 to protect users from losing funds by sending them to addresses that are valid but that where obtained from a client of another network.For example, if this EIP is implemented, a wallet can alert the user that is trying to send funds to an Ethereum Testnet address from an Ethereum Mainnet wallet.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>The motivation of this proposal is to provide a mechanism to allow software to distinguish addresses from different Ethereum based networks. This proposal is necessary because Ethereum addresses are hashes of public keys and do not include any metadata. By extending the EIP-55 checksum algorithm it is possible to achieve this objective.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Convert the address using the same algorithm defined by EIP-55 but if a registered chain id is provided, add it to the input of the hash function. If the chain id passed to the function belongs to a network that opted for using this checksum variant, prefix the address with the chain id and the <code class="language-plaintext highlighter-rouge">0x</code> separator before calculating the hash. Then convert the address to hexadecimal, but if the ith digit is a letter (ie. it’s one of <code class="language-plaintext highlighter-rouge">abcdef</code>) print it in uppercase if the 4*ith bit of the calculated hash is 1 otherwise print it in lowercase.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Benefits:</p>
+<ul>
+<li>By means of a minimal code change on existing libraries, users are protected from losing funds by mixing addresses of different Ethereum based networks.</li>
+</ul>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/python3
+</span><span class="kn">from</span> <span class="nn">sha3</span> <span class="kn">import</span> <span class="n">keccak_256</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="s">"""
+   addr (str): Hexadecimal address, 40 characters long with 2 characters prefix
+   chainid (int): chain id from EIP-155 """</span>
+<span class="k">def</span> <span class="nf">eth_checksum_encode</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">chainid</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">adopted_eip1191</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">31</span><span class="p">]</span>
+    <span class="n">hash_input</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">chainid</span><span class="p">)</span> <span class="o">+</span> <span class="n">addr</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="n">chainid</span> <span class="ow">in</span> <span class="n">adopted_eip1191</span> <span class="k">else</span> <span class="n">addr</span><span class="p">[</span><span class="mi">2</span><span class="p">:].</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">hash_output</span> <span class="o">=</span> <span class="n">keccak_256</span><span class="p">(</span><span class="n">hash_input</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s">'utf8'</span><span class="p">)).</span><span class="n">hexdigest</span><span class="p">()</span>
+    <span class="n">aggregate</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">addr</span><span class="p">[</span><span class="mi">2</span><span class="p">:].</span><span class="n">lower</span><span class="p">(),</span><span class="n">hash_output</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">addr</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">([</span><span class="n">c</span><span class="p">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="mi">16</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">8</span> <span class="k">else</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span><span class="n">a</span> <span class="ow">in</span> <span class="n">aggregate</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">out</span>
+</code></pre></div></div>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">eth_mainnet</span> <span class="o">=</span> <span class="p">[</span>
+<span class="s">"0x27b1fdb04752bbc536007a920d24acb045561c26"</span><span class="p">,</span>
+<span class="s">"0x3599689E6292b81B2d85451025146515070129Bb"</span><span class="p">,</span>
+<span class="s">"0x42712D45473476b98452f434e72461577D686318"</span><span class="p">,</span>
+<span class="s">"0x52908400098527886E0F7030069857D2E4169EE7"</span><span class="p">,</span>
+<span class="s">"0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed"</span><span class="p">,</span>
+<span class="s">"0x6549f4939460DE12611948b3f82b88C3C8975323"</span><span class="p">,</span>
+<span class="s">"0x66f9664f97F2b50F62D13eA064982f936dE76657"</span><span class="p">,</span>
+<span class="s">"0x8617E340B3D01FA5F11F306F4090FD50E238070D"</span><span class="p">,</span>
+<span class="s">"0x88021160C5C792225E4E5452585947470010289D"</span><span class="p">,</span>
+<span class="s">"0xD1220A0cf47c7B9Be7A2E6BA89F429762e7b9aDb"</span><span class="p">,</span>
+<span class="s">"0xdbF03B407c01E7cD3CBea99509d93f8DDDC8C6FB"</span><span class="p">,</span>
+<span class="s">"0xde709f2102306220921060314715629080e2fb77"</span><span class="p">,</span>
+<span class="s">"0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">rsk_mainnet</span> <span class="o">=</span> <span class="p">[</span>
+<span class="s">"0x27b1FdB04752BBc536007A920D24ACB045561c26"</span><span class="p">,</span>
+<span class="s">"0x3599689E6292B81B2D85451025146515070129Bb"</span><span class="p">,</span>
+<span class="s">"0x42712D45473476B98452f434E72461577d686318"</span><span class="p">,</span>
+<span class="s">"0x52908400098527886E0F7030069857D2E4169ee7"</span><span class="p">,</span>
+<span class="s">"0x5aaEB6053f3e94c9b9a09f33669435E7ef1bEAeD"</span><span class="p">,</span>
+<span class="s">"0x6549F4939460DE12611948B3F82B88C3C8975323"</span><span class="p">,</span>
+<span class="s">"0x66F9664f97f2B50F62d13EA064982F936de76657"</span><span class="p">,</span>
+<span class="s">"0x8617E340b3D01Fa5f11f306f4090fd50E238070D"</span><span class="p">,</span>
+<span class="s">"0x88021160c5C792225E4E5452585947470010289d"</span><span class="p">,</span>
+<span class="s">"0xD1220A0Cf47c7B9BE7a2e6ba89F429762E7B9adB"</span><span class="p">,</span>
+<span class="s">"0xDBF03B407c01E7CD3cBea99509D93F8Dddc8C6FB"</span><span class="p">,</span>
+<span class="s">"0xDe709F2102306220921060314715629080e2FB77"</span><span class="p">,</span>
+<span class="s">"0xFb6916095cA1Df60bb79ce92cE3EA74c37c5d359"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">rsk_testnet</span> <span class="o">=</span> <span class="p">[</span>
+<span class="s">"0x27B1FdB04752BbC536007a920D24acB045561C26"</span><span class="p">,</span>
+<span class="s">"0x3599689e6292b81b2D85451025146515070129Bb"</span><span class="p">,</span>
+<span class="s">"0x42712D45473476B98452F434E72461577D686318"</span><span class="p">,</span>
+<span class="s">"0x52908400098527886E0F7030069857D2e4169EE7"</span><span class="p">,</span>
+<span class="s">"0x5aAeb6053F3e94c9b9A09F33669435E7EF1BEaEd"</span><span class="p">,</span>
+<span class="s">"0x6549f4939460dE12611948b3f82b88C3c8975323"</span><span class="p">,</span>
+<span class="s">"0x66f9664F97F2b50f62d13eA064982F936DE76657"</span><span class="p">,</span>
+<span class="s">"0x8617e340b3D01fa5F11f306F4090Fd50e238070d"</span><span class="p">,</span>
+<span class="s">"0x88021160c5C792225E4E5452585947470010289d"</span><span class="p">,</span>
+<span class="s">"0xd1220a0CF47c7B9Be7A2E6Ba89f429762E7b9adB"</span><span class="p">,</span>
+<span class="s">"0xdbF03B407C01E7cd3cbEa99509D93f8dDDc8C6fB"</span><span class="p">,</span>
+<span class="s">"0xDE709F2102306220921060314715629080e2Fb77"</span><span class="p">,</span>
+<span class="s">"0xFb6916095CA1dF60bb79CE92ce3Ea74C37c5D359"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">test_cases</span> <span class="o">=</span> <span class="p">{</span><span class="mi">30</span> <span class="p">:</span> <span class="n">rsk_mainnet</span><span class="p">,</span> <span class="mi">31</span> <span class="p">:</span> <span class="n">rsk_testnet</span><span class="p">,</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">eth_mainnet</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">chainid</span><span class="p">,</span> <span class="n">cases</span> <span class="ow">in</span> <span class="n">test_cases</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">cases</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="p">(</span> <span class="n">addr</span> <span class="o">==</span> <span class="n">eth_checksum_encode</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span><span class="n">chainid</span><span class="p">)</span> <span class="p">)</span>
+</code></pre></div></div>
+<h2 id="usage">
+<a href="#usage" class="anchor-link"></a> Usage
+</h2>
+<h3 id="usage--table">
+<a href="#usage--table" class="anchor-link"></a> Usage Table
+</h3>
+<table>
+<thead>
+ <tr>
+<th>Network</th>
+<th>Chain id</th>
+<th>Supports this EIP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RSK Mainnet</td>
+<td>30</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>RSK Testnet</td>
+<td>31</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<h3 id="implementation-table">
+<a href="#implementation-table" class="anchor-link"></a> Implementation Table
+</h3>
+<p>| Project | EIP Usage | Implementation |
+|-|-|-|
+| MyCrypto | Yes | <a href="https://github.com/MyCryptoHQ/MyCrypto/blob/develop/common/utils/formatters.ts#L126">JavaScript</a> |
+| MyEtherWallet | Yes | <a href="https://github.com/MyEtherWallet/MyEtherWallet/blob/73c4a24f8f67c655749ac990c5b62efd92a2b11a/src/helpers/addressUtils.js#L22">JavaScript</a> |
+| Ledger | Yes | <a href="https://github.com/LedgerHQ/ledger-app-eth/blob/master/src_common/ethUtils.c#L203">C</a> |
+| Trezor | Yes | <a href="https://github.com/trezor/trezor-core/blob/270bf732121d004a4cd1ab129adaccf7346ff1db/src/apps/ethereum/get_address.py#L32">Python</a> and <a href="https://github.com/trezor/trezor-crypto/blob/4153e662b60a0d83c1be15150f18483a37e9092c/address.c#L62">C</a> |
+| Web3.js | Yes | <a href="https://github.com/ethereum/web3.js/blob/aaf26c8806bc9fb60cf6dcb6658104963c6c7fc7/packages/web3-utils/src/Utils.js#L140">JavaScript</a> |
+| EthereumJS-util | Yes | <a href="https://github.com/ethereumjs/ethereumjs-util/pull/204/commits/cdf0b3c996b05ac5b1f758f17ea9f9ed1847c1eb">JavaScript</a> |
+| ENS address-encoder | Yes | <a href="https://github.com/ensdomains/address-encoder/commit/5bf53b13fa014646ea28c9e5f937361dc9b40590">TypeScript</a> |</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/juli">Juliano Rizzo</a>, "EIP-1191: Add chain id to mixed-case checksum address encoding [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 1191, March 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1191.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1191: Add chain id to mixed-case checksum address encoding [DRAFT]",
+    "author": "Juliano Rizzo (@juli)",
+    "name": "EIP-1191: Add chain id to mixed-case checksum address encoding [DRAFT]",
+    "dateCreated": "2018-03-18",
+    "datePublished": "2018-03-18",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1121",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

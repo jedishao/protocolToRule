@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2976: Typed Transactions over Gossip</title>
+<meta property="og:title" content="EIP-2976: Typed Transactions over Gossip" />
+<meta name="description" content="Adds support for transmission of typed transactions over devp2p." />
+<meta property="og:description" content="Adds support for transmission of typed transactions over devp2p." />
+<meta name="twitter:description" content="Adds support for transmission of typed transactions over devp2p." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2976" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2976" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-2976: Typed Transactions over Gossip
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2976.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Adds support for transmission of typed transactions over devp2p.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/MicahZoltu">Micah Zoltu</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2976-eth-typed-transactions-over-gossip/4610">https://ethereum-magicians.org/t/eip-2976-eth-typed-transactions-over-gossip/4610</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Networking</td></tr>
+<tr><th>Created</th><td>2020-09-13</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-2718">2718</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#definitions">Definitions</a></li>
+<li><a href="#protocol-behavior">Protocol Behavior</a></li>
+<li><a href="#protocol-messages">Protocol Messages</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#why-not-specify-each-transaction-type-at-the-protocol-layer">Why not specify each transaction type at the protocol layer?</a></li>
+<li><a href="#why-have-peers-disconnect-if-they-receive-an-unknown-transaction-type">Why have peers disconnect if they receive an unknown transaction type?</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p><a href="/EIPS/eip-2718">Typed Transactions</a> can be sent over devp2p as <code class="language-plaintext highlighter-rouge">TransactionType || TransactionPayload</code>.
+The exact contents of the <code class="language-plaintext highlighter-rouge">TransactionPayload</code> are defined by the <code class="language-plaintext highlighter-rouge">TransactionType</code> in future EIPs, and clients may start supporting their gossip without incrementing the devp2p version.
+If a client receives a <code class="language-plaintext highlighter-rouge">TransactionType</code> that it doesn’t recognize, it <strong>SHOULD</strong> disconnect from the peer who sent it.
+Clients <strong>MUST NOT</strong> send new transaction types before they believe the fork block is reached.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p><a href="/EIPS/eip-2718">EIP-2718</a> introduced new transaction types for blocks (which presents itself in the makeup of a block header’s transaction root and receipts root).
+However, without a mechanism for gossiping these transactions, no one can actually include them in a block.
+By updating devp2p to support the gossip of Typed Transactions, we can benefit from these new transaction types.</p>
+<p><em>Note: See <a href="/EIPS/eip-2718">EIP-2718</a> for additional motivations of Typed Transactions.</em></p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>All changes specified below apply to all protocol/versions retroactively.</p>
+<h3 id="definitions">
+<a href="#definitions" class="anchor-link"></a> Definitions
+</h3>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">||</code> is the byte/byte-array concatenation operator.</li>
+<li><code class="language-plaintext highlighter-rouge">|</code> is the type union operator.</li>
+<li><code class="language-plaintext highlighter-rouge">DEVP2P_VERSION = TBD</code></li>
+<li><code class="language-plaintext highlighter-rouge">Transaction</code> is either <code class="language-plaintext highlighter-rouge">TypedTransaction</code> or <code class="language-plaintext highlighter-rouge">LegacyTransaction</code></li>
+<li><code class="language-plaintext highlighter-rouge">TypedTransaction</code> is a byte array containing <code class="language-plaintext highlighter-rouge">TransactionType || TransactionPayload</code></li>
+<li><code class="language-plaintext highlighter-rouge">TypedTransactionHash</code> is <code class="language-plaintext highlighter-rouge">keccak256(TypedTransaction)</code></li>
+<li><code class="language-plaintext highlighter-rouge">TransactionType</code> is a positive unsigned 8-bit number between <code class="language-plaintext highlighter-rouge">0</code> and <code class="language-plaintext highlighter-rouge">0x7f</code> that represents the type of the transcation</li>
+<li><code class="language-plaintext highlighter-rouge">TransactionPayload</code> is an opaque byte array whose interpretation is dependent on the <code class="language-plaintext highlighter-rouge">TransactionType</code> and defined in future EIPs</li>
+<li><code class="language-plaintext highlighter-rouge">LegacyTransaction</code> is an array of the form <code class="language-plaintext highlighter-rouge">[nonce, gasPrice, gasLimit, to, value, data, v, r, s]</code></li>
+<li><code class="language-plaintext highlighter-rouge">LegacyTransactionHash</code> is <code class="language-plaintext highlighter-rouge">keccak256(rlp(LegacyTransaction))</code></li>
+<li><code class="language-plaintext highlighter-rouge">TransactionId</code> is <code class="language-plaintext highlighter-rouge">keccak256(TypedTransactionHash | LegacyTransactionHash)</code></li>
+<li><code class="language-plaintext highlighter-rouge">Receipt</code> is either <code class="language-plaintext highlighter-rouge">TypedReceipt</code> or <code class="language-plaintext highlighter-rouge">LegacyReceipt</code></li>
+<li><code class="language-plaintext highlighter-rouge">TypedReceipt</code> is a byte array containing <code class="language-plaintext highlighter-rouge">TransactionType || ReceiptPayload</code></li>
+<li><code class="language-plaintext highlighter-rouge">ReceiptPayload</code> is an opaque byte array whose interpretation is dependent on the <code class="language-plaintext highlighter-rouge">TransactionType</code> and defined in future EIPs</li>
+<li><code class="language-plaintext highlighter-rouge">LegacyReceipt</code> is an array of the form <code class="language-plaintext highlighter-rouge">[status, cumulativeGasUsed, logsBloom, logs]</code></li>
+<li><code class="language-plaintext highlighter-rouge">LegacyReceiptHash</code> is <code class="language-plaintext highlighter-rouge">keccak256(rlp(LegacyReceipt))</code></li>
+</ul>
+<h3 id="protocol-behavior">
+<a href="#protocol-behavior" class="anchor-link"></a> Protocol Behavior
+</h3>
+<p>If a client receives a <code class="language-plaintext highlighter-rouge">TransactionType</code> it doesn’t recognize via any message, it <strong>SHOULD</strong> disconnect the peer that sent it.</p>
+<p>If a client receives a <code class="language-plaintext highlighter-rouge">TransactionPayload</code> that isn’t valid for the <code class="language-plaintext highlighter-rouge">TransactionType</code>, it <strong>SHOULD</strong> disconnect the peer that sent it.</p>
+<p>Clients <strong>MUST NOT</strong> send transactions of a new <code class="language-plaintext highlighter-rouge">TransactionType</code> until that transaction type’s introductory fork block.</p>
+<p>Clients <strong>MAY</strong> disconnect peers who send transactions of a new <code class="language-plaintext highlighter-rouge">TransactionType</code> significantly before that transaction type’s introductory fork block.</p>
+<h3 id="protocol-messages">
+<a href="#protocol-messages" class="anchor-link"></a> Protocol Messages
+</h3>
+<p><code class="language-plaintext highlighter-rouge">Transactions (0x02)</code>: <code class="language-plaintext highlighter-rouge">[Transaction_0, Transaction_1, ..., Transaction_n]</code></p>
+<p><code class="language-plaintext highlighter-rouge">BlockBodies (0x06)</code>: <code class="language-plaintext highlighter-rouge">[BlockBody_0, BlockBody_1, ..., BlockBody_n]</code> where:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">BlockBody</code> is <code class="language-plaintext highlighter-rouge">[TransactionList, UncleList]</code></li>
+<li><code class="language-plaintext highlighter-rouge">TransactionList</code> is <code class="language-plaintext highlighter-rouge">[Transaction_0, Transaction_1, ..., Transaction_n]</code></li>
+<li><code class="language-plaintext highlighter-rouge">UnclesList</code> is defined in previous versions of the devp2p specification</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">NewBlock (0x07)</code>: <code class="language-plaintext highlighter-rouge">[[BlockHeader, TransactionList, UncleList], TotalDifficulty]</code> where:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">BlockHeader</code> is defined in previous versions of the devp2 specification</li>
+<li><code class="language-plaintext highlighter-rouge">TransactionList</code> is <code class="language-plaintext highlighter-rouge">[Transaction_0, Transaction_1, ..., Transaction_n]</code></li>
+<li><code class="language-plaintext highlighter-rouge">UnclesList</code> is defined in previous versions of the devp2p specification</li>
+<li><code class="language-plaintext highlighter-rouge">TotalDifficulty</code> is defined in previous versions of the devp2p specification</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">NewPooledTransactionIds (0x08)</code>: <code class="language-plaintext highlighter-rouge">[TransactionId_0, TransactionId_1, ..., TransactionId_n]</code></p>
+<p><code class="language-plaintext highlighter-rouge">GetPooledTransactions (0x09)</code>: <code class="language-plaintext highlighter-rouge">[TransactionId_0, TransactionId_1, ..., TransactionId_n]</code></p>
+<p><code class="language-plaintext highlighter-rouge">PooledTransactions (0x0a)</code>: <code class="language-plaintext highlighter-rouge">[Transaction_0, Transaction_1, ..., Transaction_n]</code></p>
+<p><code class="language-plaintext highlighter-rouge">Receipts (0x10)</code>: <code class="language-plaintext highlighter-rouge">[ReceiptList_0, ReceiptList_1, ..., ReceiptList_n]</code> where:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">ReceiptList</code> is <code class="language-plaintext highlighter-rouge">[Receipt_0, Receipt_1, ..., Receipt_n]</code></li>
+</ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="why-not-specify-each-transaction-type-at-the-protocol-layer">
+<a href="#why-not-specify-each-transaction-type-at-the-protocol-layer" class="anchor-link"></a> Why not specify each transaction type at the protocol layer?
+</h3>
+<p>We could have chosen to make the protocol aware of the shape of the transaction payloads.
+The authors felt that it would be too much maintenance burden long term to have every new transaction type require an update to devp2p, so instead we merely define that typed transactions are supported.</p>
+<h3 id="why-have-peers-disconnect-if-they-receive-an-unknown-transaction-type">
+<a href="#why-have-peers-disconnect-if-they-receive-an-unknown-transaction-type" class="anchor-link"></a> Why have peers disconnect if they receive an unknown transaction type?
+</h3>
+<p>We could encourage peers to remain connected to peers that submit an unknown transaction type, in case the transaction is some new transaction type that the receiver isn’t aware of it.
+However, doing so may open clients up to DoS attacks where someone would send them transactions of an undefined <code class="language-plaintext highlighter-rouge">TransactionType</code> in order to avoid being disconnected for spamming.
+Also, in most cases we expect that by the time new transaction types are being sent over devp2p, a hard fork that requires all connected clients to be aware of the new transaction type is almost certainly imminent.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Legacy transactions are still supported.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>If a client chooses to ignore the <strong>SHOULD</strong> recommendation for disconnecting peers that send unknown transaction types they may be susceptible to DoS attacks.
+Ignoring this recommendation should be limited to trusted peers only, or other situations where the risk of DoS is extremely low.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/MicahZoltu">Micah Zoltu</a>, "EIP-2976: Typed Transactions over Gossip," <em>Ethereum Improvement Proposals</em>, no. 2976, September 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2976.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2976: Typed Transactions over Gossip",
+    "author": "Micah Zoltu (@MicahZoltu)",
+    "name": "EIP-2976: Typed Transactions over Gossip",
+    "dateCreated": "2020-09-13",
+    "datePublished": "2020-09-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2976-eth-typed-transactions-over-gossip/4610",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

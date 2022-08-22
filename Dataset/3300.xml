@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3300: Phase out refunds</title>
+<meta property="og:title" content="EIP-3300: Phase out refunds" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3300" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3300" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3300: Phase out refunds
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3300.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/wjmelements">William Morriss</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3300-phase-out-refunds/5434">https://ethereum-magicians.org/t/eip-3300-phase-out-refunds/5434</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Core</td></tr>
+ <tr><th>Created</th><td>2020-02-26</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#eip-2929">EIP-2929</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>Phases out the <code class="language-plaintext highlighter-rouge">SSTORE</code> and <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> gas refunds.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This EIP would define a block when the <code class="language-plaintext highlighter-rouge">SSTORE</code> and <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> refunds would begin to diminish.
+The refund would step linearly downward, eroding the implicit value of such refunds at an accelerating pace.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Refunds increase block elasticity, so the block gas target can exceed the number established by miners by up to 2x.
+This can cause hesitancy for miners to increase the block gas target.</p>
+<p>Refunds, tokenized or not, are valuable to their holders, especially during congestion.
+If refunds must be removed, a gradual change in their value would be less-disruptive to the gas market than sudden abolition.
+Refund consumption would proceed, especially during periods of congestion, and the refunds would be cleaned up from the state.
+Refund creation, driven by demand, would naturally diminish as the efficiency of the refunds fall.
+As the refund value approaches the activation cost, the implicit value of the refunds will approach zero, but in periods of congestion they will be cleaned up.</p>
+<p>This change is less work for the protocol developers than compensation and cleanup, while likely still achieving cleanup.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Parameters:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">FORK_BLOCK_NUM</code>: EIP-3300 activation block</li>
+<li><code class="language-plaintext highlighter-rouge">REFUND_DECAY_STEP</code>: 1 gas</li>
+<li><code class="language-plaintext highlighter-rouge">REFUND_DECAY_FREQUENCY</code>: 100 blocks</li>
+</ul>
+<p>Computed:</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">REFUND_DECAY</code>: <code class="language-plaintext highlighter-rouge">REFUND_DECAY_STEP * ceil((block.number + 1 - FORK_BLOCK_NUM) / REFUND_DECAY_FREQUENCY)</code></li>
+</ul>
+<p>On the block this EIP activates, and again every <code class="language-plaintext highlighter-rouge">REFUND_DECAY_FREQUENCY</code> blocks, all gas refunds, including <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> and <code class="language-plaintext highlighter-rouge">SSTORE</code> would diminish by <code class="language-plaintext highlighter-rouge">REFUND_DECAY_STEP</code>, until 0.
+The current difference is called the <code class="language-plaintext highlighter-rouge">REFUND_DECAY</code>, which shall be subtracted from each gas refund.</p>
+<p>For gas-cost regimes with refund removals that cancel prior refunds, the invariant that the refund counter cannot go negative will be preserved by diminishing the magnitude of those removals by <code class="language-plaintext highlighter-rouge">REFUND_DECAY</code>, until 0.</p>
+<h3 id="eip-2929">
+<a href="#eip-2929" class="anchor-link"></a> EIP-2929
+</h3>
+<p>The refunds as of EIP-2929 are as follows:</p>
+<ul>
+<li>24000 for SELFDESTRUCT</li>
+<li><code class="language-plaintext highlighter-rouge">SSTORE_RESET_GAS - SLOAD_GAS</code> (5000 - 100)</li>
+<li><code class="language-plaintext highlighter-rouge">SSTORE_SET_GAS - SLOAD_GAS</code> (20000 - 100)</li>
+<li><code class="language-plaintext highlighter-rouge">SSTORE_SET_GAS - SLOAD_GAS</code> (20000 - 100)</li>
+<li><code class="language-plaintext highlighter-rouge">SSTORE_CLEARS_SCHEDULE</code> (15000)</li>
+</ul>
+<p>Each of these refunds would be decreased by the current <code class="language-plaintext highlighter-rouge">REFUND_DECAY</code>.</p>
+<p>There is also a case where <code class="language-plaintext highlighter-rouge">SSTORE_CLEARS_SCHEDULE</code> is removed from the refund counter.
+That removal will also diminish by <code class="language-plaintext highlighter-rouge">REFUND_DECAY_STEP</code> until 0, maintaining the non-negative refund counter invariant.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>Persisted refunds would become worthless before they fall below their activation cost.
+Once the refunds are worthless, they can be removed by another hard fork without waiting for 0.
+The rate of diminishing specified would currently require (24000-5000) * 100 = 1,900,000 blocks for <code class="language-plaintext highlighter-rouge">SELFDESTRUCT</code> and (15000-5000) * 100 = 1,000,000 blocks for <code class="language-plaintext highlighter-rouge">SSTORE</code>.
+This timeframe is currently about a year, which should be enough flexibility for the remaining refunds to be consumed.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This proposal breaks gas refunds, which contribute to block elasticity.
+The effect of this will be increased gas price volatility: higher highs and lower lows.</p>
+<p>Because the refund counter is separate from the gas counter, the block-to-block gas changes will not break <code class="language-plaintext highlighter-rouge">eth_estimateGas</code>.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/wjmelements">William Morriss</a>, "EIP-3300: Phase out refunds [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3300, February 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3300.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3300: Phase out refunds [DRAFT]",
+    "author": "William Morriss (@wjmelements)",
+    "name": "EIP-3300: Phase out refunds [DRAFT]",
+    "dateCreated": "2020-02-26",
+    "datePublished": "2020-02-26",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3300-phase-out-refunds/5434",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

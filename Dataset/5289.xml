@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5289: Ethereum Notary Interface</title>
+<meta property="og:title" content="EIP-5289: Ethereum Notary Interface" />
+<meta name="description" content="Allows Smart Contracts to be Legally Binding Off-Chain" />
+<meta property="og:description" content="Allows Smart Contracts to be Legally Binding Off-Chain" />
+<meta name="twitter:description" content="Allows Smart Contracts to be Legally Binding Off-Chain" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5289" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5289" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5289: Ethereum Notary Interface
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5289.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Allows Smart Contracts to be Legally Binding Off-Chain</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/Pandapip1">Pandapip1</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/pr-5289-discussion-notary-interface/9980">https://ethereum-magicians.org/t/pr-5289-discussion-notary-interface/9980</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-07-16</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#legal-contract-library-interface">Legal Contract Library Interface</a></li>
+<li><a href="#requesting-a-signature">Requesting a Signature</a></li>
+<li><a href="#signing-a-document">Signing a Document</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a>
+<ul>
+<li><a href="#legal-contract-library">Legal Contract Library</a></li>
+</ul>
+</li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Currently, the real-world applications of smart contracts are limited by the fact that they aren’t legally binding. This EIP proposes a standard that allows smart contracts to be legally binding by providing IPFS links to legal documents and ensuring that the users of the smart contract have privity with the relevant legal documents.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>NFTs have oftentimes been branded as a way to hold and prove copyright of a specific work. However, this, in practice, has almost never been the case. Most of the time, NFTs have no legally-binding meaning, and in the rare cases that do, the NFT simply provides a limited license for the initial holder to use the work (but cannot provide any license for any future holders).</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="legal-contract-library-interface">
+<a href="#legal-contract-library-interface" class="anchor-link"></a> Legal Contract Library Interface
+</h3>
+<p>See <a href="/assets/eip-5289/interfaces/IERC5289Library.sol"><code class="language-plaintext highlighter-rouge">IERC5289Library</code></a>.</p>
+<h3 id="requesting-a-signature">
+<a href="#requesting-a-signature" class="anchor-link"></a> Requesting a Signature
+</h3>
+<p>To request that certain documents be signed, revert with the following reason:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">string</span><span class="p">.</span><span class="n">concat</span><span class="p">(</span><span class="s">"5289:"</span><span class="p">,</span> <span class="n">libraryAddress1</span><span class="p">,</span> <span class="s">"-"</span><span class="p">,</span> <span class="n">documentId1OfAddress1</span><span class="p">,</span> <span class="s">"-"</span><span class="p">,</span> <span class="n">documentId2OfAddress1</span> <span class="s">","</span><span class="p">,</span> <span class="n">libraryAddress2</span><span class="p">,</span> <span class="s">"-"</span><span class="p">,</span> <span class="n">documentId2</span><span class="p">,</span> <span class="p">...)</span>
+</code></pre></div></div>
+<p>NOTE: If an address begins with one or more zeros, they may be omitted.
+NOTE 2: The document IDs are represented in hexadecimal.</p>
+<p>Example:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"5289:0x1-1-2,0xdead-7b3"</span>
+</code></pre></div></div>
+<h3 id="signing-a-document">
+<a href="#signing-a-document" class="anchor-link"></a> Signing a Document
+</h3>
+<p>When a signature is requested, wallets MUST call <code class="language-plaintext highlighter-rouge">legalDocument</code> and fetch the file off of IPFS, and render that file to the user. If the user agrees, the wallet MUST call <code class="language-plaintext highlighter-rouge">signDocument</code>. Using a form of account abstraction is RECOMMENDED.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">uint64</code> was chosen for the timestamp return type as 64-bit time registers are standard.</li>
+<li><code class="language-plaintext highlighter-rouge">uint16</code> was chosen for the document ID as 65536 documents are likely sufficient for any use case, and the contract can always be re-deployed.</li>
+<li><code class="language-plaintext highlighter-rouge">signDocument</code> used to take a signature, but due to account abstraction being imminent, this was deemed unnecessary.</li>
+<li>IPFS is mandatory because the authenticity of the signed document can be proven.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>No backwards compatibility issues found.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<h3 id="legal-contract-library">
+<a href="#legal-contract-library" class="anchor-link"></a> Legal Contract Library
+</h3>
+<p>See <a href="/assets/eip-5289/ERC5289Library.sol"><code class="language-plaintext highlighter-rouge">ERC5289Library</code></a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>No security considerations found.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/Pandapip1">Pandapip1</a>, "EIP-5289: Ethereum Notary Interface [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5289, July 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5289.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5289: Ethereum Notary Interface [DRAFT]",
+    "author": "Pandapip1 (@Pandapip1)",
+    "name": "EIP-5289: Ethereum Notary Interface [DRAFT]",
+    "dateCreated": "2022-07-16",
+    "datePublished": "2022-07-16",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/pr-5289-discussion-notary-interface/9980",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5094: URL Format for Ethereum Network Switching</title>
+<meta property="og:title" content="EIP-5094: URL Format for Ethereum Network Switching" />
+<meta name="description" content="A way of representing various network configurations as URLs." />
+<meta property="og:description" content="A way of representing various network configurations as URLs." />
+<meta name="twitter:description" content="A way of representing various network configurations as URLs." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5094" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5094" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5094: URL Format for Ethereum Network Switching
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5094.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>A way of representing various network configurations as URLs.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/lucemans">Luc van Kampen</a>, <a href="https://github.com/svemat01">Jakob Helgesson</a>, <a href="https://github.com/thejoshuahendrix">Joshua Hendrix</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/5094-uri-format-for-ethereum-network-switching/9277">https://ethereum-magicians.org/t/5094-uri-format-for-ethereum-network-switching/9277</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-05-13</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-681">681</a>,
+<a href="eip-831">831</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#syntax">Syntax</a></li>
+<li><a href="#semantics">Semantics</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard includes all needed information for adding a network to a wallet via URL, by including parameters such as <code class="language-plaintext highlighter-rouge">chainId</code>, <code class="language-plaintext highlighter-rouge">rpc_url</code>, <code class="language-plaintext highlighter-rouge">chain_name</code> and others, such that the network configuration is provided through the URL itself.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>As observed with the use of <a href="/EIPS/eip-681">EIP-681</a> and its implementation in current mobile wallets, transactions can be made, approved, viewed, and used. However, if the wallet is instructed to perform a transaction on a chain they have not yet been configured before, the operation tends to fail.</p>
+<p>This is understandable, as the <code class="language-plaintext highlighter-rouge">chain_id</code> provided makes up only one part of what is required to connect to a network. This EIP aims to introduce a new type of URL for usage with deep-linking, QR, and more, to allow users to seamlessly add new networks to their (for ex. mobile) wallet to then be able to more easily partake in <code class="language-plaintext highlighter-rouge">pay-</code>, <code class="language-plaintext highlighter-rouge">tx-</code>, or other Ethereum URL interactions.</p>
+<p>As an extension to <a href="/EIPS/eip-831">EIP-831</a> and neighboring <a href="/EIPS/eip-681">EIP-681</a> and <a href="/EIPS/eip-2400">EIP-2400</a>, this document aims to standardize the addition of new networks and switching thereof through the means of URLs. User convenience in this case is primary.</p>
+<p>Introduction of this EIP is meant to bridge to a safer RPC listing system to be introduced in the near future.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="syntax">
+<a href="#syntax" class="anchor-link"></a> Syntax
+</h3>
+<p>Network Switching URLs contain “ethereum” in their schema (protocol) part and are constructed as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>network_add             = erc831_part "add" "@" chain_id [ "/" ] "?" parameters
+erc831_part             = "ethereum:network-"
+chain_id                = 1*DIGIT
+parameters              = parameter *( "&amp;" parameter )
+parameter               = key "=" value
+key                     = required_keys / optional_keys
+required_keys           = "rpc_url" / "chain_name"
+optional_keys           = "name" / "symbol" / "decimals" / "explorer_url" / "icon_url"
+value                   = STRING / number
+number                  = 1*DIGIT
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">STRING</code> is a URL-encoded Unicode string of arbitrary length, where delimiters and the
+percentage symbol (<code class="language-plaintext highlighter-rouge">%</code>) are mandatorily hex-encoded with a <code class="language-plaintext highlighter-rouge">%</code> prefix.</p>
+<p>If the <em>key</em> in the parameter is <code class="language-plaintext highlighter-rouge">decimals</code> the <em>value</em> MUST be a <code class="language-plaintext highlighter-rouge">number</code>.</p>
+<h3 id="semantics">
+<a href="#semantics" class="anchor-link"></a> Semantics
+</h3>
+<p><code class="language-plaintext highlighter-rouge">chain_id</code> is mandatory and denotes the decimal chain ID, such that we have the identifier of the network we would like to add.</p>
+<p><code class="language-plaintext highlighter-rouge">rpc_url</code> is represented as an array of RPC URLs. A minimum of 1 <code class="language-plaintext highlighter-rouge">rpc_url</code> MUST be present, in the format of <code class="language-plaintext highlighter-rouge">rpc_url=https%3A%2F%2Fpolygon-rpc.com</code>, or when multiple present <code class="language-plaintext highlighter-rouge">rpc_url=https%3A%2F%2Fpolygon-rpc.com&amp;rpc_url=https%3A%2F%2Frpc-mainnet.matic.network</code>.</p>
+<p><code class="language-plaintext highlighter-rouge">chain_name</code> is required to specify the name of the network to be added.</p>
+<p><code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">symbol</code> if provided, SHOULD be a human-readable string representing the native token.</p>
+<p><code class="language-plaintext highlighter-rouge">decimals</code> if provided, MUST be a non-negative integer representing the decimal precision of the native token.</p>
+<p><code class="language-plaintext highlighter-rouge">explorer_url</code> if provided, MUST specify one or more URLs pointing to block explorer web sites for the chain.</p>
+<p><code class="language-plaintext highlighter-rouge">icon_url</code> if provided, MUST specify one or more URLs pointing to reasonably sized images that can be used to visually identify the chain.</p>
+<p>An example of adding a network with RPC endpoints <code class="language-plaintext highlighter-rouge">https://rpc-polygon.com</code> and <code class="language-plaintext highlighter-rouge">https://rpc-mainnet.matic.network</code>, the name <code class="language-plaintext highlighter-rouge">Polygon Mainnet</code>, token <code class="language-plaintext highlighter-rouge">Matic</code>, symbol <code class="language-plaintext highlighter-rouge">MATIC</code>, decimals <code class="language-plaintext highlighter-rouge">18</code>, explorer at <code class="language-plaintext highlighter-rouge">https://polygonscan.com/</code>, and Chain ID <code class="language-plaintext highlighter-rouge">137</code> would look as follows:</p>
+<pre><code class="language-URL">ethereum:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1e707b6a69716c75337f7a7a5e2f2d29">[email&#160;protected]</a>/?chain_name=Polygon%20Mainnet&amp;rpc_url=https%3A%2F%2Frpc-polygon.com&amp;rpc_url=https%3A%2F%2Frpc-mainnet.matic.network&amp;name=Matic&amp;symbol=MATIC&amp;decimals=18&amp;explorer_url=https%3A%2F%2Fpolygonscan.com
+</code></pre>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>In furtherance of the Ethereum URL saga, network configuration is a needed addition to the possibility of Ethereum URLs. This would improve functionality for URLs, and offer non-mainnet users a way to connect without needing to configure their wallet by hand.</p>
+<p>The URL follows <a href="/EIPS/eip-831">EIP-831</a> with the <code class="language-plaintext highlighter-rouge">PREFIX</code> being <code class="language-plaintext highlighter-rouge">network</code> and the <code class="language-plaintext highlighter-rouge">PAYLOAD</code> being a composite of <code class="language-plaintext highlighter-rouge">add</code> and <a href="/EIPS/eip-681">EIP-681</a>-like <code class="language-plaintext highlighter-rouge">chain_id</code> and parameters.</p>
+<p>The choice for <code class="language-plaintext highlighter-rouge">PREFIX</code> being <code class="language-plaintext highlighter-rouge">network</code> is to allow further expansion and allow variants following the pattern <code class="language-plaintext highlighter-rouge">network-x</code>.</p>
+<p>An example URL for adding the Optimism Network</p>
+<pre><code class="language-URL">ethereum:<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f010a1b18001d04420e0b0b2f5e5f">[email&#160;protected]</a>/?chain_name=Optimistic%20Ethereum
+&amp;rpc_url=https%3A%2F%2Fmainnet.optimism.io&amp;name=Ethereum&amp;symbol=ETH&amp;decimals=18&amp;explorer_url=https%3A%2F%2Foptimistic.etherscan.io
+</code></pre>
+<p>The specification allows for a multitude of <code class="language-plaintext highlighter-rouge">rpc_url</code> and <code class="language-plaintext highlighter-rouge">explorer_url</code> to be specified. This is done such to overlap with parsing of the <code class="language-plaintext highlighter-rouge">TYPE</code> mentioned in <a href="/EIPS/eip-681">EIP-681</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>URLs can be malformed to deceive users. Users SHOULD confirm source of URL before using any links. As well as checking source and transaction details before confirming any transactions. Applications SHOULD display network config, prior to network addition, such that users can confirm the validity of the network configuration being added.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/lucemans">Luc van Kampen</a>, <a href="https://github.com/svemat01">Jakob Helgesson</a>, <a href="https://github.com/thejoshuahendrix">Joshua Hendrix</a>, "EIP-5094: URL Format for Ethereum Network Switching [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5094, May 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5094.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5094: URL Format for Ethereum Network Switching [DRAFT]",
+    "author": "Luc van Kampen (@lucemans), Jakob Helgesson (@svemat01), Joshua Hendrix (@thejoshuahendrix)",
+    "name": "EIP-5094: URL Format for Ethereum Network Switching [DRAFT]",
+    "dateCreated": "2022-05-13",
+    "datePublished": "2022-05-13",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/5094-uri-format-for-ethereum-network-switching/9277",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

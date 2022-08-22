@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2771: Secure Protocol for Native Meta Transactions</title>
+<meta property="og:title" content="EIP-2771: Secure Protocol for Native Meta Transactions" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2771" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2771" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2771: Secure Protocol for Native Meta Transactions
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2771.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/wighawag">Ronan Sandford</a>, <a href="https://github.com/lirazsiri">Liraz Siri</a>, <a href="https://github.com/drortirosh">Dror Tirosh</a>, <a href="https://github.com/yoavw">Yoav Weiss</a>, <a href="https://github.com/forshtat">Alex Forshtat</a>, <a href="https://github.com/Amxx">Hadrien Croubois</a>, <a href="https://github.com/tomarsachin2271">Sachin Tomar</a>, <a href="https://github.com/stonecoldpat">Patrick McCorry</a>, <a href="https://github.com/nventuro">Nicolas Venturo</a>, <a href="https://github.com/frozeman">Fabian Vogelsteller</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/erc-2771-secure-protocol-for-native-meta-transactions/4488">https://ethereum-magicians.org/t/erc-2771-secure-protocol-for-native-meta-transactions/4488</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-07-01</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#extracting-the-transaction-signer-address">Extracting The Transaction Signer address</a></li>
+<li><a href="#protocol-support-discovery-mechanism">Protocol Support Discovery Mechanism</a></li>
+<li><a href="#recipient-example">Recipient example</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#implementations">Implementations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A contract interface for receiving meta transactions through a trusted
+forwarder.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This ERC defines a minimal contract-level protocol that a compliant Recipient
+contract needs to support in order to be capable of accepting a meta
+transaction through a compliant Forwarder contract that it trusts to help it
+identify the address of the Transaction Signer.</p>
+<p>No EVM-level protocol changes are proposed or required.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>There is a growing interest in making it possible for Ethereum contracts to
+accept calls from externally owned accounts that do not have ETH to pay for
+gas.</p>
+<p>This can be accomplished with meta transactions, which are transactions that
+have been:</p>
+<ol>
+<li>Authorized by the <strong>Transaction Signer</strong>. For example, signed by an
+externally owned account.</li>
+<li>Relayed by an untrusted third party that pays for the gas (the <strong>Gas
+Relay</strong>)</li>
+</ol>
+<p><code class="language-plaintext highlighter-rouge">msg.sender</code> is a transaction parameter that can be inspected by a contract to
+determine who signed the transaction. The integrity of this parameter is
+guaranteed by the Ethereum EVM, but for a meta transaction securing
+<code class="language-plaintext highlighter-rouge">msg.sender</code> is insufficient.</p>
+<p>The problem is that for a contract that is not natively aware of meta
+transactions, the <code class="language-plaintext highlighter-rouge">msg.sender</code> of the transaction will make it appear to be
+coming from the <strong>Gas Relay</strong> and not the <strong>Transaction Signer</strong>. A secure
+protocol for a contract to accept meta transactions needs to prevent the <strong>Gas
+Relay</strong> from forging, modifying or duplicating requests by the <strong>Transaction
+Signer</strong>.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”,
+“SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be
+interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<p>Here is an example flow:</p>
+<p><img src="/assets/eip-2771/example-flow.png" alt="Example flow" /></p>
+<ul>
+<li><strong>Transaction Signer</strong> - entity that signs &amp; sends to request to <strong>Gas
+Relay</strong></li>
+<li><strong>Gas Relay</strong> - receives a signed request off-chain from <strong>Transaction
+Signer</strong> and pays gas to turn it into a valid transaction that goes through
+<strong>Trusted Forwarder</strong></li>
+<li><strong>Trusted Forwarder</strong> - a contract that is trusted by the <code class="language-plaintext highlighter-rouge">Recipient</code> to
+correctly verify the signature and nonce before forwarding the request from
+<strong>Transaction Signer</strong></li>
+<li><strong>Recipient</strong> - a contract that can securely accept meta-transactions
+through a <strong>Trusted Forwarder</strong> by being compliant with this standard.</li>
+</ul>
+<h3 id="extracting-the-transaction-signer-address">
+<a href="#extracting-the-transaction-signer-address" class="anchor-link"></a> Extracting The Transaction Signer address
+</h3>
+<p>The <strong>Trusted Forwarder</strong> is responsible for calling the <strong>Recipient</strong> contract
+and MUST append the address of the <strong>Transaction Signer</strong> (20 bytes of data) to
+the end of the call data.</p>
+<p>For example :</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="kt">bool</span> <span class="n">success</span><span class="p">,</span> <span class="kt">bytes</span> <span class="k">memory</span> <span class="n">returnData</span><span class="p">)</span> <span class="o">=</span> <span class="n">to</span><span class="p">.</span><span class="nb">call</span><span class="p">.</span><span class="n">value</span><span class="p">(</span><span class="n">value</span><span class="p">)(</span><span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">from</span><span class="p">));</span>
+</code></pre></div></div>
+<p>The <strong>Recipient</strong> contract can then extract the <strong>Transaction Signer</strong> address
+by performing 3 operations:</p>
+<ol>
+<li>Check that the <strong>Forwarder</strong> is trusted. How this is implemented is out of
+the scope of this proposal.</li>
+<li>Extract the <strong>Transaction Signer</strong> address from the last 20 bytes of the
+call data and use that as the original <code class="language-plaintext highlighter-rouge">sender</code> of the transaction (instead of <code class="language-plaintext highlighter-rouge">msg.sender</code>)</li>
+<li>If the <code class="language-plaintext highlighter-rouge">msg.sender</code> is not a trusted forwarder (or if the msg.data is
+shorter than 20 bytes), then return the original <code class="language-plaintext highlighter-rouge">msg.sender</code> as it is.</li>
+</ol>
+<p>The <strong>Recipient</strong> MUST check that it trusts the Forwarder to prevent it from
+extracting address data appended from an untrusted contract. This could result
+in a forged address.</p>
+<h3 id="protocol-support-discovery-mechanism">
+<a href="#protocol-support-discovery-mechanism" class="anchor-link"></a> Protocol Support Discovery Mechanism
+</h3>
+<p>Unless a <strong>Recipient</strong> contract is being used by a particular frontend that
+knows that this contract has support for native meta transactions, it would not
+be possible to offer the user the choice of using meta-transaction to interact
+with the contract. We thus need a mechanism by which the <strong>Recipient</strong> can let
+the world know that it supports meta transactions.</p>
+<p>This is especially important for meta transactions to be supported at the Web3
+wallet level. Such wallets may not necessarily know anything about the
+<strong>Recipient</strong> contract users may wish to interact with.</p>
+<p>As a <strong>Recipient</strong> could trust forwarders with different interfaces and
+capabilities (e.g., transaction batching, different message signing formats),
+we need to allow wallets to discover which Forwarder is trusted.</p>
+<p>To provide this discovery mechanism a <strong>Recipient</strong> contract MUST implement
+this function:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">isTrustedForwarder</span><span class="p">(</span><span class="kt">address</span> <span class="n">forwarder</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+</code></pre></div></div>
+<ul>
+<li>That function MUST return true if the forwarder is trusted by the
+Recipient.</li>
+<li>That function MUST return false if the forwarder is not trusted.</li>
+<li>That function MUST NOT throw a revert.</li>
+</ul>
+<p>Internally, the <strong>Recipient</strong> MUST then accept a request from forwarder</p>
+<p>That function can be called on-chain and as such gas restriction needs to be
+put in place.</p>
+<p>A Gas limit of 50k is enough for making the decision either inside the
+contract, or delegating it to another contract and doing some memory access
+calculations, like querying a mapping.</p>
+<h3 id="recipient-example">
+<a href="#recipient-example" class="anchor-link"></a> Recipient example
+</h3>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">contract</span> <span class="n">RecipientExample</span> <span class="p">{</span>
+
+    <span class="k">function</span> <span class="n">purchaseItem</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">itemId</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+        <span class="kt">address</span> <span class="n">sender</span> <span class="o">=</span> <span class="n">_msgSender</span><span class="p">();</span>
+        <span class="p">...</span> <span class="n">perform</span> <span class="n">the</span> <span class="n">purchase</span> <span class="k">for</span> <span class="n">sender</span>
+    <span class="p">}</span>
+
+    <span class="kt">address</span> <span class="kr">immutable</span> <span class="n">_trustedForwarder</span><span class="p">;</span>
+    <span class="k">constructor</span><span class="p">(</span><span class="kt">address</span> <span class="n">trustedForwarder</span><span class="p">)</span> <span class="k">internal</span> <span class="p">{</span>
+        <span class="n">_trustedForwarder</span> <span class="o">=</span> <span class="n">trustedForwarder</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">isTrustedForwarder</span><span class="p">(</span><span class="kt">address</span> <span class="n">forwarder</span><span class="p">)</span> <span class="k">public</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">forwarder</span> <span class="o">==</span> <span class="n">_trustedForwarder</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">_msgSender</span><span class="p">()</span> <span class="k">internal</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span> <span class="k">payable</span> <span class="n">signer</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">signer</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">length</span><span class="o">&gt;=</span><span class="mi">20</span> <span class="o">&amp;&amp;</span> <span class="n">isTrustedForwarder</span><span class="p">(</span><span class="n">signer</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">assembly</span> <span class="p">{</span>
+                <span class="n">signer</span> <span class="o">:=</span> <span class="n">shr</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span><span class="n">calldataload</span><span class="p">(</span><span class="n">sub</span><span class="p">(</span><span class="n">calldatasize</span><span class="p">(),</span><span class="mi">20</span><span class="p">)))</span>
+            <span class="p">}</span>
+        <span class="p">}</span>    
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<ul>
+<li>
+<p>Make it easy for contract developers to add support for meta
+transactions by standardizing the simplest viable contract interface.</p>
+</li>
+<li>
+<p>Without support for meta transactions in the recipient contract, an externally owned
+account can not use meta transactions to interact with the recipient contract.</p>
+</li>
+<li>
+<p>Without a standard contract interface, there is no standard way for a client
+to discover whether a recipient supports meta transactions.</p>
+</li>
+<li>
+<p>Without a standard contract interface, there is no standard way to send a
+meta transaction to a recipient.</p>
+</li>
+<li>
+<p>Without the ability to leverage a trusted forwarder every recipient contract
+has to internally implement the logic required to accept meta transactions securely.</p>
+</li>
+<li>
+<p>Without a discovery protocol, there is no mechanism for a client to discover
+whether a recipient supports a specific forwarder.</p>
+</li>
+<li>
+<p>Making the contract interface agnostic to the internal implementation
+details of the trusted forwarder, makes it possible for a recipient contract
+to support multiple forwarders with no change to code.</p>
+</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>A bad forwarder may allow forgery of the <code class="language-plaintext highlighter-rouge">msg.sender</code> returned from
+<code class="language-plaintext highlighter-rouge">_msgSender()</code> and allow transactions to appear to be coming from any address.</p>
+<p>This means a recipient contract should be very careful which forwarder it
+trusts and whether this can be modified. The power to change the forwarder
+trusted by a recipient is equivalent to giving full control over the contract.
+If this kind of control over the recipient is acceptable, it is recommended
+that only the owner of the recipient contract be able to modify which forwarder
+is trusted. Otherwise best to leave it unmodifiable, as in the example above.</p>
+<h2 id="implementations">
+<a href="#implementations" class="anchor-link"></a> Implementations
+</h2>
+<p>An implementation of a base class for a recipient: <a href="https://github.com/opengsn/forwarder/blob/master/contracts/BaseRelayRecipient.sol">BaseRelayRecipient.sol</a></p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/wighawag">Ronan Sandford</a>, <a href="https://github.com/lirazsiri">Liraz Siri</a>, <a href="https://github.com/drortirosh">Dror Tirosh</a>, <a href="https://github.com/yoavw">Yoav Weiss</a>, <a href="https://github.com/forshtat">Alex Forshtat</a>, <a href="https://github.com/Amxx">Hadrien Croubois</a>, <a href="https://github.com/tomarsachin2271">Sachin Tomar</a>, <a href="https://github.com/stonecoldpat">Patrick McCorry</a>, <a href="https://github.com/nventuro">Nicolas Venturo</a>, <a href="https://github.com/frozeman">Fabian Vogelsteller</a>, "EIP-2771: Secure Protocol for Native Meta Transactions [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2771, July 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2771.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2771: Secure Protocol for Native Meta Transactions [DRAFT]",
+    "author": "Ronan Sandford (@wighawag), Liraz Siri (@lirazsiri), Dror Tirosh (@drortirosh), Yoav Weiss (@yoavw), Alex Forshtat (@forshtat), Hadrien Croubois (@Amxx), Sachin Tomar (@tomarsachin2271), Patrick McCorry (@stonecoldpat), Nicolas Venturo (@nventuro), Fabian Vogelsteller (@frozeman)",
+    "name": "EIP-2771: Secure Protocol for Native Meta Transactions [DRAFT]",
+    "dateCreated": "2020-07-01",
+    "datePublished": "2020-07-01",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/erc-2771-secure-protocol-for-native-meta-transactions/4488",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

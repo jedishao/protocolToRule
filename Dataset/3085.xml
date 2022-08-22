@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3085: Wallet Add Ethereum Chain RPC Method (`wallet_addEthereumChain`)</title>
+<meta property="og:title" content="EIP-3085: Wallet Add Ethereum Chain RPC Method (`wallet_addEthereumChain`)" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3085" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3085" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-3085: Wallet Add Ethereum Chain RPC Method (`wallet_addEthereumChain`)
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3085.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/rekmarks">Erik Marks</a>, <a href="https://github.com/pedrouid">Pedro Gomes</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3085-wallet-addethereumchain/5469">https://ethereum-magicians.org/t/eip-3085-wallet-addethereumchain/5469</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>Interface</td></tr>
+<tr><th>Created</th><td>2020-11-01</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-155">155</a>,
+<a href="eip-695">695</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#wallet_addethereumchain">wallet_addEthereumChain</a></li>
+<li><a href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#chain-ids">Chain IDs</a></li>
+<li><a href="#rpc-endpoints-and-rpc-urls">RPC Endpoints and RPC URLs</a></li>
+<li><a href="#validating-chain-data">Validating Chain Data</a></li>
+<li><a href="#ux">UX</a></li>
+<li><a href="#preserving-user-privacy">Preserving User Privacy</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>An RPC method for adding Ethereum chains to wallet applications.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> RPC method allows Ethereum applications (“dapps”) to suggest chains to be added to the user’s wallet application.
+The caller must specify a chain ID and some chain metadata.
+The wallet application may arbitrarily refuse or accept the request.
+<code class="language-plaintext highlighter-rouge">null</code> is returned if the chain was added, and an error otherwise.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>All dapps require the user to interact with one or more Ethereum chains in order to function.
+Any given chain may or may not be supported by the user’s wallet application.
+<code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> enables dapps to request chains to be added to the user’s wallet.
+This enables UX improvements for both dapps and wallets.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC-2119</a>.</p>
+<h3 id="wallet_addethereumchain">
+<a href="#wallet_addethereumchain" class="anchor-link"></a> <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code>
+</h3>
+<p>The method accepts a single object parameter, with a <code class="language-plaintext highlighter-rouge">chainId</code> and some chain metadata.
+The method returns <code class="language-plaintext highlighter-rouge">null</code> if the chain was added to the wallet, and an error otherwise.</p>
+<p>The wallet <strong>MAY</strong> reject the request for any reason.</p>
+<blockquote>
+<p>Note that this method makes <strong>no</strong> statement about whether the wallet should change the user’s currently selected chain, if the wallet has a concept thereof.</p>
+</blockquote>
+<h4 id="parameters">
+<a href="#parameters" class="anchor-link"></a> Parameters
+</h4>
+<p><code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> accepts a single object parameter, specified by the following TypeScript interface:</p>
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">interface</span> <span class="nx">AddEthereumChainParameter</span> <span class="p">{</span>
+  <span class="nl">chainId</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">blockExplorerUrls</span><span class="p">?:</span> <span class="kr">string</span><span class="p">[];</span>
+  <span class="nl">chainName</span><span class="p">?:</span> <span class="kr">string</span><span class="p">;</span>
+  <span class="nl">iconUrls</span><span class="p">?:</span> <span class="kr">string</span><span class="p">[];</span>
+  <span class="nl">nativeCurrency</span><span class="p">?:</span> <span class="p">{</span>
+    <span class="na">name</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+    <span class="nl">symbol</span><span class="p">:</span> <span class="kr">string</span><span class="p">;</span>
+    <span class="nl">decimals</span><span class="p">:</span> <span class="kr">number</span><span class="p">;</span>
+  <span class="p">};</span>
+  <span class="nl">rpcUrls</span><span class="p">?:</span> <span class="kr">string</span><span class="p">[];</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Only the <code class="language-plaintext highlighter-rouge">chainId</code> is required per this specification, but a wallet <strong>MAY</strong> require any other fields listed, impose additional requirements on them, or ignore them outright.
+If a field does not meet the requirements of this specification and the wallet does not ignore the field, the wallet <strong>MUST</strong> reject the request.</p>
+<ul>
+<li><code class="language-plaintext highlighter-rouge">chainId</code>
+<ul>
+<li><strong>MUST</strong> specify the integer ID of the chain as a hexadecimal string, per the <a href="/EIPS/eip-695"><code class="language-plaintext highlighter-rouge">eth_chainId</code></a> Ethereum RPC method.</li>
+<li>The wallet <strong>SHOULD</strong> compare the specified <code class="language-plaintext highlighter-rouge">chainId</code> value with the <code class="language-plaintext highlighter-rouge">eth_chainId</code> return value from the endpoint.
+If these values are not identical, the wallet <strong>MUST</strong> reject the request.</li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">blockExplorerUrls</code>
+<ul>
+<li>If provided, <strong>MUST</strong> specify one or more URLs pointing to block explorer web sites for the chain.</li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">chainName</code>
+<ul>
+<li>If provided, <strong>MUST</strong> specify a human-readable name for the chain.</li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">iconUrls</code>
+<ul>
+<li>If provided, <strong>MUST</strong> specify one or more URLs pointing to reasonably sized images that can be used to visually identify the chain.</li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">nativeCurrency</code>
+<ul>
+<li>If provided, <strong>MUST</strong> describe the native currency of the chain using the <code class="language-plaintext highlighter-rouge">name</code>, <code class="language-plaintext highlighter-rouge">symbol</code>, and <code class="language-plaintext highlighter-rouge">decimals</code> fields.
+<ul>
+<li><code class="language-plaintext highlighter-rouge">decimals</code> <strong>MUST</strong> be a non-negative integer.</li>
+<li><code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">symbol</code> <strong>SHOULD</strong> be human-readable strings.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code class="language-plaintext highlighter-rouge">rpcUrls</code>
+<ul>
+<li>If provided, <strong>MUST</strong> specify one or more URLs pointing to RPC endpoints that can be used to communicate with the chain.</li>
+</ul>
+</li>
+</ul>
+<p>All URL strings <strong>MUST</strong> include the protocol component of the URL.
+HTTPS <strong>SHOULD</strong> always be used over HTTP.</p>
+<h4 id="returns">
+<a href="#returns" class="anchor-link"></a> Returns
+</h4>
+<p>The method <strong>MUST</strong> return <code class="language-plaintext highlighter-rouge">null</code> if the request was successful, and an error otherwise.</p>
+<p>A request to add a chain that was already added <strong>SHOULD</strong> be considered successful.</p>
+<p>The wallet <strong>MUST NOT</strong> allow the same <code class="language-plaintext highlighter-rouge">chainId</code> to be added multiple times.
+See <a href="#security-considerations">Security Considerations</a> for more information.</p>
+<h3 id="examples">
+<a href="#examples" class="anchor-link"></a> Examples
+</h3>
+<p>These examples use JSON-RPC, but the method could be implemented using other RPC protocols.</p>
+<p>To add the Goerli test chain:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jsonrpc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wallet_addEthereumChain"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"params"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"chainId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x5"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"chainName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Goerli"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"rpcUrls"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"https://goerli.infura.io/v3/INSERT_API_KEY_HERE"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"nativeCurrency"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Goerli ETH"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"symbol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"gorETH"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"decimals"</span><span class="p">:</span><span class="w"> </span><span class="mi">18</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="nl">"blockExplorerUrls"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"https://goerli.etherscan.io"</span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>To add POA Network’s xDAI chain:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jsonrpc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"method"</span><span class="p">:</span><span class="w"> </span><span class="s2">"wallet_addEthereumChain"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"params"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"chainId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0x64"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"chainName"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xDAI Chain"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"rpcUrls"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"https://dai.poa.network"</span><span class="p">],</span><span class="w">
+      </span><span class="nl">"iconUrls"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"https://xdaichain.com/fake/example/url/xdai.svg"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"https://xdaichain.com/fake/example/url/xdai.png"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"nativeCurrency"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xDAI"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"symbol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xDAI"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"decimals"</span><span class="p">:</span><span class="w"> </span><span class="mi">18</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>In the above example, notice that the <code class="language-plaintext highlighter-rouge">iconUrls</code> array contains URLs pointing to two different image formats.</p>
+<p>A success response:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jsonrpc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"result"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>A failure response:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"jsonrpc"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2.0"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"error"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"code"</span><span class="p">:</span><span class="w"> </span><span class="mi">4001</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The user rejected the request."</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The design of <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> is deliberately ignorant of what it means to “add” a chain to a wallet.
+The meaning of “adding” a chain to a wallet depends on the wallet implementation.</p>
+<p>When calling the method, specifying the <code class="language-plaintext highlighter-rouge">chainId</code> will always be necessary, since in the universe of Ethereum chains, the <a href="/EIPS/eip-155">EIP-155</a> chain ID is effectively the chain GUID.
+The remaining parameters amount to what, in the estimation of the authors, a wallet will minimally require in order to effectively support a chain and represent it to the user.
+The network ID (per the <code class="language-plaintext highlighter-rouge">net_version</code> RPC method) is omitted since it is effectively superseded by the chain ID.</p>
+<p>For <a href="#security-considerations">security reasons</a>, a wallet should always attempt to validate the chain metadata provided by the requester, and may choose to fetch the metadata elsewhere entirely.
+Either way, only the wallet can know which chain metadata it needs from the requester in order to “add” the chain.
+Therefore, all parameters except <code class="language-plaintext highlighter-rouge">chainId</code> are specified as optional, even though a wallet may require them in practice.</p>
+<p>This specification does not mandate that the wallet “switches” its “active” or “currently selected” chain after a successful request, if the wallet has a concept thereof.
+Just like the meaning of “adding” a chain, “switching” between chains is a wallet implementation detail, and therefore out of scope.</p>
+<p>For related work, see <a href="/EIPS/eip-2015">EIP-2015</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p><code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> is a powerful method that exposes the end user to serious risks if implemented incorrectly.
+Many of these risks can be avoided by validating the request data in the wallet, and clearly disambiguating different chains in the wallet UI.</p>
+<h3 id="chain-ids">
+<a href="#chain-ids" class="anchor-link"></a> Chain IDs
+</h3>
+<p>Since the chain ID used for transaction signing determines which chain the transaction is valid for, handling the chain ID correctly is of utmost importance.
+The wallet should:</p>
+<ul>
+<li>Ensure that a submitted chain ID is valid.
+<ul>
+<li>It should be a <code class="language-plaintext highlighter-rouge">0x</code>-prefixed hexadecimal string per <a href="/EIPS/eip-695">EIP-695</a>, and parse to an integer number.</li>
+</ul>
+</li>
+<li>Prevent the same chain ID from being added multiple times.
+<ul>
+<li>See the next section for how to handle multiple RPC endpoints.</li>
+</ul>
+</li>
+<li>Only use the submitted chain ID to sign transactions, <strong>never</strong> a chain ID received from an RPC endpoint.
+<ul>
+<li>A malicious or faulty endpoint could return arbitrary chain IDs, and potentially cause the user to sign transactions for unintended chains.</li>
+</ul>
+</li>
+<li>Verify that the specified chain ID matches the return value of <code class="language-plaintext highlighter-rouge">eth_chainId</code> from the endpoint, as described <a href="#parameters">above</a>.</li>
+</ul>
+<h3 id="rpc-endpoints-and-rpc-urls">
+<a href="#rpc-endpoints-and-rpc-urls" class="anchor-link"></a> RPC Endpoints and RPC URLs
+</h3>
+<p>Wallets generally interact with chains via an RPC endpoint, identified by some URL.
+Most wallets ship with a set of chains and corresponding trusted RPC endpoints.
+The endpoints identified by the <code class="language-plaintext highlighter-rouge">rpcUrls</code> parameter cannot be assumed to be honest, correct, or even pointing to the same chain.
+Moreover, even trusted endpoints can expose users to privacy risks depending on their data collection practices.</p>
+<p>Therefore, the wallet should:</p>
+<ul>
+<li>Inform users that their on-chain activity and IP address will be exposed to RPC endpoints.</li>
+<li>If an endpoint is unknown to the wallet, inform users that the endpoint may behave in unexpected ways.</li>
+<li>Observe good web security practices when interacting with the endpoint, such as require HTTPS.</li>
+<li>Clearly inform the user which RPC URL is being used to communicate with a chain at any given moment, and inform the user of the risks of using multiple RPC endpoints to interact with the same chain.</li>
+</ul>
+<h3 id="validating-chain-data">
+<a href="#validating-chain-data" class="anchor-link"></a> Validating Chain Data
+</h3>
+<p>A wallet that implements <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> should expect to encounter requests for chains completely unknown to the wallet maintainers.
+That said, community resources exist that can be leveraged to verify requests for many Ethereum chains.
+The wallet should maintain a list of known chains, and verify requests to add chains against that list.
+Indeed, a wallet may even prefer its own chain metadata over anything submitted with a <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> request.</p>
+<h3 id="ux">
+<a href="#ux" class="anchor-link"></a> UX
+</h3>
+<p>Adding a new chain to the wallet can have significant implications for the wallet’s functionality and the experience of the user.
+A chain should never be added without the explicit consent of the user, and different chains should be clearly differentiated in the wallet UI.
+In service of these goals, the wallet should:</p>
+<ul>
+<li>When receiving a <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> request, display a confirmation informing the user that a specific requester has requested that the chain be added.</li>
+<li>Ensure that any chain metadata, such as <code class="language-plaintext highlighter-rouge">nativeCurrency</code> and <code class="language-plaintext highlighter-rouge">blockExplorerUrls</code>, are validated and used to maximum effect in the UI.</li>
+<li>If any images are provided via <code class="language-plaintext highlighter-rouge">iconUrls</code>, ensure that the user understands that the icons could misrepresent the actual chain added.</li>
+<li>If the wallet UI has a concept of a “currently selected” or “currently active” chain, ensure that the user understands when a chain added using <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> becomes selected.</li>
+</ul>
+<h3 id="preserving-user-privacy">
+<a href="#preserving-user-privacy" class="anchor-link"></a> Preserving User Privacy
+</h3>
+<p>Although a request to add a chain that was already added should generally be considered a success, treating such requests as <em>automatic</em> successes leaks information to requesters about the chains a user has added to their wallet.
+In the interest of preserving user privacy, implementers of <code class="language-plaintext highlighter-rouge">wallet_addEthereumChain</code> should consider displaying user confirmations even in these cases.
+If the user denies the request, the wallet should return the same user rejection error as normal so that requesters cannot learn which chains are supported by the wallet without explicit permission to do so.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/rekmarks">Erik Marks</a>, <a href="https://github.com/pedrouid">Pedro Gomes</a>, "EIP-3085: Wallet Add Ethereum Chain RPC Method (`wallet_addEthereumChain`) [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 3085, November 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3085.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3085: Wallet Add Ethereum Chain RPC Method (`wallet_addEthereumChain`) [DRAFT]",
+    "author": "Erik Marks (@rekmarks), Pedro Gomes (@pedrouid)",
+    "name": "EIP-3085: Wallet Add Ethereum Chain RPC Method (`wallet_addEthereumChain`) [DRAFT]",
+    "dateCreated": "2020-11-01",
+    "datePublished": "2020-11-01",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3085-wallet-addethereumchain/5469",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

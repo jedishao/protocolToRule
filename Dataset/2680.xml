@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-2680: Ethereum 2 wallet layout</title>
+<meta property="og:title" content="EIP-2680: Ethereum 2 wallet layout" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-2680" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-2680" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="stagnant">
+🚧 This EIP had no activity for at least 6 months.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-2680: Ethereum 2 wallet layout
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2680.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#773d1e1a371a1413121259191203">Jim McDonald</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-2680-ethereum-2-wallet-layout/4323">https://ethereum-magicians.org/t/eip-2680-ethereum-2-wallet-layout/4323</a></td></tr>
+<tr><th>Status</th><td>Stagnant
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-05-29</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#base-location">Base location</a></li>
+<li><a href="#wallet-container">Wallet container</a></li>
+<li><a href="#walletstore">Walletstore</a></li>
+<li><a href="#keystore">Keystore</a></li>
+</ul>
+</li>
+<li><a href="#hierarchical-store-example">Hierarchical store example</a>
+<ul>
+<li><a href="#non-hierarchical-store-example">Non-hierarchical store example</a></li>
+<li><a href="#protecting-against-concurrent-write-access">Protecting against concurrent write access</a></li>
+<li><a href="#iterating-over-wallets">Iterating over wallets</a></li>
+<li><a href="#iterating-over-accounts">Iterating over accounts</a></li>
+<li><a href="#index-format">Index format</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#implementation">Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard layout and naming format for walletstore and keystore for both hierarchical (e.g. filesystem, Amazon S3) and non-hierarchical (key/value) storage systems.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Ethereum wallets have no standards for their layout in persistent storage, making different wallet implementations incompatible. This defines a standard for the placement of Ethereum walletstores and keystores, making it possible for different software to work with the same wallets and keys.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>A standard layout for wallets and accounts allows interoperability between validators. This benefits users, as they can move from one validator software to another (and back) without requiring movement of files. This is important because any movement of files containing keys involves danger of either deleting them or duplicating them, both of which could cause loss of access to funds.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>There are four elements for a wallet that need to be addressed. These are defined below.</p>
+<h3 id="base-location">
+<a href="#base-location" class="anchor-link"></a> Base location
+</h3>
+<p>The base location is required to be well-known, either pre-defined or defined by the storage system’s connection parameters.</p>
+<p>For filesystems the pre-defined base location for different operating systems is as follows:</p>
+<ul>
+<li>Windows: <code class="language-plaintext highlighter-rouge">%APPDATA%\ethereum2\wallets</code></li>
+<li>MacOSX: <code class="language-plaintext highlighter-rouge">${HOME}/Library/Application Support/ethereum2/wallets</code></li>
+<li>Linux: <code class="language-plaintext highlighter-rouge">${HOME}/.config/ethereum2/wallets</code></li>
+</ul>
+<p>For other hierarchical stores, for example Amazon S3, the base location MUST be the lower-case hex string representing the <a href="/assets/eip-2680/sha256-384-512.pdf">SHA-256</a> hash of the string “Ethereum 2 wallet:” appended with the identifier for the hierarchical store. For example, if the account ID for a user’s Amazon S3 account is “AbC0438EB” then:</p>
+<ul>
+<li>string would be <code class="language-plaintext highlighter-rouge">Ethereum 2 wallet:AbC0438EB</code></li>
+<li>SHA-256 hash of string would be the byte array <code class="language-plaintext highlighter-rouge">0x991ec14a8d13836b10d8c3039c9e30876491cb8aa9c9c16967578afc815c9229</code></li>
+<li>base location would be the string <code class="language-plaintext highlighter-rouge">991ec14a8d13836b10d8c3039c9e30876491cb8aa9c9c16967578afc815c9229</code></li>
+</ul>
+<p>For non-hierarchical stores there is no base location.</p>
+<h3 id="wallet-container">
+<a href="#wallet-container" class="anchor-link"></a> Wallet container
+</h3>
+<p>The wallet container holds the walletstore and related keystores.</p>
+<p>The wallet container is identified by the wallet’s UUID. It MUST be a string following the syntactic structure as laid out in <a href="https://tools.ietf.org/html/rfc4122#section-3">section 3 of RFC 4122</a>.</p>
+<h3 id="walletstore">
+<a href="#walletstore" class="anchor-link"></a> Walletstore
+</h3>
+<p>The walletstore element contains the walletstore and is held within the wallet container. It is identified by the wallet’s UUID. It MUST be a string following the syntactic structure as laid out in <a href="https://tools.ietf.org/html/rfc4122#section-3">section 3 of RFC 4122</a>.</p>
+<h3 id="keystore">
+<a href="#keystore" class="anchor-link"></a> Keystore
+</h3>
+<p>The keystore element contains the keystore for a given key and is held within the wallet container. It is identified by the key’s UUID. It MUST be a string following the syntactic structure as laid out in <a href="https://tools.ietf.org/html/rfc4122#section-3">section 3 of RFC 4122</a>.</p>
+<h2 id="hierarchical-store-example">
+<a href="#hierarchical-store-example" class="anchor-link"></a> Hierarchical store example
+</h2>
+<p>Hierarchical stores are a common way to store and organize information. The most common example is the filesystem, but a number of object-based stores such as Amazon S3 also provide hierarchical naming.</p>
+<p>Putting these elements together for a sample wallet with wallet UUID <code class="language-plaintext highlighter-rouge">1f031fff-c51d-44fc-8baf-d6b304cb70a7</code> and key UUIDs <code class="language-plaintext highlighter-rouge">1302106c-8441-4e2e-b687-6c77f49fc624</code> and <code class="language-plaintext highlighter-rouge">4a320100-83fd-4db7-8126-6d6d205ba834</code> gives the following layout:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- 1f031fff-c51d-44fc-8baf-d6b304cb70a7
++- 1302106c-8441-4e2e-b687-6c77f49fc624
++- 1f031fff-c51d-44fc-8baf-d6b304cb70a7
++- 4a320100-83fd-4db7-8126-6d6d205ba834
+</code></pre></div></div>
+<h3 id="non-hierarchical-store-example">
+<a href="#non-hierarchical-store-example" class="anchor-link"></a> Non-hierarchical store example
+</h3>
+<p>Non-hierarchical stores use a simplified approach where the wallet UUID and key UUIDs are concatenated using the ‘:’ character. Using the same example wallet and key UUIDs as above would result in objects with the following keys:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1f031fff-c51d-44fc-8baf-d6b304cb70a7:1302106c-8441-4e2e-b687-6c77f49fc624
+1f031fff-c51d-44fc-8baf-d6b304cb70a7:1f031fff-c51d-44fc-8baf-d6b304cb70a7
+1f031fff-c51d-44fc-8baf-d6b304cb70a7:4a320100-83fd-4db7-8126-6d6d205ba834
+</code></pre></div></div>
+<h3 id="protecting-against-concurrent-write-access">
+<a href="#protecting-against-concurrent-write-access" class="anchor-link"></a> Protecting against concurrent write access
+</h3>
+<p>TBD</p>
+<h3 id="iterating-over-wallets">
+<a href="#iterating-over-wallets" class="anchor-link"></a> Iterating over wallets
+</h3>
+<p>In the case of hierarchical stores and iteration-capable non-hierarchical stores iteration over wallets is a matter of iterating over the files in the root container.</p>
+<p>An implementer MAY include an index in the base location. If so then it MUST follow the structure as specified in the following “Index format” section.</p>
+<h3 id="iterating-over-accounts">
+<a href="#iterating-over-accounts" class="anchor-link"></a> Iterating over accounts
+</h3>
+<p>In the case of hierarchical stores iteration over accounts is a matter of iterating over the files in the wallet container.</p>
+<p>An implementer MAY include an index within a wallet container for accounts within that wallet. If so then it MUST follow the structure as specified in the following “Index format” section.</p>
+<h3 id="index-format">
+<a href="#index-format" class="anchor-link"></a> Index format
+</h3>
+<p>The index format is the same for both wallets and accounts, following a standard JSON schema.</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"array"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"required"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="s2">"uuid"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"name"</span><span class="w">
+        </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p>The index MUST use the identifier ‘index’.</p>
+<p>Public keys must NOT be stored in the index.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>A standard for walletstores, similar to that for keystores, provides a higher level of compatibility between wallets and allows for simpler wallet and key interchange between them.</p>
+<h2 id="implementation">
+<a href="#implementation" class="anchor-link"></a> Implementation
+</h2>
+<p>A Go implementation of the filesystem layout can be found at <a href="https://github.com/wealdtech/go-eth2-wallet-filesystem">https://github.com/wealdtech/go-eth2-wallet-filesystem</a>.</p>
+<p>A Go implementation of the Amazon S3 layout can be found at <a href="https://github.com/wealdtech/go-eth2-wallet-s3">https://github.com/wealdtech/go-eth2-wallet-s3</a>.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Locations for wallet stores are defined to be within each user’s personal space, reducing the possibility of accidental exposure of information. It is, however, still possible for permissions to be set such that this data is world-readable, and applications implementing this EIP should attempt to set, and reset, permissions to ensure that only the relevant user has access to the information.</p>
+<p>The names for both wallet and key stores are UUIDs, ensuring that no data is leaked from the metadata.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#5f1536321f323c3b3a3a71313a2b">Jim McDonald</a>, "EIP-2680: Ethereum 2 wallet layout [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 2680, May 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-2680.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-2680: Ethereum 2 wallet layout [DRAFT]",
+    "author": "Jim McDonald <Jim@mcdee.net>",
+    "name": "EIP-2680: Ethereum 2 wallet layout [DRAFT]",
+    "dateCreated": "2020-05-29",
+    "datePublished": "2020-05-29",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-2680-ethereum-2-wallet-layout/4323",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

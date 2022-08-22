@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4341: Ordered NFT Batch Standard</title>
+<meta property="og:title" content="EIP-4341: Ordered NFT Batch Standard" />
+<meta name="description" content="The ordering information of multiple NFTs is retained and managed" />
+<meta property="og:description" content="The ordering information of multiple NFTs is retained and managed" />
+<meta name="twitter:description" content="The ordering information of multiple NFTs is retained and managed" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4341" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4341" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4341: Ordered NFT Batch Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4341.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>The ordering information of multiple NFTs is retained and managed</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/simontianx">Simon Tian</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/3782">https://github.com/ethereum/EIPs/issues/3782</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-10-01</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#phrase">Phrase</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard introduces a smart contract interface that can represent a batch
+of non-fungible tokens of which the ordering information shall be retained and
+managed. Such information is particularly useful if <code class="language-plaintext highlighter-rouge">tokenId</code>s are encoded with
+the sets of <code class="language-plaintext highlighter-rouge">unicodes</code> for logographic characters and emojis. As a result, NFTs
+can be utilized as carriers of meanings.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Non-fungible tokens are widely accepted as carriers of crypto-assets, hence in both
+<a href="/EIPS/eip-721">ERC-721</a> and <a href="/EIPS/eip-1155">ERC-1155</a>, the ordering information of
+multiple NFTs is discarded. However, as proposed in <a href="/EIPS/eip-3754">EIP-3754</a>,
+non-fungible tokens are thought of as basic units on a blockchain and can carry
+abstract meanings with unicoded <code class="language-plaintext highlighter-rouge">tokenId</code>s. Transferring such tokens is transmitting
+an ordered sequence of unicodes, thus effectively transmitting phrases or meanings
+on a blockchain.</p>
+<p>A <strong><a href="https://en.wikipedia.org/wiki/Logogram">logograph</a></strong> is a written character
+that represents a word or morpheme, examples include <em>hanzi</em> in Mandarin, <em>kanji</em>
+in Japanese, <em>hanja</em> in Korean, and etc. A <a href="https://en.wikipedia.org/wiki/Unicode">unicode</a>
+is an information technology standard for the consistent encoding, representation, and
+handling of texts.</p>
+<p>It is natural to combine the two to create unicoded NFTs to represent logographic
+characters. Since a rich amount of meanings can be transmitted in just a few
+characters in such languages, it is technically practical and valuable to create
+a standard for it. Emojis are similar with logographs and can be included as well.
+For non-logographic languages such as English, although the same standard can be
+applied, it is tedious to represent each letter with an NFT, hence the gain is
+hardly justifiable.</p>
+<p>A motivating example is instead of sending the two Chinese characters of the
+Great Wall <code class="language-plaintext highlighter-rouge">长城</code>, two NFTs with IDs <code class="language-plaintext highlighter-rouge">#38271</code> and <code class="language-plaintext highlighter-rouge">#22478</code> respectively can be
+transferred in a batch. The two IDs are corresponding to the decimal unicode of
+the two characters. The receiving end decodes the IDs and retrieves the original
+characters. A key point is the ordering information matters in this scenario
+since the tuples <code class="language-plaintext highlighter-rouge">(38271, 22478)</code> and <code class="language-plaintext highlighter-rouge">(22478, 38271)</code> can be decoded as
+<code class="language-plaintext highlighter-rouge">长城</code> and <code class="language-plaintext highlighter-rouge">城长</code>, respectively, and both are legitimate words in the Chinese
+language. This illustrates the key difference between this standard and <a href="/EIPS/eip-1155">ERC-1155</a>.</p>
+<p>Besides, in the eastern Asian culture, characters are sometimes considered or
+practically used as gifts in holidays such as Spring Feastival, etc.
+<code class="language-plaintext highlighter-rouge">(24685, 21916, 21457, 36001)</code> <code class="language-plaintext highlighter-rouge">恭喜发财</code> can be used literally as a gift to
+express the best wishes for financial prosperity. It is therefore cuturally
+natural to transfer tokens to express meanings with this standard.</p>
+<p>Also in logographic language systems, ancient teachings are usually written in
+concise ways such that a handful of characters can unfold a rich amount of
+meanings. Modern people now get a reliable technical means to pass down their
+words, poems and proverbs to the future generations by sending tokens.</p>
+<p>Other practical and interesting applications include Chinese chess, wedding
+vows, family generation quotes and sayings, funeral commendation words, prayers,
+anecdotes and etc.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pragma solidity ^0.8.0;
+
+/**
+    @title EIP-4341 Multi Ordered NFT Standard
+    @dev See https://eips.ethereum.org/EIPS/eip-4341
+ */
+interface ERC4341 /* is ERC165 */ {
+    event Transfer(address indexed from, address indexed to, uint256 id, uint256 amount);
+
+    event TransferBatch(address indexed from, address indexed to, uint256[] ids, uint256[] amounts);
+
+    event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
+
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes calldata data) external;
+
+    function safeBatchTransferFrom(address from, address to, uint256[] calldata ids, uint256[] calldata amounts, bytes calldata data) external;
+
+    function safePhraseTransferFrom(address from, address to, uint256[] calldata phrase, bytes calldata data) external;
+
+    function balanceOf(address owner, uint256 id) external view returns (uint256);
+
+    function balanceOfPhrase(address owner) external view returns (uint256);
+
+    function balanceOfBatch(address[] calldata owners, uint256[] calldata ids) external view returns (uint256[] memory);
+
+    function retrievePhrase(address owner, uint256 phraseId) external view returns (uint256[] memory);
+
+    function setApprovalForAll(address operator, bool approved) external;
+
+    function isApprovedForAll(address owner, address operator) external view returns (bool);
+}
+</code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>In <a href="/EIPS/eip-1155">ERC-1155</a> and <a href="/EIPS/eip-721">ERC-721</a>, NFTs are used to represent
+crypto-assets, and in this standard together with <a href="/EIPS/eip-3754">EIP-3754</a>, NFTs
+are equipped with utilities. In this standard, the ordering information of a batch
+of NFTs is retained and managed through a construct <code class="language-plaintext highlighter-rouge">phrase</code>.</p>
+<h3 id="phrase">
+<a href="#phrase" class="anchor-link"></a> Phrase
+</h3>
+<p>A <code class="language-plaintext highlighter-rouge">phrase</code> is usually made of a handful of basic characters or an orderred sequence
+of unicodes and is able to keep the ordering information in a batch of tokens.
+Technically, it is stored in an array of unsigned integers, and is not supposed
+to be disseminated. A phrase does not increase or decrease the amount of any NFT
+in anyway. A phrase cannot be transferred, however, it can be retrieved and
+decoded to restore the original sequence of unicodes. The phrase information
+is kept in storage and hence additional storage than <a href="/EIPS/eip-1155">ERC-1155</a> is required.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p><a href="/EIPS/eip-3754">EIP-3754</a> is the pre-requisite to this standard.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>https://github.com/simontianx/ERC4341</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/simontianx">Simon Tian</a>, "EIP-4341: Ordered NFT Batch Standard [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4341, October 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4341.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4341: Ordered NFT Batch Standard [DRAFT]",
+    "author": "Simon Tian (@simontianx)",
+    "name": "EIP-4341: Ordered NFT Batch Standard [DRAFT]",
+    "dateCreated": "2021-10-01",
+    "datePublished": "2021-10-01",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/3782",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

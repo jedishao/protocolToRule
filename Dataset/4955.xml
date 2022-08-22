@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4955: Vendor Specific Metadata Extension for Non-Fungible Tokens</title>
+<meta property="og:title" content="EIP-4955: Vendor Specific Metadata Extension for Non-Fungible Tokens" />
+<meta name="description" content="Add a new field to NFT metadata to store vendor specific data" />
+<meta property="og:description" content="Add a new field to NFT metadata to store vendor specific data" />
+<meta name="twitter:description" content="Add a new field to NFT metadata to store vendor specific data" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4955" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4955" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-4955: Vendor Specific Metadata Extension for Non-Fungible Tokens
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4955.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Add a new field to NFT metadata to store vendor specific data</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/nachomazzara">Ignacio Mazzara</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4955-non-fungible-token-metadata-namespaces-extension/8746">https://ethereum-magicians.org/t/eip-4955-non-fungible-token-metadata-namespaces-extension/8746</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-03-29</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-721">721</a>,
+<a href="eip-1155">1155</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following standard allows for the implementation of a standard schema for NFTs metadata. The main goal is adding a new field namespaces to the JSON schema for NFTs</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>A standard schema allows wallets, marketplaces, metaverses, etc. to work with any NFT.</p>
+<p>This standard is inspired by the projects like marketplaces and metaverses which want to leverage the usage of NFTs by rendering them using custom 3d representations or any other new attributes.</p>
+<p>Some projects like Decentraland, TheSandbox, Cryptoavatars, etc. need their own 3d model in order to represent an NFT. These models are not compatible between them because of their esthetics and armatures.</p>
+<p>The lack of a property like the one proposed makes it almost impossible to generate interoperability of NFTs and keep the data decentralized.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p><strong>Proposed Schema</strong> (subject to “caveats” below):</p>
+<p>A new property called <code class="language-plaintext highlighter-rouge">namespaces</code> is introduced. This property expects one object per project as shown in the example below.</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Asset Metadata"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"properties"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Identifies the asset to which this NFT represents"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Describes the asset to which this NFT represents"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"image"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"string"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"A URI pointing to a resource with mime type image/* representing the asset to which this NFT represents. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"namespaces"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"object"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Projects that needs specific properties to use the NFT"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<p><strong>Example</strong></p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"My NFT"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NFT description"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"image"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ipfs://QmZfmRZHuawJDtDVMaEaPWfgWFV9iXoS9SzLvwX76wm6pa"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"namespaces"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"myAwesomeCompany"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"prop1"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value1"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"prop2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value2"</span><span class="p">,</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="nl">"myAwesomeCompany2"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"prop3"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value3"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"prop4"</span><span class="p">:</span><span class="w"> </span><span class="s2">"value4"</span><span class="p">,</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="err">//</span><span class="w"> </span><span class="err">Or</span><span class="w"> </span><span class="err">by</span><span class="w"> </span><span class="err">simply</span><span class="w"> </span><span class="err">using</span><span class="w"> </span><span class="err">a</span><span class="w"> </span><span class="err">`URI`</span><span class="w"> </span><span class="err">to</span><span class="w"> </span><span class="err">reduce</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">size</span><span class="w"> </span><span class="err">of</span><span class="w"> </span><span class="err">the</span><span class="w"> </span><span class="err">JSON</span><span class="w"> </span><span class="err">response.</span><span class="w">
+
+</span><span class="p">{</span><span class="w">
+  </span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"My NFT"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NFT description"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"image"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ipfs://QmZfmRZHuawJDtDVMaEaPWfgWFV9iXoS9SzLvwX76wm6pa"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"namespaces"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"myAwesomeCompany"</span><span class="p">:</span><span class="w"> </span><span class="s2">"URI"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"myAwesomeCompany2"</span><span class="p">:</span><span class="w"> </span><span class="s2">"URI"</span><span class="p">,</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>There are many projects which need custom properties in order to display a current NFT. Each project may have its own way to render the NFTs and therefore they need different values. An example of this is the metaverses like Decentraland or TheSandbox where they need different 3d models to render the NFT based on the visual/engine of each. NFTs projects like Cryptopunks, Bored Apes, etc. can create the 3d models needed for each project and therefore be supported out of the box.</p>
+<p>The main differences between the projects that are rendering 3d NFTs (models) are:</p>
+<ul>
+<li><strong>Armatures</strong>
+For example, every metaverse uses its own armature. There is a standard for humanoids but it is not being used for every metaverse and not all the metaverses use humanoids. For example, Decentraland has a different esthetic than Cryptovoxels and TheSandbox. It means that every metaverse will need a different model and they may have the same extension (GLB, GLTF)</li>
+</ul>
+<p><img src="../assets/eip-4955/different-renders.jpeg" alt="EIP 4955 Different Renders" /></p>
+<ul>
+<li><strong>Metadata (Representations Files)</strong></li>
+</ul>
+<p>For example, every metaverse uses its own metadata representation files to make it work inside the engine depending on its game needs.</p>
+<p>This is how a wearable looks like in Decentraland in terms of the config file:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"data": {
+  "replaces": [],
+  "hides": [],
+  "tags": [],
+  "category": "upper_body",
+  "representations": [
+    {
+      "bodyShapes": [
+        "urn:decentraland:off-chain:base-avatars:BaseMale"
+      ],
+      "mainFile": "male/Look6_Tshirt_A.glb",
+      "contents": [
+        {
+          "key": "male/Look6_Tshirt_A.glb",
+          "url": "https://peer-ec2.decentraland.org/content/contents/QmX3yMhmx4AvGmyF3CM5ycSQB4F99zXh9rL5GvdxTTcoCR"
+        }
+      ],
+      "overrideHides": [],
+      "overrideReplaces": []
+    },
+    {
+      "bodyShapes": [
+        "urn:decentraland:off-chain:base-avatars:BaseFemale"
+      ],
+      "mainFile": "female/Look6_Tshirt_B (1).glb",
+      "contents": [
+        {
+          "key": "female/Look6_Tshirt_B (1).glb",
+          "url": "https://peer-ec2.decentraland.org/content/contents/QmcgddP4L8CEKfpJ4cSZhswKownnYnpwEP4eYgTxmFdav8"
+        }
+      ],
+      "overrideHides": [],
+      "overrideReplaces": []
+    }
+  ]
+},
+"image": "https://peer-ec2.decentraland.org/content/contents/QmPnzQZWAMP4Grnq6phVteLzHeNxdmbRhKuFKqhHyVMqrK",
+"thumbnail": "https://peer-ec2.decentraland.org/content/contents/QmcnBFjhyFShGo9gWk2ETbMRDudiX7yjn282djYCAjoMuL",
+"metrics": {
+  "triangles": 3400,
+  "materials": 2,
+  "textures": 2,
+  "meshes": 2,
+  "bodies": 2,
+  "entities": 1
+}
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">replaces</code>, <code class="language-plaintext highlighter-rouge">overrides</code>, <code class="language-plaintext highlighter-rouge">hides</code>, and different body shapes representation for the same asset are needed for Decentraland in order to render the 3D asset correctly.</p>
+<hr />
+<p>Using <code class="language-plaintext highlighter-rouge">namespaces</code> instead of objects like the ones below make it easy for the specific vendor/third-parties to access and index the required models. Moreover, <code class="language-plaintext highlighter-rouge">styles</code> do not exist because there are no standards around for how an asset will be rendered. As I mentioned above, each metaverse for example uses its own armature and esthetic. There is no Decentraland-style or TheSandbox-style that other metaverses use. Each of them is unique and specific for the sake of the platform’s reason of being. Projects like Cryptoavatars are trying to push different standards but without luck for the same reasons related to the uniquity of the armature/animations/metadata.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{
+    "id": "model",
+    "type": "model/gltf+json",
+    "style": "Decentraland",
+    "uri": "..."
+},
+
+// Or
+
+{
+    "id": "model",
+    "type": "model/gltf+json",
+    "style": "humanoide",
+    "uri": "..."
+},
+</code></pre></div></div>
+<p>With <code class="language-plaintext highlighter-rouge">namespaces</code> each vendor will know how to render an asset by doing:</p>
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">fetch</span><span class="p">(</span><span class="nx">metadata</span><span class="p">.</span><span class="nx">namespaces</span><span class="p">[</span><span class="dl">"</span><span class="s2">PROJECT_NAME</span><span class="dl">"</span><span class="p">].</span><span class="nx">uri</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">res</span> <span class="o">=&gt;</span> <span class="nx">render</span><span class="p">(</span><span class="nx">res</span><span class="p">))</span>
+</code></pre></div></div>
+<p>The idea behind extending the ERC721 metadata schema is to have backward compatibility as much as possible with existing projects. Chances are that the asset’s smart contracts are not upgradeable and therefore if a project wants to be compatible with this EIP, it will need to redeploy and migrate the current contracts. This is very time- and money-consuming. Creating a new token standard that stores the data needed on-chain: 3D models and config files are not the right paths. There are protocols already used for the ERC721 metadata standard like IPFS (the token URI is an IPFS hash). The idea is to leverage this and require as few changes as possible. Moreover, the current metadata standard uses a 2D representation field: <code class="language-plaintext highlighter-rouge">image</code>. It seems reasonable to have all the representations of an asset in the same place.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Existing projects that can’t modify the metadata response (schema), may be able to create a new smart contract that based on the <code class="language-plaintext highlighter-rouge">tokenId</code> returns the updated metadata schema. Of course, the projects may need to accept these linked smart contracts as valid in order to fetch the metadata by the <code class="language-plaintext highlighter-rouge">tokenURI</code> function.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/nachomazzara">Ignacio Mazzara</a>, "EIP-4955: Vendor Specific Metadata Extension for Non-Fungible Tokens [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 4955, March 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4955.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4955: Vendor Specific Metadata Extension for Non-Fungible Tokens [DRAFT]",
+    "author": "Ignacio Mazzara (@nachomazzara)",
+    "name": "EIP-4955: Vendor Specific Metadata Extension for Non-Fungible Tokens [DRAFT]",
+    "dateCreated": "2022-03-29",
+    "datePublished": "2022-03-29",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4955-non-fungible-token-metadata-namespaces-extension/8746",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>
