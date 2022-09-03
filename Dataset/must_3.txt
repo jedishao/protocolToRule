@@ -1,0 +1,63 @@
+MUST be triggered when execute creates a new call using the operationType 0, 3, 4.
+MUST be triggered when execute creates a new contract using the operationType 1, 2.
+MUST be triggered when setData was successfully called.
+When an address becomes an operator for a holder, an AuthorizedOperator event MUST be emitted.
+When an address becomes an operator for a holder, an AuthorizedOperator event MUST be emitted.
+When a holder revokes an operator, a RevokedOperator event MUST be emitted.
+When a holder revokes an operator, a RevokedOperator event MUST be emitted.
+AuthorizedOperator events MUST NOT be emitted when defining the default operators.
+An AuthorizedOperator MUST be emitted each time.
+A RevokedOperator MUST be emitted each time.
+NOTE: This event MUST NOT be emitted outside of an operator authorization process.
+NOTE: This event MUST NOT be emitted outside of an operator revocation process.
+NOTE: This event MUST NOT be emitted outside of a send or an ERC-20 transfer process
+While a Sent event MUST NOT be emitted when minting,
+NOTE: This event MUST NOT be emitted outside of a mint process.
+While a Sent event MUST NOT be emitted when burning;
+NOTE: This event MUST NOT be emitted outside of a burn process.
+During a send, mint and burn, the respective Sent, Minted and Burned events MUST be emitted.
+During an ERC-20’s transfer or transferFrom functions, a valid Sent event MUST be emitted.
+During a send, mint and burn, the respective Sent, Minted and Burned events MUST be emitted.
+During an ERC-20’s transfer or transferFrom functions, a valid Sent event MUST be emitted.
+During a send, mint and burn, the respective Sent, Minted and Burned events MUST be emitted.
+During an ERC-20’s transfer or transferFrom functions, a valid Sent event MUST be emitted.
+This event MUST be fired on return from a call to a TokenValidator.check/2.
+This event MUST be fired on return from a call to a TokenValidator.check/4.
+MUST be triggered when changeOwner or changeOwnerSigned was successfully called.
+MUST be triggered when a change to a delegate was successfully made.
+MUST be triggered when a change to an attribute was successfully made.
+An important consideration is that even if the tokens are sent with another standard’s rules the ERC-1155 transfer events MUST still be emitted. This is so the balances can still be determined via events alone as per ERC-1155 standard rules.
+When emitted, the message event MUST be emitted with an object argument of the following form:
+This event MUST be emitted with an object of the following form:
+MUST be triggered when release is successfully called.
+MUST be triggered when an Identity is created.
+MUST be triggered when an address is added to an Identity.
+MUST be triggered when an address is removed from an Identity.
+MUST be triggered when a provider is added to an Identity.
+MUST be triggered when a provider is removed.
+MUST be triggered when a resolver is added.
+MUST be triggered when a resolver is removed.
+MUST be triggered when a recovery address change is triggered.
+MUST be triggered when recovery is triggered.
+MUST be triggered when an Identity is destroyed.
+MUST be triggered when create is successfully called.
+MUST be triggered when withdraw is successfully called.
+MUST be triggered when redeem is successfully called.
+MUST be triggered when confirmUpdate is successfully called.
+MUST be triggered when revokeUpdate is successfully called.
+MUST be triggered when an update is approved by all involved parties.
+Any time one or more functions are added, replaced or removed the DiamondCut event MUST be emitted to record changes.
+To ensure the indexing of transactions throughout the bond lifecycle (i.e “Issue”, “Redeem” and “Transfer” functions), events cited in specification section MUST be emitted when such transaction is passed.
+The ConsumerChanged event MUST be emitted when a consumer is changed.
+MUST be emitted when tokens are deposited into the Vault via the mint and deposit methods.
+MUST be emitted when shares are withdrawn from the Vault in EIP-4626.redeem or EIP-4626.withdraw methods.
+The MetadataUpdate or BatchMetadataUpdate event MUST be emitted when the JSON metadata of a token, or a consecutive range of tokens, is changed.
+The UpdateUser event MUST be emitted when a user address is changed or the user expires is changed.
+MUST be emitted when Principal Tokens are burnt and underlying is withdrawn from the contract in the EIP5095.redeem method.
+The ApprovalByAmount event MUST be emitted when a certain number of tokens are approved.
+The UpdateUser event MUST be emitted when a user address is changed or the user expires is changed or the user level is changed.
+The SlotAuthorizationCreated event MUST be emitted when a slot is authorized to an address.
+The SlotAuthorizationRevoked event MUST be emitted when a slot authorization is revoked.
+The PrivilegeAssigned event MUST be emitted when setPrivilege is called.
+The PrivilegeTransfered event MUST be emitted when transferPrivilege is called.
+The PrivilegeCloned event MUST be emitted when clonePrivilege is called.

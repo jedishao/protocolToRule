@@ -1,14 +1,6 @@
-
 https://eips.ethereum.org/EIPS/eip-1
 References to other EIPs should follow the format EIP-N where N is the EIP number you are referring to. Each EIP that is referenced in an EIP MUST be accompanied by a relative markdown link the first time it is referenced, and MAY be accompanied by a link on subsequent references. The link MUST always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc. For example, you would link to this EIP with [EIP-1](/EIPS/eip-1).
 References to other EIPs should follow the format EIP-N where N is the EIP number you are referring to. Each EIP that is referenced in an EIP MUST be accompanied by a relative markdown link the first time it is referenced, and MAY be accompanied by a link on subsequent references. The link MUST always be done via relative paths so that the links work in this GitHub repository, forks of this repository, the main EIPs site, mirrors of the main EIP site, etc. For example, you would link to this EIP with [EIP-1](/EIPS/eip-1).
-https://eips.ethereum.org/EIPS/eip-2
-https://eips.ethereum.org/EIPS/eip-3
-https://eips.ethereum.org/EIPS/eip-4
-https://eips.ethereum.org/EIPS/eip-5
-https://eips.ethereum.org/EIPS/eip-6
-https://eips.ethereum.org/EIPS/eip-7
-https://eips.ethereum.org/EIPS/eip-8
 https://eips.ethereum.org/EIPS/eip-20
 OPTIONAL - This method can be used to improve usability,
 but interfaces and other contracts MUST NOT expect these values to be present.
@@ -23,67 +15,17 @@ Transfers _value amount of tokens from address _from to address _to, and MUST fi
 Note Transfers of 0 values MUST be treated as normal transfers and fire the Transfer event.
 MUST trigger when tokens are transferred, including zero value transfers.
 MUST trigger on any successful call to approve(address _spender, uint256 _value).
-https://eips.ethereum.org/EIPS/eip-55
-https://eips.ethereum.org/EIPS/eip-67
-https://eips.ethereum.org/EIPS/eip-86
-https://eips.ethereum.org/EIPS/eip-100
-https://eips.ethereum.org/EIPS/eip-101
-https://eips.ethereum.org/EIPS/eip-107
 https://eips.ethereum.org/EIPS/eip-137
 Resolvers may implement any subset of the record types specified here. Where a record types specification requires a resolver to provide multiple functions, the resolver MUST implement either all or none of them. Resolvers MUST specify a fallback function that throws.
 Resolvers may implement any subset of the record types specified here. Where a record types specification requires a resolver to provide multiple functions, the resolver MUST implement either all or none of them. Resolvers MUST specify a fallback function that throws.
 If the resolver supports addr lookups but the requested node does not have an addr record, the resolver MUST return the zero address.
 Clients resolving the addr record MUST check for a zero return value, and treat this in the same manner as a name that does not have a resolver specified - that is, refuse to send funds to or interact with the address. Failure to do this can result in users accidentally sending funds to the 0 address.
 Changes to an address MUST trigger the following event:
-https://eips.ethereum.org/EIPS/eip-140
-https://eips.ethereum.org/EIPS/eip-141
-https://eips.ethereum.org/EIPS/eip-145
-https://eips.ethereum.org/EIPS/eip-150
-https://eips.ethereum.org/EIPS/eip-152
 https://eips.ethereum.org/EIPS/eip-155
 If block.number >= FORK_BLKNUM and CHAIN_ID is available, then when computing the hash of a transaction for the purposes of signing, instead of hashing only six rlp encoded elements (nonce, gasprice, startgas, to, value, data), you SHOULD hash nine rlp encoded elements (nonce, gasprice, startgas, to, value, data, chainid, 0, 0). If you do, then the v of the signature MUST be set to {0,1} + CHAIN_ID * 2 + 35 where {0,1} is the parity of the y value of the curve point for which r is the x-value in the secp256k1 signing process. If you choose to only hash 6 values, then v continues to be set to {0,1} + 27 as previously.
-https://eips.ethereum.org/EIPS/eip-158
-https://eips.ethereum.org/EIPS/eip-160
-https://eips.ethereum.org/EIPS/eip-161
-https://eips.ethereum.org/EIPS/eip-162
-https://eips.ethereum.org/EIPS/eip-165
-https://eips.ethereum.org/EIPS/eip-170
-https://eips.ethereum.org/EIPS/eip-173
-https://eips.ethereum.org/EIPS/eip-181
-https://eips.ethereum.org/EIPS/eip-190
-https://eips.ethereum.org/EIPS/eip-191
-https://eips.ethereum.org/EIPS/eip-196
-https://eips.ethereum.org/EIPS/eip-197
-https://eips.ethereum.org/EIPS/eip-198
-https://eips.ethereum.org/EIPS/eip-205
-https://eips.ethereum.org/EIPS/eip-210
-https://eips.ethereum.org/EIPS/eip-211
-https://eips.ethereum.org/EIPS/eip-214
-https://eips.ethereum.org/EIPS/eip-225
-https://eips.ethereum.org/EIPS/eip-233
-https://eips.ethereum.org/EIPS/eip-234
-https://eips.ethereum.org/EIPS/eip-600
-https://eips.ethereum.org/EIPS/eip-601
-https://eips.ethereum.org/EIPS/eip-606
-https://eips.ethereum.org/EIPS/eip-607
-https://eips.ethereum.org/EIPS/eip-608
-https://eips.ethereum.org/EIPS/eip-609
-https://eips.ethereum.org/EIPS/eip-615
-https://eips.ethereum.org/EIPS/eip-616
-https://eips.ethereum.org/EIPS/eip-627
-https://eips.ethereum.org/EIPS/eip-634
-https://eips.ethereum.org/EIPS/eip-649
-https://eips.ethereum.org/EIPS/eip-658
-https://eips.ethereum.org/EIPS/eip-663
-https://eips.ethereum.org/EIPS/eip-665
 https://eips.ethereum.org/EIPS/eip-681
 Note that a number can be expressed in scientific notation, with a multiplier of a power of 10. Only integer numbers are allowed, so the exponent MUST be greater or equal to the number of decimals after the point.
 If key in the parameter list is value, gasLimit, gasPrice or gas then value MUST be a number. Otherwise, it must correspond to the TYPE string used as key.
-https://eips.ethereum.org/EIPS/eip-689
-https://eips.ethereum.org/EIPS/eip-695
-https://eips.ethereum.org/EIPS/eip-698
-https://eips.ethereum.org/EIPS/eip-706
-https://eips.ethereum.org/EIPS/eip-712
 https://eips.ethereum.org/EIPS/eip-721
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -99,8 +41,6 @@ MUST be triggered when execute creates a new contract using the operationType 1,
 Sets data as bytes in the storage for a single key. MUST only be called by the current owner of the contract.
 Sets array of data at multiple keys. MUST only be called by the current owner of the contract.
 MUST be triggered when setData was successfully called.
-https://eips.ethereum.org/EIPS/eip-747
-https://eips.ethereum.org/EIPS/eip-758
 https://eips.ethereum.org/EIPS/eip-777
 The token contract MUST implement the above interface.
 The implementation MUST follow the specifications described below.
@@ -389,7 +329,6 @@ As a general rule, if an application considers the token as an ERC20 token,
 then only the Transfer event MUST be taken into account.
 If the application considers the token as an ERC777 token,
 then only the Sent, Minted and Burned events MUST be considered.
-https://eips.ethereum.org/EIPS/eip-778
 https://eips.ethereum.org/EIPS/eip-779
 Blocks with block numbers in the range [1_920_000, 1_920_009] MUST have 0x64616f2d686172642d666f726b (hex encoded ASCII string dao-hard-fork) in the extraData field of the block.
 https://eips.ethereum.org/EIPS/eip-801
@@ -412,13 +351,6 @@ NOTE: Callers MUST handle false from returns (bool success). Callers MUST NOT as
 NOTE: Callers MUST handle false from returns (bool success). Callers MUST NOT assume that false is never returned!
 NOTE: Callers MUST handle false from returns (bool success). Callers MUST NOT assume that false is never returned!
 NOTE: Callers MUST handle false from returns (bool success). Callers MUST NOT assume that false is never returned!
-https://eips.ethereum.org/EIPS/eip-831
-https://eips.ethereum.org/EIPS/eip-858
-https://eips.ethereum.org/EIPS/eip-867
-https://eips.ethereum.org/EIPS/eip-868
-https://eips.ethereum.org/EIPS/eip-875
-https://eips.ethereum.org/EIPS/eip-884
-https://eips.ethereum.org/EIPS/eip-897
 https://eips.ethereum.org/EIPS/eip-900
 Stakes a certain amount of tokens, this MUST transfer the given amount from the user.
 MUST trigger Staked event.
@@ -430,8 +362,6 @@ MUST return true if the optional history functions are implemented, otherwise fa
 https://eips.ethereum.org/EIPS/eip-902
 This event MUST be fired on return from a call to a TokenValidator.check/2.
 This event MUST be fired on return from a call to a TokenValidator.check/4.
-https://eips.ethereum.org/EIPS/eip-908
-https://eips.ethereum.org/EIPS/eip-918
 https://eips.ethereum.org/EIPS/eip-926
 Providers may implement any subset of the metadata record types specified here. Where a record types specification requires a provider to provide multiple functions, the provider MUST implement either all or none of them. Providers MUST throw if called with an unsupported function ID.
 Providers may implement any subset of the metadata record types specified here. Where a record types specification requires a provider to provide multiple functions, the provider MUST implement either all or none of them. Providers MUST throw if called with an unsupported function ID.
@@ -439,7 +369,6 @@ The first argument to all provider functions MUST be the address being queried; 
 https://eips.ethereum.org/EIPS/eip-927
 Arguments have the same meaning as in canCall. Implementing contracts MUST ensure that msg.sender is authorised to call authoriseCaller or revokeCaller on behalf of owner; this MUST always be true if owner == msg.sender. Implementing contracts SHOULD use the standard specified here to determine if other callers may provide authorisations as well.
 Arguments have the same meaning as in canCall. Implementing contracts MUST ensure that msg.sender is authorised to call authoriseCaller or revokeCaller on behalf of owner; this MUST always be true if owner == msg.sender. Implementing contracts SHOULD use the standard specified here to determine if other callers may provide authorisations as well.
-https://eips.ethereum.org/EIPS/eip-969
 https://eips.ethereum.org/EIPS/eip-998
 This function transfers an amount of tokens from a user address to an ERC721 token. This function MUST ensure that the recipient contract implements ERC721 using the ERC165 supportsInterface function. This function SHOULD ensure that the recipient token actually exists, by calling ownerOf on the recipient token’s contract, and ensuring it neither throws nor returns the zero address. This function MUST emit the TransferToParent event upon a successful transfer (in addition to the standard ERC20 Transfer event!). This function MUST throw if the _from account balance does not have enough tokens to spend.
 This function transfers an amount of tokens from a user address to an ERC721 token. This function MUST ensure that the recipient contract implements ERC721 using the ERC165 supportsInterface function. This function SHOULD ensure that the recipient token actually exists, by calling ownerOf on the recipient token’s contract, and ensuring it neither throws nor returns the zero address. This function MUST emit the TransferToParent event upon a successful transfer (in addition to the standard ERC20 Transfer event!). This function MUST throw if the _from account balance does not have enough tokens to spend.
@@ -456,22 +385,10 @@ This function transfers an amount of tokens from an ERC721 token to another ERC7
 This function transfers an amount of tokens from an ERC721 token to another ERC721 token. This function MUST emit BOTH the TransferFromParent and TransferToParent events (in addition to the standard ERC20 Transfer event!). This function MUST throw if the balance of the sender ERC721 token is less than the _amount specified. This function MUST verify that the msg.sender owns the sender ERC721 token, and MUST throw otherwise. This function MUST ensure that the recipient contract implements ERC721 using the ERC165 supportsInterface function. This function SHOULD ensure that the recipient token actually exists, by calling ownerOf on the recipient token’s contract, and ensuring it neither throws nor returns the zero address.
 For backwards-compatibility, implementations MUST emit the standard ERC20 Transfer event when a transfer occurs, regardless of whether the sender and recipient are addresses or ERC721 tokens. In the case that either sender or recipient are tokens, the corresponding parameter in the Transfer event SHOULD be the contract address of the token.
 Implementations MUST implement all ERC20 and ERC223 functions in addition to the functions specified in this interface.
-https://eips.ethereum.org/EIPS/eip-999
-https://eips.ethereum.org/EIPS/eip-1010
-https://eips.ethereum.org/EIPS/eip-1011
-https://eips.ethereum.org/EIPS/eip-1013
-https://eips.ethereum.org/EIPS/eip-1014
-https://eips.ethereum.org/EIPS/eip-1015
-https://eips.ethereum.org/EIPS/eip-1046
-https://eips.ethereum.org/EIPS/eip-1051
-https://eips.ethereum.org/EIPS/eip-1052
 https://eips.ethereum.org/EIPS/eip-1056
 MUST be triggered when changeOwner or changeOwnerSigned was successfully called.
 MUST be triggered when a change to a delegate was successfully made.
 MUST be triggered when a change to an attribute was successfully made.
-https://eips.ethereum.org/EIPS/eip-1057
-https://eips.ethereum.org/EIPS/eip-1062
-https://eips.ethereum.org/EIPS/eip-1066
 https://eips.ethereum.org/EIPS/eip-1077
 The message MUST be signed as EIP-191 standard, and the called contract MUST also implement EIP-1271 which must validate the signed messages.
 The message MUST be signed as EIP-191 standard, and the called contract MUST also implement EIP-1271 which must validate the signed messages.
@@ -480,7 +397,6 @@ In order to be compliant, the transaction MUST request to sign a “messageHash�
 The fields MUST be constructed as this method:
 If _gasRelayer is zero, then the funds MUST go to block.coinbase.
 If there are not enough funds, or if the total surpasses gasLimit then the transaction MUST revert.
-https://eips.ethereum.org/EIPS/eip-1078
 https://eips.ethereum.org/EIPS/eip-1080
 Reports the lostAccount address as being lost. MUST trigger the AccountClaimedLost event.
 After the time configured in getLostAccountRecoveryTimeInMinutes the implementer MUST provide a mechanism for determining the correct owner of the tokens held and moving the tokens to a new account.
@@ -497,8 +413,6 @@ MUST comply with sender’s chargeback window as value configured by setPendingT
 MUST NOT change the time if the account has any pending transfers.
 MUST NOT change the time if the account has open disputes.
 A record of an account being frozen. MUST trigger when an account is frozen.
-https://eips.ethereum.org/EIPS/eip-1081
-https://eips.ethereum.org/EIPS/eip-1087
 https://eips.ethereum.org/EIPS/eip-1102
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
@@ -506,7 +420,6 @@ Dapps MUST request accounts by calling the eth_requestAccounts RPC method on the
 Dapps MUST request accounts by calling the eth_requestAccounts RPC method on the provider exposed at window.ethereum. Calling this method MAY trigger a user interface that allows the user to approve or reject account access for a given dapp. This method MUST return a Promise that is resolved with an array of one or more user accounts or rejected if no accounts are available (e.g., the user rejected account access).
 The Promise returned when calling the eth_requestAccounts RPC method MUST be resolved with an Array of user accounts.
 The Promise returned when calling the eth_requestAccounts RPC method MUST be rejected with an informative Error if no accounts are available for any reason.
-https://eips.ethereum.org/EIPS/eip-1108
 https://eips.ethereum.org/EIPS/eip-1109
 A PRECOMPILEDCALL to a regular address or regular smart contract, is considered a call to an “undefined smart contract”, so the VM MUST not execute it and the opcode must return 0x0 .
 https://eips.ethereum.org/EIPS/eip-1123
@@ -519,8 +432,6 @@ document are to be interpreted as described in RFC 2119.
 https://eips.ethereum.org/EIPS/eip-1129
 MUST trigger when new announcement is created.
 MUST trigger when an announcement is removed.
-https://eips.ethereum.org/EIPS/eip-1132
-https://eips.ethereum.org/EIPS/eip-1153
 https://eips.ethereum.org/EIPS/eip-1154
 receiveResult MUST revert if the msg.sender is not an oracle authorized to provide the result for that id.
 receiveResult MUST revert if receiveResult has been called with the same id before.
@@ -545,8 +456,6 @@ Order of operation MUST therefore be:
 Hence in a hybrid ERC-1155 contract implementation an extra call MUST be made on the recipient contract and checked before any hook calls to onERC1155Received or onERC1155BatchReceived are made.
 Order of operation MUST therefore be:
 An important consideration is that even if the tokens are sent with another standard’s rules the ERC-1155 transfer events MUST still be emitted. This is so the balances can still be determined via events alone as per ERC-1155 standard rules.
-https://eips.ethereum.org/EIPS/eip-1167
-https://eips.ethereum.org/EIPS/eip-1175
 https://eips.ethereum.org/EIPS/eip-1178
 OPTIONAL - It is recommended that this method is implemented for enhanced usability with wallets and exchanges, but interfaces and other contracts MUST NOT depend on the existence of this method.
 OPTIONAL - It is recommended that this method is implemented for enhanced usability with wallets and exchanges, but interfaces and other contracts MUST NOT depend on the existence of this method.
@@ -566,9 +475,6 @@ Additionally, the creation of new MCFTs MUST trigger a Transfer event for each n
 Additionally, the creation of new MCFTs MUST trigger a Transfer event for each newly created MCFTs, with a _from address of 0 and a _to address matching the owner of the new MCFT (possibly the smart contract itself). The deletion (or burn) of any MCFT MUST trigger a Transfer event with a _to address of 0 and a _from address of the owner of the MCFT (now former owner!).
 Approval
 This event MUST trigger on any successful call to approve(_to, _classId, quantity) (unless the caller is attempting to clear approval when there is no pending approval).
-https://eips.ethereum.org/EIPS/eip-1185
-https://eips.ethereum.org/EIPS/eip-1186
-https://eips.ethereum.org/EIPS/eip-1191
 https://eips.ethereum.org/EIPS/eip-1193
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
@@ -596,13 +502,8 @@ If the Provider becomes disconnected from all chains, the Provider MUST emit the
 If the Provider becomes disconnected from all chains, the Provider MUST emit the event named disconnect with value error: ProviderRpcError, per the interfaced defined in the RPC Errors section. The value of the error’s code property MUST follow the status codes for CloseEvent.
 If the chain the Provider is connected to changes, the Provider MUST emit the event named chainChanged with value chainId: string, specifying the integer ID of the new chain as a hexadecimal string, per the eth_chainId Ethereum RPC method.
 If the accounts available to the Provider change, the Provider MUST emit the event named accountsChanged with value accounts: string[], containing the account addresses per the eth_accounts Ethereum RPC method.
-https://eips.ethereum.org/EIPS/eip-1202
-https://eips.ethereum.org/EIPS/eip-1203
 https://eips.ethereum.org/EIPS/eip-1207
 All public or external functions that are allowed the grantee to call MUST use overload to implement two functions: The First one is the standard method that the user invokes directly, the second one is the grantee methods of the same function name with one more authorizer address parameter.
-https://eips.ethereum.org/EIPS/eip-1227
-https://eips.ethereum.org/EIPS/eip-1234
-https://eips.ethereum.org/EIPS/eip-1240
 https://eips.ethereum.org/EIPS/eip-1261
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -611,41 +512,22 @@ The assign and revoke functions’ documentation only specify conditions when th
 https://eips.ethereum.org/EIPS/eip-1271
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
-https://eips.ethereum.org/EIPS/eip-1276
-https://eips.ethereum.org/EIPS/eip-1283
-https://eips.ethereum.org/EIPS/eip-1285
-https://eips.ethereum.org/EIPS/eip-1295
 https://eips.ethereum.org/EIPS/eip-1319
 MUST be triggered when release is successfully called.
-https://eips.ethereum.org/EIPS/eip-1328
-https://eips.ethereum.org/EIPS/eip-1337
-https://eips.ethereum.org/EIPS/eip-1344
-https://eips.ethereum.org/EIPS/eip-1352
-https://eips.ethereum.org/EIPS/eip-1355
 https://eips.ethereum.org/EIPS/eip-1363
 Implementing contracts MUST implement the ERC-1363 interface as well as the ERC-20 and ERC-165 interfaces.
 A contract that wants to accept token payments via transferAndCall or transferFromAndCall MUST implement the following interface:
 A contract that wants to accept token payments via approveAndCall MUST implement the following interface:
-https://eips.ethereum.org/EIPS/eip-1380
-https://eips.ethereum.org/EIPS/eip-1386
-https://eips.ethereum.org/EIPS/eip-1387
-https://eips.ethereum.org/EIPS/eip-1388
 https://eips.ethereum.org/EIPS/eip-1417
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The 0.4.24 Solidity interface grammar is not expressive enough to document the ERC-1417 standard. A contract which complies with ERC-1417 MUST also abide by the following:
-https://eips.ethereum.org/EIPS/eip-1418
-https://eips.ethereum.org/EIPS/eip-1438
 https://eips.ethereum.org/EIPS/eip-1444
 A fallback Localization with all keys filled MUST be available. If the user-specified Localization has not explicitly set a loalization (ie. textFor returns ""), the LocalizationPreferences MUST redelegate to the fallback Localization.
 A fallback Localization with all keys filled MUST be available. If the user-specified Localization has not explicitly set a loalization (ie. textFor returns ""), the LocalizationPreferences MUST redelegate to the fallback Localization.
 The first return value (bool _wasFound) represents if the text is available from that Localization, or if a fallback was used. If the fallback was used in this context, the textFor’s first return value MUST be set to false, and is true otherwise.
 All strings MUST be encoded as UTF-8.
 Template strings are allowed, and MUST follow the ANSI C printf conventions.
-https://eips.ethereum.org/EIPS/eip-1450
-https://eips.ethereum.org/EIPS/eip-1459
-https://eips.ethereum.org/EIPS/eip-1462
-https://eips.ethereum.org/EIPS/eip-1470
 https://eips.ethereum.org/EIPS/eip-1474
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
@@ -654,7 +536,6 @@ Communication with Ethereum nodes is accomplished using JSON-RPC, a stateless, l
 If an Ethereum RPC method encounters an error, the error member included on the response object MUST be an object containing a code member and descriptive message member. The following list contains all possible error codes and associated messages:
 New Ethereum RPC methods and changes to existing methods MUST be proposed via the traditional EIP process. This allows for community consensus around new method implementations and proposed method modifications. RPC method proposals MUST reach “draft” status before being added to this proposal and the official Ethereum RPC specification defined herein.
 New Ethereum RPC methods and changes to existing methods MUST be proposed via the traditional EIP process. This allows for community consensus around new method implementations and proposed method modifications. RPC method proposals MUST reach “draft” status before being added to this proposal and the official Ethereum RPC specification defined herein.
-https://eips.ethereum.org/EIPS/eip-1482
 https://eips.ethereum.org/EIPS/eip-1484
 MUST be triggered when an Identity is created.
 MUST be triggered when an address is added to an Identity.
@@ -666,9 +547,6 @@ MUST be triggered when a resolver is removed.
 MUST be triggered when a recovery address change is triggered.
 MUST be triggered when recovery is triggered.
 MUST be triggered when an Identity is destroyed.
-https://eips.ethereum.org/EIPS/eip-1485
-https://eips.ethereum.org/EIPS/eip-1491
-https://eips.ethereum.org/EIPS/eip-1504
 https://eips.ethereum.org/EIPS/eip-1523
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -680,7 +558,6 @@ All parameters MAY be plain text or MAY also be URIs pointing to resources which
 For some applications it will be sufficient to store the metadata in an off-chain repository or database which can be addressed by the tokenURI resource locator.
 For more advanced applications, it can be desirable to have metadata available on-chain.
 Therefore, we require that the tokenURI MUST point to a JSON with the above structure, while the implementation of the policyMetadata function is OPTIONAL.
-https://eips.ethereum.org/EIPS/eip-1538
 https://eips.ethereum.org/EIPS/eip-1559
 Block validity is defined in the reference implementation below.
 The GASPRICE (0x3a) opcode MUST return the effective_gas_price as defined in the reference implementation below.
@@ -762,10 +639,6 @@ When resolving a contenthash, applications MUST use the protocol code to determi
 In order to support names that have an IPFS or Swarm hash in their content field, a grace period MUST be implemented offering those name holders time to update their names. If a resolver does not support the multihash interface, it MUST be checked whether they support the content interface. If they do, the value of that field SHOULD be treated in a context dependent fashion and resolved. This condition MUST be enforced until at least March 31st, 2019.
 In order to support names that have an IPFS or Swarm hash in their content field, a grace period MUST be implemented offering those name holders time to update their names. If a resolver does not support the multihash interface, it MUST be checked whether they support the content interface. If they do, the value of that field SHOULD be treated in a context dependent fashion and resolved. This condition MUST be enforced until at least March 31st, 2019.
 In order to support names that have an IPFS or Swarm hash in their content field, a grace period MUST be implemented offering those name holders time to update their names. If a resolver does not support the multihash interface, it MUST be checked whether they support the content interface. If they do, the value of that field SHOULD be treated in a context dependent fashion and resolved. This condition MUST be enforced until at least March 31st, 2019.
-https://eips.ethereum.org/EIPS/eip-1581
-https://eips.ethereum.org/EIPS/eip-1588
-https://eips.ethereum.org/EIPS/eip-1592
-https://eips.ethereum.org/EIPS/eip-1613
 https://eips.ethereum.org/EIPS/eip-1616
 Contracts that comply with the Attribute Registry EIP MUST implement the above interface.
 As an additional requirement, the ERC-165 interface MUST be included:
@@ -794,23 +667,12 @@ MUST be triggered when redeem is successfully called.
 MUST be triggered when confirmUpdate is successfully called.
 MUST be triggered when revokeUpdate is successfully called.
 MUST be triggered when an update is approved by all involved parties.
-https://eips.ethereum.org/EIPS/eip-1633
-https://eips.ethereum.org/EIPS/eip-1679
-https://eips.ethereum.org/EIPS/eip-1681
-https://eips.ethereum.org/EIPS/eip-1682
-https://eips.ethereum.org/EIPS/eip-1702
-https://eips.ethereum.org/EIPS/eip-1706
-https://eips.ethereum.org/EIPS/eip-1710
-https://eips.ethereum.org/EIPS/eip-1716
-https://eips.ethereum.org/EIPS/eip-1753
 https://eips.ethereum.org/EIPS/eip-1761
 Metadata localization should be standardized to increase presentation uniformity across all languages. As such, a simple overlay method is proposed to enable localization. If the metadata JSON file contains a localization attribute, its content may be used to provide localized values for fields that need it. The localization attribute should be a sub-object with three attributes: uri, default and locales. If the string {locale} exists in any URI, it MUST be replaced with the chosen locale by all client software.
 https://eips.ethereum.org/EIPS/eip-1767
 Compatible nodes MUST provide a GraphQL endpoint available over HTTP. This SHOULD be offered on port 8547 by default. The path to the GraphQL endpoint SHOULD be ‘/graphql’.
 Nodes MAY offer a superset of this schema, by adding new fields or types. Experimental or client-specific fields MUST be prefixed with ‘client’ (eg, ‘geth’ or ‘parity’). Unprefixed fields MUST be specified in a new EIP that extends this one.
 Nodes MAY offer a superset of this schema, by adding new fields or types. Experimental or client-specific fields MUST be prefixed with ‘client’ (eg, ‘geth’ or ‘parity’). Unprefixed fields MUST be specified in a new EIP that extends this one.
-https://eips.ethereum.org/EIPS/eip-1775
-https://eips.ethereum.org/EIPS/eip-1803
 https://eips.ethereum.org/EIPS/eip-1812
 If the issuer is specified in the struct In addition to performing the standard ERC712 verification the verification code MUST also verify that the signing address is a valid veriKey delegate for the address specified in the issuer.
 The EIP 712 Domain specifies what kind of message that is to be signed and is used to differentiate between signed data types. The content MUST contain the following:
@@ -837,69 +699,22 @@ If a contract implements the interface (interfaceHash) for a given address (addr
 If it does not implement the interfaceHash for a given address (addr), it MUST NOT return ERC1820_ACCEPT_MAGIC.
 If a contract implements the interface (interfaceHash) for a given address (addr), it MUST return ERC1820_ACCEPT_MAGIC when called with the addr and the interfaceHash.
 If it does not implement the interfaceHash for a given address (addr), it MUST NOT return ERC1820_ACCEPT_MAGIC.
-https://eips.ethereum.org/EIPS/eip-1822
-https://eips.ethereum.org/EIPS/eip-1829
 https://eips.ethereum.org/EIPS/eip-1844
 The address returned by interfaceImplementer MUST refer to a smart contract.
 Resolvers implementing this interface MAY utilise a fallback strategy: If no matching interface was explicitly provided by the user, query the contract returned by addr(), returning its address if the requested interface is supported by that contract, and 0 otherwise. If they do this, they MUST ensure they return 0, rather than reverting, if the target contract reverts.
-https://eips.ethereum.org/EIPS/eip-1872
-https://eips.ethereum.org/EIPS/eip-1884
-https://eips.ethereum.org/EIPS/eip-1890
-https://eips.ethereum.org/EIPS/eip-1895
-https://eips.ethereum.org/EIPS/eip-1898
-https://eips.ethereum.org/EIPS/eip-1900
 https://eips.ethereum.org/EIPS/eip-1901
 JSON-RPC APIs can support the OpenRPC specification by implementing a service discovery method that will return the OpenRPC document for the JSON-RPC API. The method MUST be named rpc.discover. The rpc. prefix is a reserved method prefix for JSON-RPC 2.0 Specification system extensions.
-https://eips.ethereum.org/EIPS/eip-1921
 https://eips.ethereum.org/EIPS/eip-1922
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 https://eips.ethereum.org/EIPS/eip-1923
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
-https://eips.ethereum.org/EIPS/eip-1930
-https://eips.ethereum.org/EIPS/eip-1948
-https://eips.ethereum.org/EIPS/eip-1959
-https://eips.ethereum.org/EIPS/eip-1962
-https://eips.ethereum.org/EIPS/eip-1965
 https://eips.ethereum.org/EIPS/eip-1967
 Beacons are used for keeping the logic address for multiple proxies in a single location, allowing the upgrade of multiple proxies by modifying a single storage slot. A beacon contract MUST implement the function:
-https://eips.ethereum.org/EIPS/eip-1973
-https://eips.ethereum.org/EIPS/eip-1985
-https://eips.ethereum.org/EIPS/eip-1996
 https://eips.ethereum.org/EIPS/eip-2003
 The Client is not required to provide the Host interface ([evmc_context] argument of execute() is set to NULL).
 Therefore, the precompiled contracts implementation MUST NOT access the evmc_context.
-https://eips.ethereum.org/EIPS/eip-2009
-https://eips.ethereum.org/EIPS/eip-2014
-https://eips.ethereum.org/EIPS/eip-2015
-https://eips.ethereum.org/EIPS/eip-2018
-https://eips.ethereum.org/EIPS/eip-2019
-https://eips.ethereum.org/EIPS/eip-2020
-https://eips.ethereum.org/EIPS/eip-2021
-https://eips.ethereum.org/EIPS/eip-2025
-https://eips.ethereum.org/EIPS/eip-2026
-https://eips.ethereum.org/EIPS/eip-2027
-https://eips.ethereum.org/EIPS/eip-2028
-https://eips.ethereum.org/EIPS/eip-2029
-https://eips.ethereum.org/EIPS/eip-2031
-https://eips.ethereum.org/EIPS/eip-2035
-https://eips.ethereum.org/EIPS/eip-2045
-https://eips.ethereum.org/EIPS/eip-2046
-https://eips.ethereum.org/EIPS/eip-2069
-https://eips.ethereum.org/EIPS/eip-2070
-https://eips.ethereum.org/EIPS/eip-2098
-https://eips.ethereum.org/EIPS/eip-2124
-https://eips.ethereum.org/EIPS/eip-2135
-https://eips.ethereum.org/EIPS/eip-2157
-https://eips.ethereum.org/EIPS/eip-2159
-https://eips.ethereum.org/EIPS/eip-2193
-https://eips.ethereum.org/EIPS/eip-2200
-https://eips.ethereum.org/EIPS/eip-2228
-https://eips.ethereum.org/EIPS/eip-2242
-https://eips.ethereum.org/EIPS/eip-2255
-https://eips.ethereum.org/EIPS/eip-2256
-https://eips.ethereum.org/EIPS/eip-2266
 https://eips.ethereum.org/EIPS/eip-2304
 Resolvers MUST emit this event on each change to the address for a name and coin type.
 A checksum format is specified by EIP-55, and extended by RSKIP60, which specifies a means of including the chain ID in the checksum. The checksum on a text format address must be checked. Addresses with invalid checksums that are not all uppercase or all lowercase MUST be rejected with an error. Implementations may choose whether to accept non-checksummed addresses, but the authors recommend at least providing a warning to users in this situation.
@@ -925,16 +740,9 @@ When emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitt
 Contracts that implement the ConsecutiveTransfer event MAY still use the original Transfer event, however when emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted.
 https://eips.ethereum.org/EIPS/eip-2315
 We would like to consider EVM code valid iff no execution of the program can lead to an exceptional halting state. In practice, we must test at runtime for conditions 1 and 2 —- sufficient gas and sufficient stack. We don’t know how much gas there will be, we don’t know how deep a recursion may go, and analysis of stack depth even for non-recursive programs is nontrivial. All of the remaining conditions MUST be validated statically, in time and space quasi-linear in the size of the code.
-https://eips.ethereum.org/EIPS/eip-2327
-https://eips.ethereum.org/EIPS/eip-2330
-https://eips.ethereum.org/EIPS/eip-2333
 https://eips.ethereum.org/EIPS/eip-2334
 The path traversed through the tree of keys is defined by integers (which indicate the sibling index) separated by / which denote ancestor relations. There are 4 levels (plus the master node) in the path and at least 4 (5 including the master node) MUST be used.
 The purpose is set to 12381 which is the name of the new curve (BLS12-381). In order to be in compliance with this standard, the EIP-2333 MUST be implemented as the KDF and therefore, the purpose 12381 MAY NOT be used unless this is the case.
-https://eips.ethereum.org/EIPS/eip-2335
-https://eips.ethereum.org/EIPS/eip-2364
-https://eips.ethereum.org/EIPS/eip-2378
-https://eips.ethereum.org/EIPS/eip-2384
 https://eips.ethereum.org/EIPS/eip-2386
 This element MUST be present. It MUST be a string following the syntactic structure as laid out in section 3 of RFC 4122.
 This element MUST be present. It MUST be a string following the syntactic structure as laid out in section 3 of RFC 4122.
@@ -949,39 +757,26 @@ This element MUST be present. It MUST be an object that follows the definition d
 This element MUST be present. It MUST be an object that follows the definition described in EIP-2335.
 This element MUST be present if the wallet type requires it. It MUST be a non-negative integer.
 This element MUST be present if the wallet type requires it. It MUST be a non-negative integer.
-https://eips.ethereum.org/EIPS/eip-2387
-https://eips.ethereum.org/EIPS/eip-2390
-https://eips.ethereum.org/EIPS/eip-2400
-https://eips.ethereum.org/EIPS/eip-2458
-https://eips.ethereum.org/EIPS/eip-2464
 https://eips.ethereum.org/EIPS/eip-2470
 Below is the raw transaction which MUST be used to deploy the smart contract on any chain.
 SingletonFactory does not allow sending value on create2, this was done to prevent different results on the created object.
 SingletonFactory allows user defined salt to facilitate the creation of vanity addresses for other projects. If vanity address is not necessary, salt bytes(0) should be used.
 Contracts that are constructed by the SingletonFactory MUST not use msg.sender in their constructor, all variables must came through initialization data. This is intentional, as if allowing a callback after creation to aid initialization state would lead to contracts with same address (but different chains) to have the same address but different initial state.
 The resulting address can be calculated in chain by any contract using this formula: address(keccak256(bytes1(0xff), 0xce0042B868300000d44A59004Da54A005ffdcf9f, _salt, keccak256(_code)) << 96) or in javascript using https://github.com/ethereumjs/ethereumjs-util/blob/master/docs/README.md#const-generateaddress2.
-https://eips.ethereum.org/EIPS/eip-2474
 https://eips.ethereum.org/EIPS/eip-2477
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 Smart contracts implementing the ERC-2477 standard MUST implement the ERC2477 interface.
 Smart contracts implementing the ERC-2477 standard MUST implement the ERC-165 standard, including the interface identifiers above.
 A client implementing the ERC-2477 standard MUST support at least the sha256 hash algorithm and MAY support other algorithms.
-https://eips.ethereum.org/EIPS/eip-2481
-https://eips.ethereum.org/EIPS/eip-2488
-https://eips.ethereum.org/EIPS/eip-2494
-https://eips.ethereum.org/EIPS/eip-2515
 https://eips.ethereum.org/EIPS/eip-2520
 Setting and getting functions MUST have the same public interface as specified in EIP 1577. Additionally, they MUST also have new public interfaces introduced by this EIP:
 Setting and getting functions MUST have the same public interface as specified in EIP 1577. Additionally, they MUST also have new public interfaces introduced by this EIP:
-https://eips.ethereum.org/EIPS/eip-2525
 https://eips.ethereum.org/EIPS/eip-2535
 In ALL cases any function or code that adds or replaces or removes one or more functions MUST emit the standard DiamondCut event specified below.
 Any time one or more functions are added, replaced or removed the DiamondCut event MUST be emitted to record changes.
-https://eips.ethereum.org/EIPS/eip-2537
 https://eips.ethereum.org/EIPS/eip-2539
 This precompile performs extensive computations and in case of any errors during execution it MUST consume all gas from the the gas schedule for the corresponding operation.
-https://eips.ethereum.org/EIPS/eip-2542
 https://eips.ethereum.org/EIPS/eip-2544
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -990,19 +785,8 @@ ENS clients will call resolve with the DNS-encoded name to resolve and the encod
 EIP-2544-compliant ENS clients MUST perform the following procedure when determining the resolver for a given name:
 If the procedure above returns null, name resolution MUST terminate unsuccessfully. Otherwise, EIP-2544-compliant ENS clients MUST perform the following procedure when resolving a record:
 If the procedure above returns null, name resolution MUST terminate unsuccessfully. Otherwise, EIP-2544-compliant ENS clients MUST perform the following procedure when resolving a record:
-https://eips.ethereum.org/EIPS/eip-2565
-https://eips.ethereum.org/EIPS/eip-2566
 https://eips.ethereum.org/EIPS/eip-2569
 An EIP-2569 compatible contract MUST have a method with the signature getTokenImageSvg(uint256) view returns (string memory) and a method with the signature setTokenImageSvg(uint256 tokenId, string memory imagesvg) internal.
-https://eips.ethereum.org/EIPS/eip-2583
-https://eips.ethereum.org/EIPS/eip-2584
-https://eips.ethereum.org/EIPS/eip-2593
-https://eips.ethereum.org/EIPS/eip-2612
-https://eips.ethereum.org/EIPS/eip-2615
-https://eips.ethereum.org/EIPS/eip-2645
-https://eips.ethereum.org/EIPS/eip-2657
-https://eips.ethereum.org/EIPS/eip-2666
-https://eips.ethereum.org/EIPS/eip-2677
 https://eips.ethereum.org/EIPS/eip-2678
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
 “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this
@@ -1018,7 +802,6 @@ The keystore element contains the keystore for a given key and is held within th
 An implementer MAY include an index in the base location. If so then it MUST follow the structure as specified in the following “Index format” section.
 An implementer MAY include an index within a wallet container for accounts within that wallet. If so then it MUST follow the structure as specified in the following “Index format” section.
 The index MUST use the identifier ‘index’.
-https://eips.ethereum.org/EIPS/eip-2681
 https://eips.ethereum.org/EIPS/eip-2696
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
@@ -1041,9 +824,6 @@ https://eips.ethereum.org/EIPS/eip-2718
 As of FORK_BLOCK_NUMBER, the transaction root in the block header MUST be the root hash of patriciaTrie(rlp(Index) => Transaction) where:
 As of FORK_BLOCK_NUMBER, the receipt root in the block header MUST be the root hash of patriciaTrie(rlp(Index) => Receipt) where:
 The TransactionType of the receipt MUST match the TransactionType of the transaction with a matching Index.
-https://eips.ethereum.org/EIPS/eip-2733
-https://eips.ethereum.org/EIPS/eip-2746
-https://eips.ethereum.org/EIPS/eip-2767
 https://eips.ethereum.org/EIPS/eip-2770
 Request struct MUST contain the following fields in this exact order:
 Registration MUST be performed in advance by a call to the following method:
@@ -1063,7 +843,6 @@ in a forged address.
 To provide this discovery mechanism a Recipient contract MUST implement
 this function:
 Internally, the Recipient MUST then accept a request from forwarder
-https://eips.ethereum.org/EIPS/eip-2780
 https://eips.ethereum.org/EIPS/eip-2786
 The Provider MUST emit a connect event to all attached EIP-2700 listeners if it transitions from a disconnected state to a connected state.
 All attached listeners MUST be called with the parameter { chainId }.
@@ -1085,12 +864,10 @@ All attached listeners MUST be called with the parameter { chainId }.
 chainId MUST specify the integer ID of the connected chain encoded as a hexadecimal string.
 If the Provider supports the eth_chainId JSON-RPC method or a derivation of it, then the chainId MUST match the return value of eth_chainId.
 The Provider MAY call the attached listeners in any order.
-https://eips.ethereum.org/EIPS/eip-2803
 https://eips.ethereum.org/EIPS/eip-2831
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 These methods MUST be implemented per the Node.js EventEmitter API.
-https://eips.ethereum.org/EIPS/eip-2844
 https://eips.ethereum.org/EIPS/eip-2848
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119 when, and only when, they appear in all capitals as shown here.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119 when, and only when, they appear in all capitals as shown here.
@@ -1105,18 +882,6 @@ Each operational code has one or more parameters, and all parameters MUST be con
 Optional parameters don’t exist: if parameters for the specific operational code are not all present or they don’t follow the rules, clients MUST ignore the transaction completely.
 Messages MUST be always referenced with the multihash of their content.
 Please note that sending a DELETE command users are not asking to actually delete anything from the blockchain, they are just asking clients to hide that specific message because it’s not valid anymore for some reasons. You can think of it like if users say: I changed my mind so please ÐApps don’t show this anymore. As already stated in the specifications above, clients MUST follow this request by the author, unless expressly asked otherwise by the user.
-https://eips.ethereum.org/EIPS/eip-2876
-https://eips.ethereum.org/EIPS/eip-2917
-https://eips.ethereum.org/EIPS/eip-2926
-https://eips.ethereum.org/EIPS/eip-2929
-https://eips.ethereum.org/EIPS/eip-2930
-https://eips.ethereum.org/EIPS/eip-2935
-https://eips.ethereum.org/EIPS/eip-2936
-https://eips.ethereum.org/EIPS/eip-2937
-https://eips.ethereum.org/EIPS/eip-2938
-https://eips.ethereum.org/EIPS/eip-2942
-https://eips.ethereum.org/EIPS/eip-2970
-https://eips.ethereum.org/EIPS/eip-2972
 https://eips.ethereum.org/EIPS/eip-2976
 Typed Transactions can be sent over devp2p as TransactionType || TransactionPayload.
 The exact contents of the TransactionPayload are defined by the TransactionType in future EIPs, and clients may start supporting their gossip without incrementing the devp2p version.
@@ -1150,9 +915,6 @@ The royaltyInfo() function is not aware of the unit of exchange for the sale and
 The percentage value used must be independent of the sale price for reasons previously mentioned (i.e. if the percentage value 10%, then 10% MUST apply whether _salePrice is 10, 10000 or 1234567890). If the royalty fee calculation results in a remainder, implementers MAY round up or round down to the nearest integer. For example, if the royalty fee is 10% and _salePrice is 999, the implementer can return either 99 or 100 for royaltyAmount, both are valid.
 Marketplaces that support this standard MUST pay royalties no matter where the sale occurred or in what currency, including on-chain sales, over-the-counter (OTC) sales and off-chain sales such as at auction houses. As royalty payments are voluntary, entities that respect this EIP must pay no matter where the sale occurred - a sale conducted outside of the blockchain is still a sale. The exact mechanism for paying and notifying the recipient will be defined in future EIPs.
 Implementers of this standard MUST have all of the following functions:
-https://eips.ethereum.org/EIPS/eip-2982
-https://eips.ethereum.org/EIPS/eip-2997
-https://eips.ethereum.org/EIPS/eip-3000
 https://eips.ethereum.org/EIPS/eip-3005
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1165,13 +927,10 @@ Each entry in each of the arrays MUST represent data from one meta transaction. 
 Each entry in each of the arrays MUST represent data from one meta transaction. The order of the data is very important. Data from a single meta transaction MUST have the same index in every array.
 After a meta transaction is successfully validated, the meta nonce of the meta transaction sender MUST be increased by 1.
 Then two token transfers MUST occur:
-https://eips.ethereum.org/EIPS/eip-3009
-https://eips.ethereum.org/EIPS/eip-3014
 https://eips.ethereum.org/EIPS/eip-3026
 The base field element (Fp) is encoded as 96 bytes by performing BigEndian encoding of the corresponding (unsigned) integer. The corresponding integer MUST be less than the base field modulus.
 If encodings do not follow this spec anywhere during parsing in the precompile, the precompile MUST revert with “endoding error”.
 This precompile performs extensive computations and in case of any errors during execution it MUST consume all gas from the the gas schedule for the corresponding operation.
-https://eips.ethereum.org/EIPS/eip-3030
 https://eips.ethereum.org/EIPS/eip-3041
 Returns information about a block specified by hash.
 Every block returned by this endpoint whose block number is before the EIP-1559 fork block MUST NOT include a baseFee field.
@@ -1200,10 +959,8 @@ Every block returned by this endpoint whose block number is on or after the EIP-
 Returns information about an uncle specified by block number and uncle index position
 Every block returned by this endpoint whose block number is before the EIP-1559 fork block MUST NOT include a baseFee field.
 Every block returned by this endpoint whose block number is on or after the EIP-1559 fork block MUST include a baseFee field.
-https://eips.ethereum.org/EIPS/eip-3068
 https://eips.ethereum.org/EIPS/eip-3074
 An important note is that invoker contracts MUST NOT be upgradeable. If an invoker can be redeployed to the same address with different code, it would be possible to redeploy the invoker with code that does not properly verify commit and any account that signed a message over that invoker would be compromised. Although this sounds scary, it is no different than using a smart contract wallet via DELEGATECALL. If the wallet is redeployed with different logic, all wallets using its code could be compromised.
-https://eips.ethereum.org/EIPS/eip-3076
 https://eips.ethereum.org/EIPS/eip-3085
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
@@ -1214,10 +971,6 @@ HTTPS SHOULD always be used over HTTP.
 The method MUST return null if the request was successful, and an error otherwise.
 The wallet MUST NOT allow the same chainId to be added multiple times.
 See Security Considerations for more information.
-https://eips.ethereum.org/EIPS/eip-3091
-https://eips.ethereum.org/EIPS/eip-3102
-https://eips.ethereum.org/EIPS/eip-3135
-https://eips.ethereum.org/EIPS/eip-3143
 https://eips.ethereum.org/EIPS/eip-3155
 The CUT MUST output a json object for EACH operation.
 The stack, memory and memSize are the values before execution of the op.
@@ -1256,9 +1009,6 @@ If successful, flashLoan MUST return true.
 A receiver of flash loans MUST implement the IERC3156FlashBorrower interface:
 For the transaction to not revert, receiver MUST approve amount + fee of token to be taken by msg.sender before the end of onFlashLoan.
 If successful, onFlashLoan MUST return the keccak256 hash of “ERC3156FlashBorrower.onFlashLoan”.
-https://eips.ethereum.org/EIPS/eip-3198
-https://eips.ethereum.org/EIPS/eip-3220
-https://eips.ethereum.org/EIPS/eip-3224
 https://eips.ethereum.org/EIPS/eip-3234
 A lender MUST implement the IERC3234BatchFlashLender interface.
 The maxFlashLoan function MUST return the maximum loan possible for each token. If a token is not currently supported maxFlashLoan MUST return 0, instead of reverting.
@@ -1277,24 +1027,12 @@ If successful, batchFlashLoan MUST return true.
 A receiver of flash loans MUST implement the IERC3234BatchFlashBorrower interface:
 For the transaction to not revert, for each token in tokens, receiver MUST approve amounts[i] + fees[i] of tokens[i] to be taken by msg.sender before the end of onBatchFlashLoan.
 If successful, onBatchFlashLoan MUST return the keccak256 hash of “ERC3156BatchFlashBorrower.onBatchFlashLoan”.
-https://eips.ethereum.org/EIPS/eip-3238
-https://eips.ethereum.org/EIPS/eip-3267
-https://eips.ethereum.org/EIPS/eip-3298
-https://eips.ethereum.org/EIPS/eip-3300
-https://eips.ethereum.org/EIPS/eip-3322
 https://eips.ethereum.org/EIPS/eip-3326
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC-2119.
 If a field does not meet the requirements of this specification, the wallet MUST reject the request.
 The method MUST return null if the request was successful, and an error otherwise.
 If the wallet does not have a concept of an active chain, the wallet MUST reject the request.
-https://eips.ethereum.org/EIPS/eip-3332
-https://eips.ethereum.org/EIPS/eip-3336
-https://eips.ethereum.org/EIPS/eip-3337
-https://eips.ethereum.org/EIPS/eip-3338
-https://eips.ethereum.org/EIPS/eip-3368
-https://eips.ethereum.org/EIPS/eip-3372
-https://eips.ethereum.org/EIPS/eip-3374
 https://eips.ethereum.org/EIPS/eip-3382
 As of FORK_BLOCK_NUMBER, the header.gasLimit MUST be equal to BLOCK_GAS_LIMIT, where BLOCK_GAS_LIMIT is a hardcoded constant set to 12,500,000.
 https://eips.ethereum.org/EIPS/eip-3386
@@ -1310,9 +1048,6 @@ If the {Wrapper} does not inherit from {ERC721} or {ERC1155}, it MUST include ca
 All of the underlying transfer methods are not tied to the {Wrapper}, but rather call the ERC-20/721/1155 transfer methods. Implementations of this standard MUST:
 Wrapper contracts are RECOMMENDED to inherit from burnable ERC-20 tokens. If they are not, the supply of the {Derivative} tokens MUST be controlled by the Wrapper. Similarly, price implementations MUST ensure that the supply of {Base} tokens is reflected by the {Derivative} tokens.
 Wrapper contracts are RECOMMENDED to inherit from burnable ERC-20 tokens. If they are not, the supply of the {Derivative} tokens MUST be controlled by the Wrapper. Similarly, price implementations MUST ensure that the supply of {Base} tokens is reflected by the {Derivative} tokens.
-https://eips.ethereum.org/EIPS/eip-3403
-https://eips.ethereum.org/EIPS/eip-3416
-https://eips.ethereum.org/EIPS/eip-3436
 https://eips.ethereum.org/EIPS/eip-3440
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1321,27 +1056,15 @@ Implementations of ERC-3440 MUST designate which token Id is the original NFT (d
 Implementations of ERC-3440 MUST designate which token Id is the original NFT (defaulted to Id 0), and which token Id is a unique replica. The original print SHOULD be token Id number 0 but MAY be assigned to a different Id. The original print MUST only be designated once. The implementation MUST designate a maximum number of minted editions, after which new Ids MUST NOT be printed / minted.
 Implementations of ERC-3440 MUST designate which token Id is the original NFT (defaulted to Id 0), and which token Id is a unique replica. The original print SHOULD be token Id number 0 but MAY be assigned to a different Id. The original print MUST only be designated once. The implementation MUST designate a maximum number of minted editions, after which new Ids MUST NOT be printed / minted.
 Signature messages MUST use the EIP-712 standard.
-https://eips.ethereum.org/EIPS/eip-3448
-https://eips.ethereum.org/EIPS/eip-3450
 https://eips.ethereum.org/EIPS/eip-3475
 To ensure the indexing of transactions throughout the bond lifecycle (i.e “Issue”, “Redeem” and “Transfer” functions), events cited in specification section MUST be emitted when such transaction is passed.
-https://eips.ethereum.org/EIPS/eip-3508
-https://eips.ethereum.org/EIPS/eip-3520
-https://eips.ethereum.org/EIPS/eip-3521
 https://eips.ethereum.org/EIPS/eip-3525
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
-https://eips.ethereum.org/EIPS/eip-3529
-https://eips.ethereum.org/EIPS/eip-3534
-https://eips.ethereum.org/EIPS/eip-3540
-https://eips.ethereum.org/EIPS/eip-3541
-https://eips.ethereum.org/EIPS/eip-3554
-https://eips.ethereum.org/EIPS/eip-3561
 https://eips.ethereum.org/EIPS/eip-3569
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The sealed metadata JSON file MAY contain metadata for many different tokens. The top level keys of the JSON object MUST be token IDs.
-https://eips.ethereum.org/EIPS/eip-3584
 https://eips.ethereum.org/EIPS/eip-3589
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1358,8 +1081,6 @@ A block containing such a transaction MUST be considered invalid.
 Any transaction where tx.sender has a CODEHASH != EMPTYCODEHASH MUST be rejected as invalid, where EMPTYCODEHASH = 0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470.
 The invalid transaction MUST be rejected by the client and not be included in a block.
 A block containing such a transaction MUST be considered invalid.
-https://eips.ethereum.org/EIPS/eip-3643
-https://eips.ethereum.org/EIPS/eip-3651
 https://eips.ethereum.org/EIPS/eip-3668
 A CCIP read enabled contract MUST revert with the following error whenever a function that requires offchain data is called:
 urls specifies a list of URL templates to services (known as gateways) that implement the CCIP read protocol and can formulate an answer to the query. urls can be the empty list [], in which case the client MUST specify the URL template. The order in which URLs are tried is up to the client, but contracts SHOULD return them in order of priority, with the most important entry first.
@@ -1415,26 +1136,12 @@ Beginning with receiving the finalized block next to the FIRST_FINALIZED_BLOCK, 
 Note: The logic of message handlers that are not affected by this section MUST remain unchanged.
 https://eips.ethereum.org/EIPS/eip-3690
 This feature is introduced on the very same block EIP-3540 is enabled, therefore every EOF1-compatible bytecode MUST have a JUMPDEST-table if it uses jumps.
-https://eips.ethereum.org/EIPS/eip-3709
-https://eips.ethereum.org/EIPS/eip-3722
-https://eips.ethereum.org/EIPS/eip-3754
-https://eips.ethereum.org/EIPS/eip-3756
 https://eips.ethereum.org/EIPS/eip-3770
 shortName is mandatory and MUST be a valid short name from ethereum-lists/chains
 address is mandatory and MUST be a EIP-55 compatible hexadecimal address
-https://eips.ethereum.org/EIPS/eip-3772
-https://eips.ethereum.org/EIPS/eip-3779
-https://eips.ethereum.org/EIPS/eip-3788
-https://eips.ethereum.org/EIPS/eip-3855
-https://eips.ethereum.org/EIPS/eip-3860
-https://eips.ethereum.org/EIPS/eip-3978
-https://eips.ethereum.org/EIPS/eip-4200
 https://eips.ethereum.org/EIPS/eip-4337
 eth_sendUserOperation submits a User Operation object to the User Operation pool of the client. An entryPoint address MUST be specified, and the client MUST only simulate and submit the User Operation through the specified entryPoint.
 eth_sendUserOperation submits a User Operation object to the User Operation pool of the client. An entryPoint address MUST be specified, and the client MUST only simulate and submit the User Operation through the specified entryPoint.
-https://eips.ethereum.org/EIPS/eip-4341
-https://eips.ethereum.org/EIPS/eip-4345
-https://eips.ethereum.org/EIPS/eip-4353
 https://eips.ethereum.org/EIPS/eip-4361
 The message MUST conform with the following Augmented Backus–Naur Form (ABNF, RFC 5234) expression (note that %s denotes case sensitivity for a string term, as per RFC 7405).
 https://eips.ethereum.org/EIPS/eip-4393
@@ -1454,7 +1161,6 @@ Clever ways to minimise on-chain state updating of the deposit balances for each
 As the Ethereum ecosystem continues to grow, many dapps are relying on traditional databases and explorer API services to retrieve and categorize data. This EIP standard guarantees that event logs emitted by the smart contract MUST provide enough data to create an accurate record of all current tip token and ERC-20 reward balances. A database or explorer can provide indexed and categorized searches of every tip token and reward sent to NFT holders from the events emitted by any tip token contract that implements this standard. Thus, the state of the tip token contract can be reconstructed from the events emitted alone.
 A tip token contract can be fully compatible with ERC-20 specification and inherit some functions such as transfer if the tokens are allowed to be sent directly to other users. Note that balanceOf has been adopted and MUST be the number of tips held by a user’s address. If inheriting from, for example, OpenZeppelin’s implementation of ERC-20 token then their contract is responsible for maintaining the balance of tip token. Therefore, tip token balanceOf function SHOULD simply directly call the parent (super) contract’s balanceOf function.
 Though it is RECOMMENDED that users’ deposits are kept locked in the tip token contract or external escrow account, and SHOULD NOT be used for anything but the rewards for holders, this cannot be enforced. This standard stipulates that the rewards MUST be available for when holders withdraw their rewards from the pool of deposits.
-https://eips.ethereum.org/EIPS/eip-4396
 https://eips.ethereum.org/EIPS/eip-4399
 At the point of TRANSITION_BLOCK of the Proof-of-Stake (PoS) upgrade described in EIP-3675, the difficulty block field MUST be 0 thereafter because there is no longer any Proof-of-Work (PoW) seal on the block. This means that the DIFFICULTY (0x44) instruction no longer has it’s previous semantic meaning, nor a clear “correct” value to return.
 Beginning with TRANSITION_BLOCK, client software MUST set the value of the mixHash, i.e. the field with the number 13 (0-indexed) in a block header, to the latest RANDAO mix of the post beacon state of the previous block.
@@ -1470,11 +1176,9 @@ The ConsumerChanged event MUST be emitted when a consumer is changed.
 On every transfer, the consumer MUST be changed to a default address. It is RECOMMENDED for implementors to use address(0) as that default address.
 The supportsInterface method MUST return true when called with 0x953c8dfa.
 There are numerous use-cases where a distinct role for NFTs is required that MUST NOT have owner permissions. A contract that implements the consumer role and grants ownership permissions to the consumer renders this standard pointless.
-https://eips.ethereum.org/EIPS/eip-4430
 https://eips.ethereum.org/EIPS/eip-4444
 Clients MUST use a valid Weak Subjectivity Checkpoint to bootstrap from a more recent view of the chain. For the purpose of syncing, clients treat weak subjectivity checkpoints as the genesis block. We call this method “checkpoint sync”.
 Because there are a number of alternative proposals for reducing the execution client’s footprint on disk, we’ve decided to enforce a specific pronouncination of the EIP. When pronouncing the EIP number, it MUST be pronounced EIP “four fours”. All other pronounciations are incorrect.
-https://eips.ethereum.org/EIPS/eip-4488
 https://eips.ethereum.org/EIPS/eip-4494
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1482,8 +1186,6 @@ Three new functions MUST be added to ERC-721:
 For all addresses spender, uint256s tokenId, deadline, and nonce, and bytes sig, a call to permit(spender, tokenId, deadline, sig) MUST set spender as approved on tokenId as long as the owner of tokenId remains in possession of it, and MUST emit a corresponding Approval event, if and only if the following conditions are met:
 For all addresses spender, uint256s tokenId, deadline, and nonce, and bytes sig, a call to permit(spender, tokenId, deadline, sig) MUST set spender as approved on tokenId as long as the owner of tokenId remains in possession of it, and MUST emit a corresponding Approval event, if and only if the following conditions are met:
 This EIP requires EIP-165. EIP165 is already required in ERC-721, but is further necessary here in order to register the interface of this EIP. Doing so will allow easy verification if an NFT contract has implemented this EIP or not, enabling them to interact accordingly. The interface of this EIP (as defined in EIP-165) is 0x5604e225. Contracts implementing this EIP MUST have the supportsInterface function return true when called with 0x5604e225.
-https://eips.ethereum.org/EIPS/eip-4519
-https://eips.ethereum.org/EIPS/eip-4520
 https://eips.ethereum.org/EIPS/eip-4521
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1497,7 +1199,6 @@ safeTransfer and safeTransferFrom MUST transfer as expected to EOA addresses, an
 safeTransfer and safeTransferFrom MUST transfer as expected to EOA addresses, and to contracts implementing ERC20Receiver and returning the function selector (0x4fc35859) when called, and MUST revert when transferring to a contract which either does not have ERC20Receiver implemented, or does not return the function selector when called.
 In addition, a contract accepting safe transfers MUST implement the following if it wishes to accept safe transfers, and MUST return the function selector (0x4fc35859):
 In addition, a contract accepting safe transfers MUST implement the following if it wishes to accept safe transfers, and MUST return the function selector (0x4fc35859):
-https://eips.ethereum.org/EIPS/eip-4527
 https://eips.ethereum.org/EIPS/eip-4546
 The wrapped deposit contract SHOULD be deployed at an identifiable address (e.g. 0x1111119a9e30bceadf9f939390293ffacef93fe9). The contract MUST be non-upgradable with no ability for state variables to be changed.
 The wrapped deposit contract MUST have the following public functions:
@@ -1507,7 +1208,6 @@ Each of these functions MUST revert if to is an address with a zero code size. E
 Each of these functions MUST revert if to is an address with a zero code size. Each function MUST attempt to call a method on the to address confirming that it is willing and able to accept the deposit. If this function call does not return a true value execution MUST revert. If the asset transfer is not successful execution MUST revert.
 A receiving contract MAY implement any of these functions as desired. If a given function is not implemented deposits MUST not be sent for that asset type.
 Receiving contracts MUST verify that msg.sender is equal to the wrapped deposit contract. Failing to do so allows anyone to simulate deposits.
-https://eips.ethereum.org/EIPS/eip-4573
 https://eips.ethereum.org/EIPS/eip-4626
 All EIP-4626 tokenized Vaults MUST implement EIP-20 to represent shares.
 If a Vault is to be non-transferrable, it MAY revert on calls to transfer or transferFrom.
@@ -1588,18 +1288,12 @@ MUST revert if all of shares cannot be redeemed (due to withdrawal limit being r
 MUST be emitted when tokens are deposited into the Vault via the mint and deposit methods.
 MUST be emitted when shares are withdrawn from the Vault in EIP-4626.redeem or EIP-4626.withdraw methods.
 The only functions where the preferred rounding direction would be ambiguous are the convertTo functions. To ensure consistency across all EIP-4626 Vault implementations it is specified that these functions MUST both always round down. Integrators may wish to mimic rounding up versions of these functions themselves, like by adding 1 wei to the result.
-https://eips.ethereum.org/EIPS/eip-4671
-https://eips.ethereum.org/EIPS/eip-4675
 https://eips.ethereum.org/EIPS/eip-4736
 The Consensus Layer change withdrawal credentials operation is not yet fully specified, but MUST have at least the following fields:
 Note that these restrictions SHALL NOT apply to withdrawal credential change operations found in blocks. If any operation has been included on-chain, it MUST by definition be valid regardless of its contents or protective mechanisms described above.
 https://eips.ethereum.org/EIPS/eip-4747
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
-https://eips.ethereum.org/EIPS/eip-4750
-https://eips.ethereum.org/EIPS/eip-4758
-https://eips.ethereum.org/EIPS/eip-4760
-https://eips.ethereum.org/EIPS/eip-4762
 https://eips.ethereum.org/EIPS/eip-4788
 Beginning at the execution timestamp FORK_TIMESTAMP, execution clients MUST:
 https://eips.ethereum.org/EIPS/eip-4799
@@ -1607,12 +1301,9 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The authenticity of designated ownership of an NFT is conferred by the designating ERC-4799 contract’s ownership of the original NFT according to the source contract. This MUST be verified by clients by querying the source contract.
 Clients respecting this specification SHALL NOT distribute any utility to the address of the ERC-4799 contract. Instead, they MUST distribute it to the owner of the designated token that the ERC-4799 contract points them to.
-https://eips.ethereum.org/EIPS/eip-4803
-https://eips.ethereum.org/EIPS/eip-4804
 https://eips.ethereum.org/EIPS/eip-4834
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
-https://eips.ethereum.org/EIPS/eip-4844
 https://eips.ethereum.org/EIPS/eip-4863
 Beginning with the execution timestamp FORK_TIMESTAMP, execution clients MUST introduce the following extensions to transaction processing and block validation:
 If a block contains any transactions with WITHDRAWAL_TX_TYPE type, they MUST come after ALL other transactions in the block.
@@ -1665,9 +1356,6 @@ Downgrades the amount of destination token to the source token in the specified 
 Downgrades the amount of destination token to the source token in the specified ratio. The source tokens will be sent to the _to address. The function MUST unwrap the destination tokens back to the source tokens. The function MUST throw if the caller’s address does not have enough destination token to downgrade or if isDowngradeActive is returning false. The function MUST also fire the Downgrade event. approve MUST be called first on the destination contract.
 MUST trigger when tokens are upgraded.
 MUST trigger when tokens are downgraded.
-https://eips.ethereum.org/EIPS/eip-4938
-https://eips.ethereum.org/EIPS/eip-4944
-https://eips.ethereum.org/EIPS/eip-4950
 https://eips.ethereum.org/EIPS/eip-4955
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1688,7 +1376,6 @@ Smart contracts implementing the ERC721 held token standard MUST implement all o
 Smart contracts implementing the ERC721 held token standard MUST also implement ERC165 and return true when the interface ID 0x16b900ff is passed.
 Smart contracts implementing the ERC1155 held token standard MUST implement all of the functions in the IERC1155Holder interface.
 Smart contracts implementing the ERC1155 held token standard MUST also implement ERC165 and return true when the interface ID 0xced24c37 is passed.
-https://eips.ethereum.org/EIPS/eip-5000
 https://eips.ethereum.org/EIPS/eip-5003
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1707,9 +1394,6 @@ The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL N
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The nonce(uint256 tokenId) function MUST be implemented as view.
 The supportsInterface method MUST return true when called with 0xce03fdab.
-https://eips.ethereum.org/EIPS/eip-5018
-https://eips.ethereum.org/EIPS/eip-5022
-https://eips.ethereum.org/EIPS/eip-5027
 https://eips.ethereum.org/EIPS/eip-5050
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1721,7 +1405,6 @@ https://eips.ethereum.org/EIPS/eip-5058
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 Lockable EIP-721 MUST implement the IERC5058 interfaces:
-https://eips.ethereum.org/EIPS/eip-5065
 https://eips.ethereum.org/EIPS/eip-5069
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1785,7 +1468,6 @@ MUST support a withdraw flow where the principal tokens are burned from holder d
 MAY support an additional flow in which the principal tokens are transferred to the principal token contract before the withdraw execution, and are accounted for during withdraw.
 MUST revert if all of underlyingAmount cannot be withdrawn (due to withdrawal limit being reached, slippage, the holder not having enough principal tokens, etc).
 MUST be emitted when Principal Tokens are burnt and underlying is withdrawn from the contract in the EIP5095.redeem method.
-https://eips.ethereum.org/EIPS/eip-5114
 https://eips.ethereum.org/EIPS/eip-5115
 This EIP is fully backwards compatible as its implementation extends the functionality of EIP-20, however the optional metadata extensions, namely name, decimals, and symbol semantics MUST be implemented for all SCY token implementations.
 https://eips.ethereum.org/EIPS/eip-5131
@@ -1793,7 +1475,6 @@ The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL 
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The mainAddress MUST have an ENS resolver record and reverse record configured.
 In order to automatically discover the linked account, the authAddress SHOULD have an ENS resolver record and reverse record configured.
-https://eips.ethereum.org/EIPS/eip-5133
 https://eips.ethereum.org/EIPS/eip-5139
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1920,7 +1601,6 @@ The return values of this function MUST describe the domain separator that is us
 https://eips.ethereum.org/EIPS/eip-5269
 Similar to EIP-165 callers of the interface MUST assume the smart contract
 declaring they support such EIP interfaces doesn’t necessarily correctly support them.
-https://eips.ethereum.org/EIPS/eip-5283
 https://eips.ethereum.org/EIPS/eip-5289
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
@@ -1933,7 +1613,6 @@ https://eips.ethereum.org/EIPS/eip-5334
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The UpdateUser event MUST be emitted when a user address is changed or the user expires is changed or the user level is changed.
-https://eips.ethereum.org/EIPS/eip-5345
 https://eips.ethereum.org/EIPS/eip-5375
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
