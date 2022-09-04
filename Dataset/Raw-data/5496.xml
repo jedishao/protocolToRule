@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5496: Multi-privilege Management NFT Extension</title>
+<meta property="og:title" content="EIP-5496: Multi-privilege Management NFT Extension" />
+<meta name="description" content="Create sharable multi-privilege NFTs for EIP-721" />
+<meta property="og:description" content="Create sharable multi-privilege NFTs for EIP-721" />
+<meta name="twitter:description" content="Create sharable multi-privilege NFTs for EIP-721" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5496" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5496" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5496: Multi-privilege Management NFT Extension
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5496.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Create sharable multi-privilege NFTs for EIP-721</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/wnft">Jeremy Z</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-5496-multi-privilege-management-extension-for-erc-721/10427">https://ethereum-magicians.org/t/eip-5496-multi-privilege-management-extension-for-erc-721/10427</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-7-30</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-721">721</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#multiple-privileges">Multiple privileges</a></li>
+<li><a href="#sharable-privileges">Sharable privileges</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a>
+<ul>
+<li><a href="#test-code">Test Code</a></li>
+</ul>
+</li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This specification defines standard functions that extends current <a href="/EIPS/eip-721">EIP-721</a> standard providing sharable multiple privileges for a NFT collection. The privileges could be on-chain ones, such as voting rights, or to claim a targeted airdrop; or off-chain ones, such as a coupon in Amazon, or a discount in a local New York restaurant, or even a VIP lounge access in the airport. There could be multiple privileges attached to one NFT and each privilege holder of an NFT can transfer the privilege to others. The ownership of the privileges is verifiable. On top of the multiple-privilege extension, this standard also contains methods to give the provider to specify the privilege non-sharable or sharable. Sharable privileges can be done by simply cloning a privilege, furthermore, the provider would be able to adjust the details of privileges according to the spreading path. Expiration period can also be set to each privilege. The proposal depends on and extends the existing <a href="/EIPS/eip-721">EIP-721</a>.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Many NFTs have functions other than just being used as profile pictures or art collections, they may have real utilities in different scenarios. For example, a fashion store may give a discount for its own NFT holders; a DAO member NFT holder can vote for the proposal of how to use their treasury; a dApp may create an airdrop event to attract a certain group of people like some blue chip NFT holders to claim; Walmart can issue its membership card on chain (as an NFT) and give certain privileges when the members shop at Walmart stores, etc. There are cases when people who own NFTs do not necessarily want to use their privileges. By providing additional data recording different privileges a NFT collection has and interfaces to manage them, users can transfer or sell privileges without losing their ownership of the NFT.</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p>Every contract compliant to the <code class="language-plaintext highlighter-rouge">ERC5496</code> extension MUST implement the <code class="language-plaintext highlighter-rouge">IERC5496</code> interface. The <strong>sharable multi-privilege extension</strong> is OPTIONAL for EIP-721 contracts.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// @title multi-privilege extension for EIP-721
+///  Note: the ERC-165 identifier for this interface is 0x953c8dfa
+</span><span class="k">interface</span> <span class="n">IERC5496</span> <span class="cm">/* is ERC721 */</span> <span class="p">{</span>
+    <span class="c1">/// @notice Emitted when `owner` changes the `privilege holder` of a NFT.
+</span>    <span class="k">event</span> <span class="n">PrivilegeAssigned</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">privilegeId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">expires</span><span class="p">);</span>
+    <span class="c1">/// @notice Emitted when `privilege holder` changes the `holder` of a privilege
+</span>    <span class="k">event</span> <span class="n">PrivilegeTransfered</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">privilegeId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">from</span><span class="p">,</span> <span class="kt">address</span> <span class="n">to</span><span class="p">);</span>
+    <span class="c1">/// @notice Emitted when `contract owner` changes the `total privilege` of the collection
+</span>    <span class="k">event</span> <span class="n">PrivilegeTotalChanged</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">newTotal</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">oldTotal</span><span class="p">);</span>
+
+    <span class="c1">/// @notice set the privilege holder of a NFT.
+</span>    <span class="c1">/// @dev expires should better be less than 30 days
+</span>    <span class="c1">/// Throws if `msg.sender` is not approved or owner of the tokenId.
+</span>    <span class="c1">/// @param tokenId The NFT to set privilege for
+</span>    <span class="c1">/// @param privilegeId The privilege to set
+</span>    <span class="c1">/// @param user The privilege holder to set
+</span>    <span class="c1">/// @param expires For how long the privilege holder can have
+</span>    <span class="k">function</span> <span class="n">setPrivilege</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">privilegeId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">expires</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>    
+
+    <span class="c1">/// @notice Check if a privilege has expired
+</span>    <span class="c1">/// @param tokenId The identifier of the queried NFT
+</span>    <span class="c1">/// @param privilegeId The identifier of the queried privilege
+</span>    <span class="c1">/// @return Whether a user has a certain privilege
+</span>    <span class="k">function</span> <span class="n">privilegeExpires</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">privilegeId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Check if a user has a certain privilege
+</span>    <span class="c1">/// @param tokenId The identifier of the queried NFT
+</span>    <span class="c1">/// @param privilegeId The identifier of the queried privilege
+</span>    <span class="c1">/// @param user The address of the queried user
+</span>    <span class="c1">/// @return Whether a user has a certain privilege
+</span>    <span class="k">function</span> <span class="n">hasPrivilege</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">privilegeId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">user</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Every contract implementing the <code class="language-plaintext highlighter-rouge">ERC5496</code> SHOULD set a maximum privilege number before setting any privilege, the <code class="language-plaintext highlighter-rouge">privilegeId</code> MUST NOT be greater than the maximum privilege number.</p>
+<p>The <code class="language-plaintext highlighter-rouge">PrivilegeAssigned</code> event MUST be emitted when <code class="language-plaintext highlighter-rouge">setPrivilege</code> is called.</p>
+<p>The <code class="language-plaintext highlighter-rouge">PrivilegeTransfered</code> event MUST be emitted when <code class="language-plaintext highlighter-rouge">transferPrivilege</code> is called.</p>
+<p>The <code class="language-plaintext highlighter-rouge">supportsInterface</code> method MUST return <code class="language-plaintext highlighter-rouge">true</code> when called with <code class="language-plaintext highlighter-rouge">0x076e1bbb</code>.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// @title Cloneable extension - Optional for ERC-721
+</span><span class="k">interface</span> <span class="n">IERC721Cloneable</span> <span class="p">{</span>
+    <span class="c1">/// @notice Emitted when set the `privilege ` of a NFT cloneable.
+</span>    <span class="k">event</span> <span class="n">PrivilegeCloned</span><span class="p">(</span><span class="kt">uint</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">privId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">from</span><span class="p">,</span> <span class="kt">address</span> <span class="n">to</span><span class="p">);</span>
+
+    <span class="c1">/// @notice set a certain privilege cloneable
+</span>    <span class="c1">/// @param tokenId The identifier of the queried NFT
+</span>    <span class="c1">/// @param privilegeId The identifier of the queried privilege
+</span>    <span class="c1">/// @param referrer The address of the referrer
+</span>    <span class="c1">/// @return Whether the operation is sucessful or not
+</span>    <span class="k">function</span> <span class="n">clonePrivilege</span><span class="p">(</span><span class="kt">uint</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">privId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">referrer</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">PrivilegeCloned</code> event MUST be emitted when <code class="language-plaintext highlighter-rouge">clonePrivilege</code> is called.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="multiple-privileges">
+<a href="#multiple-privileges" class="anchor-link"></a> Multiple privileges
+</h3>
+<p>EIP-721 only records the ownership and its transfer, the privileges of an NFT are not recorded on-chain. This extension would allow merchants/projects to give out a certain privilege to a specified group of people, and owners of the privileges can manage each one of the privileges independently. This facilitates a great possibility for NFTs to have real usefulness.</p>
+<h3 id="sharable-privileges">
+<a href="#sharable-privileges" class="anchor-link"></a> Sharable privileges
+</h3>
+<p>The number of privilege holders is limited by the number of NFTs if privileges are non-sharable. A sharable privilege means the original privilege holder can copy the privilege and give it to the others, not transferring his/her own privilege to the others. This mechanism greatly enhances the spread of privileges as well as the adoption of NFTs.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This EIP is compatible with any kind of NFTs that follow the EIP-721 standard. It only adds more functions and data structures without interfering with the original EIP-721 standard.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Test cases are implemented with the reference implementation.</p>
+<h3 id="test-code">
+<a href="#test-code" class="anchor-link"></a> Test Code
+</h3>
+<p><a href="/assets/eip-5496/test/test.js">test.js</a></p>
+<p>Run in terminal:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>truffle <span class="nb">test</span> ./test/test.js
+</code></pre></div></div>
+<p><a href="/assets/eip-5496/test/testCloneable.js">testCloneable.js</a></p>
+<p>Run in terminal:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>truffle <span class="nb">test</span> ./test/testCloneable.js
+</code></pre></div></div>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span> 
+
+<span class="k">import</span> <span class="s">"@openzeppelin/contracts/token/ERC721/ERC721.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"@openzeppelin/contracts/utils/introspection/IERC165.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IERC5496.sol"</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">ERC5496</span> <span class="k">is</span> <span class="n">ERC721</span><span class="p">,</span> <span class="n">IERC5496</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">PrivilegeRecord</span> <span class="p">{</span>
+        <span class="kt">address</span> <span class="n">user</span><span class="p">;</span>
+        <span class="kt">uint256</span> <span class="n">expiresAt</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">struct</span> <span class="n">PrivilegeStorage</span> <span class="p">{</span>
+        <span class="kt">uint</span> <span class="n">lastExpiresAt</span><span class="p">;</span>
+        <span class="c1">// privId =&gt; PrivilegeRecord
+</span>        <span class="k">mapping</span><span class="p">(</span><span class="kt">uint</span> <span class="o">=&gt;</span> <span class="n">PrivilegeRecord</span><span class="p">)</span> <span class="n">privilegeEntry</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="kt">uint</span> <span class="k">public</span> <span class="n">privilegeTotal</span><span class="p">;</span>
+    <span class="c1">// tokenId =&gt; PrivilegeStorage
+</span>    <span class="k">mapping</span><span class="p">(</span><span class="kt">uint</span> <span class="o">=&gt;</span> <span class="n">PrivilegeStorage</span><span class="p">)</span> <span class="k">public</span> <span class="n">privilegeBook</span><span class="p">;</span>
+    <span class="k">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="k">mapping</span><span class="p">(</span><span class="kt">address</span> <span class="o">=&gt;</span> <span class="kt">bool</span><span class="p">))</span> <span class="k">private</span> <span class="n">privilegeDelegator</span><span class="p">;</span>
+
+    <span class="k">constructor</span><span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">name_</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span> <span class="n">symbol_</span><span class="p">)</span>
+    <span class="n">ERC721</span><span class="p">(</span><span class="n">name_</span><span class="p">,</span><span class="n">symbol_</span><span class="p">)</span>
+    <span class="p">{</span>
+    
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">setPrivilege</span><span class="p">(</span>
+        <span class="kt">uint</span> <span class="n">tokenId</span><span class="p">,</span>
+        <span class="kt">uint</span> <span class="n">privId</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">user</span><span class="p">,</span>
+        <span class="kt">uint64</span> <span class="n">expires</span>
+    <span class="p">)</span> <span class="k">external</span> <span class="k">virtual</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">_isApprovedOrOwner</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">)</span> <span class="o">||</span> <span class="n">_isDelegatorOrHolder</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">,</span> <span class="n">privId</span><span class="p">),</span> <span class="s">"ERC721: transfer caller is not owner nor approved"</span><span class="p">);</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">expires</span> <span class="o">&lt;</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span> <span class="o">+</span> <span class="mi">30</span> <span class="kc">days</span><span class="p">,</span> <span class="s">"expire time invalid"</span><span class="p">);</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">privId</span> <span class="o">&lt;</span> <span class="n">privilegeTotal</span><span class="p">,</span> <span class="s">"invalid privilege id"</span><span class="p">);</span>
+        <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">_isApprovedOrOwner</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">))</span> <span class="p">{</span>
+            <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">expiresAt</span> <span class="o">=</span> <span class="n">expires</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">lastExpiresAt</span> <span class="o">&lt;</span> <span class="n">expires</span><span class="p">)</span> <span class="p">{</span>
+                <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">lastExpiresAt</span> <span class="o">=</span> <span class="n">expires</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">emit</span> <span class="n">PrivilegeAssigned</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span> <span class="n">privId</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint64</span><span class="p">(</span><span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">expiresAt</span><span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">hasPrivilege</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">privId</span><span class="p">,</span>
+        <span class="kt">address</span> <span class="n">user</span>
+    <span class="p">)</span> <span class="k">public</span> <span class="k">virtual</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">expiresAt</span> <span class="o">&gt;=</span>  <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span><span class="p">){</span>
+            <span class="k">return</span> <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">user</span> <span class="o">==</span> <span class="n">user</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">ownerOf</span><span class="p">(</span><span class="n">tokenId</span><span class="p">)</span> <span class="o">==</span> <span class="n">user</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">privilegeExpires</span><span class="p">(</span>
+        <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span>
+        <span class="kt">uint256</span> <span class="n">privId</span>
+    <span class="p">)</span> <span class="k">public</span> <span class="k">virtual</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">){</span>
+        <span class="k">return</span> <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">expiresAt</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">_setPrivilegeTotal</span><span class="p">(</span>
+        <span class="kt">uint</span> <span class="n">total</span>
+    <span class="p">)</span> <span class="k">internal</span> <span class="p">{</span>
+        <span class="k">emit</span> <span class="n">PrivilegeTotalChanged</span><span class="p">(</span><span class="n">total</span><span class="p">,</span> <span class="n">privilegeTotal</span><span class="p">);</span>
+        <span class="n">privilegeTotal</span> <span class="o">=</span> <span class="n">total</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">getPrivilegeInfo</span><span class="p">(</span><span class="kt">uint</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">privId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">address</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">expiresAt</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">user</span><span class="p">,</span> <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">expiresAt</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">setDelegator</span><span class="p">(</span><span class="kt">address</span> <span class="n">delegator</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">enabled</span><span class="p">)</span> <span class="k">external</span> <span class="p">{</span>
+        <span class="n">privilegeDelegator</span><span class="p">[</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">][</span><span class="n">delegator</span><span class="p">]</span> <span class="o">=</span> <span class="n">enabled</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">_isDelegatorOrHolder</span><span class="p">(</span><span class="kt">address</span> <span class="n">delegator</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">privId</span><span class="p">)</span> <span class="k">internal</span> <span class="k">virtual</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">address</span> <span class="n">holder</span> <span class="o">=</span> <span class="n">privilegeBook</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">privilegeEntry</span><span class="p">[</span><span class="n">privId</span><span class="p">].</span><span class="n">user</span><span class="p">;</span>
+         <span class="k">return</span> <span class="p">(</span><span class="n">delegator</span> <span class="o">==</span> <span class="n">holder</span> <span class="o">||</span> <span class="n">isApprovedForAll</span><span class="p">(</span><span class="n">holder</span><span class="p">,</span> <span class="n">delegator</span><span class="p">)</span> <span class="o">||</span> <span class="n">privilegeDelegator</span><span class="p">[</span><span class="n">holder</span><span class="p">][</span><span class="n">delegator</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">supportsInterface</span><span class="p">(</span><span class="kt">bytes4</span> <span class="n">interfaceId</span><span class="p">)</span> <span class="k">public</span> <span class="k">override</span> <span class="k">virtual</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">interfaceId</span> <span class="o">==</span> <span class="k">type</span><span class="p">(</span><span class="n">IERC5496</span><span class="p">).</span><span class="n">interfaceId</span> <span class="o">||</span> <span class="nb">super</span><span class="p">.</span><span class="n">supportsInterface</span><span class="p">(</span><span class="n">interfaceId</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Implementations must thoroughly consider who has the permission to set or clone privileges.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/wnft">Jeremy Z</a>, "EIP-5496: Multi-privilege Management NFT Extension [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5496, July 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5496.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5496: Multi-privilege Management NFT Extension [DRAFT]",
+    "author": "Jeremy Z (@wnft)",
+    "name": "EIP-5496: Multi-privilege Management NFT Extension [DRAFT]",
+    "dateCreated": "2022-07-30",
+    "datePublished": "2022-07-30",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-5496-multi-privilege-management-extension-for-erc-721/10427",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

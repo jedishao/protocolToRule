@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-5521: Referable NFT</title>
+<meta property="og:title" content="EIP-5521: Referable NFT" />
+<meta name="description" content="An EIP-721 extension to construct reference relationships among NFTs" />
+<meta property="og:description" content="An EIP-721 extension to construct reference relationships among NFTs" />
+<meta name="twitter:description" content="An EIP-721 extension to construct reference relationships among NFTs" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-5521" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-5521" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="draft">
+⚠️ This EIP is not recommended for general use or implementation as it is likely to change.
+</div>
+<div class="home">
+<h1 class="page-heading">
+EIP-5521: Referable NFT
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-5521.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>An EIP-721 extension to construct reference relationships among NFTs</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/OniReimu">Saber Yu</a>, <a href="/cdn-cgi/l/email-protection#36475f581841575851765257425700071855455f4459185743">Qin Wang</a>, <a href="/cdn-cgi/l/email-protection#9ae9f2fbf4fdffb4fcefdaf7f5f4fbe9f2b4fffeef">Shange Fu</a>, <a href="/cdn-cgi/l/email-protection#24574c4d544d4a430a474c414a644045504512150a47574d564b0a4551">Shiping Chen</a>, <a href="/cdn-cgi/l/email-protection#d5adbca2b0bcfbada095b1b4a1b4e3e4fbb6a6bca7bafbb4a0">Sherry Xu</a>, <a href="/cdn-cgi/l/email-protection#046e6d656a63776c656a2a7d7144696b6a65776c2a616071">Jiangshan Yu</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-x-erc-721-referable-nft/10310">https://ethereum-magicians.org/t/eip-x-erc-721-referable-nft/10310</a></td></tr>
+<tr><th>Status</th><td>Draft
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2022-08-10</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>,
+<a href="eip-721">721</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a></li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard is an extension of <a href="/EIPS/eip-721">EIP-721</a>. It proposes two referrable indicators, referring and referred, and a time-based indicator <code class="language-plaintext highlighter-rouge">createdTimestamp</code>. The relationship between each NFT forms a Directed acyclic graph (DAG). The standard allows users to query, track and analyze their relationships.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Many scenarios require inheritance, reference, and extension of NFTs. For instance, an artist may develop his NFT work based on a previous NFT, or a DJ may remix his record by referring to two pop songs, etc. Proposing a referable solution for existing NFTs and enabling efficient queries on cross-references make much sense.</p>
+<p>By adding the <code class="language-plaintext highlighter-rouge">referring</code> indicator, users can mint new NFTs (e.g., C, D, E) by referring to existing NFTs (e.g., A, B), while <code class="language-plaintext highlighter-rouge">referred</code> enables the referred NFTs (A, B) to be aware that who has quoted it (e.g., A ← D; C ← E; B ← E, and A ← E). The <code class="language-plaintext highlighter-rouge">createdTimestamp</code> is an indicator used to show the creation time of NFTs (A, B, C, D, E).</p>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p><code class="language-plaintext highlighter-rouge">Relationship</code>: a structure that contains <code class="language-plaintext highlighter-rouge">referring</code>, <code class="language-plaintext highlighter-rouge">referred</code>, <code class="language-plaintext highlighter-rouge">createdTimestamp</code>, and other customized attributes such as <code class="language-plaintext highlighter-rouge">mapping (uint256 =&gt; address) privityOfAgreement</code> recording the ownerships of referred NFTs at the time the rNFTs were being created.
+<code class="language-plaintext highlighter-rouge">referring</code>: an out-degree indicator, used to show the users this NFT refers to;
+<code class="language-plaintext highlighter-rouge">referred</code>: an in-degree indicator, used to show the users who have refereed this NFT;
+<code class="language-plaintext highlighter-rouge">createdTimestamp</code>: a time-based indicator, used to compare the timestamp of mint.</p>
+<p><code class="language-plaintext highlighter-rouge">safeMint</code>: mint a new rNFT;
+<code class="language-plaintext highlighter-rouge">setNode</code>: set the referring list of an rNFT and update the referred list of each one in the referring list;
+<code class="language-plaintext highlighter-rouge">setNodeReferring</code>: set the referring list of an rNFT;
+<code class="language-plaintext highlighter-rouge">setNodeReferred</code>: set the referred list of the given rNFTs;
+<code class="language-plaintext highlighter-rouge">referringOf</code>: Get the referring list of an rNFT;
+<code class="language-plaintext highlighter-rouge">referredOf</code>: Get the referred list of an rNFT.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>This standard is intended to establish the referable DAG for queries on cross-relationship and accordingly provide the simplest functions. It provides advantages as follows.</p>
+<p><em>Clear ownership inheritance</em>: This standard extends the static NFT into a virtually extensible NFT network. Artists do not have to create work isolated from others. The ownership inheritance avoids reinventing the same wheel.</p>
+<p><em>Incentive Compatibility</em>: This standard clarifies the referable relationship across different NFTs, helping to integrate multiple up-layer incentive models for both original NFT owners and new creators.</p>
+<p><em>Easy Integration</em>: This standard makes it easier for the existing token standards or third-party protocols. For instance, the rNFT can be collaborating with the Top-down composible NFT (cf. <a href="/EIPS/eip-998">EIP-998</a> to build a finer-grained reference relationship, where the <code class="language-plaintext highlighter-rouge">Relationship</code> structure and the interface <code class="language-plaintext highlighter-rouge">IERC_rNFT</code> can be seamlessly stored and updated when invoking the <code class="language-plaintext highlighter-rouge">mint</code> function). Another example is that the rNFT can be applied to rentable scenarios (cf. <a href="/EIPS/eip-5006">EIP-5006</a> to build a hierarchical rental market, where multiple users can rent the same NFT during the same time or one user can rent multiple NFTs during the same duration).</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>This standard can be fully <a href="/EIPS/eip-721">EIP-721</a> compatible by adding an extension function set.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Truffle and Openzeppelin are required to run the following in a test network.</p>
+<pre><code class="language-node">truffle develop
+rNFT = await ERC_rNFT.new("ERC_rNFT","ERC_rNFT")
+rNFT.safeMint(1,[])
+rNFT.referredOf(1)
+rNFT.referringOf(1)
+
+rNFT.safeMint(2,[1])
+rNFT.referredOf(2)
+rNFT.referringOf(2)
+
+rNFT.safeMint(3,[1,2])
+rNFT.referredOf(2)
+rNFT.referredOf(3)
+rNFT.referringOf(3)
+
+</code></pre>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">4</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC_rNFT</span> <span class="p">{</span>
+
+    <span class="c1">// Logged when a node in the rNFT gets referred and changed
+</span>    <span class="c1">/// @notice Emitted when the `node` (i.e., an rNFT) is changed
+</span>    <span class="k">event</span> <span class="n">UpdateNode</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="n">_referringList</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="n">_referredList</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Set the referred and referring relationship of an rNFT
+</span>    <span class="c1">/// Throws if `tokenId` is not valid rNFT
+</span>    <span class="c1">/// @param _tokenIds The list of the rNFTs that `tokenId` refers to
+</span>    <span class="k">function</span> <span class="n">setNode</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_tokenIds</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Get the list of the rNFTs that `tokenId` refers to
+</span>    <span class="c1">/// Throws if `tokenId` is not valid rNFT
+</span>    <span class="c1">/// @param tokenId The rNFT of the referring list
+</span>    <span class="k">function</span> <span class="n">referringOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get the list of the rNFT that refers to `tokenId`
+</span>    <span class="c1">/// Throws if `tokenId` is not valid rNFT
+</span>    <span class="c1">/// @param tokenId The rNFT of the referred list
+</span>    <span class="k">function</span> <span class="n">referredOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">4</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s">"@openzeppelin/contracts/token/ERC721/ERC721.sol"</span><span class="p">;</span>
+<span class="k">import</span> <span class="s">"./IERC_rNFT.sol"</span><span class="p">;</span>
+
+<span class="k">contract</span> <span class="n">ERC_rNFT</span> <span class="k">is</span> <span class="n">ERC721</span><span class="p">,</span> <span class="n">IERC_rNFT</span> <span class="p">{</span>
+
+    <span class="k">struct</span> <span class="n">Relationship</span> <span class="p">{</span>
+        <span class="kt">uint256</span><span class="p">[]</span> <span class="n">referring</span><span class="p">;</span>   <span class="c1">// referring list
+</span>        <span class="kt">uint256</span><span class="p">[]</span> <span class="n">referred</span><span class="p">;</span> <span class="c1">// referred list
+</span>        <span class="kt">uint256</span> <span class="n">createdTimestamp</span><span class="p">;</span> <span class="c1">// unix timestamp when the rNFT is being created
+</span>
+        <span class="c1">// Customized attributes
+</span>        <span class="c1">// The distribution of profits complies to the aggreement when the NFT was being created regardless of the change of ownership unless specified in the agreement
+</span>        <span class="c1">// &lt;token ID =&gt; token owner address&gt;
+</span>        <span class="c1">// mapping (uint256 =&gt; address) privityOfAgreement
+</span>    <span class="p">}</span>
+
+    <span class="k">mapping</span> <span class="p">(</span><span class="kt">uint256</span> <span class="o">=&gt;</span> <span class="n">Relationship</span><span class="p">)</span> <span class="k">internal</span> <span class="n">_relationship</span><span class="p">;</span>
+    <span class="kt">address</span> <span class="n">contractOwner</span> <span class="o">=</span> <span class="kt">address</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+    <span class="k">constructor</span><span class="p">(</span><span class="kt">string</span> <span class="k">memory</span> <span class="n">name_</span><span class="p">,</span> <span class="kt">string</span> <span class="k">memory</span> <span class="n">symbol_</span><span class="p">)</span> <span class="n">ERC721</span><span class="p">(</span><span class="n">name_</span><span class="p">,</span> <span class="n">symbol_</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">contractOwner</span> <span class="o">=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">function</span> <span class="n">safeMint</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_tokenIds</span><span class="p">)</span> <span class="k">public</span> <span class="p">{</span>
+        <span class="n">_safeMint</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">);</span>
+        <span class="n">setNode</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span> <span class="n">_tokenIds</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// @notice set the referring list of an rNFT
+</span>    <span class="c1">/// Throws if `tokenId` is not a valid rNFT
+</span>    <span class="c1">/// @param _tokenIds array of rNFTs
+</span>    <span class="k">function</span> <span class="n">setNodeReferring</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_tokenIds</span><span class="p">)</span> <span class="k">private</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">_isApprovedOrOwner</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">tokenId</span><span class="p">),</span> <span class="s">"ERC_rNFT: transfer caller is not owner nor approved"</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">contractOwner</span> <span class="o">!=</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span> <span class="o">&amp;&amp;</span> <span class="n">_tokenIds</span><span class="p">.</span><span class="n">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="nb">revert</span><span class="p">(</span><span class="s">"ERC_rNFT: the referring list cannot be empty"</span><span class="p">);</span> <span class="p">}</span>
+
+        <span class="n">Relationship</span> <span class="k">storage</span> <span class="n">relationship</span> <span class="o">=</span> <span class="n">_relationship</span><span class="p">[</span><span class="n">tokenId</span><span class="p">];</span>
+        <span class="n">relationship</span><span class="p">.</span><span class="n">referring</span> <span class="o">=</span> <span class="n">_tokenIds</span><span class="p">;</span>
+        <span class="n">relationship</span><span class="p">.</span><span class="n">createdTimestamp</span> <span class="o">=</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span><span class="p">;</span>
+        <span class="k">emit</span> <span class="n">UpdateNode</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">,</span> <span class="n">relationship</span><span class="p">.</span><span class="n">referring</span><span class="p">,</span> <span class="n">relationship</span><span class="p">.</span><span class="n">referred</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// @notice set the referred list of an rNFT
+</span>    <span class="c1">/// Throws if `tokenId` is not a valid rNFT
+</span>    <span class="c1">/// @param _tokenIds array of rNFTs
+</span>    <span class="k">function</span> <span class="n">setNodeReferred</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_tokenIds</span><span class="p">)</span> <span class="k">private</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="p">(</span><span class="kt">uint</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">_tokenIds</span><span class="p">.</span><span class="n">length</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">Relationship</span> <span class="k">storage</span> <span class="n">relationship</span> <span class="o">=</span> <span class="n">_relationship</span><span class="p">[</span><span class="n">_tokenIds</span><span class="p">[</span><span class="n">i</span><span class="p">]];</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">relationship</span><span class="p">.</span><span class="n">createdTimestamp</span> <span class="o">&gt;=</span> <span class="n">block</span><span class="p">.</span><span class="n">timestamp</span><span class="p">)</span> <span class="p">{</span> <span class="nb">revert</span><span class="p">(</span><span class="s">"ERC_rNFT: the referred rNFT needs to be a predecessor"</span><span class="p">);</span> <span class="p">}</span> <span class="c1">// Make sure the reference complies with the timing sequence
+</span>
+            <span class="n">relationship</span><span class="p">.</span><span class="n">referred</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">tokenId</span><span class="p">);</span>
+            <span class="k">emit</span> <span class="n">UpdateNode</span><span class="p">(</span><span class="n">_tokenIds</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ownerOf</span><span class="p">(</span><span class="n">_tokenIds</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">relationship</span><span class="p">.</span><span class="n">referring</span><span class="p">,</span> <span class="n">relationship</span><span class="p">.</span><span class="n">referred</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// @notice set the referred list of an rNFT and update the referring list of each one in the referred list
+</span>    <span class="c1">/// Throws if `tokenId` is not a valid rNFT
+</span>    <span class="c1">/// @param _tokenIds array of rNFTs
+</span>    <span class="k">function</span> <span class="n">setNode</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span> <span class="n">_tokenIds</span><span class="p">)</span> <span class="k">public</span> <span class="k">virtual</span> <span class="k">override</span> <span class="p">{</span>
+        <span class="n">setNodeReferring</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span> <span class="n">_tokenIds</span><span class="p">);</span>
+        <span class="n">setNodeReferred</span><span class="p">(</span><span class="n">tokenId</span><span class="p">,</span> <span class="n">_tokenIds</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// @notice Get the referring list of an rNFT
+</span>    <span class="c1">/// @param tokenId The considered rNFT
+</span>    <span class="c1">/// @return The referring list of an rNFT
+</span>    <span class="k">function</span> <span class="n">referringOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">virtual</span> <span class="k">override</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">_exists</span><span class="p">(</span><span class="n">tokenId</span><span class="p">),</span> <span class="s">"ERC_rNFT: token ID not existed"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">_relationship</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">referring</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// @notice Get the referred list of an rNFT
+</span>    <span class="c1">/// @param tokenId The considered rNFT
+</span>    <span class="c1">/// @return The referred list of an rNFT
+</span>    <span class="k">function</span> <span class="n">referredOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">virtual</span> <span class="k">override</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">[]</span> <span class="k">memory</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">require</span><span class="p">(</span><span class="n">_exists</span><span class="p">(</span><span class="n">tokenId</span><span class="p">),</span> <span class="s">"ERC_rNFT: token ID not existed"</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">_relationship</span><span class="p">[</span><span class="n">tokenId</span><span class="p">].</span><span class="n">referred</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">/// @dev See {IERC165-supportsInterface}.
+</span>    <span class="k">function</span> <span class="n">supportsInterface</span><span class="p">(</span><span class="kt">bytes4</span> <span class="n">interfaceId</span><span class="p">)</span> <span class="k">public</span> <span class="k">view</span> <span class="k">virtual</span> <span class="k">override</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">interfaceId</span> <span class="o">==</span> <span class="k">type</span><span class="p">(</span><span class="n">IERC_rNFT</span><span class="p">).</span><span class="n">interfaceId</span> <span class="o">||</span> <span class="nb">super</span><span class="p">.</span><span class="n">supportsInterface</span><span class="p">(</span><span class="n">interfaceId</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The <code class="language-plaintext highlighter-rouge">createdTimestamp</code> only covers the block-level timestamp (based on block headers), which does not support fine-grained comparisons such as transaction-level.</p>
+<p>The change of ownership has nothing to do with the reference relationship. Normally, the distribution of profits complies to the aggreement when the NFT was being created regardless of the change of ownership unless specified in the agreement.</p>
+<p>In the context of collaborating with <a href="/EIPS/eip-998">EIP-998</a>, referring a token will not refer its descendants by default. In the case that only a specific child token gets referred, it means the privity of contract will involve nobody other than the owner of this specific child token. Alternatively, a chain-of-reference all the way from the root token to a specific very bottom child token (from root to leaf) can be constructured and recorded in the <code class="language-plaintext highlighter-rouge">referring</code> to explicitly define the distribution of profits.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/OniReimu">Saber Yu</a>, <a href="/cdn-cgi/l/email-protection#6f1e060141180e01082f0b0e1b0e595e410c1c061d00410e1a">Qin Wang</a>, <a href="/cdn-cgi/l/email-protection#582b3039363f3d763e2d18353736392b30763d3c2d">Shange Fu</a>, <a href="/cdn-cgi/l/email-protection#2e5d46475e474049004d464b406e4a4f5a4f181f004d5d475c41004f5b">Shiping Chen</a>, <a href="/cdn-cgi/l/email-protection#443c2d33212d6a3c31042025302572756a27372d362b6a2531">Sherry Xu</a>, <a href="/cdn-cgi/l/email-protection#b4deddd5dad3c7dcd5da9acdc1f4d9dbdad5c7dc9ad1d0c1">Jiangshan Yu</a>, "EIP-5521: Referable NFT [DRAFT]," <em>Ethereum Improvement Proposals</em>, no. 5521, August 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-5521.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-5521: Referable NFT [DRAFT]",
+    "author": "Saber Yu (@OniReimu), Qin Wang <qin.wang@data61.csiro.au>, Shange Fu <shange.fu@monash.edu>, Shiping Chen <shiping.chen@data61.csiro.au>, Sherry Xu <xiwei.xu@data61.csiro.au>, Jiangshan Yu <jiangshan.yu@monash.edu>",
+    "name": "EIP-5521: Referable NFT [DRAFT]",
+    "dateCreated": "2022-08-10",
+    "datePublished": "2022-08-10",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-x-erc-721-referable-nft/10310",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2022"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>
