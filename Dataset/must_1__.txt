@@ -1,0 +1,3 @@
+If not inheriting from ERC-20, then minting the tip tokens MUST emit event Transfer(address indexed from, address indexed to, uint256 value) where sender is the zero address for a mint and to is the zero address for a burn. The Transfer event MUST be the same signature as the Transfer function in the IERC20 interface.
+Resolvers MUST emit this event on each change to the address for a name and coin type.
+Then, the contract SHALL calculate the total amount of FR that was distributed (allocatedFR), in order to return the difference of the soldPrice and allocatedFR to the lister. Finally, it SHALL emit the FRDistributed event.
