@@ -1,6 +1,4 @@
-Transfers _value amount of tokens to address _to, and MUST fire the Transfer event.
 <em>Note</em> Transfers of 0 values MUST be treated as normal transfers and fire the Transfer event.
-Transfers _value amount of tokens from address _from to address _to, and MUST fire the Transfer event.
 <em>Note</em> Transfers of 0 values MUST be treated as normal transfers and fire the Transfer event.
 Changes to an address MUST trigger the following event:
 The token contract MUST emit an AuthorizedOperator event with the correct values
@@ -26,7 +24,6 @@ Successful completion of this method MUST emit an Approval event (defined below)
 Assigns the ownership of quantity MCFT’s with ID _classId to _to if and only if quantity == balanceOf(msg.sender, _classId). A successful transfer MUST fire the Transfer event (defined below).
 A conforming contract MUST allow the current owner to “transfer” a token to themselves, as a way of affirming ownership in the event stream. (i.e. it is valid for _to == msg.sender if balanceOf(msg.sender, _classId) &gt;= balance.) This “no-op transfer” MUST be considered a successful transfer, and therefore MUST fire a Transfer event (with the same address for _from and _to).
 Additionally, the creation of new MCFTs MUST trigger a Transfer event for each newly created MCFTs, with a _from address of 0 and a _to address matching the owner of the new MCFT (possibly the smart contract itself). The deletion (or burn) of any MCFT MUST trigger a Transfer event with a _to address of 0 and a _from address of the owner of the MCFT (now former owner!).
-MUST emit the ApprovalForScope event on success.
 When emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted
 Contracts that implement the ConsecutiveTransfer event MAY still use the original Transfer event, however when emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted.
 In ALL cases any function or code that adds or replaces or removes one or more functions MUST emit the standard DiamondCut event specified below.

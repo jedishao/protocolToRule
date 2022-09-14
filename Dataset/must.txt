@@ -2410,15 +2410,12 @@ Emits the ControllerApproval event. The contract MUST allow
 Emits the ControllerApproval event. The contract MUST allow
 
 ../Dataset/Raw-data/5069.xml
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 The best available resource to understand the EIP process is <a href="/EIPS/eip-1">EIP-1. Anyone desirous of becoming an EIP editor MUST understand this document. Afterwards, participating in the EIP process by commenting on and suggesting improvements to PRs and issues will familliarize the procedure, and is RECOMMENDED. The contributions of newer editors SHALL be monitored by other EIP editors.
 
 This EIP MUST have the same rules regarding changes as <a href="/EIPS/eip-1">EIP-1.
 
 ../Dataset/Raw-data/5081.xml
-The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
-
 execute this transaction. Any block with a block number block_num &gt; expire_by MUST NOT execute this transaction.
 
 If current_block_num is available, client MUST drop and stop propagating/broadcasting any transactions that has a
