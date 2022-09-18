@@ -35,25 +35,36 @@ def all_must():
                         j += 1
                         print(path)
                     print(sents)
-                    #break
+                    break
 
 
 # MUST trigger Staked event.
 def must_rule1():
-    file_ = open('../Dataset/must.txt', encoding='utf-8')
-    rule1_ = []
-    for sents in file_:
-        doc = nlp(sents)
-        event = None
-        for token in doc:
-            r = []
+    # file_ = open('../Dataset/must.txt', encoding='utf-8')
+    # rule1_ = []
+    for i in config.DATASET_INDEX:
+        path = '../Dataset/Raw-data/' + str(i) + '.xml'
+        file_ = open(path, encoding='utf-8')
+        for sents in file_:
+            doc = nlp(sents)
+            event = None
             m = False
             obj = False
-            # if str(token.pos_) == 'VERB' and str(token.lemma_) in ['trigger', 'suupport', 'fire', 'emit']:
-            if str(token.pos_) == 'VERB':
-                for child in token.children:
-                    if str(child.dep_) == 'advmod' and str(child).lower() == 'when':
-                        print(sents, end='')
+            for token in doc:
+                r = []
+                if str(token) == 'MUST':
+                    m = True
+                elif str(token) == 'when':
+                    obj = True
+            if m and obj:
+                print(path)
+                print(sents, end='')
+                # if str(token.pos_) == 'VERB' and str(token.lemma_) in ['trigger', 'suupport', 'fire', 'emit']:
+                # if str(token.pos_) == 'VERB':
+                #     for child in token.children:
+                #         if str(child.dep_) == 'advmod' and str(child).lower() == 'when':
+                #             print(path)
+                #             print(sents, end='')
                 #     if str(child) == 'MUST':
                 #         m = True
                 #     if str(child.dep_) == 'dobj' and str(child).lower() == 'event':
@@ -63,12 +74,12 @@ def must_rule1():
                 #                 event = str(c)
                 # if m and obj:
                 #     print(sents, end='')
-                    # r.append(str(token))
-                    # r.append(event)
-                    # rule1_.append(r)
-                    # if event is None:
-                    #     print(sents, end='')
-    return rule1_
+                # r.append(str(token))
+                # r.append(event)
+                # rule1_.append(r)
+                # if event is None:
+                #     print(sents, end='')
+        #return rule1_
 
 
 # MUST be triggered when a resolver is added.
@@ -113,6 +124,7 @@ def must_rule3():
 
 
 if __name__ == '__main__':
-    result = must_rule1()
+    must_rule1()
     # for r in result:
     #     print(r)
+#    all_must()
