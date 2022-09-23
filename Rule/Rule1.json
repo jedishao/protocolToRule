@@ -1,0 +1,170 @@
+[
+  {
+    "EIP": 900,
+    "function": "stake",
+    "emit": "MUST",
+    "event": "Staked"
+  },
+  {
+    "EIP": 900,
+    "function": "stakeFor",
+    "emit": "MUST",
+    "event": "Staked"
+  },
+  {
+    "EIP": 900,
+    "function": "unstake",
+    "emit": "MUST",
+    "event": "Unstaked"
+  },
+  {
+    "EIP": 3525,
+    "function": "approve",
+    "emit": "MUST",
+    "event": "ApprovalValue"
+  },
+  {
+    "EIP": 3525,
+    "function": "transferFrom",
+    "emit": "MUST",
+    "event": "TransferValue"
+  },
+  {
+    "EIP": 3525,
+    "function": "setApprovalForSlot",
+    "emit": "MUST",
+    "event": "ApprovalSlot"
+  },
+  {
+    "EIP": 4626,
+    "function": "deposit",
+    "emit": "MUST",
+    "event": "Deposit"
+  },
+  {
+    "EIP": 4626,
+    "function": "mint",
+    "emit": "MUST",
+    "event": "Deposit"
+  },
+  {
+    "EIP": 4626,
+    "function": "withdraw",
+    "emit": "MUST",
+    "event": "Withdraw"
+  },
+  {
+    "EIP": 4626,
+    "function": "redeem",
+    "emit": "MUST",
+    "event": "Withdraw"
+  },
+  {
+    "EIP": 4675,
+    "function": "transfer",
+    "emit": "MUST",
+    "event": "Transfer"
+  },
+  {
+    "EIP": 4675,
+    "function": "approve",
+    "emit": "MUST",
+    "event": "Approval"
+  },
+  {
+    "EIP": 4974,
+    "function": "setOperator",
+    "emit": "MUST",
+    "event": "Appointment"
+  },
+  {
+    "EIP": 4974,
+    "function": "setParticipation",
+    "emit": "MUST",
+    "event": "Participation"
+  },
+  {
+    "EIP": 4974,
+    "function": "transfer",
+    "emit": "MUST",
+    "event": "Transfer"
+  },
+  {
+    "EIP": 5095,
+    "function": "redeem",
+    "emit": "MUST",
+    "event": "Redeem"
+  },
+  {
+    "EIP": 5095,
+    "function": "withdraw",
+    "emit": "MUST",
+    "event": "Redeem"
+  },
+  {
+    "EIP": 5143,
+    "function": "deposit",
+    "emit": "MUST",
+    "event": "Deposit"
+  },
+  {
+    "EIP": 5143,
+    "function": "mint",
+    "emit": "MUST",
+    "event": "Deposit"
+  },
+  {
+    "EIP": 5143,
+    "function": "withdraw",
+    "emit": "MUST",
+    "event": "Withdraw"
+  },
+  {
+    "EIP": 5143,
+    "function": "redeem",
+    "emit": "MUST",
+    "event": "Withdraw"
+  },
+  {
+    "EIP": 3569,
+    "function": "seal",
+    "emit": "MUST",
+    "event": "Sealed"
+  },
+  {
+    "EIP": 884,
+    "function": "cancelAndReissue",
+    "emit": "MUST",
+    "event": "VerifiedAddressSuperseded"
+  },
+  {
+    "EIP": 20,
+    "function": "transferFrom",
+    "emit": "MUST",
+    "event": "Transfer"
+  },
+  {
+    "EIP": 20,
+    "function": "transfer",
+    "emit": "MUST",
+    "event": "Transfer"
+  },
+  {
+    "EIP": 1761,
+    "function": "setApprovalForScope",
+    "emit": "MUST",
+    "event": "ApprovalForScope"
+  },
+  {
+    "EIP": 998,
+    "function": "transferToParent",
+    "emit": "MUST",
+    "event": "TransferToParent"
+  },
+  {
+    "EIP": 998,
+    "function": "transferFromParent",
+    "emit": "MUST",
+    "event": "TransferFromParent"
+  }
+]
