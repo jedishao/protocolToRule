@@ -1,0 +1,54 @@
+MUST be triggered when setData was successfully called.
+MUST trigger when the contract is called the first time after the canary died.
+MUST be triggered when changeOwner or changeOwnerSigned was successfully called.
+MUST be triggered when release is successfully called.
+MUST be triggered when create is successfully called.
+MUST be triggered when withdraw is successfully called.
+MUST be triggered when redeem is successfully called.
+MUST be triggered when confirmUpdate is successfully called.
+MUST be triggered when revokeUpdate is successfully called.
+The PrivilegeAssigned event MUST be emitted when setPrivilege is called.
+The PrivilegeTransfered event MUST be emitted when transferPrivilege is called.
+The PrivilegeCloned event MUST be emitted when clonePrivilege is called.MUST trigger when tokens are transferred, including zero value transfers.
+MUST be triggered when a change to a delegate was successfully made.
+MUST be triggered when a change to an attribute was successfully made.
+A record of an account being frozen. MUST trigger when an account is frozen.
+MUST trigger when new announcement is created.
+MUST trigger when an announcement is removed.
+Either TransferSingle or TransferBatch MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).
+Either TransferSingle or TransferBatch MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).
+MUST emit when the URI is updated for a token ID.
+This event MUST trigger when MCFT ownership is transferred via any mechanism.
+MUST be triggered when an Identity is created.
+MUST be triggered when an address is added to an Identity.
+MUST be triggered when an address is removed from an Identity.
+MUST be triggered when a provider is added to an Identity.
+MUST be triggered when a provider is removed.
+MUST be triggered when a resolver is added.
+MUST be triggered when a resolver is removed.
+MUST be triggered when a recovery address change is triggered.
+MUST be triggered when recovery is triggered.
+MUST be triggered when an Identity is destroyed.
+MUST be triggered when an update is approved by all involved parties.
+MUST emit when the token IDs are added to the scope.
+MUST emit when the token IDs are removed from the scope.
+MUST emit when a scope URI is set or changes.
+Issue MUST trigger when Bonds are issued. This SHOULD not include zero value Issuing.
+Redeem MUST trigger when Bonds are redeemed. This SHOULD not include zero value redemption.
+Burn MUST trigger when the bonds are being redeemed via staking (or being invalidated) by the bank contract.
+Burn MUST trigger when Bonds are burned. This SHOULD not include zero value burning.
+Transfer MUST trigger when Bonds are transferred. This SHOULD not include zero value transfers.
+To ensure the reading of transactions, “Issue”, “Redeem”, “Burn” and “Transfer”, Events cited above MUST be emitted when such transaction is passed.
+MUST emit when value of a token is transferred to another token with the same slot,
+The ConsumerChanged event MUST be emitted when a consumer is changed.
+MUST be emitted when tokens are deposited into the Vault via the mint and deposit methods.
+MUST be emitted when shares are withdrawn from the Vault in ERC4626.redeem or ERC4626.withdraw methods.
+The MetadataUpdate or BatchMetadataUpdate event MUST be emitted when the JSON metadata of a token, or a consecutive range of tokens, is changed.
+The UpdateUser event MUST be emitted when a user address is changed or the user expires is changed.
+MUST trigger when tokens are upgraded.
+MUST trigger when tokens are downgraded.
+MUST emit when EXP is transferred by any mechanism.
+The SlotAuthorizationCreated event MUST be emitted when a slot is authorized to an address.
+The SlotAuthorizationRevoked event MUST be emitted when a slot authorization is revoked.
+The UpdateUser event MUST be emitted when a user is changed.
+The TerminateBorrow event MUST be emitted when the rent is terminated.

@@ -1,0 +1,82 @@
+The transfer and accept functions’ documentation only specify conditions when the transaction MUST throw. Your implementation MAY also throw in other situations. This allows implementations to achieve interesting results:
+MUST be triggered when execute creates a new call using the operationType 0, 3, 4.
+MUST be triggered when execute creates a new contract using the operationType 1, 2.
+The token contract MUST revert when sending in any of the following cases:
+Nonetheless, the rules below MUST be respected when minting for a <em>recipient</em>:
+The token contract MUST revert when minting in any of the following cases:
+The rules below MUST be respected when burning the tokens of a <em>holder</em>:
+The token contract MUST revert when burning in any of the following cases:
+If a contract dynamically changes its interface and relies on the ERC-165</a> cache of the ERC-820 registry, the cache MUST be updated manually—there is no automatic cache invalidation or cache update. Ideally the contract SHOULD automatically update the cache when changing its interface. However anyone MAY update the cache on the contract’s behalf.
+If a contract implements the interface (interfaceHash) for a given address (addr), it MUST return ERC820_ACCEPT_MAGIC when called with the addr and the interfaceHash. If it does not implement the interfaceHash for a given address (addr), it MUST NOT return ERC820_ACCEPT_MAGIC.
+For backwards-compatibility, implementations MUST emit the standard ERC20 Transfer event when a transfer occurs, regardless of whether the sender and recipient are addresses or ERC721 tokens. In the case that either sender or recipient are tokens, the corresponding parameter in the Transfer event SHOULD be the contract address of the token.
+MUST emit when approval for a second party/operator address to manage all tokens for an owner address is enabled or disabled (absence of an event assumes disabled).
+Even in a non-safe API and/or hybrid standards case the above event rules MUST still be adhered to when minting/creating or burning/destroying.
+The requirement to emit TransferSingle or TransferBatch on balance change implies that a valid implementation of ERC-1155 redeploying to a new contract address MUST emit events from the new contract address to replicate the deprecated contract final state. It is valid to only emit a minimal number of events to reflect only the final balance and omit all the transactions that led to that state. The event emit requirement is to ensure that the current state of the contract can always be traced only through events. To alleviate the need to emit events when changing contract address, consider using the proxy pattern, such as described in <a href="/EIPS/eip-2535">EIP-2535</a>. This will also have the added benefit of providing a stable contract address for users.
+Successful completion of this method MUST emit an Approval event (defined below) unless the caller is attempting to clear approval when there is no pending approval. In particular, an Approval event MUST be fired if the _to address is zero and there is some outstanding approval. Additionally, an Approval event MUST be fired if _to is already the currently approved address and this call otherwise has no effect. (i.e. An approve() call that “reaffirms” an existing approval MUST fire an event.)
+This event MUST trigger on any successful call to approve(_to, _classId, quantity) (unless the caller is attempting to clear approval when there is no pending approval).
+This event MUST trigger when the authorizer grant a new authorization when grant or regrant processes successfully
+This event MUST trigger when the authorizer revoke a specific authorization successfully
+The assign and revoke functions’ documentation only specify conditions when the transaction MUST throw. Your implementation MAY also throw in other situations. This allows implementations to achieve interesting results:
+MUST return the bytes4 magic value 0x1626ba7e when function passes.
+The field contenthash is introduced, which permits a wide range of protocols to be supported by ENS names. Resolvers supporting this field MUST return true when the supportsInterface function is called with argument 0xbc1c58d1.
+This function MUST return two equal values when performing two directly consecutive function calls with identical account and attributeTypeID parameters, regardless of differences in the caller’s address, the transaction origin, or other out-of-band information.
+This function MUST return two equal values when performing two directly consecutive function calls with identical account and attributeTypeID parameters, regardless of differences in the caller’s address, the transaction origin, or other out-of-band information.
+This function MUST return an attributeTypeID value on <em>some</em> index if the same attributeTypeID value would cause a given call to hasAttribute to return true when passed as a parameter.
+MUST emit when approval changes for scope.
+If a contract implements the interface (interfaceHash) for a given address (addr), it MUST return ERC1820_ACCEPT_MAGIC when called with the addr and the interfaceHash.
+Contracts that implement the ConsecutiveTransfer event <strong>MAY</strong> still use the original Transfer event, however when emitting the ConsecutiveTransfer event the Transfer event <strong>MUST NOT</strong> be emitted.
+If a resolver implements this function, it MUST return true when supportsInterface() is called on it with the interface’s ID, 0xTBD.
+EIP-2544-compliant ENS clients MUST perform the following procedure when determining the resolver for a given name:
+If the procedure above returns null, name resolution MUST terminate unsuccessfully. Otherwise, EIP-2544-compliant ENS clients MUST perform the following procedure when resolving a record:
+<td>Clients <strong>MUST</strong> add the message with motivations to the message list and they <strong>MUST NOT</strong> consider MOM messages sent by that address to be valid anymore, ever. In other words, MOM clients <strong>MUST</strong> ignore any other transaction sent by that address while creating the message list. This is useful when users want to change account, for example because the private key seems compromised.</td>
+deposit(bytes8) MUST return false when the contract needs to keep the value, but signal to the depositor that the deposit (in terms of the parent application) itself has not yet succeeded. (This can be used for partial payment, ie. the invoice is for 5 ETH, sending 3 ETH returns false, but sending a second tx with 2 ETH will return true.)
+MUST emit when a mint occurs where a single {Base} token is received by the {Pool}.
+MUST emit when a mint occurs where multiple {Base} tokens are received by the {Wrapper}.
+MUST emit when a burn occurs where a single {Base} token is sent by the {Wrapper}.
+MUST emit when a mint occurs where multiple {Base} tokens are sent by the {Wrapper}.
+Issue MUST be triggered when the operator (i.e Bank address) contract issues bonds to the given entity.
+Approval MUST trigger when bond-holders are approving an _operator. This SHOULD not include zero value approval.
+MUST emit when the approval value of a token is set or changed.
+MUST emit when the slot of a token is set or changed.
+MUST emit when an operator is approved or disapproved to manage all of _owner's
+All EIP-3525 contracts need to MUST check for the existence of onERC3525Received on the recipient contract and call the function when it exists;
+In order to prevent a malicious client from causing unintended effects when making transactions using CCIP read, contracts MUST implement appropriate checks on the extraData returned to them in the callback. Any sanity/permission checks performed on input data for the initial call MUST be repeated on the data passed through the extraData field in the callback. For example, if a transaction should only be executable by an authorised account, that authorisation check MUST be done in the callback; it is not sufficient to perform it with the initial call and embed the authorised address in the extraData.
+When executing JUMP or JUMPI instructions, the jump destination MUST be in the jumpdests table. Otherwise, the execution aborts with <em>bad jump destination</em>. In case of JUMPI, the check is done only when the jump is to be taken (no change to the previous behaviour).
+Wallet implementers MUST prevent phishing attacks by matching on the domain term when processing a signing request. For example, when processing the message beginning with "service.invalid wants you to sign in...", the wallet checks that the request actually originated from service.invalid.
+Clever ways to minimise on-chain state updating of the deposit balances for each user and the reward balances of each holder, can help further to minimise the gas costs when sending in a batch if the batch is ordered beforehand. For example, can avoid the checks if the next NFT in the batch is the same. This left to the tip token contract implementer. Whatever optimisation is applied, it MUST still allow information of which account tipped which account and for what NFT to be reconstructed from the Tip and the TipBatch events emitted.
+Though it is RECOMMENDED that users’ deposits are kept locked in the tip token contract or external escrow account, and SHOULD NOT be used for anything but the rewards for holders, this cannot be enforced. This standard stipulates that the rewards MUST be available for when holders withdraw their rewards from the pool of deposits.
+The supportsInterface method MUST return true when called with 0x953c8dfa.
+This EIP requires <a href="/EIPS/eip-165">EIP-165</a>. EIP165 is already required in <a href="/EIPS/eip-721">ERC-721</a>, but is further necessary here in order to register the interface of this EIP. Doing so will allow easy verification if an NFT contract has implemented this EIP or not, enabling them to interact accordingly. The interface of this EIP (as defined in EIP-165) is 0x5604e225. Contracts implementing this EIP MUST have the supportsInterface function return true when called with 0x5604e225.
+safeTransfer and safeTransferFrom MUST transfer as expected to EOA addresses, and to contracts implementing ERC20Receiver and returning the function selector (0x4fc35859) when called, and MUST revert when transferring to a contract which either does not have ERC20Receiver implemented, or does not return the function selector when called.
+MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.
+MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.
+Consensus clients MAY continue to implement the deposit Merkle tree however they choose. However, when transmitting the tree to newly syncing nodes, clients MUST use the following format:
+tokenId emitted from event SubscribeToNFT MUST be the same as tokenId except when
+uri emitted from event SubscribeToNFT MUST be the same as uri except when uri is empty.
+Use of subscription tokens is in effect an indirect way to control the lifetime of an NFT. As such it is assumed that this arrangement would work best when the NFTs and subscription token contracts subscribing to the NFTs, are deployed by the same platform or decentralised app. It MUST NOT have an impact or dependencies to existing NFTs that have not approved the subscription token as an operator. Indeed in this case, any other parties wouldn’t be aware of and any NFT lifetime dependencies will be ignored, hence should not work anyway. To this end, this proposal specifies that the ‘nft’ MUST have approved the subscriptionToken contract address as operator.
+The supportsInterface method MUST return true when called with 0x49064906.
+The supportsInterface method MUST return true when called with 0xad092b5c.
+Returns the current status of the upgrade functionality. Status MUST return true when the upgrade contract is functional and serving upgrades. It MUST return false when the upgrade contract is not currently serving upgrades.
+Returns the current status of the downgrade functionality. Status MUST return true when the upgrade contract is functional and serving downgrades. It MUST return false when the upgrade contract is not currently serving downgrades. When the downgrade Optional Ext. is not implemented, this method will always return false to signify downgrades are not available.
+MUST emit when operator changes by any mechanism.
+MUST emit emit when participation status changes by any mechanism.
+Smart contracts implementing the ERC20 held token standard MUST also implement ERC165 and return true when the interface ID 0x74c89d54 is passed.
+Smart contracts implementing the ERC721 held token standard MUST also implement ERC165 and return true when the interface ID 0x16b900ff is passed.
+Smart contracts implementing the ERC1155 held token standard MUST also implement ERC165 and return true when the interface ID 0xced24c37 is passed.
+The supportsInterface method MUST return true when called with 0x208994f8.
+The supportsInterface method MUST return true when called with 0xce03fdab.
+rpc_url is represented as an array of RPC URLs. A minimum of 1 rpc_url MUST be present, in the format of rpc_url=https%3A%2F%2Fpolygon-rpc.com, or when multiple present rpc_url=https%3A%2F%2Fpolygon-rpc.com&amp;rpc_url=https%3A%2F%2Frpc-mainnet.matic.network.
+MUST NOT reflect slippage or other on-chain conditions, when performing the actual redemption.
+MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.
+MUST be emitted when Principal Tokens are burnt and underlying is withdrawn from the contract in the EIP5095.redeem method.
+An nFR-compliant smart contract MUST override the <a href="/EIPS/eip-721">EIP-721</a> _mint, _transfer, and _burn functions. When overriding the _mint function, a default FR model is REQUIRED to be established if the mint is to succeed when calling the <a href="/EIPS/eip-721">EIP-721</a> _mint function and not the nFR _mint function. It is also to update the owner amount and directly add the recipient address to the FR cycle. When overriding the _transfer function, the smart contract SHALL consider the NFT as sold for 0 ETH, and update the state accordingly after a successful transfer. This is to prevent FR circumvention. Finally, when overriding the _burn function, the smart contract SHALL delete the FRInfo corresponding to that Token ID after a successful burn.
+The supportsInterface method MUST return true when called with 0xac7b5ca9.
+Any compliant contract MUST return true when a behavior defined in that ERC and optional interface extensions is available to a caller.
+The supportsInterface method MUST return true when called with 0x6352211e.
+Suppose a compliant ContractA is deployed at address 0x&lt;Contract_Address_A&gt; and gains its legitimacy from another contract or External Owned Account (EOA) at 0x&lt;ADDRESS_B&gt;. In this case, it MUST return the 0x&lt;ADDRESS_B&gt; when being queried for sourceOfLegitimacy(). For example. If ContractA gains legitimacy from ContractB, ContractB gains legitimacy from ContractC but ContractC doesn’t gain legitimacy from anyone, ContractC is considered the “jurisdiction” that both ContractB and ContractA observe. Both ContractA and ContractB MUST return the address of ContractC as the result of jurisdiction.
+Any compliant contract MUST return its legitimacy sources chain up to the sovereign contract when queried by jurisdiction().
+The supportInterface method MUST return true when called with 0x8f65987b.
+The supportsInterface method MUST return true when called with 0x076e1bbb.
+The supportsInterface function MUST return true when called with 0xf808ec37.
+The AgreeToTerminateBorrow event MUST be emitted when either the lender or borrower agrees to terminate the rent.
+The ResetTerminationAgreements event MUST be emitted when a token is borrowed and transferred or setUser and terminateBorrow functions are called.

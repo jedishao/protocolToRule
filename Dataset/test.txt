@@ -1,0 +1,1 @@
+While a Sent event MUST NOT be emitted when minting.

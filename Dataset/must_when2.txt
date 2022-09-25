@@ -1,0 +1,4 @@
+AuthorizedOperator events MUST NOT be emitted when defining the <em>default operators</em>.
+AuthorizedOperator events MUST NOT be emitted when defining <em>default operators</em>.
+While a Sent event MUST NOT be emitted when minting.
+While a Sent event MUST NOT be emitted when burning.
