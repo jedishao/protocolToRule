@@ -31,7 +31,7 @@
 [event ProviderRemoved MUST be triggered when a provider is removed.](https://eips.ethereum.org/EIPS/eip-1484#:~:text=MUST%20be%20triggered%20when%20a%20provider%20is%20removed.)
 
 #### rule: 
-· \[function\] MUST be triggered when \[funciton\]
+· \[event\] MUST be triggered when \[funciton\]
 
 · \[funciton\]:variabl e*\[noun\]+function\[verb\]
 
@@ -48,6 +48,32 @@ The corresponding function for this protocol is removeProviders, which can be fo
         "remove",
         "removeprovider",
         "removeprovider(.+)"
+    ]
+}
+```
+
+## Rule 3
+
+### Example
+
+#### protocol: 
+
+[While a Sent event MUST NOT be emitted when minting.](https://eips.ethereum.org/EIPS/eip-777#:~:text=While%20a%20Sent%20event%20MUST%20NOT%20be%20emitted%20when%20minting.)
+
+#### rule: 
+· \[event\] MUST NOT be emiitted when \[funciton\]
+
+· \[funciton\]:variable
+
+#### .json:
+
+```json
+{
+    "EIP": "777",
+    "event": "Sent",
+    "emit": "MUST NOT",
+    "functions": [
+      "mint"
     ]
 }
 ```
