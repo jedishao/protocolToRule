@@ -1,0 +1,18 @@
+[
+  {
+    "EIP": "777",
+    "event": "Sent",
+    "emit": "MUST NOT",
+    "functions": [
+      "mint"
+    ]
+  },
+  {
+    "EIP": "777",
+    "event": "Sent",
+    "emit": "MUST NOT",
+    "functions": [
+      "burn"
+    ]
+  }
+]

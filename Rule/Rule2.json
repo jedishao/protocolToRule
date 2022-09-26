@@ -1,540 +1,542 @@
-[{
+[
+  {
     "EIP": "725",
     "event": "DataChanged",
     "emit": "MUST WHEN",
     "functions": [
-        "setData"
+      "setData"
     ]
-},
-{
+  },
+  {
     "EIP": "801",
     "event": "RIP",
     "emit": "MUST WHEN",
     "functions": [
-        "contract"
+      "contract"
     ]
-},
-{
+  },
+  {
     "EIP": "1056",
     "event": "DIDOwnerChanged",
     "emit": "MUST WHEN",
     "functions": [
-        "changeOwner",
-        "changeOwnerSigned"
+      "changeOwner",
+      "changeOwnerSigned"
     ]
-},
-{
+  },
+  {
     "EIP": "1319",
     "event": "VersionRelease",
     "emit": "MUST WHEN",
     "functions": [
-        "release"
+      "release"
     ]
-},
-{
+  },
+  {
     "EIP": "1620",
     "event": "LogCreate",
     "emit": "MUST WHEN",
     "functions": [
-        "create"
+      "create"
     ]
-},
-{
+  },
+  {
     "EIP": "1620",
     "event": "LogWithdraw",
     "emit": "MUST WHEN",
     "functions": [
-        "withdraw"
+      "withdraw"
     ]
-},
-{
+  },
+  {
     "EIP": "1620",
     "event": "LogRedeem",
     "emit": "MUST WHEN",
     "functions": [
-        "redeem"
+      "redeem"
     ]
-},
-{
+  },
+  {
     "EIP": "1620",
     "event": "LogConfirmUpdate",
     "emit": "MUST WHEN",
     "functions": [
-        "confirmUpdate"
+      "confirmUpdate"
     ]
-},
-{
+  },
+  {
     "EIP": "1620",
     "event": "LogRevokeUpdate",
     "emit": "MUST WHEN",
     "functions": [
-        "revokeUpdate"
+      "revokeUpdate"
     ]
-},
-{
+  },
+  {
     "EIP": "5496",
     "event": "PrivilegeAssigned",
     "emit": "MUST WHEN",
     "functions": [
-        "setPrivilege"
+      "setPrivilege"
     ]
-},
-{
+  },
+  {
     "EIP": "5496",
     "event": "PrivilegeTransfered",
     "emit": "MUST WHEN",
     "functions": [
-        "transferPrivilege"
+      "transferPrivilege"
     ]
-},
-{
+  },
+  {
     "EIP": "5496",
     "event": "PrivilegeCloned",
     "emit": "MUST WHEN",
     "functions": [
-        "clonePrivilege"
+      "clonePrivilege"
     ]
-},
-{
+  },
+  {
     "EIP": "20",
     "event": "Transfer",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transfer(.+)",
-        "transfertoken",
-        "transfertoken(.+)"
+      "transfer",
+      "transfer(.+)",
+      "transfertoken",
+      "transfertoken(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1056",
     "event": "DIDDelegateChanged",
     "emit": "MUST WHEN",
     "functions": [
-        "delegate",
-        "delegate(.+)",
-        "(.+)delegate",
-        "(.+)delegate(.+)"
+      "delegate",
+      "delegate(.+)",
+      "(.+)delegate",
+      "(.+)delegate(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1056",
     "event": "DIDAttritueChanged",
     "emit": "MUST WHEN",
     "functions": [
-        "attribute",
-        "attribute(.+)",
-        "(.+)attribute",
-        "(.+)attribute(.+)"
+      "attribute",
+      "attribute(.+)",
+      "(.+)attribute",
+      "(.+)attribute(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1080",
     "event": "AccountFrozen",
     "emit": "MUST WHEN",
     "functions": [
-        "freeze",
-        "freezeaccount",
-        "freezeaccount(.+)"
+      "freeze",
+      "freezeaccount",
+      "freezeaccount(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1129",
     "event": "NewAnnouncement",
     "emit": "MUST WHEN",
     "functions": [
-        "create",
-        "createannouncement",
-        "createannouncement(.+)"
+      "create",
+      "createannouncement",
+      "createannouncement(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1129",
     "event": "RemovedAnnouncement",
     "emit": "MUST WHEN",
     "functions": [
-        "remove",
-        "removeannouncement",
-        "removeannouncement(.+)"
+      "remove",
+      "removeannouncement",
+      "removeannouncement(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1155",
     "event": "TransferSingle",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transfertoken",
-        "transfertoken(.+)"
+      "transfer",
+      "transfertoken",
+      "transfertoken(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1155",
     "event": "TransferBatch",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transfer(.+)"
+      "transfer",
+      "transfer(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1155",
     "event": "URI",
     "emit": "MUST WHEN",
     "functions": [
-        "uri",
-        "update",
-        "updateURI",
-        "updateURI(.+)"
+      "uri",
+      "update",
+      "updateURI",
+      "updateURI(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1178",
     "event": "Transfer",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transfer(.+)"
+      "transfer",
+      "transfer(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "IdentityCreated",
     "emit": "MUST WHEN",
     "functions": [
-        "create",
-        "createidentity",
-        "createidentity(.+)"
+      "create",
+      "createidentity",
+      "createidentity(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "AssociatedAddressAdded",
     "emit": "MUST WHEN",
     "functions": [
-        "add",
-        "addaddress",
-        "addaddress(.+)",
-        "addAssociatedaddress",
-        "addAssociatedaddress(.+)"
+      "add",
+      "addaddress",
+      "addaddress(.+)",
+      "addAssociatedaddress",
+      "addAssociatedaddress(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "AssociatedAddressRemoved",
     "emit": "MUST WHEN",
     "functions": [
-        "remove",
-        "removeaddress",
-        "removeaddress(.+)",
-        "removeAssociatedaddress",
-        "removeAssociatedaddress(.+)"
+      "remove",
+      "removeaddress",
+      "removeaddress(.+)",
+      "removeAssociatedaddress",
+      "removeAssociatedaddress(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "ProviderAdded",
     "emit": "MUST WHEN",
     "functions": [
-        "add",
-        "addprovider",
-        "addprovider(.+)"
+      "add",
+      "addprovider",
+      "addprovider(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "ProviderRemoved",
     "emit": "MUST WHEN",
     "functions": [
-        "remove",
-        "removeprovider",
-        "removeprovider(.+)"
+      "remove",
+      "removeprovider",
+      "removeprovider(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "ResolverAdded",
     "emit": "MUST WHEN",
     "functions": [
-        "add",
-        "addresolver",
-        "addresolver(.+)"
+      "add",
+      "addresolver",
+      "addresolver(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "ResolverRemoved",
     "emit": "MUST WHEN",
     "functions": [
-        "remove",
-        "removeresolver",
-        "removeresolver(.+)"
+      "remove",
+      "removeresolver",
+      "removeresolver(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "RecoveryAddressChangeTriggered",
     "emit": "MUST WHEN",
     "functions": [
-        "trigger",
-        "triggerchange",
-        "triggerchange(.+)",
-        "triggerRecoveryAddressChange",
-        "triggerRecoveryAddressChange(.+)"
+      "trigger",
+      "triggerchange",
+      "triggerchange(.+)",
+      "triggerRecoveryAddressChange",
+      "triggerRecoveryAddressChange(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "RecoveryTriggered",
     "emit": "MUST WHEN",
     "functions": [
-        "trigger",
-        "triggerrecovery",
-        "triggerrecovery(.+)",
-        "recoverytrigger",
-        "recoverytrigger(.+)"
+      "trigger",
+      "triggerrecovery",
+      "triggerrecovery(.+)",
+      "recoverytrigger",
+      "recoverytrigger(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1484",
     "event": "IdentityDestroyed",
     "emit": "MUST WHEN",
     "functions": [
-        "destroy",
-        "destroyidentity",
-        "destroyidentity(.+)",
-        "identitydestroy",
-        "identitydestroy(.+)"
+      "destroy",
+      "destroyidentity",
+      "destroyidentity(.+)",
+      "identitydestroy",
+      "identitydestroy(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1620",
     "event": "LogExecuteUpdate",
     "emit": "MUST WHEN",
     "functions": [
-        "approve",
-        "approveupdate",
-        "approveupdate(.+)",
-        "update"
+      "approve",
+      "approveupdate",
+      "approveupdate(.+)",
+      "update"
     ]
-},
-{
+  },
+  {
     "EIP": "1761",
     "event": "IdsAddedToScope",
     "emit": "MUST WHEN",
     "functions": [
-        "add",
-        "addid",
-        "addid(.+)"
+      "add",
+      "addid",
+      "addid(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1761",
     "event": "IdsRemovedFromScope",
     "emit": "MUST WHEN",
     "functions": [
-        "remove",
-        "removeid",
-        "removeid(.+)"
+      "remove",
+      "removeid",
+      "removeid(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "1761",
     "event": "ScopeURI",
     "emit": "MUST WHEN",
     "functions": [
-        "set",
-        "setscope",
-        "setscope(.+)"
+      "set",
+      "setscope",
+      "setscope(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "3475",
     "event": "Issue",
     "emit": "MUST WHEN",
     "functions": [
-        "issue",
-        "issuebond",
-        "issuebond(.+)"
+      "issue",
+      "issuebond",
+      "issuebond(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "3475",
     "event": "Redeem",
     "emit": "MUST WHEN",
     "functions": [
-        "redeem",
-        "redeembond",
-        "redeembond(.+)"
+      "redeem",
+      "redeembond",
+      "redeembond(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "3475",
     "event": "Burn",
     "emit": "MUST WHEN",
     "functions": [
-        "redeem",
-        "redeembond",
-        "redeembond(.+)"
+      "redeem",
+      "redeembond",
+      "redeembond(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "3475",
     "event": "Burn",
     "emit": "MUST WHEN",
     "functions": [
-        "burn",
-        "burnbond",
-        "burnbond(.+)"
+      "burn",
+      "burnbond",
+      "burnbond(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "3475",
     "event": "Transfer",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transferbond",
-        "transferbond(.+)"
+      "transfer",
+      "transferbond",
+      "transferbond(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "3525",
     "event": "TransferValue",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transfervalue",
-        "transfervalue(.+)"
+      "transfer",
+      "transfervalue",
+      "transfervalue(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4400",
     "event": "ConsumerChanged",
     "emit": "MUST WHEN",
     "functions": [
-        "change",
-        "changeconsumer",
-        "changeconsumer(.+)"
+      "change",
+      "changeconsumer",
+      "changeconsumer(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4626",
     "event": "Deposit",
     "emit": "MUST WHEN",
     "functions": [
-        "deposit",
-        "deposittoken",
-        "deposittoken(.+)"
+      "deposit",
+      "deposittoken",
+      "deposittoken(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4626",
     "event": "Withdraw",
     "emit": "MUST WHEN",
     "functions": [
-        "withdraw",
-        "withdrawshare",
-        "withdrawshare(.+)"
+      "withdraw",
+      "withdrawshare",
+      "withdrawshare(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4906",
     "event": "MetadataUpdate",
     "emit": "MUST WHEN",
     "functions": [
-        "change",
-        "changemetadata",
-        "changemetadata(.+)"
+      "change",
+      "changemetadata",
+      "changemetadata(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4906",
     "event": "BatchMetadataUpdate",
     "emit": "MUST WHEN",
     "functions": [
-        "change",
-        "changemetadata",
-        "changemetadata(.+)"
+      "change",
+      "changemetadata",
+      "changemetadata(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4907",
     "event": "UpdateUser",
     "emit": "MUST WHEN",
     "functions": [
-        "change",
-        "changeaddress",
-        "changeaddress(.+)"
+      "change",
+      "changeaddress",
+      "changeaddress(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4931",
     "event": "Upgrade",
     "emit": "MUST WHEN",
     "functions": [
-        "upgrade",
-        "upgradetoken",
-        "upgradetoken(.+)"
+      "upgrade",
+      "upgradetoken",
+      "upgradetoken(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4931",
     "event": "Downgrade",
     "emit": "MUST WHEN",
     "functions": [
-        "downgrade",
-        "downgradetoken",
-        "downgradetoken(.+)"
+      "downgrade",
+      "downgradetoken",
+      "downgradetoken(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "4974",
     "event": "Transfer",
     "emit": "MUST WHEN",
     "functions": [
-        "transfer",
-        "transferEXP",
-        "transferEXP(.+)"
+      "transfer",
+      "transferEXP",
+      "transferEXP(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "5489",
     "event": "SlotAuthorizationCreated",
     "emit": "MUST WHEN",
     "functions": [
-        "authorize",
-        "authorizeslot",
-        "authorizeslot(.+)"
+      "authorize",
+      "authorizeslot",
+      "authorizeslot(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "5489",
     "event": "SlotAuthorizationRevoked",
     "emit": "MUST WHEN",
     "functions": [
-        "revoke",
-        "revokeauthorization",
-        "revokeauthorization(.+)"
+      "revoke",
+      "revokeauthorization",
+      "revokeauthorization(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "5501",
     "event": "UpdateUser",
     "emit": "MUST WHEN",
     "functions": [
-        "change",
-        "changeuser",
-        "changeuser(.+)"
+      "change",
+      "changeuser",
+      "changeuser(.+)"
     ]
-},
-{
+  },
+  {
     "EIP": "5501",
     "event": "TerminateBorrow",
     "emit": "MUST WHEN",
     "functions": [
-        "terminate",
-        "terminaterent",
-        "terminaterent(.+)"
+      "terminate",
+      "terminaterent",
+      "terminaterent(.+)"
     ]
-}]
+  }
+]
