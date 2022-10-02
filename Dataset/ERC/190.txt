@@ -1,0 +1,54 @@
+
+ Specification
+
+The full specification for this standard is maintained separately in the repository epm/epm-spec.
+This EIP refers to the 1.0.0 version of the specification: https://github.com/ethpm/epm-spec/tree/v1.0.0
+The specification contains details for a single document referred to as a “Release Lockfile”.
+
+Release Lockfile Specification: https://github.com/ethpm/epm-spec/blob/v1.0.0/release-lockfile.spec.md.
+JSON Schema for Release Lockfile: https://github.com/ethpm/epm-spec/blob/v1.0.0/spec/release-lockfile.spec.json
+
+
+These documents have not been inlined into this ERC to ensure that there is a single source of truth for the specification.
+
+
+ Use Cases
+
+This specification covers the following types of smart contract packages.
+
+Packages with contracts intended to be used as base contract such as the common owned pattern.
+Packages with contracts that are ready to use as-is such as an ERC20 token contract.
+Packages with deployed contracts such as libraries or services.
+
+Full explanations and examples of these use cases can be found in the README.md from the epm/epm-spec repository.
+
+ Package Managers
+
+The Release Lockfile is intended for consumption by package management software. Specific care was made to ensure that all of the following functionality can be implemented by package managers.
+
+ Deterministic builds
+
+Ensures that a package will always resolve to the same set of dependencies and source files. Both source files and dependencies are content addressed to ensure that the referenced resources cannot change.
+
+ Bytecode verification
+
+Contains the appropriate information for a package manager to inspect a deployed contract and verify that its bytecode matches the bytecode that results from compilation and linking of the package source code.
+
+ Multi-chain deploys
+
+Supports deployments across multiple chains, allowing a package to define addresses on both the public mainnet and testnet.
+
+ Trusted packages
+
+Allows for packages which exclude source code or other elements which would be needed for verification of the contract bytecode. This allows for minimalistic packages to be created for special situations where the package manager will not be performing verification.
+
+ Framework support and integration
+
+Support for ERC190 is either implemented or in progress for the following:
+
+Truffle
+Populus
+Dapple
+Eris PM
+Embark
+Browser Solidity

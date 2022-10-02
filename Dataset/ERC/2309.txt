@@ -1,0 +1,30 @@
+
+ Specification
+
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL
+NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in
+RFC 2119.
+ERC-721 compliant contracts MAY implement this Consecutive Transfer Extension to provide a standard event to be emitted at the time of creation, burn, or transfer of one or many consecutive tokens
+The address executing the transaction MUST own all the tokens within the range of fromTokenId and toTokenId, or MUST be an approved operator to act on the owners behalf.
+The fromTokenId and toTokenId MUST be a consecutive range of tokens IDs.
+The fromTokenId, fromAddress, and toAddress MUST be indexed parameters
+The toTokenId MUST NOT be an indexed parameter
+When minting/creating tokens, the fromAddress argument MUST be set to 0x0 (i.e. zero address).
+When burning/destroying tokens, the toAddress argument MUST be set to 0x0 (i.e. zero address).
+When emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted
+Contracts that implement the ConsecutiveTransfer event MAY still use the original Transfer event, however when emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted.
+  event ConsecutiveTransfer(uint256 indexed fromTokenId, uint256 toTokenId, address indexed fromAddress, address indexed toAddress);
+
+
+ Examples
+
+The ConsecutiveTransfer event can be used for a single token as well as many tokens:
+Single token creation
+emit ConsecutiveTransfer(1, 1, address(0), toAddress);
+Batch token creation
+emit ConsecutiveTransfer(1, 100000, address(0), toAddress);
+Batch token transfer
+emit ConsecutiveTransfer(1, 100000, fromAddress, toAddress);
+Burn
+emit ConsecutiveTransfer(1, 100000, from, address(0));

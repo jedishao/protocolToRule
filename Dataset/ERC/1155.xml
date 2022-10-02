@@ -1,3 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-1155: Multi Token Standard</title>
+<meta property="og:title" content="EIP-1155: Multi Token Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-1155" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-1155" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-1155: Multi Token Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1155.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="/cdn-cgi/l/email-protection#9becf2effef0dbfef5f1f2f5b5f2f4">Witek Radomski</a>, <a href="/cdn-cgi/l/email-protection#6100025105040c510f0a521821060c00080d4f020e0c">Andrew Cooke</a>, <a href="/cdn-cgi/l/email-protection#0a7a694a626578637065646d6b676f7924646f7e">Philippe Castonguay</a>, <a href="/cdn-cgi/l/email-protection#3258535f5741724647405b5c551f515d5f425e5746571c515d5f">James Therien</a>, <a href="/cdn-cgi/l/email-protection#cbaeb9a2a88baea5a1a2a5e5a2a4">Eric Binet</a>, <a href="/cdn-cgi/l/email-protection#aaddc3cdc2cbddcbcdeacdc7cbc3c684c9c5c7">Ronan Sandford</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/1155">https://github.com/ethereum/EIPs/issues/1155</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-06-17</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#erc-1155-token-receiver">ERC-1155 Token Receiver</a></li>
+<li><a href="#safe-transfer-rules">Safe Transfer Rules</a></li>
+<li><a href="#metadata">Metadata</a></li>
+<li><a href="#approval">Approval</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#metadata-choices">Metadata Choices</a></li>
+<li><a href="#upgrades">Upgrades</a></li>
+<li><a href="#design-decision-supporting-non-batch">Design decision: Supporting non-batch</a></li>
+<li><a href="#design-decision-safe-transfers-only">Design decision: Safe transfers only</a></li>
+<li><a href="#guaranteed-log-trace">Guaranteed log trace</a></li>
+<li><a href="#approval-1">Approval</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#usage">Usage</a>
+<ul>
+<li><a href="#batch-transfers">Batch Transfers</a></li>
+<li><a href="#batch-balance">Batch Balance</a></li>
+<li><a href="#enumerating-from-events">Enumerating from events</a></li>
+<li><a href="#non-fungible-tokens">Non-Fungible Tokens</a></li>
+</ul>
+</li>
+<li><a href="#references">References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard interface for contracts that manage multiple token types. A single deployed contract may include any combination of fungible tokens, non-fungible tokens or other configurations (e.g. semi-fungible tokens).</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This standard outlines a smart contract interface that can represent any number of fungible and non-fungible token types. Existing standards such as ERC-20 require deployment of separate contracts per token type. The ERC-721 standard’s token ID is a single non-fungible index and the group of these non-fungibles is deployed as a single contract with settings for the entire collection. In contrast, the ERC-1155 Multi Token Standard allows for each token ID to represent a new configurable token type, which may have its own metadata, supply and other attributes.</p>
+<p>The <code class="language-plaintext highlighter-rouge">_id</code> argument contained in each function’s argument set indicates a specific token or token type in a transaction.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Tokens standards like ERC-20 and ERC-721 require a separate contract to be deployed for each token type or collection. This places a lot of redundant bytecode on the Ethereum blockchain and limits certain functionality by the nature of separating each token contract into its own permissioned address. With the rise of blockchain games and platforms like Enjin Coin, game developers may be creating thousands of token types, and a new type of token standard is needed to support them. However, ERC-1155 is not specific to games and many other applications can benefit from this flexibility.</p>
+<p>New functionality is possible with this design such as transferring multiple token types at once, saving on transaction costs. Trading (escrow / atomic swaps) of multiple tokens can be built on top of this standard and it removes the need to “approve” individual token contracts separately. It is also easy to describe and mix multiple fungible or non-fungible token types in a single contract.</p>
 <h2 id="specification">
 <a href="#specification" class="anchor-link"></a> Specification
 </h2>
@@ -659,3 +771,164 @@
 <p>The function <code class="language-plaintext highlighter-rouge">setApprovalForAll</code> allows an operator to manage one’s entire set of tokens on behalf of the approver. To permit approval of a subset of token IDs, an interface such as <a href="/EIPS/eip-1761">ERC-1761 Scoped Approval Interface</a> is suggested.
 The counterpart <code class="language-plaintext highlighter-rouge">isApprovedForAll</code> provides introspection into any status set by <code class="language-plaintext highlighter-rouge">setApprovalForAll</code>.</p>
 <p>An owner SHOULD be assumed to always be able to operate on their own tokens regardless of approval status, so should SHOULD NOT have to call <code class="language-plaintext highlighter-rouge">setApprovalForAll</code> to approve themselves as an operator before they can operate on them.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="metadata-choices">
+<a href="#metadata-choices" class="anchor-link"></a> Metadata Choices
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">symbol</code> function (found in the ERC-20 and ERC-721 standards) was not included as we do not believe this is a globally useful piece of data to identify a generic virtual item / asset and are also prone to collisions. Short-hand symbols are used in tickers and currency trading, but they aren’t as useful outside of that space.</p>
+<p>The <code class="language-plaintext highlighter-rouge">name</code> function (for human-readable asset names, on-chain) was removed from the standard to allow the Metadata JSON to be the definitive asset name and reduce duplication of data. This also allows localization for names, which would otherwise be prohibitively expensive if each language string was stored on-chain, not to mention bloating the standard interface. While this decision may add a small burden on implementers to host a JSON file containing metadata, we believe any serious implementation of ERC-1155 will already utilize JSON Metadata.</p>
+<h3 id="upgrades">
+<a href="#upgrades" class="anchor-link"></a> Upgrades
+</h3>
+<p>The requirement to emit <code class="language-plaintext highlighter-rouge">TransferSingle</code> or <code class="language-plaintext highlighter-rouge">TransferBatch</code> on balance change implies that a valid implementation of ERC-1155 redeploying to a new contract address MUST emit events from the new contract address to replicate the deprecated contract final state. It is valid to only emit a minimal number of events to reflect only the final balance and omit all the transactions that led to that state. The event emit requirement is to ensure that the current state of the contract can always be traced only through events. To alleviate the need to emit events when changing contract address, consider using the proxy pattern, such as described in <a href="/EIPS/eip-2535">EIP-2535</a>. This will also have the added benefit of providing a stable contract address for users.</p>
+<h3 id="design-decision-supporting-non-batch">
+<a href="#design-decision-supporting-non-batch" class="anchor-link"></a> Design decision: Supporting non-batch
+</h3>
+<p>The standard supports <code class="language-plaintext highlighter-rouge">safeTransferFrom</code> and <code class="language-plaintext highlighter-rouge">onERC1155Received</code> functions because they are significantly cheaper for single token-type transfers, which is arguably a common use case.</p>
+<h3 id="design-decision-safe-transfers-only">
+<a href="#design-decision-safe-transfers-only" class="anchor-link"></a> Design decision: Safe transfers only
+</h3>
+<p>The standard only supports safe-style transfers, making it possible for receiver contracts to depend on <code class="language-plaintext highlighter-rouge">onERC1155Received</code> or <code class="language-plaintext highlighter-rouge">onERC1155BatchReceived</code> function to be always called at the end of a transfer.</p>
+<h3 id="guaranteed-log-trace">
+<a href="#guaranteed-log-trace" class="anchor-link"></a> Guaranteed log trace
+</h3>
+<p>As the Ethereum ecosystem continues to grow, many dapps are relying on traditional databases and explorer API services to retrieve and categorize data. The ERC-1155 standard guarantees that event logs emitted by the smart contract will provide enough data to create an accurate record of all current token balances. A database or explorer may listen to events and be able to provide indexed and categorized searches of every ERC-1155 token in the contract.</p>
+<h3 id="approval-1">
+<a href="#approval-1" class="anchor-link"></a> Approval
+</h3>
+<p>The function <code class="language-plaintext highlighter-rouge">setApprovalForAll</code> allows an operator to manage one’s entire set of tokens on behalf of the approver. It enables frictionless interaction with exchange and trade contracts.</p>
+<p>Restricting approval to a certain set of token IDs, quantities or other rules MAY be done with an additional interface or an external contract. The rationale is to keep the ERC-1155 standard as generic as possible for all use-cases without imposing a specific approval scheme on implementations that may not need it. Standard token approval interfaces can be used, such as the suggested <a href="/EIPS/eip-1761">ERC-1761 Scoped Approval Interface</a> which is compatible with ERC-1155.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>There have been requirements during the design discussions to have this standard be compatible with existing standards when sending to contract addresses, specifically ERC-721 at time of writing.
+To cater for this scenario, there is some leeway with the revert logic should a contract not implement the <code class="language-plaintext highlighter-rouge">ERC1155TokenReceiver</code> as per “Safe Transfer Rules” section above, specifically “Scenario#3 : The receiver does not implement the necessary <code class="language-plaintext highlighter-rouge">ERC1155TokenReceiver</code> interface function(s)”.</p>
+<p>Hence in a hybrid ERC-1155 contract implementation an extra call MUST be made on the recipient contract and checked before any hook calls to <code class="language-plaintext highlighter-rouge">onERC1155Received</code> or <code class="language-plaintext highlighter-rouge">onERC1155BatchReceived</code> are made.
+Order of operation MUST therefore be:</p>
+<ol>
+<li>The implementation MUST call the function <code class="language-plaintext highlighter-rouge">supportsInterface(0x4e2312e0)</code> on the recipient contract, providing at least 10,000 gas.</li>
+<li>If the function call succeeds and the return value is the constant value <code class="language-plaintext highlighter-rouge">true</code> the implementation proceeds as a regular ERC-1155 implementation, with the call(s) to the <code class="language-plaintext highlighter-rouge">onERC1155Received</code> or <code class="language-plaintext highlighter-rouge">onERC1155BatchReceived</code> hooks and rules associated.</li>
+<li>If the function call fails or the return value is NOT the constant value <code class="language-plaintext highlighter-rouge">true</code> the implementation can assume the recipient contract is not an <code class="language-plaintext highlighter-rouge">ERC1155TokenReceiver</code> and follow its other standard’s rules for transfers.</li>
+</ol>
+<p><em><strong>Note that a pure implementation of a single standard is recommended</strong></em> rather than a hybrid solution, but an example of a hybrid ERC-1155/ERC-721 contract is linked in the references section under implementations.</p>
+<p>An important consideration is that even if the tokens are sent with another standard’s rules the <em><strong>ERC-1155 transfer events MUST still be emitted.</strong></em> This is so the balances can still be determined via events alone as per ERC-1155 standard rules.</p>
+<h2 id="usage">
+<a href="#usage" class="anchor-link"></a> Usage
+</h2>
+<p>This standard can be used to represent multiple token types for an entire domain. Both fungible and non-fungible tokens can be stored in the same smart-contract.</p>
+<h3 id="batch-transfers">
+<a href="#batch-transfers" class="anchor-link"></a> Batch Transfers
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">safeBatchTransferFrom</code> function allows for batch transfers of multiple token IDs and values. The design of ERC-1155 makes batch transfers possible without the need for a wrapper contract, as with existing token standards. This reduces gas costs when more than one token type is included in a batch transfer, as compared to single transfers with multiple transactions.</p>
+<p>Another advantage of standardized batch transfers is the ability for a smart contract to respond to the batch transfer in a single operation using <code class="language-plaintext highlighter-rouge">onERC1155BatchReceived</code>.</p>
+<p>It is RECOMMENDED that clients and wallets sort the token IDs and associated values (in ascending order) when posting a batch transfer, as some ERC-1155 implementations offer significant gas cost savings when IDs are sorted. See <a href="https://github.com/horizon-games/multi-token-standard">Horizon Games - Multi-Token Standard</a> “packed balance” implementation for an example of this.</p>
+<h3 id="batch-balance">
+<a href="#batch-balance" class="anchor-link"></a> Batch Balance
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">balanceOfBatch</code> function allows clients to retrieve balances of multiple owners and token IDs with a single call.</p>
+<h3 id="enumerating-from-events">
+<a href="#enumerating-from-events" class="anchor-link"></a> Enumerating from events
+</h3>
+<p>In order to keep storage requirements light for contracts implementing ERC-1155, enumeration (discovering the IDs and values of tokens) must be done using event logs. It is RECOMMENDED that clients such as exchanges and blockchain explorers maintain a local database containing the token ID, Supply, and URI at the minimum. This can be built from each TransferSingle, TransferBatch, and URI event, starting from the block the smart contract was deployed until the latest block.</p>
+<p>ERC-1155 contracts must therefore carefully emit <code class="language-plaintext highlighter-rouge">TransferSingle</code> or <code class="language-plaintext highlighter-rouge">TransferBatch</code> events in any instance where tokens are created, minted, transferred or destroyed.</p>
+<h3 id="non-fungible-tokens">
+<a href="#non-fungible-tokens" class="anchor-link"></a> Non-Fungible Tokens
+</h3>
+<p>The following strategies are examples of how you MAY mix fungible and non-fungible tokens together in the same contract. The standard does NOT mandate how an implementation must do this.</p>
+<h5 id="split-id-bits">
+<a href="#split-id-bits" class="anchor-link"></a> Split ID bits
+</h5>
+<p>The top 128 bits of the uint256 <code class="language-plaintext highlighter-rouge">_id</code> parameter in any ERC-1155 function MAY represent the base token ID, while the bottom 128 bits MAY represent the index of the non-fungible to make it unique.</p>
+<p>Non-fungible tokens can be interacted with using an index based accessor into the contract/token data set. Therefore to access a particular token set within a mixed data contract and a particular non-fungible within that set, <code class="language-plaintext highlighter-rouge">_id</code> could be passed as <code class="language-plaintext highlighter-rouge">&lt;uint128: base token id&gt;&lt;uint128: index of non-fungible&gt;</code>.</p>
+<p>To identify a non-fungible set/category as a whole (or a fungible) you COULD just pass in the base id via the <code class="language-plaintext highlighter-rouge">_id</code> argument as <code class="language-plaintext highlighter-rouge">&lt;uint128: base token id&gt;&lt;uint128: zero&gt;</code>. If your implementation uses this technique this naturally means the index of a non-fungible SHOULD be 1-based.</p>
+<p>Inside the contract code the two pieces of data needed to access the individual non-fungible can be extracted with uint128(~0) and the same mask shifted by 128.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">uint256</span> <span class="n">baseTokenNFT</span> <span class="o">=</span> <span class="mi">12345</span> <span class="o">&lt;&lt;</span> <span class="mi">128</span><span class="p">;</span>
+<span class="kt">uint128</span> <span class="n">indexNFT</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span>
+
+<span class="kt">uint256</span> <span class="n">baseTokenFT</span> <span class="o">=</span> <span class="mi">54321</span> <span class="o">&lt;&lt;</span> <span class="mi">128</span><span class="p">;</span>
+
+<span class="n">balanceOf</span><span class="p">(</span><span class="n">baseTokenNFT</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">);</span> <span class="c1">// Get balance of the base token for non-fungible set 12345 (this MAY be used to get balance of the user for all of this token set if the implementation wishes as a convenience).
+</span><span class="n">balanceOf</span><span class="p">(</span><span class="n">baseTokenNFT</span> <span class="o">+</span> <span class="n">indexNFT</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">);</span> <span class="c1">// Get balance of the token at index 50 for non-fungible set 12345 (should be 1 if user owns the individual non-fungible token or 0 if they do not).
+</span><span class="n">balanceOf</span><span class="p">(</span><span class="n">baseTokenFT</span><span class="p">,</span> <span class="n">msg</span><span class="p">.</span><span class="n">sender</span><span class="p">);</span> <span class="c1">// Get balance of the fungible base token 54321.
+</span></code></pre></div></div>
+<p>Note that 128 is an arbitrary number, an implementation MAY choose how they would like this split to occur as suitable for their use case. An observer of the contract would simply see events showing balance transfers and mints happening and MAY track the balances using that information alone.
+For an observer to be able to determine type (non-fungible or fungible) from an ID alone they would have to know the split ID bits format on a implementation by implementation basis.</p>
+<p>The <a href="https://github.com/enjin/erc-1155">ERC-1155 Reference Implementation</a> is an example of the split ID bits strategy.</p>
+<h5 id="natural-non-fungible-tokens">
+<a href="#natural-non-fungible-tokens" class="anchor-link"></a> Natural Non-Fungible tokens
+</h5>
+<p>Another simple way to represent non-fungibles is to allow a maximum value of 1 for each non-fungible token. This would naturally mirror the real world, where unique items have a quantity of 1 and fungible items have a quantity greater than 1.</p>
+<h2 id="references">
+<a href="#references" class="anchor-link"></a> References
+</h2>
+<p><strong>Standards</strong></p>
+<ul>
+<li><a href="/EIPS/eip-721">ERC-721 Non-Fungible Token Standard</a></li>
+<li><a href="/EIPS/eip-165">ERC-165 Standard Interface Detection</a></li>
+<li><a href="/EIPS/eip-1538">ERC-1538 Transparent Contract Standard</a></li>
+<li><a href="https://json-schema.org/">JSON Schema</a></li>
+<li><a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119 Key words for use in RFCs to Indicate Requirement Levels</a></li>
+</ul>
+<p><strong>Implementations</strong></p>
+<ul>
+<li><a href="https://github.com/enjin/erc-1155">ERC-1155 Reference Implementation</a></li>
+<li><a href="https://github.com/horizon-games/multi-token-standard">Horizon Games - Multi-Token Standard</a></li>
+<li><a href="https://enjincoin.io">Enjin Coin</a> (<a href="https://github.com/enjin">GitHub</a>)</li>
+<li><a href="https://github.com/pixowl/thesandbox-contracts/tree/master/src/Asset">The Sandbox - Dual ERC-1155/721 Contract</a></li>
+</ul>
+<p><strong>Articles &amp; Discussions</strong></p>
+<ul>
+<li><a href="https://github.com/ethereum/EIPs/issues/1155">GitHub - Original Discussion Thread</a></li>
+<li><a href="https://blog.enjincoin.io/erc-1155-the-crypto-item-standard-ac9cf1c5a226">ERC-1155 - The Crypto Item Standard</a></li>
+<li><a href="https://medium.com/horizongames/going-beyond-erc20-and-erc721-9acebd4ff6ef">Here Be Dragons - Going Beyond ERC-20 and ERC-721 To Reduce Gas Cost by ~80%</a></li>
+<li><a href="https://blockonomi.com/erc1155-gaming-token/">Blockonomi - Ethereum ERC-1155 Token Perfect for Online Games, Possibly More</a></li>
+<li><a href="https://blockgeeks.com/erc-1155-token/">Beyond Gaming - Exploring the Utility of ERC-1155 Token Standard!</a></li>
+<li><a href="https://medium.com/sandbox-game/erc-1155-a-new-standard-for-the-sandbox-c95ee1e45072">ERC-1155: A new standard for The Sandbox</a></li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="/cdn-cgi/l/email-protection#186f716c7d73587d76727176367177">Witek Radomski</a>, <a href="/cdn-cgi/l/email-protection#6302005307060e530d08501a23040e020a0f4d000c0e">Andrew Cooke</a>, <a href="/cdn-cgi/l/email-protection#49392a0921263b203326272e28242c3a67272c3d">Philippe Castonguay</a>, <a href="/cdn-cgi/l/email-protection#086269656d7b487c7d7a61666f256b676578646d7c6d266b6765">James Therien</a>, <a href="/cdn-cgi/l/email-protection#f693849f95b693989c9f98d89f99">Eric Binet</a>, <a href="/cdn-cgi/l/email-protection#f98e909e91988e989eb99e94989095d79a9694">Ronan Sandford</a>, "EIP-1155: Multi Token Standard," <em>Ethereum Improvement Proposals</em>, no. 1155, June 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-1155.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-1155: Multi Token Standard",
+    "author": "Witek Radomski <witek@enjin.io>, Andrew Cooke <ac0dem0nk3y@gmail.com>, Philippe Castonguay <pc@horizongames.net>, James Therien <james@turing-complete.com>, Eric Binet <eric@enjin.io>, Ronan Sandford <wighawag@gmail.com>",
+    "name": "EIP-1155: Multi Token Standard",
+    "dateCreated": "2018-06-17",
+    "datePublished": "2018-06-17",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/1155",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

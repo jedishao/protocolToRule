@@ -1,0 +1,5 @@
+
+ Specification
+
+The exact bytecode of the standard clone contract is this: 363d3d373d3d3d363d73bebebebebebebebebebebebebebebebebebebebe5af43d82803e903d91602b57fd5bf3 wherein the bytes at indices 10 - 29 (inclusive) are replaced with the 20 byte address of the master functionality contract.
+A reference implementation of this can be found at the optionality/clone-factory github repo.

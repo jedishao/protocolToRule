@@ -1,3 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3525: Semi-Fungible Token</title>
+<meta property="og:title" content="EIP-3525: Semi-Fungible Token" />
+<meta name="description" content="Defines a specification where EIP-721 compatible tokens with the same SLOT and different IDs are fungible." />
+<meta property="og:description" content="Defines a specification where EIP-721 compatible tokens with the same SLOT and different IDs are fungible." />
+<meta name="twitter:description" content="Defines a specification where EIP-721 compatible tokens with the same SLOT and different IDs are fungible." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3525" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3525" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-3525: Semi-Fungible Token
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3525.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Defines a specification where EIP-721 compatible tokens with the same SLOT and different IDs are fungible.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/will-edge">Will Wang</a>, <a href="/cdn-cgi/l/email-protection#3b56425a557b4854574d155d52555a55585e">Mike Meng</a>, <a href="https://github.com/YeeTsai">Ethan Y. Tsai</a>, <a href="/cdn-cgi/l/email-protection#3d4f445c535e55524a7d4e52514b135b54535c535e58">Ryan Chow</a>, <a href="https://github.com/Nerverwind">Zhongxin Wu</a>, <a href="https://github.com/AlvisDu">AlvisDu</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3525-the-semi-fungible-token">https://ethereum-magicians.org/t/eip-3525-the-semi-fungible-token</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-12-01</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-20">20</a>,
+<a href="eip-165">165</a>,
+<a href="eip-721">721</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#eip-3525-token-receiver">EIP-3525 Token Receiver</a></li>
+<li><a href="#token-manipulation">Token Manipulation</a></li>
+<li><a href="#metadata">Metadata</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#metadata-generation">Metadata generation</a></li>
+<li><a href="#design-decision-value-transfer-from-token-to-address">Design decision: Value transfer from token to address</a></li>
+<li><a href="#design-decision-notificationacceptance-mechanism-instead-of-safe-transfer">Design decision: Notification/acceptance mechanism instead of ‘Safe Transfer’</a></li>
+<li><a href="#design-decision-relationship-between-different-approval-models">Design decision: Relationship between different approval models</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>This is a standard for semi-fungible tokens. The set of smart contract interfaces described in this document defines an <a href="/EIPS/eip-721">EIP-721</a> compatible token standard. This standard introduces an <code class="language-plaintext highlighter-rouge">&lt;ID, SLOT, VALUE&gt;</code> triple scalar model that represents the semi-fungible structure of a token. It also introduces new transfer models as well as approval models that reflect the semi-fungible nature of the tokens.</p>
+<p>Token contains an EIP-721 equivalent ID property to identify itself as a universally unique entity, so that the tokens can be transferred between addresses and approved to be operated in EIP-721 compatible way.</p>
+<p>Token also contains a <code class="language-plaintext highlighter-rouge">value</code> property, representing the quantitative nature of the token. The meaning of the ‘value’ property is quite like that of the ‘balance’ property of an <a href="/EIPS/eip-20">EIP-20</a> token. Each token has a ‘slot’ attribute, ensuring that the value of two tokens with the same slot be treated as fungible, adding fungibility to the value property of the tokens.</p>
+<p>This EIP introduces new token transfer models for semi-fungibility, including value transfer between two tokens of the same slot and value transfer from a token to an address.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Tokenization is one of the most important trends by which to use and control digital assets in crypto. Traditionally, there have been two approaches to do so: fungible and non-fungible tokens. Fungible tokens generally use the EIP-20 standard, where every unit of an asset is identical to each other. EIP-20 is a flexible and efficient way to manipulate fungible tokens. Non-fungible tokens are predominantly EIP-721 tokens, a standard capable of distinguishing digital assets from one another based on identity.</p>
+<p>However, both have significant drawbacks. For example, EIP-20 requires that users create a separate EIP-20 contract for each individual data structure or combination of customizable properties. In practice, this results in an extraordinarily large amount of EIP-20 contracts that need to be created. On the other hand, EIP-721 tokens provide no quantitative feature, significantly undercutting their computability, liquidity, and manageability. For example, if one was to create financial instruments such as bonds, insurance policy, or vesting plans using EIP-721, no standard interfaces are available for us to control the value in them, making it impossible, for example, to transfer a portion of the equity in the contract represented by the token.</p>
+<p>A more intuitive and straightforward way to solve the problem is to create a semi-fungible token that has the quantitative features of EIP-20 and qualitative attributes of EIP-721. The backwards-compatibility with EIP-721 of such semi-fungible tokens would help utilize existing infrastructures already in use and lead to faster adoption.</p>
 <h2 id="specification">
 <a href="#specification" class="anchor-link"></a> Specification
 </h2>
@@ -461,3 +563,101 @@
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="metadata-generation">
+<a href="#metadata-generation" class="anchor-link"></a> Metadata generation
+</h3>
+<p>This token standard is designed to represent semi-fungible assets, which are most suited for financial instruments rather than collectibles or in-game items. For maximum transparency and safety of digital assets, we strongly recommend that all implementations should generate metadata directly from contract code rather than giving out an off-chain server URL.</p>
+<h3 id="design-decision-value-transfer-from-token-to-address">
+<a href="#design-decision-value-transfer-from-token-to-address" class="anchor-link"></a> Design decision: Value transfer from token to address
+</h3>
+<p>The ‘value’ of a token is a property of the token and is not linked to an address, so to transfer the value to an address would be actually transferring it to a token owned by that address, not the address itself.</p>
+<p>From the implementation perspective, the process of transferring values from token to address could be done as follows: (1) create a new token for the recipient’s address, (2) transfer the value to the new token from the ‘source token’. So that this method is not fully independent from the ID-to-ID transfer method, and can be viewed as syntactic sugar that wraps the process described above.</p>
+<p>In a special case, if the destination address owns one or more tokens with the same slot value as the source token, this method will have an alternative implementation as follows: (1) find one token owned by the address with the same slot value of the source token, (2) transfer the value to the found token.</p>
+<p>Both implementations described above should be treated as compliant with this standard.</p>
+<p>The purpose of maintaining id-to-address transfer function is to maximize the compatibility with most wallet apps, since for most of the token standards, the destination of token transfer are addresses. This syntactic wrapping will help wallet apps easily implement the value transfer function from a token to any address.</p>
+<h3 id="design-decision-notificationacceptance-mechanism-instead-of-safe-transfer">
+<a href="#design-decision-notificationacceptance-mechanism-instead-of-safe-transfer" class="anchor-link"></a> Design decision: Notification/acceptance mechanism instead of ‘Safe Transfer’
+</h3>
+<p>EIP-721 and some later token standards introduced ‘Safe Transfer’ model, for better control of the ‘safety’ when transferring tokens, this mechanism leaves the choice of different transfer mode (safe/unsafe) to the sender, and may cause some potential problem:</p>
+<ol>
+<li>In most situation the sender don’t know how to choose between two kinds of transfer methods (safe/unsafe);</li>
+<li>If the sender calls the <code class="language-plaintext highlighter-rouge">safeTransferFrom</code> method, the transfer may fail when the recipient contract didn’t implements the callback function, even if that contract can receive and manipulate the token with no problem.</li>
+</ol>
+<p>This EIP defines a simple ‘Check, Notify and Response’ model for better flexibility as well as simplicity:</p>
+<ol>
+<li>No extra <code class="language-plaintext highlighter-rouge">safeTransferFrom</code> methods are needed, all callers only need to call one kind of transfer;</li>
+<li>All EIP-3525 contracts need to MUST check for the existence of <code class="language-plaintext highlighter-rouge">onERC3525Received</code> on the recipient contract and call the function when it exists;</li>
+<li>Any smart contract can implement <code class="language-plaintext highlighter-rouge">onERC3525Received</code> function for purpose of being notified after receiving values, in this function it can return certain pre-defined value to accept the transfer, or any other value to reject.</li>
+</ol>
+<p>There is a special case for this notification/acceptance mechanism, since EIP-3525 allow value transfer from an address to itself, so that when a smart contract which implements <code class="language-plaintext highlighter-rouge">onERC3525Received</code> transfers value to itself, this function will also be called. So that the contract is responsible to choose different rules of acceptance between self-value-transfer and receiving value from other addresses.</p>
+<h3 id="design-decision-relationship-between-different-approval-models">
+<a href="#design-decision-relationship-between-different-approval-models" class="anchor-link"></a> Design decision: Relationship between different approval models
+</h3>
+<p>For semantic compatibility with EIP-721 as well as the flexibility of value manipulation of tokens, we decided to define the relationships between some of the levels of approval like that:</p>
+<ol>
+<li>Approval of an id will lead to the ability to partially transfer values from this id by the approved operator, this will simplify the value approval for an id. However, the approval of total values in a token should not lead to the ability to transfer the token entity by the approved operator.</li>
+<li><code class="language-plaintext highlighter-rouge">setApprovalForAll</code> will lead to the ability to partially transfer values from any token, as well as the ability to approve partial transfer of values from any token to a third party, this will simplify the value transfer and approval of all tokens owned by an address.</li>
+</ol>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>As mentioned in the beginning, this EIP is backward compatible with EIP-721.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<ul>
+<li><a href="/assets/eip-3525/contracts/ERC3525.sol">EIP-3525 implementation</a></li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>The value level approval and slot level approval(optional) is isolated from EIP-721 approval models, so that approving value should not affect EIP-721 level approvals, implementations of this EIP must obey this principle.</p>
+<p>Since this EIP is EIP-721 compatible, any wallets and smart contracts that can hold and manipulate standard EIP-721 tokens will have no risks of asset loss for EIP-3525 tokens.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/will-edge">Will Wang</a>, <a href="/cdn-cgi/l/email-protection#5934203837192a36352f773f303738373a3c">Mike Meng</a>, <a href="https://github.com/YeeTsai">Ethan Y. Tsai</a>, <a href="/cdn-cgi/l/email-protection#f18388909f92999e86b1829e9d87df97989f909f9294">Ryan Chow</a>, <a href="https://github.com/Nerverwind">Zhongxin Wu</a>, <a href="https://github.com/AlvisDu">AlvisDu</a>, "EIP-3525: Semi-Fungible Token," <em>Ethereum Improvement Proposals</em>, no. 3525, December 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3525.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3525: Semi-Fungible Token",
+    "author": "Will Wang (@will-edge), Mike Meng <myan@solv.finance>, Ethan Y. Tsai (@YeeTsai), Ryan Chow <ryanchow@solv.finance>, Zhongxin Wu (@Nerverwind), AlvisDu (@AlvisDu)",
+    "name": "EIP-3525: Semi-Fungible Token",
+    "dateCreated": "2020-12-01",
+    "datePublished": "2020-12-01",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3525-the-semi-fungible-token",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

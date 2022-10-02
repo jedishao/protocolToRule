@@ -1,0 +1,12 @@
+
+ Specification
+
+The exact bytecode of the MetaProxy contract is:
+                                              20 bytes target contract address
+                                          ----------------------------------------
+363d3d373d3d3d3d60368038038091363936013d7300000000000000000000000000000000000000005af43d3d93803e603457fd5bf3
+
+wherein the bytes at indices 21 - 41 (inclusive) are replaced with the 20 byte address of the master functionality contract.
+Additionally, everything after the MetaProxy bytecode can be arbitrary metadata and the last 32 bytes (one word) of the bytecode must indicate the length of the metadata in bytes.
+&lt;54 bytes metaproxy&gt; &lt;arbitrary data&gt; &lt;length in bytes of arbitrary data (uint256)&gt;
+

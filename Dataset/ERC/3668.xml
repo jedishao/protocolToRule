@@ -1,3 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3668: CCIP Read: Secure offchain data retrieval</title>
+<meta property="og:title" content="EIP-3668: CCIP Read: Secure offchain data retrieval" />
+<meta name="description" content="CCIP Read provides a mechanism to allow a contract to fetch external data." />
+<meta property="og:description" content="CCIP Read provides a mechanism to allow a contract to fetch external data." />
+<meta name="twitter:description" content="CCIP Read provides a mechanism to allow a contract to fetch external data." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3668" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3668" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-3668: CCIP Read: Secure offchain data retrieval
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3668.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>CCIP Read provides a mechanism to allow a contract to fetch external data.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/arachnid">Nick Johnson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/durin-secure-offchain-data-retrieval/6728">https://ethereum-magicians.org/t/durin-secure-offchain-data-retrieval/6728</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2020-07-19</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#contract-interface">Contract interface</a></li>
+<li><a href="#gateway-interface">Gateway Interface</a></li>
+<li><a href="#client-lookup-protocol">Client Lookup Protocol</a></li>
+<li><a href="#use-of-ccip-read-for-transactions">Use of CCIP read for transactions</a></li>
+<li><a href="#glossary">Glossary</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a>
+<ul>
+<li><a href="#use-of-revert-to-convey-call-information">Use of revert to convey call information</a></li>
+<li><a href="#passing-contract-address-to-the-gateway-service">Passing contract address to the gateway service</a></li>
+<li><a href="#existence-of-extradata-argument">Existence of extraData argument</a></li>
+<li><a href="#use-of-get-and-post-requests-for-the-gateway-interface">Use of GET and POST requests for the gateway interface</a></li>
+</ul>
+</li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#security-considerations">Security Considerations</a>
+<ul>
+<li><a href="#gateway-response-data-validation">Gateway Response Data Validation</a></li>
+<li><a href="#client-extra-data-validation">Client Extra Data Validation</a></li>
+<li><a href="#http-requests-and-fingerprinting-attacks">HTTP requests and fingerprinting attacks</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>Contracts wishing to support lookup of data from external sources may, instead of returning the data directly, revert using <code class="language-plaintext highlighter-rouge">OffchainLookup(address sender, string[] urls, bytes callData, bytes4 callbackFunction, bytes extraData)</code>. Clients supporting this specification then make an RPC call to a URL from <code class="language-plaintext highlighter-rouge">urls</code>, supplying <code class="language-plaintext highlighter-rouge">callData</code>, and getting back an opaque byte string <code class="language-plaintext highlighter-rouge">response</code>. Finally, clients call the function specified by <code class="language-plaintext highlighter-rouge">callbackFunction</code> on the contract, providing <code class="language-plaintext highlighter-rouge">response</code> and <code class="language-plaintext highlighter-rouge">extraData</code>. The contract can then decode and verify the returned data using an implementation-specific method.</p>
+<p>This mechanism allows for offchain lookups of data in a way that is transparent to clients, and allows contract authors to implement whatever validation is necessary; in many cases this can be provided without any additional trust assumptions over and above those required if data is stored onchain.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Minimising storage and transaction costs on Ethereum has driven contract authors to adopt a variety of techniques for moving data offchain, including hashing, recursive hashing (eg Merkle Trees/Tries) and L2 solutions. While each solution has unique constraints and parameters, they all share in common the fact that enough information is stored onchain to validate the externally stored data when required.</p>
+<p>Thus far, applications have tended to devise bespoke solutions rather than trying to define a universal standard. This is practical - although inefficient - when a single offchain data storage solution suffices, but rapidly becomes impractical in a system where multiple end-users may wish to make use of different data storage and availability solutions based on what suits their needs.</p>
+<p>By defining a common specification allowing smart contract to fetch data from offchain, we facilitate writing clients that are entirely agnostic to the storage solution being used, which enables new applications that can operate without knowing about the underlying storage details of the contracts they interact with.</p>
+<p>Examples of this include:</p>
+<ul>
+<li>Interacting with ‘airdrop’ contracts that store a list of recipients offchain in a merkle trie.</li>
+<li>Viewing token information for tokens stored on an L2 solution as if they were native L1 tokens.</li>
+<li>Allowing delegation of data such as ENS domains to various L2 solutions, without requiring clients to support each solution individually.</li>
+<li>Allowing contracts to proactively request external data to complete a call, without requiring the caller to be aware of the details of that data.</li>
+</ul>
 <h2 id="specification">
 <a href="#specification" class="anchor-link"></a> Specification
 </h2>
@@ -284,3 +394,100 @@ curl -D - -X POST -H "Content-Type: application/json" --data '{"data":"0xd5fa2b0
  <li>Contract: A smart contract existing on Ethereum or another blockchain.</li>
 <li>Gateway: A service that answers application-specific CCIP read queries, usually over HTTPS.</li>
 </ul>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<h3 id="use-of-revert-to-convey-call-information">
+<a href="#use-of-revert-to-convey-call-information" class="anchor-link"></a> Use of <code class="language-plaintext highlighter-rouge">revert</code> to convey call information
+</h3>
+<p>For offchain data lookup to function as desired, clients must either have some way to know that a function depends on this specification for functionality - such as a specifier in the ABI for the function - or else there must be a way for the contract to signal to the client that data needs to be fetched from elsewhere.</p>
+<p>While specifying the call type in the ABI is a possible solution, this makes retrofitting existing interfaces to support offchain data awkward, and either results in contracts with the same name and arguments as the original specification, but with different return data - which will cause decoding errors for clients that do not expect this - or duplicating every function that needs support for offchain data with a different name (eg, <code class="language-plaintext highlighter-rouge">balanceOf -&gt; offchainBalanceOf</code>). Neither solutions is particularly satisfactory.</p>
+<p>Using a revert, and conveying the required information in the revert data, allows any function to be retrofitted to support lookups via CCIP read so long as the client understands the specification, and so facilitates translation of existing specifications to use offchain data.</p>
+<h3 id="passing-contract-address-to-the-gateway-service">
+<a href="#passing-contract-address-to-the-gateway-service" class="anchor-link"></a> Passing contract address to the gateway service
+</h3>
+<p><code class="language-plaintext highlighter-rouge">address</code> is passed to the gateway in order to facilitate the writing of generic gateways, thus reducing the burden on contract authors to provide their own gateway implementations. Supplying <code class="language-plaintext highlighter-rouge">address</code> allows the gateway to perform lookups to the original contract for information needed to assist with resolution, making it possible to operate one gateway for any number of contracts implementing the same interface.</p>
+<h3 id="existence-of-extradata-argument">
+<a href="#existence-of-extradata-argument" class="anchor-link"></a> Existence of <code class="language-plaintext highlighter-rouge">extraData</code> argument
+</h3>
+<p><code class="language-plaintext highlighter-rouge">extraData</code> allows the original contract function to pass information to a subsequent invocation. Since contracts are not persistent, without this data a contract has no state from the previous invocation. Aside from allowing arbitrary contextual information to be propagated between the two calls, this also allows the contract to verify that the query the gateway answered is in fact the one the contract originally requested.</p>
+<h3 id="use-of-get-and-post-requests-for-the-gateway-interface">
+<a href="#use-of-get-and-post-requests-for-the-gateway-interface" class="anchor-link"></a> Use of GET and POST requests for the gateway interface
+</h3>
+<p>Using a GET request, with query data encoded in the URL, minimises complexity and enables entirely static implementations of gateways - in some applications a gateway can simply be an HTTP server or IPFS instance with a static set of responses in text files.</p>
+<p>However, URLs are limited to 2 kilobytes in size, which will impose issues for more complex uses of CCIP read. Thus, we provide for an option to use POST data. This is made at the contract’s discretion (via the choice of URL template) in order to preserve the ability to have a static gateway operating exclusively using GET when desired.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Existing contracts that do not wish to use this specification are unaffected. Clients can add support for CCIP read to all contract calls without introducing any new overhead or incompatibilities.</p>
+<p>Contracts that require CCIP read will not function in conjunction with clients that do not implement this specification. Attempts to call these contracts from non-compliant clients will result in the contract throwing an exception that is propagaged to the user.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<h3 id="gateway-response-data-validation">
+<a href="#gateway-response-data-validation" class="anchor-link"></a> Gateway Response Data Validation
+</h3>
+<p>In order to prevent a malicious gateway from causing unintended side-effects or faulty results, contracts MUST include sufficient information in the <code class="language-plaintext highlighter-rouge">extraData</code> argument to allow them to verify the relevance and validity of the gateway’s response. For example, if the contract is requesting information based on an <code class="language-plaintext highlighter-rouge">address</code> supplied to the original call, it MUST include that address in the <code class="language-plaintext highlighter-rouge">extraData</code> so that the callback can verify the gateway is not providing the answer to a different query.</p>
+<p>Contracts must also implement sufficient validation of the data returned by the gateway to ensure it is valid. The validation required is application-specific and cannot be specified on a global basis. Examples would include verifying a Merkle proof of inclusion for an L2 or other Merkleized state, or verifying a signature by a trusted signer over the response data.</p>
+<h3 id="client-extra-data-validation">
+<a href="#client-extra-data-validation" class="anchor-link"></a> Client Extra Data Validation
+</h3>
+<p>In order to prevent a malicious client from causing unintended effects when making transactions using CCIP read, contracts MUST implement appropriate checks on the <code class="language-plaintext highlighter-rouge">extraData</code> returned to them in the callback. Any sanity/permission checks performed on input data for the initial call MUST be repeated on the data passed through the <code class="language-plaintext highlighter-rouge">extraData</code> field in the callback. For example, if a transaction should only be executable by an authorised account, that authorisation check MUST be done in the callback; it is not sufficient to perform it with the initial call and embed the authorised address in the <code class="language-plaintext highlighter-rouge">extraData</code>.</p>
+<h3 id="http-requests-and-fingerprinting-attacks">
+<a href="#http-requests-and-fingerprinting-attacks" class="anchor-link"></a> HTTP requests and fingerprinting attacks
+</h3>
+<p>Because CCIP read can cause a user’s browser to make HTTP requests to an address controlled by the contract, there is the potential for this to be used to identify users - for example, to associate their wallet address with their IP address.</p>
+<p>The impact of this is application-specific; fingerprinting a user when they resolve an ENS domain may have little privacy impact, as the attacker will not learn the user’s wallet address, only the fact that the user is resolving a given ENS name from a given IP address - information they can also learn from running a DNS server. On the other hand, fingerprinting a user when they attempt a transaction to transfer an NFT may give an attacker everything they need to identify the IP address of a user’s wallet.</p>
+<p>To minimise the security impact of this, we make the following recommendations:</p>
+<ol>
+<li>Client libraries should provide clients with a hook to override CCIP read calls - either by rewriting them to use a proxy service, or by denying them entirely. This mechanism or another should be written so as to easily facilitate adding domains to allowlists or blocklists.</li>
+<li>Client libraries should disable CCIP read for transactions (but not for calls) by default, and require the caller to explicitly enable this functionality. Enablement should be possible both on a per-contract, per-domain, or global basis.</li>
+<li>App authors should not supply a ‘from’ address for contract calls (‘view’ operations) where the call could execute untrusted code (that is, code not authored or trusted by the application author). As a precuationary principle it is safest to not supply this parameter at all unless the author is certain that no attacker-determined smart contract code will be executed.</li>
+<li>Wallet authors that are responsible for fetching user information - for example, by querying token contracts - should either ensure CCIP read is disabled for transactions, and that no contract calls are made with a ‘from’ address supplied, or operate a proxy on their users’ behalf, rewriting all CCIP read calls to take place via the proxy, or both.</li>
+</ol>
+<p>We encourage client library authors and wallet authors not to disable CCIP read by default, as many applications can be transparently enhanced with this functionality, which is quite safe if the above precautions are observed.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/arachnid">Nick Johnson</a>, "EIP-3668: CCIP Read: Secure offchain data retrieval," <em>Ethereum Improvement Proposals</em>, no. 3668, July 2020. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3668.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3668: CCIP Read: Secure offchain data retrieval",
+    "author": "Nick Johnson (@arachnid)",
+    "name": "EIP-3668: CCIP Read: Secure offchain data retrieval",
+    "dateCreated": "2020-07-19",
+    "datePublished": "2020-07-19",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/durin-secure-offchain-data-retrieval/6728",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2020"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

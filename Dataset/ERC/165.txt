@@ -1,0 +1,67 @@
+
+ Specification
+
+
+ How Interfaces are Identified
+
+For this standard, an interface is a set of function selectors as defined by the Ethereum ABI. This a subset of Solidity’s concept of interfaces and the interface keyword definition which also defines return types, mutability and events.
+We define the interface identifier as the XOR of all function selectors in the interface. This code example shows how to calculate an interface identifier:
+pragma solidity ^0.4.20;
+
+interface Solidity101 {
+    function hello() external pure;
+    function world(int) external pure;
+}
+
+contract Selector {
+    function calculateSelector() public pure returns (bytes4) {
+        Solidity101 i;
+        return i.hello.selector ^ i.world.selector;
+    }
+}
+
+Note: interfaces do not permit optional functions, therefore, the interface identity will not include them.
+
+ How a Contract will Publish the Interfaces it Implements
+
+A contract that is compliant with ERC-165 shall implement the following interface (referred as ERC165.sol):
+pragma solidity ^0.4.20;
+
+interface ERC165 {
+    /// @notice Query if a contract implements an interface
+    /// @param interfaceID The interface identifier, as specified in ERC-165
+    /// @dev Interface identification is specified in ERC-165. This function
+    ///  uses less than 30,000 gas.
+    /// @return `true` if the contract implements `interfaceID` and
+    ///  `interfaceID` is not 0xffffffff, `false` otherwise
+    function supportsInterface(bytes4 interfaceID) external view returns (bool);
+}
+
+The interface identifier for this interface is 0x01ffc9a7. You can calculate this by running bytes4(keccak256('supportsInterface(bytes4)')); or using the Selector contract above.
+Therefore the implementing contract will have a supportsInterface function that returns:
+
+true when interfaceID is 0x01ffc9a7 (EIP165 interface)
+false when interfaceID is 0xffffffff
+true for any other interfaceID this contract implements
+false for any other interfaceID
+
+This function must return a bool and use at most 30,000 gas.
+Implementation note, there are several logical ways to implement this function. Please see the example implementations and the discussion on gas usage.
+
+ How to Detect if a Contract Implements ERC-165
+
+
+The source contract makes a STATICCALL to the destination address with input data: 0x01ffc9a701ffc9a700000000000000000000000000000000000000000000000000000000 and gas 30,000. This corresponds to contract.supportsInterface(0x01ffc9a7).
+If the call fails or return false, the destination contract does not implement ERC-165.
+If the call returns true, a second call is made with input data 0x01ffc9a7ffffffff00000000000000000000000000000000000000000000000000000000.
+If the second call fails or returns true, the destination contract does not implement ERC-165.
+Otherwise it implements ERC-165.
+
+
+ How to Detect if a Contract Implements any Given Interface
+
+
+If you are not sure if the contract implements ERC-165, use the above procedure to confirm.
+If it does not implement ERC-165, then you will have to see what methods it uses the old-fashioned way.
+If it implements ERC-165 then just call supportsInterface(interfaceID) to determine if it implements an interface you can use.
+

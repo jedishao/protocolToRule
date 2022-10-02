@@ -1,3 +1,98 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-4626: Tokenized Vaults</title>
+<meta property="og:title" content="EIP-4626: Tokenized Vaults" />
+<meta name="description" content="Tokenized Vaults with a single underlying EIP-20 token." />
+<meta property="og:description" content="Tokenized Vaults with a single underlying EIP-20 token." />
+<meta name="twitter:description" content="Tokenized Vaults with a single underlying EIP-20 token." />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-4626" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-4626" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-4626: Tokenized Vaults
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-4626.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Tokenized Vaults with a single underlying EIP-20 token.</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/joeysantoro">Joey Santoro</a>, <a href="https://github.com/transmissions11">t11s</a>, <a href="https://github.com/JetJadeja">Jet Jadeja</a>, <a href="https://github.com/alcueca">Alberto Cuesta Cañada</a>, <a href="https://github.com/fubuloubu">Señor Doggo</a></td></tr>
+ <tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-4626-yield-bearing-vault-standard/7900">https://ethereum-magicians.org/t/eip-4626-yield-bearing-vault-standard/7900</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-12-22</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-20">20</a>,
+<a href="eip-2612">2612</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#definitions">Definitions:</a></li>
+<li><a href="#methods">Methods</a></li>
+<li><a href="#events">Events</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following standard allows for the implementation of a standard API for tokenized Vaults
+representing shares of a single underlying <a href="/EIPS/eip-20">EIP-20</a> token.
+This standard is an extension on the EIP-20 token that provides basic functionality for depositing
+and withdrawing tokens and reading balances.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Tokenized Vaults have a lack of standardization leading to diverse implementation details.
+Some various examples include lending markets, aggregators, and intrinsically interest bearing tokens.
+This makes integration difficult at the aggregator or plugin layer for protocols which need to conform to many standards, and forces each protocol to implement their own adapters which are error prone and waste development resources.</p>
+<p>A standard for tokenized Vaults will lower the integration effort for yield-bearing vaults, while creating more consistent and robust implementation patterns.</p>
 <h2 id="specification">
 <a href="#specification" class="anchor-link"></a> Specification
 </h2>
@@ -414,3 +509,98 @@ MAY support an additional flow in which the underlying tokens are owned by the V
       <span class="na">indexed</span><span class="pi">:</span> <span class="no">false</span>
       <span class="na">type</span><span class="pi">:</span> <span class="s">uint256</span>
 </code></pre></div></div>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>The Vault interface is designed to be optimized for integrators with a feature complete yet minimal interface.
+Details such as accounting and allocation of deposited tokens are intentionally not specified,
+as Vaults are expected to be treated as black boxes on-chain and inspected off-chain before use.</p>
+<p>EIP-20 is enforced because implementation details like token approval
+and balance calculation directly carry over to the shares accounting.
+This standardization makes the Vaults immediately compatible with all EIP-20 use cases in addition to EIP-4626.</p>
+<p>The mint method was included for symmetry and feature completeness.
+Most current use cases of share-based Vaults do not ascribe special meaning to the shares such that
+a user would optimize for a specific number of shares (<code class="language-plaintext highlighter-rouge">mint</code>) rather than specific amount of underlying (<code class="language-plaintext highlighter-rouge">deposit</code>).
+However, it is easy to imagine future Vault strategies which would have unique and independently useful share representations.</p>
+<p>The <code class="language-plaintext highlighter-rouge">convertTo</code> functions serve as rough estimates that do not account for operation specific details like withdrawal fees, etc.
+They were included for frontends and applications that need an average value of shares or assets, not an exact value possibly including slippage or other fees.
+For applications that need an exact value that attempts to account for fees and slippage we have included a corresponding <code class="language-plaintext highlighter-rouge">preview</code> function to match each mutable function. These functions must not account for deposit or withdrawal limits, to ensure they are easily composable, the <code class="language-plaintext highlighter-rouge">max</code> functions are provided for that purpose.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>EIP-4626 is fully backward compatible with the EIP-20 standard and has no known compatibility issues with other standards.
+For production implementations of Vaults which do not use EIP-4626, wrapper adapters can be developed and used.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<p>See <a href="https://github.com/Rari-Capital/solmate/blob/main/src/mixins/ERC4626.sol">Solmate EIP-4626</a>:
+a minimal and opinionated implementation of the standard with hooks for developers to easily insert custom logic into deposits and withdrawals.</p>
+<p>See <a href="https://github.com/fubuloubu/ERC4626">Vyper EIP-4626</a>:
+a demo implementation of the standard in Vyper, with hooks for share price manipulation and other testing needs.</p>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<p>Fully permissionless use cases could fall prey to malicious implementations which only conform to the interface but not the specification.
+It is recommended that all integrators review the implementation for potential ways of losing user deposits before integrating.</p>
+<p>If implementors intend to support EOA account access directly, they should consider adding an additional function call for <code class="language-plaintext highlighter-rouge">deposit</code>/<code class="language-plaintext highlighter-rouge">mint</code>/<code class="language-plaintext highlighter-rouge">withdraw</code>/<code class="language-plaintext highlighter-rouge">redeem</code> with the means to accommodate slippage loss or unexpected deposit/withdrawal limits, since they have no other means to revert the transaction if the exact output amount is not achieved.</p>
+<p>The methods <code class="language-plaintext highlighter-rouge">totalAssets</code>, <code class="language-plaintext highlighter-rouge">convertToShares</code> and <code class="language-plaintext highlighter-rouge">convertToAssets</code> are estimates useful for display purposes,
+and do <em>not</em> have to confer the <em>exact</em> amount of underlying assets their context suggests.</p>
+<p>The <code class="language-plaintext highlighter-rouge">preview</code> methods return values that are as close as possible to exact as possible. For that reason, they are manipulable by altering the on-chain conditions and are not always safe to be used as price oracles. This specification includes <code class="language-plaintext highlighter-rouge">convert</code> methods that are allowed to be inexact and therefore can be implemented as robust price oracles. For example, it would be correct to implement the <code class="language-plaintext highlighter-rouge">convert</code> methods as using a time-weighted average price in converting between assets and shares.</p>
+<p>Integrators of EIP-4626 Vaults should be aware of the difference between these view methods when integrating with this standard. Additionally, note that the amount of underlying assets a user may receive from redeeming their Vault shares (<code class="language-plaintext highlighter-rouge">previewRedeem</code>) can be significantly different than the amount that would be taken from them when minting the same quantity of shares (<code class="language-plaintext highlighter-rouge">previewMint</code>). The differences may be small (like if due to rounding error), or very significant (like if a Vault implements withdrawal or deposit fees, etc). Therefore integrators should always take care to use the preview function most relevant to their use case, and never assume they are interchangeable.</p>
+<p>Finally, EIP-4626 Vault implementers should be aware of the need for specific, opposing rounding directions across the different mutable and view methods, as it is considered most secure to favor the Vault itself during calculations over its users:</p>
+<ul>
+<li>
+<p>If (1) it’s calculating how many shares to issue to a user for a certain amount of the underlying tokens they provide or (2) it’s determining the amount of the underlying tokens to transfer to them for returning a certain amount of shares, it should round <em>down</em>.</p>
+</li>
+<li>
+<p>If (1) it’s calculating the amount of shares a user has to supply to receive a given amount of the underlying tokens or (2) it’s calculating the amount of underlying tokens a user has to provide to receive a certain amount of shares, it should round <em>up</em>.</p>
+</li>
+</ul>
+<p>The only functions where the preferred rounding direction would be ambiguous are the <code class="language-plaintext highlighter-rouge">convertTo</code> functions. To ensure consistency across all EIP-4626 Vault implementations it is specified that these functions MUST both always round <em>down</em>. Integrators may wish to mimic rounding up versions of these functions themselves, like by adding 1 wei to the result.</p>
+<p>Although the <code class="language-plaintext highlighter-rouge">convertTo</code> functions should eliminate the need for any use of an EIP-4626 Vault’s <code class="language-plaintext highlighter-rouge">decimals</code> variable, it is still strongly recommended to mirror
+the underlying token’s <code class="language-plaintext highlighter-rouge">decimals</code> if at all possible, to eliminate possible sources of confusion and simplify integration across front-ends and for other off-chain users.</p>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/joeysantoro">Joey Santoro</a>, <a href="https://github.com/transmissions11">t11s</a>, <a href="https://github.com/JetJadeja">Jet Jadeja</a>, <a href="https://github.com/alcueca">Alberto Cuesta Cañada</a>, <a href="https://github.com/fubuloubu">Señor Doggo</a>, "EIP-4626: Tokenized Vaults," <em>Ethereum Improvement Proposals</em>, no. 4626, December 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-4626.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-4626: Tokenized Vaults",
+    "author": "Joey Santoro (@joeysantoro), t11s (@transmissions11), Jet Jadeja (@JetJadeja), Alberto Cuesta Cañada (@alcueca), Señor Doggo (@fubuloubu)",
+    "name": "EIP-4626: Tokenized Vaults",
+    "dateCreated": "2021-12-22",
+    "datePublished": "2021-12-22",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-4626-yield-bearing-vault-standard/7900",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

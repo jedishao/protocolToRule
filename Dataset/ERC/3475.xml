@@ -1,3 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-3475: Abstract Storage Bonds</title>
+<meta property="og:title" content="EIP-3475: Abstract Storage Bonds" />
+<meta name="description" content="Interface for creating tokenized obligations with abstract on-chain metadata storage" />
+<meta property="og:description" content="Interface for creating tokenized obligations with abstract on-chain metadata storage" />
+<meta name="twitter:description" content="Interface for creating tokenized obligations with abstract on-chain metadata storage" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-3475" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-3475" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-3475: Abstract Storage Bonds
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-3475.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3>Interface for creating tokenized obligations with abstract on-chain metadata storage</h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/yuliu-debond">Yu Liu</a>, <a href="https://github.com/dr-chain">Varun Deshpande</a>, <a href="https://github.com/drikssy">Cedric Ngakam</a>, <a href="https://github.com/dhruvmalik007">Dhruv Malik</a>, <a href="https://github.com/Edoumou">Samuel Gwlanold Edoumou</a>, <a href="https://github.com/toufic0710">Toufic Batrice</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://ethereum-magicians.org/t/eip-3475-multiple-callable-bonds-standard/8691">https://ethereum-magicians.org/t/eip-3475-multiple-callable-bonds-standard/8691</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2021-04-05</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-20">20</a>,
+<a href="eip-721">721</a>,
+<a href="eip-1155">1155</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#1-description">1. Description:</a></li>
+<li><a href="#2-nonce">2. Nonce:</a></li>
+<li><a href="#3-class-metadata">3. Class metadata:</a></li>
+<li><a href="#4-decoding-data">4. Decoding data:</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#reference-implementation">Reference Implementation</a></li>
+<li><a href="#security-considerations">Security Considerations</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<ul>
+<li>
+<p>This EIP allows the creation of tokenized obligations with abstract on-chain metadata storage. Issuing bonds with multiple redemption data cannot be achieved with existing token standards.</p>
+</li>
+<li>
+<p>This EIP enables each bond class ID to represent a new configurable token type and corresponding to each class, corresponding bond nonces to represent an issuing condition or any other form of data in uint256. Every single nonce of a bond class can have its metadata, supply, and other redemption conditions.</p>
+</li>
+<li>
+<p>Bonds created by this EIP can also be batched for issuance/redemption conditions for efficiency on gas costs and UX side. And finally, bonds created from this standard can be divided and exchanged in a secondary market.</p>
+</li>
+</ul>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>Current LP (Liquidity Provider) tokens are simple <a href="/EIPS/eip-20">EIP-20</a> tokens with no complex data structure. To allow more complex reward and redemption logic to be stored on-chain, we need a new token standard that:</p>
+<ul>
+<li>Supports multiple token IDs</li>
+<li>Can store on-chain metadata</li>
+<li>Doesn’t require a fixed storage pattern</li>
+<li>Is gas-efficient.</li>
+</ul>
+<p>Also Some benefits:</p>
+<ul>
+<li>This EIP allows the creation of any obligation with the same interface.</li>
+<li>It will enable any 3rd party wallet applications or exchanges to read these tokens’ balance and redemption conditions.</li>
+<li>These bonds can also be batched as tradeable instruments. Those instruments can then be divided and exchanged in secondary markets.</li>
+</ul>
 <h2 id="specification">
 <a href="#specification" class="anchor-link"></a> Specification
 </h2>
@@ -296,3 +410,120 @@ The metadata of a bond class or nonce is stored as an array of JSON objects, rep
 }
 </code></pre>
 <p>e.g. in the above example, to get the <code class="language-plaintext highlighter-rouge">symbol</code> of the given class id, we can use the class id as a key to get the <code class="language-plaintext highlighter-rouge">symbol</code> value in the values, which then can be used for fetching the detail for instance.</p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p><strong>Metadata structure</strong>: Instead of utilizing a mapping from address, the bond’s metadata like the time of redemption, redemption conditions, and interest rate can be stored in the bond class and nonce structures. Classes represent the different bond types, and nonces represent the various period of issuances. Nonces under the same class share the same metadata. Meanwhile, nonces are non-fungible. Each nonce can store a different set of metadata. Thus, upon transfer of a bond, all the metadata will be transferred to the new owner of the bond.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">struct</span> <span class="n">Values</span><span class="p">{</span>
+ <span class="kt">string</span> <span class="n">stringValue</span><span class="p">;</span>
+ <span class="kt">uint</span> <span class="n">uintValue</span><span class="p">;</span>
+ <span class="kt">address</span> <span class="n">addressValue</span><span class="p">;</span>
+ <span class="kt">bool</span> <span class="n">boolValue</span><span class="p">;</span>
+ <span class="p">}</span>
+</code></pre></div></div>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">struct</span> <span class="n">Metadata</span> <span class="p">{</span>
+ <span class="kt">string</span> <span class="n">title</span><span class="p">;</span>
+ <span class="kt">string</span> <span class="n">_type</span><span class="p">;</span>
+ <span class="kt">string</span> <span class="n">description</span><span class="p">;</span>
+ <span class="p">}</span>
+</code></pre></div></div>
+<p><strong>Batch function:</strong></p>
+<p>This EIP supports batch operations. It allows the user to transfer different bonds along with their metadata to a new address instantaneously in a single transaction. After execution, the new owner holds the right to reclaim the face value of each of the bonds. This mechanism helps with the “packaging” of bonds–helpful in use cases like trades on a secondary market.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">struct</span> <span class="n">Transaction</span> <span class="p">{</span>
+ <span class="kt">uint256</span> <span class="n">classId</span><span class="p">;</span>
+ <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">;</span>
+ <span class="kt">uint256</span> <span class="n">_amount</span><span class="p">;</span>
+ <span class="p">}</span>
+</code></pre></div></div>
+<p>Where:
+The <code class="language-plaintext highlighter-rouge">classId</code> is the class id of the bond.</p>
+<p>The <code class="language-plaintext highlighter-rouge">nonceId</code> is the nonce id of the given bond class. This param is for distinctions of the issuing conditions of the bond.</p>
+<p>The <code class="language-plaintext highlighter-rouge">_amount</code> is the amount of the bond for which the spender is approved.</p>
+<p><strong>AMM optimization</strong>: One of the most obvious use cases of this EIP is the multilayered pool. The early version of AMM uses a separate smart contract and an <a href="/EIPS/eip-20">EIP-20</a> LP token to manage a pair. By doing so, the overall liquidity inside of one pool is significantly reduced and thus generates unnecessary gas spent and slippage. Using this EIP standard, one can build a big liquidity pool with all the pairs inside (thanks to the presence of the data structures consisting of the liquidity corresponding to the given class and nonce of bonds). Thus by knowing the class and nonce of the bonds, the liquidity can be represented as the percentage of a given token pair for the owner of the bond in the given pool. Effectively, the <a href="/EIPS/eip-20">EIP-20</a> LP token (defined by a unique smart contract in the pool factory contract) is aggregated into a single bond and consolidated into a single pool.</p>
+<ul>
+<li>The reason behind the standard’s name (abstract storage bond) is its ability to store all the specifications (metadata/values and transaction as defined in the following sections) without needing external storage on-chain/off-chain.</li>
+</ul>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>Any contract that inherits the interface of this EIP is compatible. This compatibility exists for issuer and receiver of the bonds. Also any client EOA wallet can be compatible with the standard if they are able to sign <code class="language-plaintext highlighter-rouge">issue()</code> and <code class="language-plaintext highlighter-rouge">redeem()</code> commands.</p>
+<p>However, any existing <a href="/EIPS/eip-20">EIP-20</a> token contract can issue its bonds by delegating the minting role to a bank contract with the interface of this standard built-in. Check out our reference implementation for the correct interface definition.</p>
+<p>To ensure the indexing of transactions throughout the bond lifecycle (i.e “Issue”, “Redeem” and “Transfer” functions), events cited in specification section MUST be emitted when such transaction is passed.</p>
+<p><strong>Note that the this standard interface is also compatible with <a href="/EIPS/eip-20">EIP-20</a> and <a href="/EIPS/eip-721">EIP-721</a> and <a href="/EIPS/eip-1155">EIP-1155</a>interface.</strong></p>
+<p>However, creating a separate bank contract is recommended for reading the bonds and future upgrade needs.</p>
+<p>Acceptable collateral can be in the form of <a href="/EIPS/eip-20">EIP-20</a> tokens, <a href="/EIPS/eip-721">EIP-721</a> tokens, or other bonds represented by the standard.Thus bonds can now represent a collection of collaterals (of the same type) of all fungible/non-fungible or semi-fungible tokens.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>Test-case for the minimal reference implementation is <a href="/assets/eip-3475/ERC3475.test.ts">here</a>. Use the Truffle box to compile and test the contracts.</p>
+<h2 id="reference-implementation">
+<a href="#reference-implementation" class="anchor-link"></a> Reference Implementation
+</h2>
+<ul>
+<li>
+<p><a href="/assets/eip-3475/interfaces/IERC3475.sol">Interface</a>.</p>
+</li>
+<li>
+<p><a href="/assets/eip-3475/ERC3475.sol">Basic Example</a>.
+- This demonstration shows only minimalist implementation.</p>
+</li>
+</ul>
+<h2 id="security-considerations">
+<a href="#security-considerations" class="anchor-link"></a> Security Considerations
+</h2>
+<ul>
+<li>
+<p>The <code class="language-plaintext highlighter-rouge">function setApprovalFor()</code> gives the operator role in this standard. It has all the permissions to transfer, burn and redeem bonds by default.</p>
+</li>
+<li>
+<p>If the owner wants to give a one-time allocation to an address for specific bonds(classId,bondsId), he should call the <code class="language-plaintext highlighter-rouge">function approve()</code> giving the <code class="language-plaintext highlighter-rouge">Transaction[]</code> allocated rather than approving all the classes using <code class="language-plaintext highlighter-rouge">setApprovalFor</code>.</p>
+</li>
+<li>
+<p>The <code class="language-plaintext highlighter-rouge">function issue()</code> can only be called by the bank contract (what we call issuer in this EIP). this can be either a smart contract managing the logic of liquidity management and routing the collateral, but also EOA multi-sig.</p>
+</li>
+</ul>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/yuliu-debond">Yu Liu</a>, <a href="https://github.com/dr-chain">Varun Deshpande</a>, <a href="https://github.com/drikssy">Cedric Ngakam</a>, <a href="https://github.com/dhruvmalik007">Dhruv Malik</a>, <a href="https://github.com/Edoumou">Samuel Gwlanold Edoumou</a>, <a href="https://github.com/toufic0710">Toufic Batrice</a>, "EIP-3475: Abstract Storage Bonds," <em>Ethereum Improvement Proposals</em>, no. 3475, April 2021. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-3475.</p>
+</div>
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-3475: Abstract Storage Bonds",
+    "author": "Yu Liu (@yuliu-debond), Varun Deshpande (@dr-chain), Cedric Ngakam (@drikssy), Dhruv Malik (@dhruvmalik007), Samuel Gwlanold Edoumou (@Edoumou), Toufic Batrice (@toufic0710)",
+    "name": "EIP-3475: Abstract Storage Bonds",
+    "dateCreated": "2021-04-05",
+    "datePublished": "2021-04-05",
+
+    "discussionUrl": "https://ethereum-magicians.org/t/eip-3475-multiple-callable-bonds-standard/8691",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2021"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

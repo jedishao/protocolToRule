@@ -1,3 +1,104 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-721: Non-Fungible Token Standard</title>
+<meta property="og:title" content="EIP-721: Non-Fungible Token Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-721" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-721" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-721: Non-Fungible Token Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/fulldecent">William Entriken</a>, <a href="/cdn-cgi/l/email-protection#e98d8c9d8ca98891808684938c87c78a86">Dieter Shirley</a>, <a href="/cdn-cgi/l/email-protection#ddb7bcbeb2bf9db9b8b6a7f3b3b8a9">Jacob Evans</a>, <a href="/cdn-cgi/l/email-protection#37595644435644445e56194456545f44774745584358595a565e5b1954585a">Nastassia Sachs</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/eips/issues/721">https://github.com/ethereum/eips/issues/721</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2018-01-24</td></tr>
+<tr><th>Requires</th><td>
+<a href="eip-165">165</a>
+</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#simple-summary">Simple Summary</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#caveats">Caveats</a></li>
+</ul>
+</li>
+<li><a href="#rationale">Rationale</a></li>
+<li><a href="#backwards-compatibility">Backwards Compatibility</a></li>
+<li><a href="#test-cases">Test Cases</a></li>
+<li><a href="#implementations">Implementations</a></li>
+<li><a href="#references">References</a></li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</div>
+<h2 id="simple-summary">
+<a href="#simple-summary" class="anchor-link"></a> Simple Summary
+</h2>
+<p>A standard interface for non-fungible tokens, also known as deeds.</p>
+<h2 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h2>
+<p>The following standard allows for the implementation of a standard API for NFTs within smart contracts. This standard provides basic functionality to track and transfer NFTs.</p>
+<p>We considered use cases of NFTs being owned and transacted by individuals as well as consignment to third party brokers/wallets/auctioneers (“operators”). NFTs can represent ownership over digital or physical assets. We considered a diverse universe of assets, and we know you will dream up many more:</p>
+<ul>
+<li>Physical property — houses, unique artwork</li>
+<li>Virtual collectables — unique pictures of kittens, collectable cards</li>
+<li>“Negative value” assets — loans, burdens and other responsibilities</li>
+</ul>
+<p>In general, all houses are distinct and no two kittens are alike. NFTs are <em>distinguishable</em> and you must track the ownership of each one separately.</p>
+<h2 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h2>
+<p>A standard interface allows wallet/broker/auction applications to work with any NFT on Ethereum. We provide for simple ERC-721 smart contracts as well as contracts that track an <em>arbitrarily large</em> number of NFTs. Additional applications are discussed below.</p>
+<p>This standard is inspired by the ERC-20 token standard and builds on two years of experience since EIP-20 was created. EIP-20 is insufficient for tracking NFTs because each asset is distinct (non-fungible) whereas each of a quantity of tokens is identical (fungible).</p>
+<p>Differences between this standard and EIP-20 are examined below.</p>
 <h2 id="specification">
 <a href="#specification" class="anchor-link"></a> Specification
 </h2>
@@ -207,3 +308,200 @@
 <li>Solidity issues #3494, #3544: Use of <code class="language-plaintext highlighter-rouge">this.*.selector</code> is marked as a warning by Solidity, a future version of Solidity will not mark this as an error.</li>
 </ul>
 <p><em>If a newer version of Solidity allows the caveats to be expressed in code, then this EIP MAY be updated and the caveats removed, such will be equivalent to the original specification.</em></p>
+<h2 id="rationale">
+<a href="#rationale" class="anchor-link"></a> Rationale
+</h2>
+<p>There are many proposed uses of Ethereum smart contracts that depend on tracking distinguishable assets. Examples of existing or planned NFTs are LAND in Decentraland, the eponymous punks in CryptoPunks, and in-game items using systems like DMarket or EnjinCoin. Future uses include tracking real-world assets, like real-estate (as envisioned by companies like Ubitquity or Propy). It is critical in each of these cases that these items are not “lumped together” as numbers in a ledger, but instead each asset must have its ownership individually and atomically tracked. Regardless of the nature of these assets, the ecosystem will be stronger if we have a standardized interface that allows for cross-functional asset management and sales platforms.</p>
+<p><strong>“NFT” Word Choice</strong></p>
+<p>“NFT” was satisfactory to nearly everyone surveyed and is widely applicable to a broad universe of distinguishable digital assets. We recognize that “deed” is very descriptive for certain applications of this standard (notably, physical property).</p>
+<p><em>Alternatives considered: distinguishable asset, title, token, asset, equity, ticket</em></p>
+<p><strong>NFT Identifiers</strong></p>
+<p>Every NFT is identified by a unique <code class="language-plaintext highlighter-rouge">uint256</code> ID inside the ERC-721 smart contract. This identifying number SHALL NOT change for the life of the contract. The pair <code class="language-plaintext highlighter-rouge">(contract address, uint256 tokenId)</code> will then be a globally unique and fully-qualified identifier for a specific asset on an Ethereum chain. While some ERC-721 smart contracts may find it convenient to start with ID 0 and simply increment by one for each new NFT, callers SHALL NOT assume that ID numbers have any specific pattern to them, and MUST treat the ID as a “black box”. Also note that NFTs MAY become invalid (be destroyed). Please see the enumeration functions for a supported enumeration interface.</p>
+<p>The choice of <code class="language-plaintext highlighter-rouge">uint256</code> allows a wide variety of applications because UUIDs and sha3 hashes are directly convertible to <code class="language-plaintext highlighter-rouge">uint256</code>.</p>
+<p><strong>Transfer Mechanism</strong></p>
+<p>ERC-721 standardizes a safe transfer function <code class="language-plaintext highlighter-rouge">safeTransferFrom</code> (overloaded with and without a <code class="language-plaintext highlighter-rouge">bytes</code> parameter) and an unsafe function <code class="language-plaintext highlighter-rouge">transferFrom</code>. Transfers may be initiated by:</p>
+<ul>
+<li>The owner of an NFT</li>
+<li>The approved address of an NFT</li>
+<li>An authorized operator of the current owner of an NFT</li>
+</ul>
+<p>Additionally, an authorized operator may set the approved address for an NFT. This provides a powerful set of tools for wallet, broker and auction applications to quickly use a <em>large</em> number of NFTs.</p>
+<p>The transfer and accept functions’ documentation only specify conditions when the transaction MUST throw. Your implementation MAY also throw in other situations. This allows implementations to achieve interesting results:</p>
+<ul>
+<li><strong>Disallow transfers if the contract is paused</strong> — prior art, CryptoKitties deployed contract, line 611</li>
+<li><strong>Blocklist certain address from receiving NFTs</strong> — prior art, CryptoKitties deployed contract, lines 565, 566</li>
+<li><strong>Disallow unsafe transfers</strong> — <code class="language-plaintext highlighter-rouge">transferFrom</code> throws unless <code class="language-plaintext highlighter-rouge">_to</code> equals <code class="language-plaintext highlighter-rouge">msg.sender</code> or <code class="language-plaintext highlighter-rouge">countOf(_to)</code> is non-zero or was non-zero previously (because such cases are safe)</li>
+<li><strong>Charge a fee to both parties of a transaction</strong> — require payment when calling <code class="language-plaintext highlighter-rouge">approve</code> with a non-zero <code class="language-plaintext highlighter-rouge">_approved</code> if it was previously the zero address, refund payment if calling <code class="language-plaintext highlighter-rouge">approve</code> with the zero address if it was previously a non-zero address, require payment when calling any transfer function, require transfer parameter <code class="language-plaintext highlighter-rouge">_to</code> to equal <code class="language-plaintext highlighter-rouge">msg.sender</code>, require transfer parameter <code class="language-plaintext highlighter-rouge">_to</code> to be the approved address for the NFT</li>
+<li><strong>Read only NFT registry</strong> — always throw from <code class="language-plaintext highlighter-rouge">safeTransferFrom</code>, <code class="language-plaintext highlighter-rouge">transferFrom</code>, <code class="language-plaintext highlighter-rouge">approve</code> and <code class="language-plaintext highlighter-rouge">setApprovalForAll</code></li>
+</ul>
+<p>Failed transactions will throw, a best practice identified in ERC-223, ERC-677, ERC-827 and OpenZeppelin’s implementation of SafeERC20.sol. ERC-20 defined an <code class="language-plaintext highlighter-rouge">allowance</code> feature, this caused a problem when called and then later modified to a different amount, as on OpenZeppelin issue #438. In ERC-721, there is no allowance because every NFT is unique, the quantity is none or one. Therefore we receive the benefits of ERC-20’s original design without problems that have been later discovered.</p>
+<p>Creation of NFTs (“minting”) and destruction of NFTs (“burning”) is not included in the specification. Your contract may implement these by other means. Please see the <code class="language-plaintext highlighter-rouge">event</code> documentation for your responsibilities when creating or destroying NFTs.</p>
+<p>We questioned if the <code class="language-plaintext highlighter-rouge">operator</code> parameter on <code class="language-plaintext highlighter-rouge">onERC721Received</code> was necessary. In all cases we could imagine, if the operator was important then that operator could transfer the token to themself and then send it – then they would be the <code class="language-plaintext highlighter-rouge">from</code> address. This seems contrived because we consider the operator to be a temporary owner of the token (and transferring to themself is redundant). When the operator sends the token, it is the operator acting on their own accord, NOT the operator acting on behalf of the token holder. This is why the operator and the previous token owner are both significant to the token recipient.</p>
+<p><em>Alternatives considered: only allow two-step ERC-20 style transaction, require that transfer functions never throw, require all functions to return a boolean indicating the success of the operation.</em></p>
+<p><strong>ERC-165 Interface</strong></p>
+<p>We chose Standard Interface Detection (ERC-165) to expose the interfaces that a ERC-721 smart contract supports.</p>
+<p>A future EIP may create a global registry of interfaces for contracts. We strongly support such an EIP and it would allow your ERC-721 implementation to implement <code class="language-plaintext highlighter-rouge">ERC721Enumerable</code>, <code class="language-plaintext highlighter-rouge">ERC721Metadata</code>, or other interfaces by delegating to a separate contract.</p>
+<p><strong>Gas and Complexity</strong> (regarding the enumeration extension)</p>
+<p>This specification contemplates implementations that manage a few and <em>arbitrarily large</em> numbers of NFTs. If your application is able to grow then avoid using for/while loops in your code (see CryptoKitties bounty issue #4). These indicate your contract may be unable to scale and gas costs will rise over time without bound.</p>
+<p>We have deployed a contract, XXXXERC721, to Testnet which instantiates and tracks 340282366920938463463374607431768211456 different deeds (2^128). That’s enough to assign every IPV6 address to an Ethereum account owner, or to track ownership of nanobots a few micron in size and in aggregate totalling half the size of Earth. You can query it from the blockchain. And every function takes less gas than querying the ENS.</p>
+<p>This illustration makes clear: the ERC-721 standard scales.</p>
+<p><em>Alternatives considered: remove the asset enumeration function if it requires a for-loop, return a Solidity array type from enumeration functions.</em></p>
+<p><strong>Privacy</strong></p>
+<p>Wallets/brokers/auctioneers identified in the motivation section have a strong need to identify which NFTs an owner owns.</p>
+<p>It may be interesting to consider a use case where NFTs are not enumerable, such as a private registry of property ownership, or a partially-private registry. However, privacy cannot be attained because an attacker can simply (!) call <code class="language-plaintext highlighter-rouge">ownerOf</code> for every possible <code class="language-plaintext highlighter-rouge">tokenId</code>.</p>
+<p><strong>Metadata Choices</strong> (metadata extension)</p>
+<p>We have required <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">symbol</code> functions in the metadata extension. Every token EIP and draft we reviewed (ERC-20, ERC-223, ERC-677, ERC-777, ERC-827) included these functions.</p>
+<p>We remind implementation authors that the empty string is a valid response to <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">symbol</code> if you protest to the usage of this mechanism. We also remind everyone that any smart contract can use the same name and symbol as <em>your</em> contract. How a client may determine which ERC-721 smart contracts are well-known (canonical) is outside the scope of this standard.</p>
+<p>A mechanism is provided to associate NFTs with URIs. We expect that many implementations will take advantage of this to provide metadata for each NFT. The image size recommendation is taken from Instagram, they probably know much about image usability. The URI MAY be mutable (i.e. it changes from time to time). We considered an NFT representing ownership of a house, in this case metadata about the house (image, occupants, etc.) can naturally change.</p>
+<p>Metadata is returned as a string value. Currently this is only usable as calling from <code class="language-plaintext highlighter-rouge">web3</code>, not from other contracts. This is acceptable because we have not considered a use case where an on-blockchain application would query such information.</p>
+<p><em>Alternatives considered: put all metadata for each asset on the blockchain (too expensive), use URL templates to query metadata parts (URL templates do not work with all URL schemes, especially P2P URLs), multiaddr network address (not mature enough)</em></p>
+<p><strong>Community Consensus</strong></p>
+<p>A significant amount of discussion occurred on the original ERC-721 issue, additionally we held a first live meeting on Gitter that had good representation and well advertised (on Reddit, in the Gitter #ERC channel, and the original ERC-721 issue). Thank you to the participants:</p>
+<ul>
+<li><a href="https://github.com/imallinnow">@ImAllInNow</a> Rob from DEC Gaming / Presenting Michigan Ethereum Meetup Feb 7</li>
+<li><a href="https://github.com/arachnid">@Arachnid</a> Nick Johnson</li>
+<li><a href="https://github.com/jadhavajay">@jadhavajay</a> Ajay Jadhav from AyanWorks</li>
+<li><a href="https://github.com/superphly">@superphly</a> Cody Marx Bailey - XRAM Capital / Sharing at hackathon Jan 20 / UN Future of Finance Hackathon.</li>
+<li><a href="https://github.com/fulldecent">@fulldecent</a> William Entriken</li>
+</ul>
+<p>A second event was held at ETHDenver 2018 to discuss distinguishable asset standards (notes to be published).</p>
+<p>We have been very inclusive in this process and invite anyone with questions or contributions into our discussion. However, this standard is written only to support the identified use cases which are listed herein.</p>
+<h2 id="backwards-compatibility">
+<a href="#backwards-compatibility" class="anchor-link"></a> Backwards Compatibility
+</h2>
+<p>We have adopted <code class="language-plaintext highlighter-rouge">balanceOf</code>, <code class="language-plaintext highlighter-rouge">totalSupply</code>, <code class="language-plaintext highlighter-rouge">name</code> and <code class="language-plaintext highlighter-rouge">symbol</code> semantics from the ERC-20 specification. An implementation may also include a function <code class="language-plaintext highlighter-rouge">decimals</code> that returns <code class="language-plaintext highlighter-rouge">uint8(0)</code> if its goal is to be more compatible with ERC-20 while supporting this standard. However, we find it contrived to require all ERC-721 implementations to support the <code class="language-plaintext highlighter-rouge">decimals</code> function.</p>
+<p>Example NFT implementations as of February 2018:</p>
+<ul>
+<li>CryptoKitties – Compatible with an earlier version of this standard.</li>
+<li>CryptoPunks – Partially ERC-20 compatible, but not easily generalizable because it includes auction functionality directly in the contract and uses function names that explicitly refer to the assets as “punks”.</li>
+<li>Auctionhouse Asset Interface – The author needed a generic interface for the Auctionhouse ÐApp (currently ice-boxed). His “Asset” contract is very simple, but is missing ERC-20 compatibility, <code class="language-plaintext highlighter-rouge">approve()</code> functionality, and metadata. This effort is referenced in the discussion for EIP-173.</li>
+</ul>
+<p>Note: “Limited edition, collectible tokens” like Curio Cards and Rare Pepe are <em>not</em> distinguishable assets. They’re actually a collection of individual fungible tokens, each of which is tracked by its own smart contract with its own total supply (which may be <code class="language-plaintext highlighter-rouge">1</code> in extreme cases).</p>
+<p>The <code class="language-plaintext highlighter-rouge">onERC721Received</code> function specifically works around old deployed contracts which may inadvertently return 1 (<code class="language-plaintext highlighter-rouge">true</code>) in certain circumstances even if they don’t implement a function (see Solidity DelegateCallReturnValue bug). By returning and checking for a magic value, we are able to distinguish actual affirmative responses versus these vacuous <code class="language-plaintext highlighter-rouge">true</code>s.</p>
+<h2 id="test-cases">
+<a href="#test-cases" class="anchor-link"></a> Test Cases
+</h2>
+<p>0xcert ERC-721 Token includes test cases written using Truffle.</p>
+<h2 id="implementations">
+<a href="#implementations" class="anchor-link"></a> Implementations
+</h2>
+<p>0xcert ERC721 – a reference implementation</p>
+<ul>
+<li>MIT licensed, so you can freely use it for your projects</li>
+<li>Includes test cases</li>
+<li>Active bug bounty, you will be paid if you find errors</li>
+</ul>
+<p>Su Squares – an advertising platform where you can rent space and place images</p>
+<ul>
+<li>Complete the Su Squares Bug Bounty Program to seek problems with this standard or its implementation</li>
+<li>Implements the complete standard and all optional interfaces</li>
+</ul>
+<p>ERC721ExampleDeed – an example implementation</p>
+<ul>
+<li>Implements using the OpenZeppelin project format</li>
+</ul>
+<p>XXXXERC721, by William Entriken – a scalable example implementation</p>
+<ul>
+<li>Deployed on testnet with 1 billion assets and supporting all lookups with the metadata extension. This demonstrates that scaling is NOT a problem.</li>
+</ul>
+<h2 id="references">
+<a href="#references" class="anchor-link"></a> References
+</h2>
+<p><strong>Standards</strong></p>
+<ol>
+<li><a href="/EIPS/eip-20">ERC-20</a> Token Standard.</li>
+<li><a href="/EIPS/eip-165">ERC-165</a> Standard Interface Detection.</li>
+<li><a href="/EIPS/eip-173">ERC-173</a> Owned Standard.</li>
+<li><a href="https://github.com/ethereum/EIPs/issues/223">ERC-223</a> Token Standard.</li>
+<li><a href="https://github.com/ethereum/EIPs/issues/677">ERC-677</a> <code class="language-plaintext highlighter-rouge">transferAndCall</code> Token Standard.</li>
+<li><a href="https://github.com/ethereum/EIPs/issues/827">ERC-827</a> Token Standard.</li>
+<li>Ethereum Name Service (ENS). https://ens.domains</li>
+<li>Instagram – What’s the Image Resolution? https://help.instagram.com/1631821640426723</li>
+<li>JSON Schema. https://json-schema.org/</li>
+<li>Multiaddr. https://github.com/multiformats/multiaddr</li>
+<li>RFC 2119 Key words for use in RFCs to Indicate Requirement Levels. https://www.ietf.org/rfc/rfc2119.txt</li>
+</ol>
+<p><strong>Issues</strong></p>
+<ol>
+<li>The Original ERC-721 Issue. https://github.com/ethereum/eips/issues/721</li>
+<li>Solidity Issue #2330 – Interface Functions are External. https://github.com/ethereum/solidity/issues/2330</li>
+<li>Solidity Issue #3412 – Implement Interface: Allow Stricter Mutability. https://github.com/ethereum/solidity/issues/3412</li>
+<li>Solidity Issue #3419 – Interfaces Can’t Inherit. https://github.com/ethereum/solidity/issues/3419</li>
+<li>Solidity Issue #3494 – Compiler Incorrectly Reasons About the <code class="language-plaintext highlighter-rouge">selector</code> Function. https://github.com/ethereum/solidity/issues/3494</li>
+<li>Solidity Issue #3544 – Cannot Calculate Selector of Function Named <code class="language-plaintext highlighter-rouge">transfer</code>. https://github.com/ethereum/solidity/issues/3544</li>
+<li>CryptoKitties Bounty Issue #4 – Listing all Kitties Owned by a User is <code class="language-plaintext highlighter-rouge">O(n^2)</code>. https://github.com/axiomzen/cryptokitties-bounty/issues/4</li>
+<li>OpenZeppelin Issue #438 – Implementation of <code class="language-plaintext highlighter-rouge">approve</code> method violates ERC20 standard. https://github.com/OpenZeppelin/zeppelin-solidity/issues/438</li>
+<li>Solidity DelegateCallReturnValue Bug. https://solidity.readthedocs.io/en/develop/bugs.html#DelegateCallReturnValue</li>
+</ol>
+<p><strong>Discussions</strong></p>
+<ol>
+<li>Reddit (announcement of first live discussion). https://www.reddit.com/r/ethereum/comments/7r2ena/friday_119_live_discussion_on_erc_nonfungible/</li>
+<li>Gitter #EIPs (announcement of first live discussion). https://gitter.im/ethereum/EIPs?at=5a5f823fb48e8c3566f0a5e7</li>
+<li>ERC-721 (announcement of first live discussion). https://github.com/ethereum/eips/issues/721#issuecomment-358369377</li>
+<li>ETHDenver 2018. https://ethdenver.com</li>
+</ol>
+<p><strong>NFT Implementations and Other Projects</strong></p>
+<ol>
+<li>CryptoKitties. https://www.cryptokitties.co</li>
+<li>0xcert ERC-721 Token. https://github.com/0xcert/ethereum-erc721</li>
+<li>Su Squares. https://tenthousandsu.com</li>
+<li>Decentraland. https://decentraland.org</li>
+<li>CryptoPunks. https://www.larvalabs.com/cryptopunks</li>
+<li>DMarket. https://www.dmarket.io</li>
+<li>Enjin Coin. https://enjincoin.io</li>
+<li>Ubitquity. https://www.ubitquity.io</li>
+<li>Propy. https://tokensale.propy.com</li>
+<li>CryptoKitties Deployed Contract. https://etherscan.io/address/0x06012c8cf97bead5deae237070f9587f8e7a266d#code</li>
+<li>Su Squares Bug Bounty Program. https://github.com/fulldecent/su-squares-bounty</li>
+<li>XXXXERC721. https://github.com/fulldecent/erc721-example</li>
+<li>ERC721ExampleDeed. https://github.com/nastassiasachs/ERC721ExampleDeed</li>
+<li>Curio Cards. https://mycuriocards.com</li>
+<li>Rare Pepe. https://rarepepewallet.com</li>
+<li>Auctionhouse Asset Interface. https://github.com/dob/auctionhouse/blob/master/contracts/Asset.sol</li>
+<li>OpenZeppelin SafeERC20.sol Implementation. https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/contracts/token/ERC20/SafeERC20.sol</li>
+</ol>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/fulldecent">William Entriken</a>, <a href="/cdn-cgi/l/email-protection#751110011035140d1c1a180f101b5b161a">Dieter Shirley</a>, <a href="/cdn-cgi/l/email-protection#9cf6fdfff3fedcf8f9f7e6b2f2f9e8">Jacob Evans</a>, <a href="/cdn-cgi/l/email-protection#c2aca3b1b6a3b1b1aba3ecb1a3a1aab182b2b0adb6adacafa3abaeeca1adaf">Nastassia Sachs</a>, "EIP-721: Non-Fungible Token Standard," <em>Ethereum Improvement Proposals</em>, no. 721, January 2018. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-721.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-721: Non-Fungible Token Standard",
+    "author": "William Entriken (@fulldecent), Dieter Shirley <dete@axiomzen.co>, Jacob Evans <jacob@dekz.net>, Nastassia Sachs <nastassia.sachs@protonmail.com>",
+    "name": "EIP-721: Non-Fungible Token Standard",
+    "dateCreated": "2018-01-24",
+    "datePublished": "2018-01-24",
+
+    "discussionUrl": "https://github.com/ethereum/eips/issues/721",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2018"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

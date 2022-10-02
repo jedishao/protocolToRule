@@ -1,0 +1,37 @@
+
+ Specification
+
+A secp256k1 signature is made up of 3 parameters, r, s and yParity.
+The r represents the x component on the curve (from which the y can be
+computed), and the s represents the challenge solution for signing by a
+private key. Due to the symmetric nature of an elliptic curve, a yParity
+is required, which indicates which of the 2 possible solutions was intended,
+by indicating its parity (odd-ness).
+Two key observations are required to create a compact representation.
+First, the yParity parameter is always either 0 or 1 (canonically the values
+used have historically been 27 and 28, as these values didn’t collide with other
+binary prefixes used in Bitcoin).
+Second, the top bit of the s parameters is always 0, due to the use of
+canonical signatures which flip the solution parity to prevent negative values,
+which was introduced as a constraint in Homestead.
+So, we can hijack the top bit in the s parameter to store the value of
+yParity, resulting in:
+[256-bit r value][1-bit yParity value][255-bit s value]
+
+
+ Example Implementation In Python
+
+# Assume yParity is 0 or 1, normalized from the canonical 27 or 28
+def to_compact(r, s, yParity):
+    return {
+        "r": r,
+        "yParityAndS": (yParity &lt;&lt; 255) | s
+    }
+
+def to_canonical(r, yParityAndS):
+    return {
+        "r": r,
+        "s": yParityAndS &amp; ((1 &lt;&lt; 255) - 1),
+        "yParity": (yParityAndS &gt;&gt; 255)
+    }
+

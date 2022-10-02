@@ -1,0 +1,34 @@
+
+ Specification
+
+Reverse ENS records are stored in the ENS hierarchy in the same fashion as regular records, under a reserved domain, addr.reverse. To generate the ENS name for a given account’s reverse records, convert the account to hexadecimal representation in lower-case, and append addr.reverse. For instance, the ENS registry’s address at 0x112234455c3a32fd11230c42e7bccd4a84e02010 has any reverse records stored at 112234455c3a32fd11230c42e7bccd4a84e02010.addr.reverse.
+Note that this means that contracts wanting to do dynamic reverse resolution of addresses will need to perform hex encoding in the contract.
+
+ Registrar
+
+The owner of the addr.reverse domain will be a registrar that permits the caller to take ownership of
+the reverse record for their own address. It provides the following methods:
+
+ function claim(address owner) returns (bytes32 node)
+
+When called by account x, instructs the ENS registry to transfer ownership of the name hex(x) + '.addr.reverse' to the provided address, and return the namehash of the ENS record thus transferred.
+Allowing the caller to specify an owner other than themselves for the relevant node facilitates contracts that need accurate reverse ENS entries delegating this to their creators with a minimum of code inside their constructor:
+reverseRegistrar.claim(msg.sender)
+
+
+ function claimWithResolver(address owner, address resolver) returns (bytes32 node)
+
+When called by account x, instructs the ENS registry to set the resolver of the name hex(x) + '.addr.reverse' to the specified resolver, then transfer ownership of the name to the provided address, and return the namehash of the ENS record thus transferred. This method facilitates setting up a custom resolver and owner in fewer transactions than would be required if calling claim.
+
+ function setName(string name) returns (bytes32 node)
+
+When called by account x, sets the resolver for the name hex(x) + '.addr.reverse' to a default resolver, and sets the name record on that name to the specified name. This method facilitates setting up simple reverse records for users in a single transaction.
+
+ Resolver interface
+
+A new resolver interface is defined, consisting of the following method:
+function name(bytes32 node) constant returns (string);
+
+Resolvers that implement this interface must return a valid ENS name for the requested node, or the empty string if no name is defined for the requested node.
+The interface ID of this interface is 0x691f3431.
+Future EIPs may specify more record types appropriate to reverse ENS records.

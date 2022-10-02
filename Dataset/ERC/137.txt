@@ -1,0 +1,134 @@
+
+ Specification
+
+
+ Overview
+
+The ENS system comprises three main parts:
+
+The ENS registry
+Resolvers
+Registrars
+
+The registry is a single contract that provides a mapping from any registered name to the resolver responsible for it, and permits the owner of a name to set the resolver address, and to create subdomains, potentially with different owners to the parent domain.
+Resolvers are responsible for performing resource lookups for a name - for instance, returning a contract address, a content hash, or IP address(es) as appropriate. The resolver specification, defined here and extended in other EIPs, defines what methods a resolver may implement to support resolving different types of records.
+Registrars are responsible for allocating domain names to users of the system, and are the only entities capable of updating the ENS; the owner of a node in the ENS registry is its registrar. Registrars may be contracts or externally owned accounts, though it is expected that the root and top-level registrars, at a minimum, will be implemented as contracts.
+Resolving a name in ENS is a two-step process. First, the ENS registry is called with the name to resolve, after hashing it using the procedure described below. If the record exists, the registry returns the address of its resolver. Then, the resolver is called, using the method appropriate to the resource being requested. The resolver then returns the desired result.
+For example, suppose you wish to find the address of the token contract associated with ‘beercoin.eth’. First, get the resolver:
+var node = namehash("beercoin.eth");
+var resolver = ens.resolver(node);
+
+Then, ask the resolver for the address for the contract:
+var address = resolver.addr(node);
+
+Because the namehash procedure depends only on the name itself, this can be precomputed and inserted into a contract, removing the need for string manipulation, and permitting O(1) lookup of ENS records regardless of the number of components in the raw name.
+
+ Name Syntax
+
+ENS names must conform to the following syntax:
+&lt;domain&gt; ::= &lt;label&gt; | &lt;domain&gt; "." &lt;label&gt;
+&lt;label&gt; ::= any valid string label per [UTS46](https://unicode.org/reports/tr46/)
+
+In short, names consist of a series of dot-separated labels. Each label must be a valid normalised label as described in UTS46 with the options transitional=false and useSTD3AsciiRules=true. For Javascript implementations, a library is available that normalises and checks names.
+Note that while upper and lower case letters are allowed in names, the UTS46 normalisation process case-folds labels before hashing them, so two names with different case but identical spelling will produce the same namehash.
+Labels and domains may be of any length, but for compatibility with legacy DNS, it is recommended that labels be restricted to no more than 64 characters each, and complete ENS names to no more than 255 characters. For the same reason, it is recommended that labels do not start or end with hyphens, or start with digits.
+
+ namehash algorithm
+
+Before being used in ENS, names are hashed using the ‘namehash’ algorithm. This algorithm recursively hashes components of the name, producing a unique, fixed-length string for any valid input domain. The output of namehash is referred to as a ‘node’.
+Pseudocode for the namehash algorithm is as follows:
+def namehash(name):
+  if name == '':
+    return '\0' * 32
+  else:
+    label, _, remainder = name.partition('.')
+    return sha3(namehash(remainder) + sha3(label))
+
+Informally, the name is split into labels, each label is hashed. Then, starting with the last component, the previous output is concatenated with the label hash and hashed again. The first component is concatenated with 32 ‘0’ bytes. Thus, ‘mysite.swarm’ is processed as follows:
+node = '\0' * 32
+node = sha3(node + sha3('swarm'))
+node = sha3(node + sha3('mysite'))
+
+Implementations should conform to the following test vectors for namehash:
+namehash('') = 0x0000000000000000000000000000000000000000000000000000000000000000
+namehash('eth') = 0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae
+namehash('foo.eth') = 0xde9b09fd7c5f901e23a3f19fecc54828e9c848539801e86591bd9801b019f84f
+
+
+ Registry specification
+
+The ENS registry contract exposes the following functions:
+function owner(bytes32 node) constant returns (address);
+
+Returns the owner (registrar) of the specified node.
+function resolver(bytes32 node) constant returns (address);
+
+Returns the resolver for the specified node.
+function ttl(bytes32 node) constant returns (uint64);
+
+Returns the time-to-live (TTL) of the node; that is, the maximum duration for which a node’s information may be cached.
+function setOwner(bytes32 node, address owner);
+
+Transfers ownership of a node to another registrar. This function may only be called by the current owner of node. A successful call to this function logs the event Transfer(bytes32 indexed, address).
+function setSubnodeOwner(bytes32 node, bytes32 label, address owner);
+
+Creates a new node, sha3(node, label) and sets its owner to owner, or updates the node with a new owner if it already exists. This function may only be called by the current owner of node. A successful call to this function logs the event NewOwner(bytes32 indexed, bytes32 indexed, address).
+function setResolver(bytes32 node, address resolver);
+
+Sets the resolver address for node. This function may only be called by the owner of node. A successful call to this function logs the event NewResolver(bytes32 indexed, address).
+function setTTL(bytes32 node, uint64 ttl);
+
+Sets the TTL for a node. A node’s TTL applies to the ‘owner’ and ‘resolver’ records in the registry, as well as to any information returned by the associated resolver.
+
+ Resolver specification
+
+Resolvers may implement any subset of the record types specified here. Where a record types specification requires a resolver to provide multiple functions, the resolver MUST implement either all or none of them. Resolvers MUST specify a fallback function that throws.
+Resolvers have one mandatory function:
+function supportsInterface(bytes4 interfaceID) constant returns (bool)
+
+The supportsInterface function is documented in EIP-165, and returns true if the resolver implements the interface specified by the provided 4 byte identifier. An interface identifier consists of the XOR of the function signature hashes of the functions provided by that interface; in the degenerate case of single-function interfaces, it is simply equal to the signature hash of that function. If a resolver returns true for supportsInterface(), it must implement the functions specified in that interface.
+supportsInterface must always return true for 0x01ffc9a7, which is the interface ID of supportsInterface itself.
+Currently standardised resolver interfaces are specified in the table below.
+The following interfaces are defined:
+
+
+
+Interface name
+Interface hash
+Specification
+
+
+
+
+addr
+0x3b3b57de
+Contract address
+
+
+name
+0x691f3431
+#181
+
+
+ABI
+0x2203ab56
+#205
+
+
+pubkey
+0xc8690233
+#619
+
+
+
+EIPs may define new interfaces to be added to this registry.
+
+ Contract Address Interface
+
+Resolvers wishing to support contract address resources must provide the following function:
+function addr(bytes32 node) constant returns (address);
+
+If the resolver supports addr lookups but the requested node does not have an addr record, the resolver MUST return the zero address.
+Clients resolving the addr record MUST check for a zero return value, and treat this in the same manner as a name that does not have a resolver specified - that is, refuse to send funds to or interact with the address. Failure to do this can result in users accidentally sending funds to the 0 address.
+Changes to an address MUST trigger the following event:
+event AddrChanged(bytes32 indexed node, address a);

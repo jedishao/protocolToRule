@@ -1,0 +1,31 @@
+
+ Specification
+
+We define the following 4 levels in BIP32 path:
+m / purpose' / subpurpose' / EIP' / wallet'
+
+Apostrophe in the path indicates that BIP32 hardened derivation is used.
+Each level has a special meaning, described in the chapters below.
+
+ Purpose
+
+Purpose is a constant set to 43, indicating the key derivation is for a non-bitcoin cryptocurrency.
+Hardened derivation is used at this level.
+
+ Subpurpose
+
+Subpurpose is set to 60, the SLIP-44 code for Ethereum.
+Hardened derivation is used at this level.
+
+ EIP
+
+EIP is set to the EIP number specifying the remainder of the BIP32 derivation path. For paths following this EIP specification, the number assigned to this EIP is used.
+Hardened derivation is used at this level.
+
+ Wallet
+
+This component of the path splits the wallet into different user identities, allowing a single wallet to have multiple public identities.
+Accounts are numbered from index 0 in sequentially increasing manner. This number is used as child index in BIP32 derivation.
+Hardened derivation is used at this level.
+Software should prevent a creation of an account if a previous account does not have a transaction history (meaning its address has not been used before).
+Software needs to discover all used accounts after importing the seed from an external source.
