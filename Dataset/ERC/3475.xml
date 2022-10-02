@@ -1,0 +1,298 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p><strong>Definition</strong></p>
+<p>Bank: an entity that issues, redeems, or burns bonds after getting the necessary amount of liquidity. Generally, a single entity with admin access to the pool.</p>
+<p><strong>Functions</strong></p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="cm">/**
+* transferFrom
+* @param _from argument is the address of the bond holder whose balance is about to decrease.
+* @param _to argument is the address of the bond recipient whose balance is about to increase.
+* @param _transactions is the `Transaction[] calldata` (of type ['classId', 'nonceId', '_amountBonds']) structure defined in the rationale section below.
+* @dev transferFrom MUST have the `isApprovedFor(_from, _to, _transactions[i].classId)` approval to transfer `_from` address to `_to` address for given classId (i.e for Transaction tuple corresponding to all nonces).
+*/</span>
+<span class="c1">// function transferFrom(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef, 0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B, [[1, 42, 500000000]]);
+// transfer from `_from` address, to `_to` address, `500000000` bonds of type class`1` and nonce `42`.
+</span><span class="k">function</span> <span class="n">transferFrom</span><span class="p">(</span><span class="kt">address</span> <span class="n">_from</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_to</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_transactions</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+<span class="cm">/**
+* transferAllowanceFrom
+* @dev allows the transfer of only those bond types and nonces being allotted to the _to address using allowance().
+* @param _from is the address of the holder whose balance is about to decrease.
+* @param _to is the address of the recipient whose balance is about to increase.
+* @param _transactions is the `Transaction[] calldata` structure defined in the section `rationale` below.
+* @dev transferAllowanceFrom MUST have the `allowance(_from, msg.sender, _transactions[i].classId, _transactions[i].nonceId)` (where `i` looping for  [ 0 ...Transaction.length - 1] ) 
+*/</span>
+<span class="c1">// function transferAllowanceFrom(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef, 0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B, [[1, 42, 500000000]]);
+// transfer from `_from` address, to `_to` address, `500000000` bonds of type class`1` and nonce `42`.
+</span><span class="k">function</span> <span class="n">transferAllowanceFrom</span><span class="p">(</span><span class="kt">address</span> <span class="n">_from</span><span class="p">,</span><span class="kt">address</span> <span class="n">_to</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_transactions</span><span class="p">)</span> <span class="k">public</span> <span class="k">virtual</span> <span class="k">override</span>
+
+<span class="cm">/**
+* issue 
+* @dev allows issuing any number of bond types (defined by values in Transaction tuple as param) to an address.
+* @dev it MUST be issued by a single entity (for instance, a role-based ownable contract that has integration with the liquidity pool of the deposited collateral by `_to` address).
+* @param `_to` argument is the address to which the bond will be issued.
+* @param `_transactions` is the `Transaction[] calldata` (ie array of issued bond class, bond nonce and amount of bonds to be issued).
+* @dev transferAllowanceFrom MUST have the `allowance(_from, msg.sender, _transactions[i].classId, _transactions[i].nonceId)` (where `i` looping for  [ 0 ...Transaction.length - 1] ) 
+*/</span>
+<span class="c1">// example: issue(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef,[[0,5,1000]]);
+// issues `1000` bonds with a class of `0` to address `0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef` with a nonce of `5`.
+</span><span class="k">function</span> <span class="n">issue</span><span class="p">(</span><span class="kt">address</span> <span class="n">_to</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_transaction</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span> 
+
+<span class="cm">/**
+* redeem
+* @dev permits redemption of bond from an address.
+* @dev the calling of this function needs to be restricted to the bond issuer contract.
+* @param `_from` is the address from which the bond will be redeemed.
+* @param `_transactions` is the `Transaction[] calldata` structure (i.e., array of tuples with the pairs of (class, nonce and amount) of the bonds that are to be redeemed). Further defined in the rationale section.
+* @dev redeem function for a given class, and nonce category MUST BE done after certain conditions for maturity (can be end time, total active liquidity, etc.) are met. 
+* @dev furthermore, it SHOULD ONLY be called by the bank or secondary market maker contract.
+*/</span>
+<span class="c1">// redeem(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef, [[1,42,500000000]]);
+// means “redeem from wallet address(0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef), 500000000 of bond class1 and nonce 42.
+</span><span class="k">function</span> <span class="n">redeem</span><span class="p">(</span><span class="kt">address</span> <span class="n">_from</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_transactions</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span> 
+
+<span class="cm">/**
+* burn
+* @dev permits nullifying of the bonds (or transferring given bonds to address(0)).
+* @dev burn function for given class and nonce MUST BE called by only the controller contract.
+* @param _from is the address of the holder whose bonds are about to burn.
+* @param `_transactions` is the `Transaction[] calldata` structure (i.e., array of tuple with the pairs of (class, nonce and amount) of the bonds that are to be burned). further defined in the rationale.
+* @dev burn function for a given class, and nonce category MUST BE done only after certain conditions for maturity (can be end time, total active liquidity, etc). 
+* @dev furthermore, it SHOULD ONLY be called by the bank or secondary market maker contract.
+*/</span>
+<span class="c1">// burnBond(0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B,[[1,42,500000000]]);
+// means burning 500000000 bonds of class 1 nonce 42 owned by address 0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B.
+</span><span class="k">function</span> <span class="n">burn</span><span class="p">(</span><span class="kt">address</span> <span class="n">_from</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_transactions</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span> 
+
+<span class="cm">/**
+* approve
+* @dev Allows `_spender` to withdraw from the msg.sender the bonds of `_amount` and type (classId and nonceId).
+* @dev If this function is called again, it overwrites the current allowance with the amount.
+* @dev `approve()` should only be callable by the bank, or the owner of the account.
+* @param `_spender` argument is the address of the user who is approved to transfer the bonds.
+* @param `_transactions` is the `Transaction[] calldata` structure (ie array of tuple with the pairs of (class,nonce, and amount) of the bonds that are to be approved to be spend by _spender). Further defined in the rationale section.
+*/</span>
+<span class="c1">// approve(0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B,[[0,1,30000]]);
+// means owner of address 0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B is approved to manage 30000 bonds from class 0 and Nonce 1.
+</span><span class="k">function</span> <span class="n">approve</span><span class="p">(</span><span class="kt">address</span> <span class="n">_spender</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="k">calldata</span> <span class="n">_transactions</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+<span class="cm">/**
+* SetApprovalFor
+* @dev enable or disable approval for a third party (“operator”) to manage all the Bonds in the given class of the caller’s bonds.
+* @dev If this function is called again, it overwrites the current allowance with the amount.
+* @dev `approve()` should only be callable by the bank or the owner of the account.
+* @param `_operator` is the address to add to the set of authorized operators.
+* @param `classId` is the class id of the bond.
+* @param `_approved` is true if the operator is approved (based on the conditions provided), false meaning approval is revoked.
+* @dev contract MUST define internal function regarding the conditions for setting approval and should be callable only by bank or owner.
+*/</span>
+<span class="c1">// setApprovalFor(0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B,0,true);
+// means that address 0x82a55a613429Aeb3D01fbE6841bE1AcA4fFD5b2B is authorized to transfer bonds from class 0 (across all nonces).
+</span><span class="k">function</span> <span class="n">setApprovalFor</span><span class="p">(</span><span class="kt">address</span> <span class="n">_operator</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_approved</span><span class="p">)</span> <span class="k">external</span> <span class="k">returns</span><span class="p">(</span><span class="kt">bool</span> <span class="n">approved</span><span class="p">);</span>
+
+<span class="cm">/**
+* totalSupply
+* @dev Here, total supply includes burned and redeemed supply.
+* @param classId is the corresponding class Id of the bond.
+* @param nonceId is the nonce Id of the given bond class.
+* @return the supply of the bonds
+*/</span>
+<span class="c1">// totalSupply(0, 1);
+// it finds the total supply of the bonds of classid 0 and bond nonce 1.
+</span><span class="k">function</span> <span class="n">totalSupply</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+<span class="cm">/**
+* redeemedSupply
+* @dev Returns the redeemed supply of the bond identified by (classId,nonceId).
+* @param classId is the corresponding class id of the bond.
+* @param nonceId is the nonce id of the given bond class.
+* @return the supply of bonds redeemed.
+*/</span>
+<span class="k">function</span> <span class="n">redeemedSupply</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+<span class="cm">/**
+* activeSupply
+* @dev Returns the active supply of the bond defined by (classId,NonceId).
+* @param classId is the corresponding classId of the bond.
+* @param nonceId is the nonce id of the given bond class.
+* @return the non-redeemed, active supply. 
+*/</span>
+<span class="k">function</span> <span class="n">activeSupply</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+<span class="cm">/**
+* burnedSupply
+* @dev Returns the burned supply of the bond in defined by (classId,NonceId).
+* @param classId is the corresponding classId of the bond.
+* @param nonceId is the nonce id of the given bond class.
+* @return gets the supply of bonds for given classId and nonceId that are already burned.
+*/</span>
+<span class="k">function</span> <span class="n">burnedSupply</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+<span class="cm">/**
+* balanceOf
+* @dev Returns the balance of the bonds (nonReferenced) of given classId and bond nonce held by the address `_account`.
+* @param classId is the corresponding classId of the bond.
+* @param nonceId is the nonce id of the given bond class.
+* @param _account address of the owner whose balance is to be determined.
+* @dev this also consists of bonds that are redeemed.
+*/</span>
+<span class="k">function</span> <span class="n">balanceOf</span><span class="p">(</span><span class="kt">address</span> <span class="n">_account</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+<span class="cm">/**
+* classMetadata
+* @dev Returns the JSON metadata of the classes.
+* @dev The metadata SHOULD follow a set of structures explained later in the metadata.md
+* @param metadataId is the index-id given bond class information.
+* @return the JSON metadata of the nonces. — e.g. `[title, type, description]`.
+*/</span>
+<span class="k">function</span> <span class="n">classMetadata</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">metadataId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Metadata</span> <span class="k">memory</span><span class="p">);</span>
+
+<span class="cm">/**
+* nonceMetadata 
+* @dev Returns the JSON metadata of the nonces.
+* @dev The metadata SHOULD follow a set of structures explained later in metadata.md
+* @param classId is the corresponding classId of the bond.
+* @param nonceId is the nonce id of the given bond class.
+* @param metadataId is the index of the JSON storage for given metadata information. more is defined in metadata.md.
+* @returns the JSON metadata of the nonces. — e.g. `[title, type, description]`.
+*/</span>
+<span class="k">function</span> <span class="n">nonceMetadata</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">metadataId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Metadata</span> <span class="k">memory</span><span class="p">);</span>
+
+<span class="cm">/**
+* classValues
+* @dev allows anyone to read the values (stored in struct Values for different class) for given bond class `classId`.
+* @dev the values SHOULD follow a set of structures as explained in metadata along with correct mapping corresponding to the given metadata structure
+* @param classId is the corresponding classId of the bond.
+* @param metadataId is the index of the JSON storage for given metadata information of all values of given metadata. more is defined in metadata.md.
+* @returns the Values of the class metadata. — e.g. `[string, uint, address]`.
+*/</span>
+<span class="k">function</span> <span class="n">classValues</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">metadataId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Values</span> <span class="k">memory</span><span class="p">);</span>
+
+<span class="cm">/**
+* nonceValues
+* @dev allows anyone to read the values (stored in struct Values for different class) for given bond (`nonceId`,`classId`).
+* @dev the values SHOULD follow a set of structures explained in metadata along with correct mapping corresponding to the given metadata structure
+* @param classId is the corresponding classId of the bond.
+* @param metadataId is the index of the JSON storage for given metadata information of all values of given metadata. More is defined in metadata.md.
+* @returns the Values of the class metadata. — e.g. `[string, uint, address]`.
+*/</span>
+<span class="k">function</span> <span class="n">nonceValues</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">metadataId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="n">Values</span> <span class="k">memory</span><span class="p">);</span>
+
+<span class="cm">/**
+* getProgress
+* @dev Returns the parameters to determine the current status of bonds maturity.
+* @dev the conditions of redemption SHOULD be defined with one or several internal functions. 
+* @param classId is the corresponding classId of the bond.
+* @param nonceId is the nonceId of the given bond class . 
+* @returns progressAchieved defines the metric (either related to % liquidity, time, etc.) that defines the current status of the bond.
+* @returns progressRemaining defines the metric that defines the remaining time/ remaining progress. 
+*/</span>
+<span class="k">function</span> <span class="n">getProgress</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">uint256</span> <span class="n">progressAchieved</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">progressRemaining</span><span class="p">);</span>
+
+<span class="cm">/** 
+* allowance
+* @dev Authorizes to set the allowance for given `_spender` by `_owner` for all bonds identified by (classId, nonceId).
+* @param _owner address of the owner of bond(and also msg.sender).
+* @param _spender is the address authorized to spend the bonds held by _owner of info (classId, nonceId).
+* @param classId is the corresponding classId of the bond.
+* @param nonceId is the nonceId of the given bond class. 
+* @notice Returns the _amount which spender is still allowed to withdraw from _owner.
+*/</span>
+<span class="k">function</span> <span class="n">allowance</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_spender</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+
+<span class="cm">/** 
+* isApprovedFor
+* @dev returns true if address _operator is approved for managing the account’s bonds class.
+* @notice Queries the approval status of an operator for a given owner.
+* @dev _owner is the owner of bonds. 
+* @dev _operator is the EOA /contract, whose status for approval on bond class for this approval is checked.
+* @returns “true” if the operator is approved, “false” if not.
+*/</span>
+<span class="k">function</span> <span class="n">isApprovedFor</span><span class="p">(</span><span class="kt">address</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">address</span> <span class="n">_operator</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+</code></pre></div></div>
+<p><strong>Events</strong></p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/** 
+* Issue
+* @notice Issue MUST trigger when Bonds are issued. This SHOULD not include zero value Issuing.
+* @dev This SHOULD not include zero value issuing.
+* @dev Issue MUST be triggered when the operator (i.e Bank address) contract issues bonds to the given entity.
+*/</span>
+<span class="k">event</span> <span class="n">Issue</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">_operator</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_to</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="n">_transactions</span><span class="p">);</span> 
+<span class="c1">// eg:
+</span> 
+<span class="k">emit</span> <span class="n">Issue</span><span class="p">(</span><span class="n">_operator</span><span class="p">,</span> <span class="mh">0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef</span><span class="p">,[[</span><span class="s">'0'</span><span class="p">,</span><span class="s">'14'</span><span class="p">,</span><span class="s">'500'</span><span class="p">]]);</span> 
+<span class="c1">// issue by address(operator) 500 DBIT-USD Bond(nonce14,class 0) to address 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
+</span>
+<span class="cm">/** 
+* Redeem
+* @notice Redeem MUST trigger when Bonds are redeemed. This SHOULD not include zero value redemption.
+*/</span>
+<span class="k">event</span> <span class="n">Redeem</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">_operator</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_from</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">classId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">nonceId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_amount</span><span class="p">);</span>
+<span class="c1">//e.g: 
+</span><span class="k">emit</span> <span class="n">Redeem</span><span class="p">(</span><span class="mh">0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef</span><span class="p">,</span><span class="mh">0x492Af743654549b12b1B807a9E0e8F397E44236E</span><span class="p">,[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">500</span><span class="p">]]);</span>
+<span class="c1">//emit event when 5000 bonds of class 1, nonce 14 owned by address 0x492Af743654549b12b1B807a9E0e8F397E44236E are being redeemed by 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
+</span>
+<span class="cm">/** 
+* Burn.
+* @dev `Burn` MUST trigger when the bonds are being redeemed via staking (or being invalidated) by the bank contract.
+* @dev `Burn` MUST trigger when Bonds are burned. This SHOULD not include zero value burning.
+*/</span>
+  
+ <span class="k">emit</span> <span class="n">Burn</span><span class="p">(</span><span class="mh">0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef</span><span class="p">,</span><span class="mh">0x492Af743654549b12b1B807a9E0e8F397E44236E</span><span class="p">,[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">500</span><span class="p">]]);</span>
+<span class="c1">//emits event when 5000 bonds of owner 0x492Af743654549b12b1B807a9E0e8F397E44236E of type (class 1, nonce 14) are burned by operator 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef.
+</span>
+<span class="cm">/** 
+* Transfer
+* @dev its emitted when the bond is transferred by address(operator) from owner address(_from) to address(_to) with the bonds transferred, whose params are defined by _transactions struct array. 
+* @dev Transfer MUST trigger when Bonds are transferred. This SHOULD not include zero value transfers.
+* @dev Transfer event with the _from `0x0` MUST not create this event(use `event Issued` instead). 
+*/</span>
+ <span class="k">emit</span> <span class="n">Transfer</span><span class="p">(</span><span class="mh">0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef</span><span class="p">,</span> <span class="mh">0x492Af743654549b12b1B807a9E0e8F397E44236E</span><span class="p">,</span>  <span class="n">_to</span><span class="p">,</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">500</span><span class="p">]]);</span>
+<span class="c1">// transfer by address(_operator) amount 500 DBIT-USD bonds with (Class 1 and Nonce 14) from 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef, to address(_to).
+</span><span class="k">event</span> <span class="n">Transfer</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">_operator</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_from</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_to</span><span class="p">,</span> <span class="n">Transaction</span><span class="p">[]</span> <span class="n">_transactions</span><span class="p">);</span>
+
+<span class="cm">/**
+* ApprovalFor
+* @dev its emitted when address(_owner) approves the address(_operator) to transfer his bonds.
+* @notice Approval MUST trigger when bond holders are approving an _operator. This SHOULD not include zero value approval. 
+*/</span>
+<span class="k">emit</span> <span class="n">ApprovalFor</span><span class="p">(</span><span class="mh">0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef</span><span class="p">,</span> <span class="mh">0x492Af743654549b12b1B807a9E0e8F397E44236E</span><span class="p">);</span>
+<span class="c1">// this means 0x2d03B6C79B75eE7aB35298878D05fe36DC1fE8Ef gives 0x492Af743654549b12b1B807a9E0e8F397E44236E access permission for transfer of its bonds.
+</span><span class="k">event</span> <span class="n">ApprovalFor</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">_owner</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">_operator</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">_approved</span><span class="p">);</span>
+</code></pre></div></div>
+<p><strong>Metadata</strong>:
+The metadata of a bond class or nonce is stored as an array of JSON objects, represented by the following types.</p>
+<p><strong>NOTE: all of the metadata schemas are referenced from <a href="/assets/eip-3475/Metadata">here</a></strong></p>
+<h3 id="1-description">
+<a href="#1-description" class="anchor-link"></a> 1. Description:
+</h3>
+<p>This defines the additional information about the nature of data being stored in the nonce/class metadata structures. They are defined using the structured explained <a href="/assets/eip-3475/Metadata#1-description-metadata">here</a>. this will then be used by the frontend of the respective entities participating in the bond markets to interpret the data which is compliant with their jurisdiction.</p>
+<h3 id="2-nonce">
+<a href="#2-nonce" class="anchor-link"></a> 2. Nonce:
+</h3>
+<p>The key value for indexing the information is the ‘class’ field. Following are the rules:</p>
+<ul>
+<li>The title can be any alphanumeric type that is differentiated by the description of metadata (although it can be dependent on certain jurisdictions).</li>
+<li>The title SHOULD not be EMPTY.</li>
+</ul>
+<p>Some specific examples of metadata can be the localization of bonds, jurisdiction details etc., and they can be found in the <a href="/assets/eip-3475/Metadata">metadata.md</a> example description.</p>
+<h3 id="3-class-metadata">
+<a href="#3-class-metadata" class="anchor-link"></a> 3. Class metadata:
+</h3>
+<p>This structure defines the details of the class information (symbol, risk information, etc.). the example is explained <a href="/assets/eip-3475/Metadata">here</a> in the class metadata section.</p>
+<h3 id="4-decoding-data">
+<a href="#4-decoding-data" class="anchor-link"></a> 4. Decoding data:
+</h3>
+<p>First, the functions for analyzing the metadata (i.e <code class="language-plaintext highlighter-rouge">ClassMetadata</code> and <code class="language-plaintext highlighter-rouge">NonceMetadata</code>) are to be used by the corresponding frontend to decode the information of the bond.</p>
+<p>This is done via overriding the function interface for functions <code class="language-plaintext highlighter-rouge">classValues</code> and <code class="language-plaintext highlighter-rouge">nonceValues</code> by defining the key (which SHOULD be an index) to read the corresponding information stored as a JSON object.</p>
+<pre><code class="language-JSON">{
+"title": "symbol",
+"_type": "string",
+"description": "Lorem ipsum..."
+"values": ["Class Name 1","Class Name 2","DBIT Fix 6M"],
+}
+</code></pre>
+<p>e.g. in the above example, to get the <code class="language-plaintext highlighter-rouge">symbol</code> of the given class id, we can use the class id as a key to get the <code class="language-plaintext highlighter-rouge">symbol</code> value in the values, which then can be used for fetching the detail for instance.</p>

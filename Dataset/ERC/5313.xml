@@ -1,0 +1,15 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key word “MUST” in this document is to be interpreted as described in RFC 2119.</p>
+<p>Every contract compliant with this EIP MUST implement the <code class="language-plaintext highlighter-rouge">EIP5313</code> interface.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">15</span><span class="p">;</span>
+
+<span class="c1">/// @title EIP-5313 Light Contract Ownership Standard
+</span><span class="k">interface</span> <span class="n">EIP5313</span> <span class="p">{</span>
+    <span class="c1">/// @notice Get the address of the owner    
+</span>    <span class="c1">/// @return The address of the owner
+</span>    <span class="k">function</span> <span class="n">owner</span><span class="p">()</span> <span class="k">view</span> <span class="k">external</span> <span class="k">returns</span><span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>

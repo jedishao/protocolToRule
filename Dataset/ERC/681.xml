@@ -1,0 +1,37 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="syntax">
+<a href="#syntax" class="anchor-link"></a> Syntax
+</h3>
+<p>Payment request URLs contain “ethereum” in their schema (protocol) part and are constructed as follows:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>request                 = schema_prefix target_address [ "@" chain_id ] [ "/" function_name ] [ "?" parameters ]
+schema_prefix           = "ethereum" ":" [ "pay-" ]
+target_address          = ethereum_address
+chain_id                = 1*DIGIT
+function_name           = STRING
+ethereum_address        = ( "0x" 40*HEXDIG ) / ENS_NAME
+parameters              = parameter *( "&amp;" parameter )
+parameter               = key "=" value
+key                     = "value" / "gas" / "gasLimit" / "gasPrice" / TYPE
+value                   = number / ethereum_address / STRING
+number                  = [ "-" / "+" ] *DIGIT [ "." 1*DIGIT ] [ ( "e" / "E" ) [ 1*DIGIT ] ]
+</code></pre></div></div>
+<p>Where <code class="language-plaintext highlighter-rouge">TYPE</code> is a standard ABI type name, as defined in <a href="https://solidity.readthedocs.io/en/develop/abi-spec.html">Ethereum Contract ABI specification</a>. <code class="language-plaintext highlighter-rouge">STRING</code> is a URL-encoded unicode string of arbitrary length, where delimiters and the
+percentage symbol (<code class="language-plaintext highlighter-rouge">%</code>) are mandatorily hex-encoded with a <code class="language-plaintext highlighter-rouge">%</code> prefix.</p>
+<p>Note that a <code class="language-plaintext highlighter-rouge">number</code> can be expressed in <em>scientific notation</em>, with a multiplier of a power of 10. Only integer numbers are allowed, so the exponent MUST be greater or equal to the number of decimals after the point.</p>
+<p>If <em>key</em> in the parameter list is <code class="language-plaintext highlighter-rouge">value</code>, <code class="language-plaintext highlighter-rouge">gasLimit</code>, <code class="language-plaintext highlighter-rouge">gasPrice</code> or <code class="language-plaintext highlighter-rouge">gas</code> then <em>value</em> MUST be a <code class="language-plaintext highlighter-rouge">number</code>. Otherwise, it must correspond to the <code class="language-plaintext highlighter-rouge">TYPE</code> string used as <em>key</em>.</p>
+<p>For the syntax of ENS_NAME, please consult <a href="/EIPS/eip-137">ERC-137</a> defining Ethereum Name Service.</p>
+<h3 id="semantics">
+<a href="#semantics" class="anchor-link"></a> Semantics
+</h3>
+<p><code class="language-plaintext highlighter-rouge">target_address</code> is mandatory and denotes either the beneficiary of native token payment (see below) or the contract address with which the user is asked to interact.</p>
+<p><code class="language-plaintext highlighter-rouge">chain_id</code> is optional and contains the decimal chain ID, such that transactions on various test- and private networks can be requested. If no <code class="language-plaintext highlighter-rouge">chain_id</code> is present, the client’s current network setting remains effective.</p>
+<p>If <code class="language-plaintext highlighter-rouge">function_name</code> is missing, then the URL is requesting payment in the native token of the blockchain, which is ether in our case. The amount is specified in <code class="language-plaintext highlighter-rouge">value</code> parameter, in the atomic unit (i.e. wei). The use of scientific notation is strongly encouraged. For example, requesting 2.014 ETH to address <code class="language-plaintext highlighter-rouge">0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359</code> would look as follows:
+<a href="ethereum:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18">ethereum:0xfb6916095ca1df60bb79Ce92ce3ea74c37c5d359?value=2.014e18</a></p>
+<p>Requesting payments in <a href="/EIPS/eip-20">ERC-20</a> tokens involves a request to call the <code class="language-plaintext highlighter-rouge">transfer</code> function of the token contract with an <code class="language-plaintext highlighter-rouge">address</code> and a <code class="language-plaintext highlighter-rouge">uint256</code> typed parameter, containing the <em>beneficiary address</em> and the <em>amount in atomic units</em>, respectively. For example,
+requesting a Unicorn to address <code class="language-plaintext highlighter-rouge">0x8e23ee67d1332ad560396262c48ffbb01f93d052</code> looks as follows:
+<a href="ethereum:0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7/transfer?address=0x8e23ee67d1332ad560396262c48ffbb01f93d052&amp;uint256=1">ethereum:0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7/transfer?address=0x8e23ee67d1332ad560396262c48ffbb01f93d052&amp;uint256=1</a></p>
+<p>If using ENS names instead of hexadecimal addresses, the resolution is up to the payer, at any time between receiving the URL and sending the transaction. Hexadecimal addresses always take precedence over ENS names, i. e. even if there exists a matching ENS name consisting of <code class="language-plaintext highlighter-rouge">0x</code> followed by 40 hexadecimal digits, it should never be resolved. Instead, the hexadecimal address should be used directly.</p>
+<p>Note that the indicated amount is only a suggestion (as are all the supplied arguments) which the user is free to change. With no indicated amount, the user should be prompted to enter the amount to be paid.</p>
+<p>Similarly <code class="language-plaintext highlighter-rouge">gasLimit</code> and <code class="language-plaintext highlighter-rouge">gasPrice</code> are suggested user-editable values for <em>gas limit</em> and <em>gas price</em>, respectively, for the requested transaction. It is acceptable to abbreviate <code class="language-plaintext highlighter-rouge">gasLimit</code> as <code class="language-plaintext highlighter-rouge">gas</code>, the two are treated synonymously.</p>

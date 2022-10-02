@@ -1,0 +1,102 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>A flash lending feature integrates two smart contracts using a callback pattern. These are called the LENDER and the RECEIVER in this EIP.</p>
+<h3 id="lender-specification">
+<a href="#lender-specification" class="anchor-link"></a> Lender Specification
+</h3>
+<p>A <code class="language-plaintext highlighter-rouge">lender</code> MUST implement the IERC3156FlashLender interface.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pragma solidity ^0.7.0 || ^0.8.0;
+import "./IERC3156FlashBorrower.sol";
+
+
+interface IERC3156FlashLender {
+
+    /**
+     * @dev The amount of currency available to be lent.
+     * @param token The loan currency.
+     * @return The amount of `token` that can be borrowed.
+     */
+    function maxFlashLoan(
+        address token
+    ) external view returns (uint256);
+
+    /**
+     * @dev The fee to be charged for a given loan.
+     * @param token The loan currency.
+     * @param amount The amount of tokens lent.
+     * @return The amount of `token` to be charged for the loan, on top of the returned principal.
+     */
+    function flashFee(
+        address token,
+        uint256 amount
+    ) external view returns (uint256);
+
+    /**
+     * @dev Initiate a flash loan.
+     * @param receiver The receiver of the tokens in the loan, and the receiver of the callback.
+     * @param token The loan currency.
+     * @param amount The amount of tokens lent.
+     * @param data Arbitrary data structure, intended to contain user-defined parameters.
+     */
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address token,
+        uint256 amount,
+        bytes calldata data
+    ) external returns (bool);
+}
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">maxFlashLoan</code> function MUST return the maximum loan possible for <code class="language-plaintext highlighter-rouge">token</code>. If a <code class="language-plaintext highlighter-rouge">token</code> is not currently supported <code class="language-plaintext highlighter-rouge">maxFlashLoan</code> MUST return 0, instead of reverting.</p>
+<p>The <code class="language-plaintext highlighter-rouge">flashFee</code> function MUST return the fee charged for a loan of <code class="language-plaintext highlighter-rouge">amount</code> <code class="language-plaintext highlighter-rouge">token</code>. If the token is not supported <code class="language-plaintext highlighter-rouge">flashFee</code> MUST revert.</p>
+<p>The <code class="language-plaintext highlighter-rouge">flashLoan</code> function MUST include a callback to the <code class="language-plaintext highlighter-rouge">onFlashLoan</code> function in a <code class="language-plaintext highlighter-rouge">IERC3156FlashBorrower</code> contract.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function flashLoan(
+    IERC3156FlashBorrower receiver,
+    address token,
+    uint256 amount,
+    bytes calldata data
+) external returns (bool) {
+  ...
+  require(
+      receiver.onFlashLoan(msg.sender, token, amount, fee, data) == keccak256("ERC3156FlashBorrower.onFlashLoan"),
+      "IERC3156: Callback failed"
+  );
+  ...
+}
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">flashLoan</code> function MUST transfer <code class="language-plaintext highlighter-rouge">amount</code> of <code class="language-plaintext highlighter-rouge">token</code> to <code class="language-plaintext highlighter-rouge">receiver</code> before the callback to the receiver.</p>
+<p>The <code class="language-plaintext highlighter-rouge">flashLoan</code> function MUST include <code class="language-plaintext highlighter-rouge">msg.sender</code> as the <code class="language-plaintext highlighter-rouge">initiator</code> to <code class="language-plaintext highlighter-rouge">onFlashLoan</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">flashLoan</code> function MUST NOT modify the <code class="language-plaintext highlighter-rouge">token</code>, <code class="language-plaintext highlighter-rouge">amount</code> and <code class="language-plaintext highlighter-rouge">data</code> parameter received, and MUST pass them on to <code class="language-plaintext highlighter-rouge">onFlashLoan</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">flashLoan</code> function MUST include a <code class="language-plaintext highlighter-rouge">fee</code> argument to <code class="language-plaintext highlighter-rouge">onFlashLoan</code> with the fee to pay for the loan on top of the principal, ensuring that <code class="language-plaintext highlighter-rouge">fee == flashFee(token, amount)</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">lender</code> MUST verify that the <code class="language-plaintext highlighter-rouge">onFlashLoan</code> callback returns the keccak256 hash of “ERC3156FlashBorrower.onFlashLoan”.</p>
+<p>After the callback, the <code class="language-plaintext highlighter-rouge">flashLoan</code> function MUST take the <code class="language-plaintext highlighter-rouge">amount + fee</code> <code class="language-plaintext highlighter-rouge">token</code> from the <code class="language-plaintext highlighter-rouge">receiver</code>, or revert if this is not successful.</p>
+<p>If successful, <code class="language-plaintext highlighter-rouge">flashLoan</code> MUST return <code class="language-plaintext highlighter-rouge">true</code>.</p>
+<h3 id="receiver-specification">
+<a href="#receiver-specification" class="anchor-link"></a> Receiver Specification
+</h3>
+<p>A <code class="language-plaintext highlighter-rouge">receiver</code> of flash loans MUST implement the IERC3156FlashBorrower interface:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pragma solidity ^0.7.0 || ^0.8.0;
+
+
+interface IERC3156FlashBorrower {
+
+    /**
+     * @dev Receive a flash loan.
+     * @param initiator The initiator of the loan.
+     * @param token The loan currency.
+     * @param amount The amount of tokens lent.
+     * @param fee The additional amount of tokens to repay.
+     * @param data Arbitrary data structure, intended to contain user-defined parameters.
+     * @return The keccak256 hash of "ERC3156FlashBorrower.onFlashLoan"
+     */
+    function onFlashLoan(
+        address initiator,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata data
+    ) external returns (bytes32);
+}
+</code></pre></div></div>
+<p>For the transaction to not revert, <code class="language-plaintext highlighter-rouge">receiver</code> MUST approve <code class="language-plaintext highlighter-rouge">amount + fee</code> of <code class="language-plaintext highlighter-rouge">token</code> to be taken by <code class="language-plaintext highlighter-rouge">msg.sender</code> before the end of <code class="language-plaintext highlighter-rouge">onFlashLoan</code>.</p>
+<p>If successful, <code class="language-plaintext highlighter-rouge">onFlashLoan</code> MUST return the keccak256 hash of “ERC3156FlashBorrower.onFlashLoan”.</p>

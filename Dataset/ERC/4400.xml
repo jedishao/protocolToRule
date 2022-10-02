@@ -1,0 +1,37 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<p>Every contract compliant to the <code class="language-plaintext highlighter-rouge">EIP721Consumable</code> extension MUST implement the <code class="language-plaintext highlighter-rouge">IEIP721Consumable</code> interface. The <strong>consumer extension</strong> is OPTIONAL for EIP-721 contracts.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">/// @title EIP-721 Consumer Role extension
+///  Note: the EIP-165 identifier for this interface is 0x953c8dfa
+</span><span class="k">interface</span> <span class="n">IEIP721Consumable</span> <span class="cm">/* is EIP721 */</span> <span class="p">{</span>
+
+    <span class="c1">/// @notice Emitted when `owner` changes the `consumer` of an NFT
+</span>    <span class="c1">/// The zero address for consumer indicates that there is no consumer address
+</span>    <span class="c1">/// When a Transfer event emits, this also indicates that the consumer address
+</span>    <span class="c1">/// for that NFT (if any) is set to none
+</span>    <span class="k">event</span> <span class="n">ConsumerChanged</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">owner</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">consumer</span><span class="p">,</span> <span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get the consumer address of an NFT
+</span>    <span class="c1">/// @dev The zero address indicates that there is no consumer
+</span>    <span class="c1">/// Throws if `_tokenId` is not a valid NFT
+</span>    <span class="c1">/// @param _tokenId The NFT to get the consumer address for
+</span>    <span class="c1">/// @return The consumer address for this NFT, or the zero address if there is none
+</span>    <span class="k">function</span> <span class="n">consumerOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">)</span> <span class="k">view</span> <span class="k">external</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Change or reaffirm the consumer address for an NFT
+</span>    <span class="c1">/// @dev The zero address indicates there is no consumer address
+</span>    <span class="c1">/// Throws unless `msg.sender` is the current NFT owner, an authorised
+</span>    <span class="c1">/// operator of the current owner or approved address
+</span>    <span class="c1">/// Throws if `_tokenId` is not valid NFT
+</span>    <span class="c1">/// @param _consumer The new consumer of the NFT
+</span>    <span class="k">function</span> <span class="n">changeConsumer</span><span class="p">(</span><span class="kt">address</span> <span class="n">_consumer</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">_tokenId</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>Every contract implementing the <code class="language-plaintext highlighter-rouge">EIP721Consumable</code> extension is free to define the permissions of a <code class="language-plaintext highlighter-rouge">consumer</code> (e.g. what are consumers allowed to do within their system) with only one exception - consumers MUST NOT be considered owners, authorised operators or approved addresses as per the EIP-721 specification. Thus, they MUST NOT be able to execute transfers &amp; approvals.</p>
+<p>The <code class="language-plaintext highlighter-rouge">consumerOf(uint256 _tokenId)</code> function MAY be implemented as <code class="language-plaintext highlighter-rouge">pure</code> or <code class="language-plaintext highlighter-rouge">view</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">changeConsumer(address _consumer, uint256 _tokenId)</code> function MAY be implemented as <code class="language-plaintext highlighter-rouge">public</code> or <code class="language-plaintext highlighter-rouge">external</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">ConsumerChanged</code> event MUST be emitted when a consumer is changed.</p>
+<p>On every <code class="language-plaintext highlighter-rouge">transfer</code>, the consumer MUST be changed to a default address. It is RECOMMENDED for implementors to use <code class="language-plaintext highlighter-rouge">address(0)</code> as that default address.</p>
+<p>The <code class="language-plaintext highlighter-rouge">supportsInterface</code> method MUST return <code class="language-plaintext highlighter-rouge">true</code> when called with <code class="language-plaintext highlighter-rouge">0x953c8dfa</code>.</p>

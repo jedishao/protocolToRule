@@ -1,0 +1,37 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>A secp256k1 signature is made up of 3 parameters, <code class="language-plaintext highlighter-rouge">r</code>, <code class="language-plaintext highlighter-rouge">s</code> and <code class="language-plaintext highlighter-rouge">yParity</code>.
+The <code class="language-plaintext highlighter-rouge">r</code> represents the <code class="language-plaintext highlighter-rouge">x</code> component on the curve (from which the <code class="language-plaintext highlighter-rouge">y</code> can be
+computed), and the <code class="language-plaintext highlighter-rouge">s</code> represents the challenge solution for signing by a
+private key. Due to the symmetric nature of an elliptic curve, a <code class="language-plaintext highlighter-rouge">yParity</code>
+is required, which indicates which of the 2 possible solutions was intended,
+by indicating its parity (odd-ness).</p>
+<p>Two key observations are required to create a compact representation.</p>
+<p>First, the <code class="language-plaintext highlighter-rouge">yParity</code> parameter is always either 0 or 1 (canonically the values
+used have historically been 27 and 28, as these values didn’t collide with other
+binary prefixes used in Bitcoin).</p>
+<p>Second, the top bit of the <code class="language-plaintext highlighter-rouge">s</code> parameters is <strong>always</strong> 0, due to the use of
+canonical signatures which flip the solution parity to prevent negative values,
+which was introduced as <a href="/EIPS/eip-2">a constraint in Homestead</a>.</p>
+<p>So, we can hijack the top bit in the <code class="language-plaintext highlighter-rouge">s</code> parameter to store the value of
+<code class="language-plaintext highlighter-rouge">yParity</code>, resulting in:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[256-bit r value][1-bit yParity value][255-bit s value]
+</code></pre></div></div>
+<h3 id="example-implementation-in-python">
+<a href="#example-implementation-in-python" class="anchor-link"></a> Example Implementation In Python
+</h3>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Assume yParity is 0 or 1, normalized from the canonical 27 or 28
+</span><span class="k">def</span> <span class="nf">to_compact</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">yParity</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s">"r"</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span>
+        <span class="s">"yParityAndS"</span><span class="p">:</span> <span class="p">(</span><span class="n">yParity</span> <span class="o">&lt;&lt;</span> <span class="mi">255</span><span class="p">)</span> <span class="o">|</span> <span class="n">s</span>
+    <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">to_canonical</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">yParityAndS</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s">"r"</span><span class="p">:</span> <span class="n">r</span><span class="p">,</span>
+        <span class="s">"s"</span><span class="p">:</span> <span class="n">yParityAndS</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">255</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="s">"yParity"</span><span class="p">:</span> <span class="p">(</span><span class="n">yParityAndS</span> <span class="o">&gt;&gt;</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre></div></div>

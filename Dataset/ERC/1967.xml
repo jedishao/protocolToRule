@@ -1,0 +1,37 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Monitoring of proxies is essential to the security of many applications. It is thus essential to have the ability to track changes to the implementation and admin slots. Unfortunately, tracking changes to storage slots is not easy. Consequently, it is recommended that any function that changes any of these slots SHOULD also emit the corresponding event. This includes initialization, from <code class="language-plaintext highlighter-rouge">0x0</code> to the first non-zero value.</p>
+<p>The proposed storage slots for proxy-specific information are the following. More slots for additional information can be added in subsequent ERCs as needed.</p>
+<h3 id="logic-contract-address">
+<a href="#logic-contract-address" class="anchor-link"></a> Logic contract address
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc</code>
+(obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)</code>).</p>
+<p>Holds the address of the logic contract that this proxy delegates to. SHOULD be empty if a beacon is used instead. Changes to this slot SHOULD be notified by the event:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">Upgraded</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">implementation</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="beacon-contract-address">
+<a href="#beacon-contract-address" class="anchor-link"></a> Beacon contract address
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50</code> (obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip1967.proxy.beacon')) - 1)</code>).</p>
+<p>Holds the address of the beacon contract this proxy relies on (fallback). SHOULD be empty if a logic address is used directly instead, and should only be considered if the logic contract slot is empty. Changes to this slot SHOULD be notified by the event:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">BeaconUpgraded</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">beacon</span><span class="p">);</span>
+</code></pre></div></div>
+<p>Beacons are used for keeping the logic address for multiple proxies in a single location, allowing the upgrade of multiple proxies by modifying a single storage slot. A beacon contract MUST implement the function:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function implementation() returns (address)
+</code></pre></div></div>
+<p>Beacon based proxy contracts do not use the logic contract slot. Instead, they use the beacon contract slot to store the address of the beacon they are attached to. In order to know the logic contract used by a beacon proxy, a client SHOULD:</p>
+<ul>
+<li>Read the address of the beacon for the beacon logic storage slot;</li>
+<li>Call the <code class="language-plaintext highlighter-rouge">implementation()</code> function on the beacon contract.</li>
+</ul>
+<p>The result of the <code class="language-plaintext highlighter-rouge">implementation()</code> function on the beacon contract SHOULD NOT depend on the caller (<code class="language-plaintext highlighter-rouge">msg.sender</code>).</p>
+<h3 id="admin-address">
+<a href="#admin-address" class="anchor-link"></a> Admin address
+</h3>
+<p>Storage slot <code class="language-plaintext highlighter-rouge">0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103</code>
+(obtained as <code class="language-plaintext highlighter-rouge">bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1)</code>).</p>
+<p>Holds the address that is allowed to upgrade the logic contract address for this proxy (optional). Changes to this slot SHOULD be notified by the event:</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">event</span> <span class="n">AdminChanged</span><span class="p">(</span><span class="kt">address</span> <span class="n">previousAdmin</span><span class="p">,</span> <span class="kt">address</span> <span class="n">newAdmin</span><span class="p">);</span>
+</code></pre></div></div>

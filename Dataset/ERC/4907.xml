@@ -1,0 +1,40 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="contract-interface">
+<a href="#contract-interface" class="anchor-link"></a> Contract Interface
+</h3>
+<p>Solidity Interface with NatSpec &amp; OpenZeppelin v4 Interfaces (also available at <a href="/assets/eip-4907/contracts/IERC4907.sol"><code class="language-plaintext highlighter-rouge">IERC4907.sol</code></a>):</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="n">IERC4907</span> <span class="p">{</span>
+
+    <span class="c1">// Logged when the user of an NFT is changed or expires is changed
+</span>    <span class="c1">/// @notice Emitted when the `user` of an NFT or the `expires` of the `user` is changed
+</span>    <span class="c1">/// The zero address for user indicates that there is no user address
+</span>    <span class="k">event</span> <span class="n">UpdateUser</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint64</span> <span class="n">expires</span><span class="p">);</span>
+
+    <span class="c1">/// @notice set the user and expires of an NFT
+</span>    <span class="c1">/// @dev The zero address indicates there is no user
+</span>    <span class="c1">/// Throws if `tokenId` is not valid NFT
+</span>    <span class="c1">/// @param user  The new user of the NFT
+</span>    <span class="c1">/// @param expires  UNIX timestamp, The new user could use the NFT before expires
+</span>    <span class="k">function</span> <span class="n">setUser</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="n">user</span><span class="p">,</span> <span class="kt">uint64</span> <span class="n">expires</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>
+
+    <span class="c1">/// @notice Get the user address of an NFT
+</span>    <span class="c1">/// @dev The zero address indicates that there is no user or the user is expired
+</span>    <span class="c1">/// @param tokenId The NFT to get the user address for
+</span>    <span class="c1">/// @return The user address for this NFT
+</span>    <span class="k">function</span> <span class="n">userOf</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get the user expires of an NFT
+</span>    <span class="c1">/// @dev The zero value indicates that there is no user
+</span>    <span class="c1">/// @param tokenId The NFT to get the user expires for
+</span>    <span class="c1">/// @return The user expires for this NFT
+</span>    <span class="k">function</span> <span class="n">userExpires</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span><span class="p">(</span><span class="kt">uint256</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">userOf(uint256 tokenId)</code> function MAY be implemented as <code class="language-plaintext highlighter-rouge">pure</code> or <code class="language-plaintext highlighter-rouge">view</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">userExpires(uint256 tokenId)</code> function MAY be implemented as <code class="language-plaintext highlighter-rouge">pure</code> or <code class="language-plaintext highlighter-rouge">view</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">setUser(uint256 tokenId, address user, uint64 expires)</code> function MAY be implemented as <code class="language-plaintext highlighter-rouge">public</code> or <code class="language-plaintext highlighter-rouge">external</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">UpdateUser</code> event MUST be emitted when a user address is changed or the user expires is changed.</p>
+<p>The <code class="language-plaintext highlighter-rouge">supportsInterface</code> method MUST return <code class="language-plaintext highlighter-rouge">true</code> when called with <code class="language-plaintext highlighter-rouge">0xad092b5c</code>.</p>

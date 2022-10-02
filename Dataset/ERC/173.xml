@@ -1,0 +1,34 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>Every ERC-173 compliant contract must implement the <code class="language-plaintext highlighter-rouge">ERC173</code> interface. Contracts should also implement <code class="language-plaintext highlighter-rouge">ERC165</code> for the ERC-173 interface.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1">/// @title ERC-173 Contract Ownership Standard
+///  Note: the ERC-165 identifier for this interface is 0x7f5828d0
+</span><span class="k">interface</span> <span class="n">ERC173</span> <span class="cm">/* is ERC165 */</span> <span class="p">{</span>
+    <span class="c1">/// @dev This emits when ownership of a contract changes.    
+</span>    <span class="k">event</span> <span class="n">OwnershipTransferred</span><span class="p">(</span><span class="kt">address</span> <span class="k">indexed</span> <span class="n">previousOwner</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">newOwner</span><span class="p">);</span>
+
+    <span class="c1">/// @notice Get the address of the owner    
+</span>    <span class="c1">/// @return The address of the owner.
+</span>    <span class="k">function</span> <span class="n">owner</span><span class="p">()</span> <span class="k">view</span> <span class="k">external</span> <span class="k">returns</span><span class="p">(</span><span class="kt">address</span><span class="p">);</span>
+	
+    <span class="c1">/// @notice Set the address of the new owner of the contract
+</span>    <span class="c1">/// @dev Set _newOwner to address(0) to renounce any ownership.
+</span>    <span class="c1">/// @param _newOwner The address of the new owner of the contract    
+</span>    <span class="k">function</span> <span class="n">transferOwnership</span><span class="p">(</span><span class="kt">address</span> <span class="n">_newOwner</span><span class="p">)</span> <span class="k">external</span><span class="p">;</span>	
+<span class="p">}</span>
+
+<span class="k">interface</span> <span class="n">ERC165</span> <span class="p">{</span>
+    <span class="c1">/// @notice Query if a contract implements an interface
+</span>    <span class="c1">/// @param interfaceID The interface identifier, as specified in ERC-165
+</span>    <span class="c1">/// @dev Interface identification is specified in ERC-165. 
+</span>    <span class="c1">/// @return `true` if the contract implements `interfaceID` and
+</span>    <span class="c1">///  `interfaceID` is not 0xffffffff, `false` otherwise
+</span>    <span class="k">function</span> <span class="n">supportsInterface</span><span class="p">(</span><span class="kt">bytes4</span> <span class="n">interfaceID</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>The <code class="language-plaintext highlighter-rouge">owner()</code> function may be implemented as <code class="language-plaintext highlighter-rouge">pure</code> or <code class="language-plaintext highlighter-rouge">view</code>.</p>
+<p>The <code class="language-plaintext highlighter-rouge">transferOwnership(address _newOwner)</code> function may be implemented as <code class="language-plaintext highlighter-rouge">public</code> or <code class="language-plaintext highlighter-rouge">external</code>.</p>
+<p>To renounce any ownership of a contract set <code class="language-plaintext highlighter-rouge">_newOwner</code> to the zero address: <code class="language-plaintext highlighter-rouge">transferOwnership(address(0))</code>. If this is done then a contract is no longer owned by anybody.</p>
+<p>The OwnershipTransferred event should be emitted when a contract is created.</p>

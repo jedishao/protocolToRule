@@ -1,0 +1,63 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>We propose the following format for <code class="language-plaintext highlighter-rouge">signed_data</code></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x19 &lt;1 byte version&gt; &lt;version specific data&gt; &lt;data to sign&gt;.
+</code></pre></div></div>
+<p>Version <code class="language-plaintext highlighter-rouge">0</code> has <code class="language-plaintext highlighter-rouge">&lt;20 byte address&gt;</code> for the version specific data, and the <code class="language-plaintext highlighter-rouge">address</code> is the intended validator. In the case of a Multisig wallet, that is the wallet’s own address .</p>
+<p>The initial <code class="language-plaintext highlighter-rouge">0x19</code> byte is intended to ensure that the <code class="language-plaintext highlighter-rouge">signed_data</code> is not valid <a href="https://github.com/ethereum/wiki/wiki/RLP">RLP</a></p>
+<blockquote>
+<p>For a single byte whose value is in the [0x00, 0x7f] range, that byte is its own RLP encoding.</p>
+</blockquote>
+<p>That means that any <code class="language-plaintext highlighter-rouge">signed_data</code> cannot be one RLP-structure, but a 1-byte <code class="language-plaintext highlighter-rouge">RLP</code> payload followed by something else. Thus, any ERC-191 <code class="language-plaintext highlighter-rouge">signed_data</code> can never be an Ethereum transaction.</p>
+<p>Additionally, <code class="language-plaintext highlighter-rouge">0x19</code> has been chosen because since ethereum/go-ethereum#2940 , the following is prepended before hashing in personal_sign:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"\x19Ethereum Signed Message:\n" + len(message).
+</code></pre></div></div>
+<p>Using <code class="language-plaintext highlighter-rouge">0x19</code> thus makes it possible to extend the scheme by defining a version <code class="language-plaintext highlighter-rouge">0x45</code> (<code class="language-plaintext highlighter-rouge">E</code>) to handle these kinds of signatures.</p>
+<h3 id="registry-of-version-bytes">
+<a href="#registry-of-version-bytes" class="anchor-link"></a> Registry of version bytes
+</h3>
+<table>
+<thead>
+<tr>
+<th>Version byte</th>
+<th>EIP</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x00</code></td>
+<td><a href="/EIPS/eip-191">191</a></td>
+<td>Data with intended validator</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x01</code></td>
+<td><a href="/EIPS/eip-712">712</a></td>
+<td>Structured data</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x45</code></td>
+<td><a href="/EIPS/eip-191">191</a></td>
+<td><code class="language-plaintext highlighter-rouge">personal_sign</code> messages</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">
+<a href="#example" class="anchor-link"></a> Example
+</h3>
+<p>The following snippet has been written in Solidity 0.5.0.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">submitTransactionPreSigned</span><span class="p">(</span><span class="kt">address</span> <span class="n">destination</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">value</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">nonce</span><span class="p">,</span> <span class="kt">uint8</span> <span class="n">v</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">r</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">public</span>
+    <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span> <span class="n">transactionHash</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Arguments when calculating hash to validate
+</span>    <span class="c1">// 1: byte(0x19) - the initial 0x19 byte
+</span>    <span class="c1">// 2: byte(0) - the version byte
+</span>    <span class="c1">// 3: this - the validator address
+</span>    <span class="c1">// 4-7 : Application specific data
+</span>    <span class="n">transactionHash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="kt">byte</span><span class="p">(</span><span class="mh">0x19</span><span class="p">),</span><span class="kt">byte</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">),</span><span class="n">destination</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nonce</span><span class="p">));</span>
+    <span class="n">sender</span> <span class="o">=</span> <span class="nb">ecrecover</span><span class="p">(</span><span class="n">transactionHash</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+    <span class="c1">// ...
+</span><span class="p">}</span>
+</code></pre></div></div>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EIP-191: Signed Data Standard</title>
+<meta property="og:title" content="EIP-191: Signed Data Standard" />
+<meta name="description" content="" />
+<meta property="og:description" content="" />
+<meta name="twitter:description" content="" />
+<meta name="generator" content="Jekyll" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="https://eips.ethereum.org/EIPS/eip-191" />
+<meta property="og:url" content="https://eips.ethereum.org/EIPS/eip-191" />
+<meta property="og:site_name" content="Ethereum Improvement Proposals" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@" />
+<script type="application/ld+json">
+    {
+      "@type": "WebSite",
+      "url": "https://eips.ethereum.org",
+      "name": "Ethereum Improvement Proposals",
+      "description": "Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.",
+      "@context": "https://schema.org"
+    }
+  </script>
+<link rel="stylesheet" href="/assets/css/style.css" /><link type="application/atom+xml" rel="alternate" href="https://eips.ethereum.org/feed.xml" title="Ethereum Improvement Proposals" /><script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" integrity="sha256-nlrDrBTHxJJlDDX22AS33xYI1OJHnGMDhiYMSe2U0e0=" crossorigin="anonymous"></script>
+</head>
+<body><header class="site-header" role="banner">
+<div class="wrapper"><a class="site-title" rel="author" href="/">Ethereum Improvement Proposals</a><nav class="site-nav">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger">
+<span class="menu-icon">
+<svg viewBox="0 0 18 15" width="18px" height="15px">
+<path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z" />
+</svg>
+</span>
+</label>
+<div class="trigger"><a class="page-link" href="/all">All</a><a class="page-link" href="/core">Core</a><a class="page-link" href="/networking">Networking</a><a class="page-link" href="/interface">Interface</a><a class="page-link" href="/erc">ERC</a><a class="page-link" href="/meta">Meta</a><a class="page-link" href="/informational">Informational</a></div>
+</nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+<div class="wrapper">
+<div class="home">
+<h1 class="page-heading">
+EIP-191: Signed Data Standard
+<a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-191.md"><svg role="img" aria-label="Source" xmlns="https://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><title>Source</title><path fill-rule="evenodd" d="M9.5 3L8 4.5 11.5 8 8 11.5 9.5 13 14 8 9.5 3zm-5 0L0 8l4.5 5L6 11.5 2.5 8 6 4.5 4.5 3z" /></svg></a>
+</h1>
+<h3></h3>
+<table>
+<tr><th>Author</th><td><a href="https://github.com/holiman">Martin Holst Swende</a>, <a href="/cdn-cgi/l/email-protection#a4c5d6c5c7cccacdc0e4cacbd0c0cbd08acac1d0">Nick Johnson</a></td></tr>
+<tr><th>Discussions-To</th><td><a href="https://github.com/ethereum/EIPs/issues/191">https://github.com/ethereum/EIPs/issues/191</a></td></tr>
+<tr><th>Status</th><td>Final
+</td></tr>
+<tr><th>Type</th><td>Standards Track</td></tr>
+<tr><th>Category</th><td>ERC</td></tr>
+<tr><th>Created</th><td>2016-01-20</td></tr>
+</table>
+<div class="toc">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#motivation">Motivation</a>
+<ul>
+<li><a href="#specification">Specification</a>
+<ul>
+<li><a href="#registry-of-version-bytes">Registry of version bytes</a></li>
+<li><a href="#example">Example</a></li>
+</ul>
+</li>
+<li><a href="#copyright">Copyright</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<h1 id="abstract">
+<a href="#abstract" class="anchor-link"></a> Abstract
+</h1>
+<p>This ERC proposes a specification about how to handle signed data in Ethereum contracts.</p>
+<h1 id="motivation">
+<a href="#motivation" class="anchor-link"></a> Motivation
+</h1>
+<p>Several multisignature wallet implementations have been created which accepts <code class="language-plaintext highlighter-rouge">presigned</code> transactions. A <code class="language-plaintext highlighter-rouge">presigned</code> transaction is a chunk of binary <code class="language-plaintext highlighter-rouge">signed_data</code>, along with signature (<code class="language-plaintext highlighter-rouge">r</code>, <code class="language-plaintext highlighter-rouge">s</code> and <code class="language-plaintext highlighter-rouge">v</code>). The interpretation of the <code class="language-plaintext highlighter-rouge">signed_data</code> has not been specified, leading to several problems:</p>
+<ul>
+<li>Standard Ethereum transactions can be submitted as <code class="language-plaintext highlighter-rouge">signed_data</code>. An Ethereum transaction can be unpacked, into the following components: <code class="language-plaintext highlighter-rouge">RLP&lt;nonce, gasPrice, startGas, to, value, data&gt;</code> (hereby called <code class="language-plaintext highlighter-rouge">RLPdata</code>), <code class="language-plaintext highlighter-rouge">r</code>, <code class="language-plaintext highlighter-rouge">s</code> and <code class="language-plaintext highlighter-rouge">v</code>. If there are no syntactical constraints on <code class="language-plaintext highlighter-rouge">signed_data</code>, this means that <code class="language-plaintext highlighter-rouge">RLPdata</code> can be used as a syntactically valid <code class="language-plaintext highlighter-rouge">presigned</code> transaction.</li>
+<li>Multisignature wallets have also had the problem that a <code class="language-plaintext highlighter-rouge">presigned</code> transaction has not been tied to a particular <code class="language-plaintext highlighter-rouge">validator</code>, i.e a specific wallet. Example:
+<ol>
+<li>Users <code class="language-plaintext highlighter-rouge">A</code>, <code class="language-plaintext highlighter-rouge">B</code> and <code class="language-plaintext highlighter-rouge">C</code> have the <code class="language-plaintext highlighter-rouge">2/3</code>-wallet <code class="language-plaintext highlighter-rouge">X</code></li>
+<li>Users <code class="language-plaintext highlighter-rouge">A</code>, <code class="language-plaintext highlighter-rouge">B</code> and <code class="language-plaintext highlighter-rouge">D</code> have the <code class="language-plaintext highlighter-rouge">2/3</code>-wallet <code class="language-plaintext highlighter-rouge">Y</code></li>
+<li>User <code class="language-plaintext highlighter-rouge">A</code> and <code class="language-plaintext highlighter-rouge">B</code> submit <code class="language-plaintext highlighter-rouge">presigned</code> transactions to <code class="language-plaintext highlighter-rouge">X</code>.</li>
+<li>Attacker can now reuse their presigned transactions to <code class="language-plaintext highlighter-rouge">X</code>, and submit to <code class="language-plaintext highlighter-rouge">Y</code>.</li>
+</ol>
+</li>
+</ul>
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>We propose the following format for <code class="language-plaintext highlighter-rouge">signed_data</code></p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x19 &lt;1 byte version&gt; &lt;version specific data&gt; &lt;data to sign&gt;.
+</code></pre></div></div>
+<p>Version <code class="language-plaintext highlighter-rouge">0</code> has <code class="language-plaintext highlighter-rouge">&lt;20 byte address&gt;</code> for the version specific data, and the <code class="language-plaintext highlighter-rouge">address</code> is the intended validator. In the case of a Multisig wallet, that is the wallet’s own address .</p>
+<p>The initial <code class="language-plaintext highlighter-rouge">0x19</code> byte is intended to ensure that the <code class="language-plaintext highlighter-rouge">signed_data</code> is not valid <a href="https://github.com/ethereum/wiki/wiki/RLP">RLP</a></p>
+<blockquote>
+<p>For a single byte whose value is in the [0x00, 0x7f] range, that byte is its own RLP encoding.</p>
+</blockquote>
+<p>That means that any <code class="language-plaintext highlighter-rouge">signed_data</code> cannot be one RLP-structure, but a 1-byte <code class="language-plaintext highlighter-rouge">RLP</code> payload followed by something else. Thus, any ERC-191 <code class="language-plaintext highlighter-rouge">signed_data</code> can never be an Ethereum transaction.</p>
+<p>Additionally, <code class="language-plaintext highlighter-rouge">0x19</code> has been chosen because since ethereum/go-ethereum#2940 , the following is prepended before hashing in personal_sign:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"\x19Ethereum Signed Message:\n" + len(message).
+</code></pre></div></div>
+<p>Using <code class="language-plaintext highlighter-rouge">0x19</code> thus makes it possible to extend the scheme by defining a version <code class="language-plaintext highlighter-rouge">0x45</code> (<code class="language-plaintext highlighter-rouge">E</code>) to handle these kinds of signatures.</p>
+<h3 id="registry-of-version-bytes">
+<a href="#registry-of-version-bytes" class="anchor-link"></a> Registry of version bytes
+</h3>
+<table>
+<thead>
+<tr>
+<th>Version byte</th>
+<th>EIP</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x00</code></td>
+<td><a href="/EIPS/eip-191">191</a></td>
+<td>Data with intended validator</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x01</code></td>
+<td><a href="/EIPS/eip-712">712</a></td>
+<td>Structured data</td>
+</tr>
+<tr>
+<td><code class="language-plaintext highlighter-rouge">0x45</code></td>
+<td><a href="/EIPS/eip-191">191</a></td>
+<td><code class="language-plaintext highlighter-rouge">personal_sign</code> messages</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example">
+<a href="#example" class="anchor-link"></a> Example
+</h3>
+<p>The following snippet has been written in Solidity 0.5.0.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">function</span> <span class="n">submitTransactionPreSigned</span><span class="p">(</span><span class="kt">address</span> <span class="n">destination</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">value</span><span class="p">,</span> <span class="kt">bytes</span> <span class="n">data</span><span class="p">,</span> <span class="kt">uint</span> <span class="n">nonce</span><span class="p">,</span> <span class="kt">uint8</span> <span class="n">v</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">r</span><span class="p">,</span> <span class="kt">bytes32</span> <span class="n">s</span><span class="p">)</span>
+    <span class="k">public</span>
+    <span class="k">returns</span> <span class="p">(</span><span class="kt">bytes32</span> <span class="n">transactionHash</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Arguments when calculating hash to validate
+</span>    <span class="c1">// 1: byte(0x19) - the initial 0x19 byte
+</span>    <span class="c1">// 2: byte(0) - the version byte
+</span>    <span class="c1">// 3: this - the validator address
+</span>    <span class="c1">// 4-7 : Application specific data
+</span>    <span class="n">transactionHash</span> <span class="o">=</span> <span class="nb">keccak256</span><span class="p">(</span><span class="n">abi</span><span class="p">.</span><span class="n">encodePacked</span><span class="p">(</span><span class="kt">byte</span><span class="p">(</span><span class="mh">0x19</span><span class="p">),</span><span class="kt">byte</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="kt">address</span><span class="p">(</span><span class="nb">this</span><span class="p">),</span><span class="n">destination</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">nonce</span><span class="p">));</span>
+    <span class="n">sender</span> <span class="o">=</span> <span class="nb">ecrecover</span><span class="p">(</span><span class="n">transactionHash</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+    <span class="c1">// ...
+</span><span class="p">}</span>
+</code></pre></div></div>
+<h2 id="copyright">
+<a href="#copyright" class="anchor-link"></a> Copyright
+</h2>
+<p>Copyright and related rights waived via <a href="/LICENSE">CC0</a>.</p>
+<h2>Citation</h2>
+<p>Please cite this document as:</p>
+<p><a href="https://github.com/holiman">Martin Holst Swende</a>, <a href="/cdn-cgi/l/email-protection#8eeffcefede6e0e7eacee0e1faeae1faa0e0ebfa">Nick Johnson</a>, "EIP-191: Signed Data Standard," <em>Ethereum Improvement Proposals</em>, no. 191, January 2016. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-191.</p>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "TechArticle",
+    "headline": "EIP-191: Signed Data Standard",
+    "author": "Martin Holst Swende (@holiman), Nick Johnson <arachnid@notdot.net>",
+    "name": "EIP-191: Signed Data Standard",
+    "dateCreated": "2016-01-20",
+    "datePublished": "2016-01-20",
+
+    "discussionUrl": "https://github.com/ethereum/EIPs/issues/191",
+    
+    "inLanguage": "en-US",
+    "license": "#copyright",
+    "copyrightYear": "2016"
+  }
+</script>
+</div>
+</main><footer class="site-footer h-card">
+<data class="u-url" href="/"></data>
+<div class="wrapper">
+<h2 class="footer-heading">Ethereum Improvement Proposals</h2>
+<div class="footer-col-wrapper">
+<div class="footer-col footer-col-1">
+<ul class="contact-list">
+<li class="p-name">Ethereum Improvement Proposals</li></ul>
+</div>
+<div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/ethereum/EIPs"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">ethereum/EIPs</span></a></li></ul>
+</div>
+<div class="footer-col footer-col-3">
+<p>Ethereum Improvement Proposals (EIPs) describe standards for the Ethereum platform, including core protocol specifications, client APIs, and contract standards.</p>
+</div>
+</div>
+</div>
+</footer>
+</body>
+</html>

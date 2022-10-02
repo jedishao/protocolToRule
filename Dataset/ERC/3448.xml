@@ -1,0 +1,12 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The exact bytecode of the MetaProxy contract is:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                                              20 bytes target contract address
+                                          ----------------------------------------
+363d3d373d3d3d3d60368038038091363936013d7300000000000000000000000000000000000000005af43d3d93803e603457fd5bf3
+</code></pre></div></div>
+<p>wherein the bytes at indices 21 - 41 (inclusive) are replaced with the 20 byte address of the master functionality contract.
+Additionally, everything after the MetaProxy bytecode can be arbitrary metadata and the last 32 bytes (one word) of the bytecode must indicate the length of the metadata in bytes.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;54 bytes metaproxy&gt; &lt;arbitrary data&gt; &lt;length in bytes of arbitrary data (uint256)&gt;
+</code></pre></div></div>

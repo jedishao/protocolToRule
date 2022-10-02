@@ -1,0 +1,30 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.</p>
+<h3 id="contract-interface">
+<a href="#contract-interface" class="anchor-link"></a> Contract Interface
+</h3>
+<p>A token with a <code class="language-plaintext highlighter-rouge">uint256 tokenId</code> may be bound to a receiving account with <code class="language-plaintext highlighter-rouge">function locked(...)</code> returning <code class="language-plaintext highlighter-rouge">true</code>. In this case, all <a href="/EIPS/eip-721">EIP-721</a> functions of the contract that transfer the token from one account to another must throw.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// SPDX-License-Identifier: CC0-1.0
+</span><span class="k">pragma</span> <span class="n">solidity</span> <span class="o">^</span><span class="mf">0.8</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="n">IERC5192</span> <span class="p">{</span>
+  <span class="c1">/// @notice Emitted when the locking status is changed to locked.
+</span>  <span class="c1">/// @dev If a token is minted and the status is locked, this event should be emitted.
+</span>  <span class="c1">/// @param tokenId The identifier for a token.
+</span>  <span class="k">event</span> <span class="n">Locked</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">);</span>
+
+  <span class="c1">/// @notice Emitted when the locking status is changed to unlocked.
+</span>  <span class="c1">/// @dev If a token is minted and the status is unlocked, this event should be emitted.
+</span>  <span class="c1">/// @param tokenId The identifier for a token.
+</span>  <span class="k">event</span> <span class="n">Unlocked</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">);</span>
+
+  <span class="c1">/// @notice Returns the locking status of an Soulbound Token
+</span>  <span class="c1">/// @dev SBTs assigned to zero address are considered invalid, and queries
+</span>  <span class="c1">/// about them do throw.
+</span>  <span class="c1">/// @param tokenId The identifier for an SBT.
+</span>  <span class="k">function</span> <span class="n">locked</span><span class="p">(</span><span class="kt">uint256</span> <span class="n">tokenId</span><span class="p">)</span> <span class="k">external</span> <span class="k">view</span> <span class="k">returns</span> <span class="p">(</span><span class="kt">bool</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>To aid recognition that an <a href="/EIPS/eip-721">EIP-721</a> token implements “soulbinding” via this EIP upon calling <a href="/EIPS/eip-721">EIP-721</a>’s <code class="language-plaintext highlighter-rouge">function supportsInterface(bytes4 interfaceID) external view returns (bool)</code> with <code class="language-plaintext highlighter-rouge">interfaceID=0xb45a3c0e</code>, a contract implementing this EIP must return <code class="language-plaintext highlighter-rouge">true</code>.</p>

@@ -1,0 +1,24 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>We define the following 2 levels in BIP32 path:</p>
+<pre>m / purpose' / subpurpose' / EIP'
+</pre>
+<p>Apostrophe in the path indicates that BIP32 hardened derivation is used.</p>
+<p>Each level has a special meaning, described in the chapters below.</p>
+<h3 id="purpose">
+<a href="#purpose" class="anchor-link"></a> Purpose
+</h3>
+<p>Purpose is set to 43, as documented in <a href="https://github.com/bitcoin/bips/pull/523">this proposed change to BIP43</a>.</p>
+<p>The purpose field indicates that this path is for a non-bitcoin cryptocurrency.</p>
+<p>Hardened derivation is used at this level.</p>
+<h3 id="subpurpose">
+<a href="#subpurpose" class="anchor-link"></a> Subpurpose
+</h3>
+<p>Subpurpose is set to 60, the SLIP-44 code for Ethereum.</p>
+<p>Hardened derivation is used at this level.</p>
+<h3 id="eip">
+<a href="#eip" class="anchor-link"></a> EIP
+</h3>
+<p>EIP is set to the EIP number specifying the remainder of the BIP32 derivation path. This permits new Ethereum-focused applications of deterministic wallets without needing to interface with the BIP process.</p>
+<p>Hardened derivation is used at this level.</p>

@@ -1,0 +1,30 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL
+NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and
+“OPTIONAL” in this document are to be interpreted as described in
+RFC 2119.</p>
+<p><strong>ERC-721 compliant contracts MAY implement this Consecutive Transfer Extension to provide a standard event to be emitted at the time of creation, burn, or transfer of one or many consecutive tokens</strong></p>
+<p>The address executing the transaction <strong>MUST</strong> own all the tokens within the range of <code class="language-plaintext highlighter-rouge">fromTokenId</code> and <code class="language-plaintext highlighter-rouge">toTokenId</code>, or <strong>MUST</strong> be an approved operator to act on the owners behalf.</p>
+<p>The <code class="language-plaintext highlighter-rouge">fromTokenId</code> and <code class="language-plaintext highlighter-rouge">toTokenId</code> <strong>MUST</strong> be a consecutive range of tokens IDs.</p>
+<p>The <code class="language-plaintext highlighter-rouge">fromTokenId</code>, <code class="language-plaintext highlighter-rouge">fromAddress</code>, and <code class="language-plaintext highlighter-rouge">toAddress</code> <strong>MUST</strong> be indexed parameters</p>
+<p>The <code class="language-plaintext highlighter-rouge">toTokenId</code> <strong>MUST NOT</strong> be an indexed parameter</p>
+<p>When minting/creating tokens, the <code class="language-plaintext highlighter-rouge">fromAddress</code> argument <strong>MUST</strong> be set to <code class="language-plaintext highlighter-rouge">0x0</code> (i.e. zero address).</p>
+<p>When burning/destroying tokens, the <code class="language-plaintext highlighter-rouge">toAddress</code> argument <strong>MUST</strong> be set to <code class="language-plaintext highlighter-rouge">0x0</code> (i.e. zero address).</p>
+<p>When emitting the ConsecutiveTransfer event the Transfer event <strong>MUST NOT</strong> be emitted</p>
+<p>Contracts that implement the <code class="language-plaintext highlighter-rouge">ConsecutiveTransfer</code> event <strong>MAY</strong> still use the original <code class="language-plaintext highlighter-rouge">Transfer</code> event, however when emitting the <code class="language-plaintext highlighter-rouge">ConsecutiveTransfer</code> event the <code class="language-plaintext highlighter-rouge">Transfer</code> event <strong>MUST NOT</strong> be emitted.</p>
+<div class="language-solidity highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">event</span> <span class="n">ConsecutiveTransfer</span><span class="p">(</span><span class="kt">uint256</span> <span class="k">indexed</span> <span class="n">fromTokenId</span><span class="p">,</span> <span class="kt">uint256</span> <span class="n">toTokenId</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">fromAddress</span><span class="p">,</span> <span class="kt">address</span> <span class="k">indexed</span> <span class="n">toAddress</span><span class="p">);</span>
+</code></pre></div></div>
+<h3 id="examples">
+<a href="#examples" class="anchor-link"></a> Examples
+</h3>
+<p>The <code class="language-plaintext highlighter-rouge">ConsecutiveTransfer</code> event can be used for a single token as well as many tokens:</p>
+<p><strong>Single token creation</strong></p>
+<p><code class="language-plaintext highlighter-rouge">emit ConsecutiveTransfer(1, 1, address(0), toAddress);</code></p>
+<p><strong>Batch token creation</strong></p>
+<p><code class="language-plaintext highlighter-rouge">emit ConsecutiveTransfer(1, 100000, address(0), toAddress);</code></p>
+<p><strong>Batch token transfer</strong></p>
+<p><code class="language-plaintext highlighter-rouge">emit ConsecutiveTransfer(1, 100000, fromAddress, toAddress);</code></p>
+<p><strong>Burn</strong></p>
+<p><code class="language-plaintext highlighter-rouge">emit ConsecutiveTransfer(1, 100000, from, address(0));</code></p>

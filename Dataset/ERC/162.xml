@@ -1,0 +1,223 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<h3 id="initial-restrictions">
+<a href="#initial-restrictions" class="anchor-link"></a> Initial restrictions
+</h3>
+<p>The Initial Registrar is expected to be in service for approximately two years, prior to upgrading. This should be sufficient time to learn, observe, and design an updated system.</p>
+<p>During the initial two year period, the available name space will be restricted to the <code class="language-plaintext highlighter-rouge">.eth</code> TLD.</p>
+<p>This restriction is enforced by the owner of the ENS root node who should not assign any nodes other than <code class="language-plaintext highlighter-rouge">.eth</code> to the Initial Registrar. The ENS’s root node should be controlled by multiple parties using a multisig contract.</p>
+<p>The Initial Registrar will also prohibit registration of names 6 characters or less in length.</p>
+<h3 id="name-format-for-hash-registration">
+<a href="#name-format-for-hash-registration" class="anchor-link"></a> Name format for hash registration
+</h3>
+<p>Names submitted to the initial registrar must be hashed using Ethereum’s sha3 function. Note that the hashes submitted to the registrar are the hash of the subdomain label being registered, not the namehash as defined in EIP 137.</p>
+<p>For example, in order to register <code class="language-plaintext highlighter-rouge">abcdefg.eth</code>, one should submit <code class="language-plaintext highlighter-rouge">sha3('abcdefg')</code>, not <code class="language-plaintext highlighter-rouge">sha3(sha3(0, 'eth'), 'abcdefg')</code>.</p>
+<h3 id="auctioning-names">
+<a href="#auctioning-names" class="anchor-link"></a> Auctioning names
+</h3>
+<p>The registrar will allocate the available names through a Vickrey auction:</p>
+<blockquote>
+<p>A Vickrey auction is a type of sealed-bid auction. Bidders submit written bids without knowing the bid of the other people in the auction. The highest bidder wins but the price paid is the second-highest bid. This type of auction… gives bidders an incentive to bid their true value.</p>
+<p>- <a href="https://en.wikipedia.org/wiki/Vickrey_auction">Vickrey Auction, Wikipedia</a></p>
+</blockquote>
+<p>The auction lifecycle of a name has 5 possible states, or Modes.</p>
+<ol>
+<li><strong>Not-yet-available:</strong> The majority of names will be initially unavailable for auction, and will become available some time during the 8 weeks after launch.</li>
+<li><strong>Open:</strong> The earliest availability for a name is determined by the most significant byte of its sha3 hash. <code class="language-plaintext highlighter-rouge">0x00</code> would become available immediately, <code class="language-plaintext highlighter-rouge">0xFF</code> would become available after 8 weeks, and the availability of other names is distributed accordingly. Once a name is available, it is possible to start an auction on it.</li>
+<li><strong>Auction:</strong> Once the auction for a name has begun, there is a 72 hour bidding period. Bidders must submit a payment of ether, along with sealed bids as a hash of <code class="language-plaintext highlighter-rouge">sha3(bytes32 hash, address owner, uint value, bytes32 salt)</code>. The bidder may obfuscate the true bid value by sending a greater amount of ether.</li>
+<li><strong>Reveal:</strong> After the bidding period, a 48 hour reveal period commences. During this time, bidders must reveal the true parameters of their sealed bid. As bids are revealed, ether payments are returned according to the schedule of “refund ratios” outlined in the table below. If no bids are revealed, the name will return to the Open state.</li>
+<li><strong>Owned:</strong> After the reveal period has finished, the winning bidder must submit a transaction to finalize the auction, which then calls the ENS’s <code class="language-plaintext highlighter-rouge">setSubnodeOwner</code> function, recording the winning bidder’s address as the owner of the hash of the name.</li>
+</ol>
+<p>The following table outlines important parameters which define the Registrar’s auction mechanism.</p>
+<h4 id="registrar-parameters">
+<a href="#registrar-parameters" class="anchor-link"></a> Registrar Parameters
+</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>totalAuctionLength</td>
+<td>The full time period from start of auction to end of the reveal period.</td>
+<td>5 days</td>
+</tr>
+<tr>
+<td>revealPeriod</td>
+<td>The length of the time period during which bidding is no longer allowed, and bids must be revealed.</td>
+<td>48 hours</td>
+</tr>
+<tr>
+<td>launchLength</td>
+<td>The time period during which all names will become available for auction.</td>
+<td>8 weeks</td>
+</tr>
+<tr>
+<td>minPrice</td>
+<td>The minimum amount of ether which must be locked up in exchange for ownership of a name.</td>
+<td>0.01 ether</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deeds">
+<a href="#deeds" class="anchor-link"></a> Deeds
+</h3>
+<p>The Initial Registrar contract does not hold a balance itself. All ether sent to the Registrar will be held in a separate <code class="language-plaintext highlighter-rouge">Deed</code> contracts. A deed contract is first created and funded when a sealed bid is submitted. After an auction is completed and a hash is registered, the deed for the winning bid is held in exchange for ownership of the hash. Non-winning bids are refunded.</p>
+<p>A deed for an owned name may be transferred to another account by its owner, thus transferring ownership and control of the name.</p>
+<p>After 1 year of registration, the owner of a hash may choose to relinquish ownership and have the value of the deed returned to them.</p>
+<p>Deeds for non-winning bids can be closed by various methods, at which time any ether held will either be returned to the bidder, burnt, or sent to someone else as a reward for actions which help the registrar.</p>
+<p>The following table outlines what portion of the balance held in a deed contract will be returned upon closure, and to whom. The remaining balance will be burnt.</p>
+<h4 id="refund-schedule">
+<a href="#refund-schedule" class="anchor-link"></a> Refund schedule
+</h4>
+<table>
+<thead>
+<tr>
+<th>Reason for Deed closure</th>
+<th>Refund Recipient</th>
+<th>Refund Percentage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A valid non-winning bid is revealed.</td>
+<td>Bidder</td>
+<td>99.5%</td>
+</tr>
+<tr>
+<td>A bid submitted after the auction period is revealed.</td>
+<td>Bidder</td>
+<td>99.5%</td>
+</tr>
+<tr>
+<td>An otherwise valid bid is revealed on an owned name. <sup>1</sup></td>
+<td>Bidder</td>
+<td>0.5%</td>
+</tr>
+<tr>
+<td>An expired sealed bid is cancelled. <sup>2</sup></td>
+<td>Canceler</td>
+<td>0.5%</td>
+</tr>
+<tr>
+<td>A registered hash is reported as invalid. <sup>3</sup></td>
+<td>Reporter</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>A registered hash is reported as invalid. <sup>3</sup></td>
+<td>Owner</td>
+<td>50%</td>
+</tr>
+</tbody>
+</table>
+<h5 id="notes">
+<a href="#notes" class="anchor-link"></a> Notes:
+</h5>
+<ol>
+<li>This incentivizes all bids to be revealed in time. If bids could be revealed late, an extortion attack on the current highest bidder could be made by threatening to reveal a new second highest bid.</li>
+<li>A bid which remains sealed after more than 2 weeks and 5 days may be cancelled by anyone to collect a small reward.</li>
+<li>Since names are hashed before auctioning and registration, the Initial Registrar is unable to enforce character length restrictions independently. A reward is therefore provided for reporting invalid names.</li>
+</ol>
+<h3 id="deployment-and-upgrade-process">
+<a href="#deployment-and-upgrade-process" class="anchor-link"></a> Deployment and Upgrade process
+</h3>
+<p>The Initial Registrar requires the ENS’s address as a constructor, and should be deployed after the ENS. The multisig account owning the root node in the ENS should then set the Initial Registrar’s address as owner of the <code class="language-plaintext highlighter-rouge">eth</code> node.</p>
+<p>The Initial Registrar is expected to be replaced by a Permanent Registrar approximately 2 years after deployment. The following process should be used for the upgrade:</p>
+<ol>
+<li>The Permanent Registrar contract will be deployed.</li>
+<li>The multisig account owning the root node in the ENS will assign ownership of the <code class="language-plaintext highlighter-rouge">.eth</code> node to the Permanent Registrar.</li>
+<li>Owners of hashes in the Initial Registrar will be responsible for registering their deeds to the Permanent Registrar. A couple options are considered here:
+<ol>
+<li>Require owners to transfer their ownership prior to a cutoff date in order to maintain ownership and/or continue name resolution services.</li>
+<li>Have the Permanent Registrar query the Initial Registrar for ownership if it is lacking an entry.</li>
+</ol>
+</li>
+</ol>
+<h3 id="planned-deactivation">
+<a href="#planned-deactivation" class="anchor-link"></a> Planned deactivation
+</h3>
+<p>In order to limit dependence on the Initial Registrar, new auctions will stop after 4 years, and all ether held in deeds after 8 years will become unreachable.</p>
+<h3 id="registrar-interface">
+<a href="#registrar-interface" class="anchor-link"></a> Registrar Interface
+
+</h3>
+<p><code class="language-plaintext highlighter-rouge">function state(bytes32 _hash) constant returns (Mode)</code></p>
+<ul>
+<li>Implements a state machine returning the current state of a name</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function entries(bytes32 _hash) constant returns (Mode, address, uint, uint, uint)</code></p>
+<ul>
+<li>Returns the following information regarding a registered name:
+<ul>
+<li>state</li>
+<li>deed address</li>
+<li>registration date</li>
+<li>balance of the deed</li>
+<li>highest value bid at auction</li>
+</ul>
+</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function getAllowedTime(bytes32 _hash) constant returns (uint timestamp)</code></p>
+<ul>
+<li>Returns the time at which the hash will no longer be in the initial <code class="language-plaintext highlighter-rouge">not-yet-available</code> state.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function isAllowed(bytes32 _hash, uint _timestamp) constant returns (bool allowed)</code></p>
+<ul>
+<li>Takes a hash and a time, returns true if and only if it has passed the initial <code class="language-plaintext highlighter-rouge">not-yet-available</code> state.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function startAuction(bytes32 _hash);</code></p>
+<ul>
+<li>Moves the state of a hash from Open to Auction. Throws if state is not Open.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function startAuctions(bytes32[] _hashes);</code></p>
+<ul>
+<li>Starts multiple auctions on an array of hashes. This enables someone to open up an auction for a number of dummy hashes when they are only really interested in bidding for one. This will increase the cost for an attacker to simply bid blindly on all new auctions. Dummy auctions that are open but not bid on are closed after a week.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function shaBid(bytes32 hash, address owner, uint value, bytes32 salt) constant returns (bytes32 sealedBid);</code></p>
+<ul>
+<li>Takes the parameters of a bid, and returns the sealedBid hash value required to participate in the bidding for an auction. This obfuscates the parameters in order to mimic the mechanics of placing a bid in an envelope.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function newBid(bytes32 sealedBid);</code></p>
+<ul>
+<li>Bids are sent by sending a message to the main contract with a sealedBid hash and an amount of ether. The hash contains information about the bid, including the bidded name hash, the bid value, and a random salt. Bids are not tied to any one auction until they are revealed. The value of the bid itself can be masqueraded by sending more than the value of your actual bid. This is followed by a 48h reveal period. Bids revealed after this period will be burned and the ether unrecoverable. Since this is an auction, it is expected that most public hashes, like known domains and common dictionary words, will have multiple bidders pushing the price up.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function startAuctionsAndBid(bytes32[] hashes, bytes32 sealedBid)</code></p>
+<ul>
+<li>A utility function allowing a call to <code class="language-plaintext highlighter-rouge">startAuctions</code> followed by <code class="language-plaintext highlighter-rouge">newBid</code> in a single transaction.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function unsealBid(bytes32 _hash, address _owner, uint _value, bytes32 _salt);</code></p>
+<ul>
+<li>Once the bidding period is completed, there is a reveal period during with the properties of a bid are submitted to reveal them. The registrar hashes these properties using the <code class="language-plaintext highlighter-rouge">shaBid()</code> function above to verify that they match a pre-existing sealed bid. If the unsealedBid is the new best bid, the old best bid is returned to its bidder.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function cancelBid(bytes32 seal);</code></p>
+<ul>
+<li>Cancels an unrevealed bid according to the rules described in the notes on the refund schedule above.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function finalizeAuction(bytes32 _hash);</code></p>
+<p>After the registration date has passed, this function can be called to finalize the auction, which then calls the ENS function <code class="language-plaintext highlighter-rouge">setSubnodeOwner()</code> updating the ENS record to set the winning bidder as owner of the node.</p>
+<p><code class="language-plaintext highlighter-rouge">function transfer(bytes32 _hash, address newOwner);</code></p>
+<ul>
+<li>Update the owner of the ENS node corresponding to the submitted hash to a new owner. This function must be callable only by the current owner.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function releaseDeed(bytes32 _hash);</code></p>
+<ul>
+<li>After some time, the owner can release the property and get their ether back.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function invalidateName(string unhashedName);</code></p>
+<ul>
+<li>Since registration is done on the hash of a name, the registrar itself cannot validate names. This function can be used to report a name which is 6 characters long or less. If it has been registered, the submitter will earn 10% of the deed value. We are purposefully handicapping the simplified registrar as a way to force it into being restructured in a few years.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function eraseNode(bytes32[] labels)</code></p>
+<ul>
+<li>Allows anyone to delete the owner and resolver records for a subdomain of a name that is not currently owned in the registrar. For instance, to zero <code class="language-plaintext highlighter-rouge">foo.bar.eth</code> on a registrar that owns <code class="language-plaintext highlighter-rouge">.eth</code>, pass an array containing <code class="language-plaintext highlighter-rouge">[sha3('foo'), sha3('bar')]</code>.</li>
+</ul>
+<p><code class="language-plaintext highlighter-rouge">function transferRegistrars(bytes32 _hash) onlyOwner(_hash);</code></p>
+<ul>
+<li>Used during the upgrade process to a permanent registrar. If this registrar is no longer the owner of the its root node in the ENS, this function will transfers the deed to the current owner, which should be a new registrar. This function throws if this registrar still owns its root node.</li>
+</ul>

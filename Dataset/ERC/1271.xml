@@ -1,0 +1,30 @@
+<h2 id="specification">
+<a href="#specification" class="anchor-link"></a> Specification
+</h2>
+<p>The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in <a href="https://www.ietf.org/rfc/rfc2119.txt">RFC 2119</a>.</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pragma</span> <span class="nx">solidity</span> <span class="o">^</span><span class="mf">0.5</span><span class="p">.</span><span class="mi">0</span><span class="p">;</span>
+
+<span class="nx">contract</span> <span class="nx">ERC1271</span> <span class="p">{</span>
+
+  <span class="c1">// bytes4(keccak256("isValidSignature(bytes32,bytes)")</span>
+  <span class="nx">bytes4</span> <span class="nx">constant</span> <span class="nx">internal</span> <span class="nx">MAGICVALUE</span> <span class="o">=</span> <span class="mh">0x1626ba7e</span><span class="p">;</span>
+
+  <span class="cm">/**
+   * @dev Should return whether the signature provided is valid for the provided hash
+   * @param _hash      Hash of the data to be signed
+   * @param _signature Signature byte array associated with _hash
+   *
+   * MUST return the bytes4 magic value 0x1626ba7e when function passes.
+   * MUST NOT modify state (using STATICCALL for solc &lt; 0.5, view modifier for solc &gt; 0.5)
+   * MUST allow external calls
+   */</span> 
+  <span class="kd">function</span> <span class="nx">isValidSignature</span><span class="p">(</span>
+    <span class="nx">bytes32</span> <span class="nx">_hash</span><span class="p">,</span> 
+    <span class="nx">bytes</span> <span class="nx">memory</span> <span class="nx">_signature</span><span class="p">)</span>
+    <span class="kr">public</span>
+    <span class="nx">view</span> 
+    <span class="nx">returns</span> <span class="p">(</span><span class="nx">bytes4</span> <span class="nx">magicValue</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">isValidSignature</code> can call arbitrary methods to validate a given signature, which could be context dependent (e.g. time based or state based), EOA dependent (e.g. signers authorization level within smart wallet), signature scheme Dependent (e.g. ECDSA, multisig, BLS), etc.</p>
+<p>This function should be implemented by contracts which desire to sign messages (e.g. smart contract wallets, DAOs, multisignature wallets, etc.) Applications wanting to support contract signatures should call this method if the signer is a contract.</p>
