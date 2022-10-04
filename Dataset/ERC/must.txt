@@ -1,0 +1,557 @@
+../Dataset/ERC/20.txt
+Callers MUST handle false from returns (bool success). Callers MUST NOT assume that false is never returned!
+but interfaces and other contracts MUST NOT expect these values to be present.
+but interfaces and other contracts MUST NOT expect these values to be present.
+but interfaces and other contracts MUST NOT expect these values to be present.
+Transfers _value amount of tokens to address _to, and MUST fire the Transfer event.
+Note Transfers of 0 values MUST be treated as normal transfers and fire the Transfer event.
+Transfers _value amount of tokens from address _from to address _to, and MUST fire the Transfer event.
+Note Transfers of 0 values MUST be treated as normal transfers and fire the Transfer event.
+MUST trigger when tokens are transferred, including zero value transfers.
+MUST trigger on any successful call to approve(address _spender, uint256 _value).
+../Dataset/ERC/137.txt
+Resolvers may implement any subset of the record types specified here. Where a record types specification requires a resolver to provide multiple functions, the resolver MUST implement either all or none of them. Resolvers MUST specify a fallback function that throws.
+If the resolver supports addr lookups but the requested node does not have an addr record, the resolver MUST return the zero address.
+Clients resolving the addr record MUST check for a zero return value, and treat this in the same manner as a name that does not have a resolver specified - that is, refuse to send funds to or interact with the address. Failure to do this can result in users accidentally sending funds to the 0 address.
+Changes to an address MUST trigger the following event:
+../Dataset/ERC/681.txt
+Note that a number can be expressed in scientific notation, with a multiplier of a power of 10. Only integer numbers are allowed, so the exponent MUST be greater or equal to the number of decimals after the point.
+If key in the parameter list is value, gasLimit, gasPrice or gas then value MUST be a number. Otherwise, it must correspond to the TYPE string used as key.
+../Dataset/ERC/721.txt
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+    /// @dev Emits the ApprovalForAll event. The contract MUST allow
+A wallet/broker/auction application MUST implement the wallet interface if it will accept safe transfers.
+    ///  transfer. Return of other than the magic value MUST result in the
+The 0.4.20 Solidity interface grammar is not expressive enough to document the ERC-721 standard. A contract which complies with ERC-721 MUST also abide by the following:
+Solidity issue #3412: The above interfaces include explicit mutability guarantees for each function. Mutability guarantees are, in order weak to strong: payable, implicit nonpayable, view, and pure. Your implementation MUST meet the mutability guarantee in this interface and you MAY meet a stronger guarantee. For example, a payable function in this interface may be implemented as nonpayable (no state mutability specified) in your contract. We expect a later Solidity release will allow your stricter contract to inherit from this interface, but a workaround for version 0.4.20 is that you can edit this interface to add stricter mutability before inheriting from your contract.
+../Dataset/ERC/777.txt
+The token contract MUST implement the above interface.
+The implementation MUST follow the specifications described below.
+The token contract MUST register the ERC777Token interface with its own address via ERC-1820.
+the token MUST register or unregister the ERC777Token interface for its own address accordingly via ERC1820.
+When interacting with the token contract, all amounts and balances MUST be unsigned integers.
+The display denomination—to display any amount to the end user—MUST
+the user interface MUST show 0.5 tokens to the user.
+the contract MUST be called with an amount of 300,000,000,000,000,000 (0.3×1018).
+But this MUST be made clear, for example by displaying the uint256 type.
+The view functions detailed below MUST be implemented.
+NOTE: The total supply MUST be equal to the sum of the balances of all addresses—as
+NOTE: The total supply MUST be equal to the sum of all the minted tokens
+The balance MUST be zero (0) or higher.
+The following rules MUST be applied regarding the granularity:
+The granularity value MUST be set at creation time.
+The granularity value MUST NOT be changed, ever.
+The granularity value MUST be greater than or equal to 1.
+All balances MUST be a multiple of the granularity.
+MUST be a multiple of the granularity value.
+MUST be considered invalid, and the transaction MUST revert.
+The decimals of the token MUST always be 18.
+For an ERC-20 compatible token, the decimals function is REQUIRED and MUST return 18.
+Hence for compatibility reasons, decimals MUST be implemented for ERC-20 compatible tokens.)
+When an address becomes an operator for a holder, an AuthorizedOperator event MUST be emitted.
+MUST be the addresses of the operator and the holder respectively.
+When a holder revokes an operator, a RevokedOperator event MUST be emitted.
+MUST be the addresses of the operator and the holder respectively.
+AuthorizedOperator events MUST NOT be emitted when defining the default operators.
+The token contract MUST define default operators at creation time.
+The default operators MUST be invariants. I.e., the token contract MUST NOT add or remove default operators ever.
+AuthorizedOperator events MUST NOT be emitted when defining default operators.
+A holder MUST be allowed to revoke a default operator
+A holder MUST be allowed to re-authorize a previously revoked default operator.
+an AuthorizedOperator or RevokedOperator event (respectively) MUST be emitted.
+An address MUST always be an operator for itself. Hence an address MUST NOT ever be revoked as its own operator.
+If an address is an operator for a holder, isOperatorFor MUST return true.
+If an address is not an operator for a holder, isOperatorFor MUST return false.
+The token contract MUST emit an AuthorizedOperator event with the correct values
+The token contract MUST emit a RevokedOperator event with the correct values
+An AuthorizedOperator MUST be emitted each time.
+A RevokedOperator MUST be emitted each time.
+NOTE: This event MUST NOT be emitted outside of an operator authorization process.
+NOTE: This event MUST NOT be emitted outside of an operator revocation process.
+MUST be implemented to manage operators.
+NOTE: If the token contract does not have any default operators, this function MUST return an empty list.
+Hence this function MUST revert if it is called to authorize the holder (msg.sender)
+Hence this function MUST revert if it is called to revoke the holder (msg.sender)
+one MUST call isOperatorFor with the holder for each default operator
+with the associated data and operatorData, the token contract MUST apply the following rules:
+The balance of the holder MUST be decreased by the amount.
+The balance of the recipient MUST be increased by the amount.
+The balance of the holder MUST be greater or equal to the amount—such
+The token contract MUST emit a Sent event with the correct values as defined in the Sent Event.
+The token contract MUST call the tokensToSend hook of the holder
+The token contract MUST call the tokensReceived hook of the recipient
+The data and operatorData MUST be immutable during the entire send process—hence
+the same data and operatorData MUST be used to call both hooks and emit the Sent event.
+The token contract MUST revert when sending in any of the following cases:
+The previous send rules MUST apply to all the holders and all the recipients.
+The sum of all the balances incremented MUST be equal to the total sent amount.
+The sum of all the balances decremented MUST be equal to the total sent amount.
+A Sent event MUST be emitted for every holder and recipient pair with the corresponding amount for each pair.
+The sum of all the amounts from the Sent event MUST be equal to the total sent amount.
+NOTE: Sending an amount of zero (0) tokens is valid and MUST be treated as a regular send.
+The token contract MUST call the tokensToSend hook before updating the state.
+The token contract MUST call the tokensReceived hook after updating the state.
+I.e., tokensToSend MUST be called first,
+then the balances MUST be updated to reflect the send,
+and finally tokensReceived MUST be called afterward.
+The operatorData MUST only be provided by the operator.
+NOTE: This event MUST NOT be emitted outside of a send or an ERC-20 transfer process.
+The send and operatorSend functions described below MUST be implemented to send tokens.
+The operator and the holder MUST both be the msg.sender.
+then the send process MUST revert.
+This call MUST be equivalent to send with the addition
+Nonetheless, the rules below MUST be respected when minting for a recipient:
+The total supply MUST be increased by the amount of tokens minted.
+The balance of 0x0 MUST NOT be decreased.
+The balance of the recipient MUST be increased by the amount of tokens minted.
+The token contract MUST emit a Minted event with the correct values as defined in the Minted Event.
+The token contract MUST call the tokensReceived hook of the recipient
+The data and operatorData MUST be immutable during the entire mint process—hence
+the same data and operatorData MUST be used to call the tokensReceived hook and emit the Minted event.
+The token contract MUST revert when minting in any of the following cases:
+NOTE: The initial token supply at the creation of the token contract MUST be considered as minting
+and the tokensReceived hook of the recipient(s) MUST be called.
+While a Sent event MUST NOT be emitted when minting,
+The previous mint rules MUST apply to all the recipients.
+The sum of all the balances incremented MUST be equal to the total minted amount.
+A Minted event MUST be emitted for every recipient with the corresponding amount for each recipient.
+The sum of all the amounts from the Minted event MUST be equal to the total minted amount.
+NOTE: Minting an amount of zero (0) tokens is valid and MUST be treated as a regular mint.
+NOTE: This event MUST NOT be emitted outside of a mint process.
+The rules below MUST be respected when burning the tokens of a holder:
+The total supply MUST be decreased by the amount of tokens burned.
+The balance of 0x0 MUST NOT be increased.
+The balance of the holder MUST be decreased by amount of tokens burned.
+The token contract MUST emit a Burned event with the correct values as defined in the Burned Event.
+The token contract MUST call the tokensToSend hook of the holder
+The operatorData MUST be immutable during the entire burn process—hence
+the same operatorData MUST be used to call the tokensToSend hook and emit the Burned event.
+The token contract MUST revert when burning in any of the following cases:
+While a Sent event MUST NOT be emitted when burning;
+The previous burn rules MUST apply to each holders.
+The sum of all the balances decremented MUST be equal to the total burned amount.
+A Burned event MUST be emitted for every holder with the corresponding amount for each holder.
+The sum of all the amounts from the Burned event MUST be equal to the total burned amount.
+NOTE: Burning an amount of zero (0) tokens is valid and MUST be treated as a regular burn.
+NOTE: This event MUST NOT be emitted outside of a burn process.
+The burn and operatorBurn functions described below MUST be implemented to burn tokens.
+The operator and the holder MUST both be the msg.sender.
+then the burn process MUST revert.
+The operatorData MUST only be provided by the operator.
+This call MUST be equivalent to burn
+but said address MUST implement the interface on its behalf.
+NOTE: This function MUST NOT be called outside of a burn, send or ERC-20 transfer process.
+The tokensToSend hook MUST be called for every send and burn processes.
+The tokensToSend hook MUST be called before the state is updated—i.e. before the balance is decremented.
+operator MUST be the address which triggered the send or burn process.
+from MUST be the address of the holder whose tokens are sent or burned.
+to MUST be the address of the recipient which receives the tokens for a send.
+to MUST be 0x0 for a burn.
+amount MUST be the number of tokens the holder sent or burned.
+data MUST contain the extra information (if any) provided to the send or the burn process.
+operatorData MUST contain the extra information provided by the address
+Hence the ERC777TokensSender MUST expect to be called by different token contracts.
+This hook takes precedence over ERC-20 and MUST be called (if registered)
+When called from a transfer, operator MUST be the same value as the from.
+When called from a transferFrom, operator MUST be the address which issued the transferFrom call.
+MUST revert if the tokensReceived hook is called from a mint or send call.
+A contract MUST register either its address or the address of another contract
+but said address MUST implement the interface on its behalf.
+NOTE: This function MUST NOT be called outside of a mint, send or ERC-20 transfer process.
+The tokensReceived hook MUST be called for every send and mint processes.
+The tokensReceived hook MUST be called after the state is updated—i.e. after the balance is incremented.
+operator MUST be the address which triggered the send or mint process.
+from MUST be the address of the holder whose tokens are sent for a send.
+from MUST be 0x0 for a mint.
+to MUST be the address of the recipient which receives the tokens.
+amount MUST be the number of tokens the recipient sent or minted.
+data MUST contain the extra information (if any) provided to the send or the mint process.
+operatorData MUST contain the extra information provided by the address
+Hence the ERC777TokensRecipient MUST expect to be called by different token contracts.
+This hook takes precedence over ERC-20 and MUST be called (if registered)
+When called from a transfer, operator MUST be the same value as the from.
+When called from a transferFrom, operator MUST be the address which issued the transferFrom call.
+The logo MUST NOT be used to advertise, promote or associate in any way technology—such
+../Dataset/ERC/820.txt
+/// @dev The interface a contract MUST implement if it is the implementer of
+Below is the raw transaction which MUST be used to deploy the smart contract on any chain.
+This transaction MUST NOT use EIP-155 in order to work on any chain.
+This transaction MUST have a relatively high gas price to be deployed on any chain. In this case, it is going to be 100 Gwei.
+To deploy the registry, 0.08 ethers MUST be sent to this account first.
+      "content": "/* ERC820 Pseudo-introspection Registry Contract\n * This standard defines a universal registry smart contract where any address\n * (contract or regular account) can register which interface it supports and\n * which smart contract is responsible for its implementation.\n *\n * Written in 2018 by Jordi Baylina and Jacques Dafflon\n *\n * To the extent possible under law, the author(s) have dedicated all copyright\n * and related and neighboring rights to this software to the public domain\n * worldwide. This software is distributed without any warranty.\n *\n * You should have received a copy of the CC0 Public Domain Dedication along\n * with this software. If not, see\n * &lt;https://creativecommons.org/publicdomain/zero/1.0/&gt;.\n *\n *    ███████╗██████╗  ██████╗ █████╗ ██████╗  ██████╗\n *    ██╔════╝██╔══██╗██╔════╝██╔══██╗╚════██╗██╔═████╗\n *    █████╗  ██████╔╝██║     ╚█████╔╝ █████╔╝██║██╔██║\n *    ██╔══╝  ██╔══██╗██║     ██╔══██╗██╔═══╝ ████╔╝██║\n *    ███████╗██║  ██║╚██████╗╚█████╔╝███████╗╚██████╔╝\n *    ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚════╝ ╚══════╝ ╚═════╝\n *\n *    ██████╗ ███████╗ ██████╗ ██╗███████╗████████╗██████╗ ██╗   ██╗\n *    ██╔══██╗██╔════╝██╔════╝ ██║██╔════╝╚══██╔══╝██╔══██╗╚██╗ ██╔╝\n *    ██████╔╝█████╗  ██║  ███╗██║███████╗   ██║   ██████╔╝ ╚████╔╝\n *    ██╔══██╗██╔══╝  ██║   ██║██║╚════██║   ██║   ██╔══██╗  ╚██╔╝\n *    ██║  ██║███████╗╚██████╔╝██║███████║   ██║   ██║  ██║   ██║\n *    ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝\n *\n */\npragma solidity 0.4.24;\n// IV is value needed to have a vanity address starting with `0x820`.\n// IV: 9513\n\n/// @dev The interface a contract MUST implement if it is the implementer of\n/// some (other) interface for any address other than itself.\ninterface ERC820ImplementerInterface {\n    /// @notice Indicates whether the contract implements the interface `interfaceHash` for the address `addr` or not.\n    /// @param interfaceHash keccak256 hash of the name of the interface\n    /// @param addr Address for which the contract will implement the interface\n    /// @return ERC820_ACCEPT_MAGIC only if the contract implements `interfaceHash` for the address `addr`.\n    function canImplementInterfaceForAddress(bytes32 interfaceHash, address addr) external view returns(bytes32);\n}\n\n\n/// @title ERC820 Pseudo-introspection Registry Contract\n/// @author Jordi Baylina and Jacques Dafflon\n/// @notice This contract is the official implementation of the ERC820 Registry.\n/// @notice For more details, see https://eips.ethereum.org/EIPS/eip-820\ncontract ERC820Registry {\n    /// @notice ERC165 Invalid ID.\n    bytes4 constant INVALID_ID = 0xffffffff;\n    /// @notice Method ID for the ERC165 supportsInterface method (= `bytes4(keccak256('supportsInterface(bytes4)'))`).\n    bytes4 constant ERC165ID = 0x01ffc9a7;\n    /// @notice Magic value which is returned if a contract implements an interface on behalf of some other address.\n    bytes32 constant ERC820_ACCEPT_MAGIC = keccak256(abi.encodePacked(\"ERC820_ACCEPT_MAGIC\"));\n\n    mapping (address =&gt; mapping(bytes32 =&gt; address)) interfaces;\n    mapping (address =&gt; address) managers;\n    mapping (address =&gt; mapping(bytes4 =&gt; bool)) erc165Cached;\n\n    /// @notice Indicates a contract is the `implementer` of `interfaceHash` for `addr`.\n    event InterfaceImplementerSet(address indexed addr, bytes32 indexed interfaceHash, address indexed implementer);\n    /// @notice Indicates `newManager` is the address of the new manager for `addr`.\n    event ManagerChanged(address indexed addr, address indexed newManager);\n\n    /// @notice Query if an address implements an interface and through which contract.\n    /// @param _addr Address being queried for the implementer of an interface.\n    /// (If `_addr == 0` then `msg.sender` is assumed.)\n    /// @param _interfaceHash keccak256 hash of the name of the interface as a string.\n    /// E.g., `web3.utils.keccak256('ERC777Token')`.\n    /// @return The address of the contract which implements the interface `_interfaceHash` for `_addr`\n    /// or `0x0` if `_addr` did not register an implementer for this interface.\n    function getInterfaceImplementer(address _addr, bytes32 _interfaceHash) external view returns (address) {\n        address addr = _addr == 0 ? msg.sender : _addr;\n        if (isERC165Interface(_interfaceHash)) {\n            bytes4 erc165InterfaceHash = bytes4(_interfaceHash);\n            return implementsERC165Interface(addr, erc165InterfaceHash) ? addr : 0;\n        }\n        return interfaces[addr][_interfaceHash];\n    }\n\n    /// @notice Sets the contract which implements a specific interface for an address.\n    /// Only the manager defined for that address can set it.\n    /// (Each address is the manager for itself until it sets a new manager.)\n    /// @param _addr Address to define the interface for. (If `_addr == 0` then `msg.sender` is assumed.)\n    /// @param _interfaceHash keccak256 hash of the name of the interface as a string.\n    /// For example, `web3.utils.keccak256('ERC777TokensRecipient')` for the `ERC777TokensRecipient` interface.\n    /// @param _implementer Contract address implementing _interfaceHash for _addr.\n    function setInterfaceImplementer(address _addr, bytes32 _interfaceHash, address _implementer) external {\n        address addr = _addr == 0 ? msg.sender : _addr;\n        require(getManager(addr) == msg.sender, \"Not the manager\");\n\n        require(!isERC165Interface(_interfaceHash), \"Must not be a ERC165 hash\");\n        if (_implementer != 0 &amp;&amp; _implementer != msg.sender) {\n            require(\n                ERC820ImplementerInterface(_implementer)\n                    .canImplementInterfaceForAddress(_interfaceHash, addr) == ERC820_ACCEPT_MAGIC,\n                \"Does not implement the interface\"\n            );\n        }\n        interfaces[addr][_interfaceHash] = _implementer;\n        emit InterfaceImplementerSet(addr, _interfaceHash, _implementer);\n    }\n\n    /// @notice Sets the `_newManager` as manager for the `_addr` address.\n    /// The new manager will be able to call `setInterfaceImplementer` for `_addr`.\n    /// @param _addr Address for which to set the new manager.\n    /// @param _newManager Address of the new manager for `addr`.\n    function setManager(address _addr, address _newManager) external {\n        require(getManager(_addr) == msg.sender, \"Not the manager\");\n        managers[_addr] = _newManager == _addr ? 0 : _newManager;\n        emit ManagerChanged(_addr, _newManager);\n    }\n\n    /// @notice Get the manager of an address.\n    /// @param _addr Address for which to return the manager.\n    /// @return Address of the manager for a given address.\n    function getManager(address _addr) public view returns(address) {\n        // By default the manager of an address is the same address\n        if (managers[_addr] == 0) {\n            return _addr;\n        } else {\n            return managers[_addr];\n        }\n    }\n\n    /// @notice Compute the keccak256 hash of an interface given its name.\n    /// @param _interfaceName Name of the interface.\n    /// @return The keccak256 hash of an interface name.\n    function interfaceHash(string _interfaceName) external pure returns(bytes32) {\n        return keccak256(abi.encodePacked(_interfaceName));\n    }\n\n    /* --- ERC165 Related Functions --- */\n    /* --- Developed in collaboration with William Entriken. --- */\n\n    /// @notice Updates the cache with whether the contract implements an ERC165 interface or not.\n    /// @param _contract Address of the contract for which to update the cache.\n    /// @param _interfaceId ERC165 interface for which to update the cache.\n    function updateERC165Cache(address _contract, bytes4 _interfaceId) external {\n        interfaces[_contract][_interfaceId] = implementsERC165InterfaceNoCache(_contract, _interfaceId) ? _contract : 0;\n        erc165Cached[_contract][_interfaceId] = true;\n    }\n\n    /// @notice Checks whether a contract implements an ERC165 interface or not.\n    /// The result may be cached, if not a direct lookup is performed.\n    /// @param _contract Address of the contract to check.\n    /// @param _interfaceId ERC165 interface to check.\n    /// @return `true` if `_contract` implements `_interfaceId`, false otherwise.\n    function implementsERC165Interface(address _contract, bytes4 _interfaceId) public view returns (bool) {\n        if (!erc165Cached[_contract][_interfaceId]) {\n            return implementsERC165InterfaceNoCache(_contract, _interfaceId);\n        }\n        return interfaces[_contract][_interfaceId] == _contract;\n    }\n\n    /// @notice Checks whether a contract implements an ERC165 interface or not without using nor updating the cache.\n    /// @param _contract Address of the contract to check.\n    /// @param _interfaceId ERC165 interface to check.\n    /// @return `true` if `_contract` implements `_interfaceId`, false otherwise.\n    function implementsERC165InterfaceNoCache(address _contract, bytes4 _interfaceId) public view returns (bool) {\n        uint256 success;\n        uint256 result;\n\n        (success, result) = noThrowCall(_contract, ERC165ID);\n        if (success == 0 || result == 0) {\n            return false;\n        }\n\n        (success, result) = noThrowCall(_contract, INVALID_ID);\n        if (success == 0 || result != 0) {\n            return false;\n        }\n\n        (success, result) = noThrowCall(_contract, _interfaceId);\n        if (success == 1 &amp;&amp; result == 1) {\n            return true;\n        }\n        return false;\n    }\n\n    /// @notice Checks whether the hash is a ERC165 interface (ending with 28 zeroes) or not.\n    /// @param _interfaceHash The hash to check.\n    /// @return `true` if the hash is a ERC165 interface (ending with 28 zeroes), `false` otherwise.\n    function isERC165Interface(bytes32 _interfaceHash) internal pure returns (bool) {\n        return _interfaceHash &amp; 0x00000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF == 0;\n    }\n\n    /// @dev Make a call on a contract without throwing if the function does not exist.\n    function noThrowCall(address _contract, bytes4 _interfaceId)\n        internal view returns (uint256 success, uint256 result)\n    {\n        bytes4 erc165ID = ERC165ID;\n\n        assembly {\n                let x := mload(0x40)               // Find empty storage location using \"free memory pointer\"\n                mstore(x, erc165ID)                // Place signature at beginning of empty storage\n                mstore(add(x, 0x04), _interfaceId) // Place first argument directly next to signature\n\n                success := staticcall(\n                    30000,                         // 30k gas\n                    _contract,                     // To addr\n                    x,                             // Inputs are stored at location x\n                    0x08,                          // Inputs are 8 bytes long\n                    x,                             // Store output over input (saves space)\n                    0x20                           // Outputs are 32 bytes long\n                )\n\n                result := mload(x)                 // Load the result\n        }\n    }\n}\n",
+If the interface is part of an approved ERC, it MUST be named ERC###XXXXX where ### is the number of the ERC and XXXXX should be the name of the interface in CamelCase. The meaning of this interface SHOULD be defined in the specified ERC.
+NOTE: The result is cached. If the cache is out of date, it MUST be updated by calling updateERC165Cache. (See ERC165 Cache for more details.)
+If a contract dynamically changes its interface and relies on the ERC-165 cache of the ERC-820 registry, the cache MUST be updated manually—there is no automatic cache invalidation or cache update. Ideally the contract SHOULD automatically update the cache when changing its interface. However anyone MAY update the cache on the contract’s behalf.
+The cache update MUST be done using the updateERC165Cache function:
+This scheme is extensible. You MAY make up your own interface name and raise awareness to get other people to implement it and then check for those implementations. Have fun but please, you MUST not conflict with the reserved designations above.
+The _implementer MUST implement the ERC820ImplementerInterface (detailed below).
+Calling canImplementInterfaceForAddress on _implementer with the given _addr and _interfaceHash MUST return the ERC820_ACCEPT_MAGIC value.
+NOTE: The _interfaceHash MUST NOT be an ERC-165 interface—it MUST NOT end with 28 zeroes (0).
+Any contract being registered as the implementation of an interface for a given address MUST implement said interface. In addition if it implements an interface on behalf of a different address, the contract MUST implement the ERC820ImplementerInterface shown above.
+If a contract implements the interface (interfaceHash) for a given address (addr), it MUST return ERC820_ACCEPT_MAGIC when called with the addr and the interfaceHash. If it does not implement the interfaceHash for a given address (addr), it MUST NOT return ERC820_ACCEPT_MAGIC.
+../Dataset/ERC/1155.txt
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+Smart contracts implementing the ERC-1155 standard MUST implement all of the functions in the ERC1155 interface.
+Smart contracts implementing the ERC-1155 standard MUST implement the ERC-165 supportsInterface function and MUST return the constant value true if 0xd9b67a26 is passed through the interfaceID argument.
+        @dev Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).
+        The `_operator` argument MUST be the address of an account/contract that is approved to make the transfer (SHOULD be msg.sender).
+        The `_from` argument MUST be the address of the holder whose balance is decreased.
+        The `_to` argument MUST be the address of the recipient whose balance is increased.
+        The `_id` argument MUST be the token type being transferred.
+        The `_value` argument MUST be the number of tokens the holder balance is decreased by and match what the recipient balance is increased by.
+        When minting/creating tokens, the `_from` argument MUST be set to `0x0` (i.e. zero address).
+        When burning/destroying tokens, the `_to` argument MUST be set to `0x0` (i.e. zero address).
+        @dev Either `TransferSingle` or `TransferBatch` MUST emit when tokens are transferred, including zero value transfers as well as minting or burning (see "Safe Transfer Rules" section of the standard).
+        The `_operator` argument MUST be the address of an account/contract that is approved to make the transfer (SHOULD be msg.sender).
+        The `_from` argument MUST be the address of the holder whose balance is decreased.
+        The `_to` argument MUST be the address of the recipient whose balance is increased.
+        The `_ids` argument MUST be the list of tokens being transferred.
+        The `_values` argument MUST be the list of number of tokens (matching the list and order of tokens specified in _ids) the holder balance is decreased by and match what the recipient balance is increased by.
+        When minting/creating tokens, the `_from` argument MUST be set to `0x0` (i.e. zero address).
+        When burning/destroying tokens, the `_to` argument MUST be set to `0x0` (i.e. zero address).
+        @dev MUST emit when approval for a second party/operator address to manage all tokens for an owner address is enabled or disabled (absence of an event assumes disabled).
+        @dev MUST emit when the URI is updated for a token ID.
+        The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+        MUST revert if `_to` is the zero address.
+        MUST revert if balance of holder for token `_id` is lower than the `_value` sent.
+        MUST revert on any other error.
+        MUST emit the `TransferSingle` event to reflect the balance change (see "Safe Transfer Rules" section of the standard).
+        After the above conditions are met, this function MUST check if `_to` is a smart contract (e.g. code size &gt; 0). If so, it MUST call `onERC1155Received` on `_to` and act appropriately (see "Safe Transfer Rules" section of the standard).
+        @param _data    Additional data with no specified format, MUST be sent unaltered in call to `onERC1155Received` on `_to`
+        MUST revert if `_to` is the zero address.
+        MUST revert if length of `_ids` is not the same as length of `_values`.
+        MUST revert if any of the balance(s) of the holder(s) for token(s) in `_ids` is lower than the respective amount(s) in `_values` sent to the recipient.
+        MUST revert on any other error.
+        MUST emit `TransferSingle` or `TransferBatch` event(s) such that all the balance changes are reflected (see "Safe Transfer Rules" section of the standard).
+        Balance changes and events MUST follow the ordering of the arrays (_ids[0]/_values[0] before _ids[1]/_values[1], etc).
+        After the above conditions for the transfer(s) in the batch are met, this function MUST check if `_to` is a smart contract (e.g. code size &gt; 0). If so, it MUST call the relevant `ERC1155TokenReceiver` hook(s) on `_to` and act appropriately (see "Safe Transfer Rules" section of the standard).
+        @param _data    Additional data with no specified format, MUST be sent unaltered in call to the `ERC1155TokenReceiver` hook(s) on `_to`
+        @dev MUST emit the ApprovalForAll event on success.
+Smart contracts MUST implement all of the functions in the ERC1155TokenReceiver interface to accept transfers. See “Safe Transfer Rules” for further detail.
+Smart contracts MUST implement the ERC-165 supportsInterface function and signify support for the ERC1155TokenReceiver interface to accept transfers. See “ERC1155TokenReceiver ERC-165 rules” for further detail.
+        @dev An ERC1155-compliant smart contract MUST call this function on the token recipient contract, at the end of a `safeTransferFrom` after the balance has been updated.
+        This function MUST return `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))` (i.e. 0xf23a6e61) if it accepts the transfer.
+        This function MUST revert if it rejects the transfer.
+        Return of any other value than the prescribed keccak256 generated value MUST result in the transaction being reverted by the caller.
+        @dev An ERC1155-compliant smart contract MUST call this function on the token recipient contract, at the end of a `safeBatchTransferFrom` after the balances have been updated.
+        This function MUST return `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))` (i.e. 0xbc197c81) if it accepts the transfer(s).
+        This function MUST revert if it rejects the transfer(s).
+        Return of any other value than the prescribed keccak256 generated value MUST result in the transaction being reverted by the caller.
+To be more explicit about how the standard safeTransferFrom and safeBatchTransferFrom functions MUST operate with respect to the ERC1155TokenReceiver hook functions, a list of scenarios and rules follows.
+onERC1155Received and onERC1155BatchReceived MUST NOT be called on an EOA (Externally Owned Account).
+onERC1155Received and onERC1155BatchReceived MUST NOT be called outside of a mint or transfer process.
+The transfer MUST be reverted with the one caveat below.
+The transfer MUST be reverted.
+The transfer MUST be reverted.
+The balances for the transfer MUST have been updated before the ERC1155TokenReceiver hook is called on a recipient contract.
+The transfer event MUST have been emitted to reflect the balance changes before the ERC1155TokenReceiver hook is called on the recipient contract.
+One of onERC1155Received or onERC1155BatchReceived MUST be called on the recipient contract.
+See “onERC1155Received rules” for further rules that MUST be followed.
+See “onERC1155BatchReceived rules” for further rules that MUST be followed.
+All balance transfers that are referenced in a call to an ERC1155TokenReceiver hook MUST be updated before the ERC1155TokenReceiver hook is called on the recipient contract.
+All transfer events MUST have been emitted to reflect current balance changes before an ERC1155TokenReceiver hook is called on the recipient contract.
+onERC1155Received or onERC1155BatchReceived MUST be called on the recipient as many times as necessary such that every balance change for the recipient in the scenario is accounted for.
+The return magic value for every hook call MUST be checked and acted upon as per “onERC1155Received rules” and “onERC1155BatchReceived rules”.
+See “onERC1155BatchReceived rules” for further rules that MUST be followed.
+See “onERC1155Received rules” for further rules that MUST be followed.
+The prescribed keccak256 acceptance value magic for the receiver hook being called MUST be returned after forwarding is successful.
+i.e. an external viewer MUST still be able to query the balance via a standard function and it MUST be identical to the balance as determined by TransferSingle and TransferBatch events alone.
+However while the safeTransferFrom or safeBatchTransferFrom functions MUST revert if a receiving contract does not implement the ERC1155TokenReceiver interface, a non-standard function MAY proceed with the transfer.
+MUST revert if _to is the zero address.
+MUST revert if balance of holder for token _id is lower than the _value sent to the recipient.
+MUST revert on any other error.
+MUST emit the TransferSingle event to reflect the balance change (see “TransferSingle and TransferBatch event rules” section).
+After the above conditions are met, this function MUST check if _to is a smart contract (e.g. code size &gt; 0). If so, it MUST call onERC1155Received on _to and act appropriately (see “onERC1155Received rules” section).
+The _data argument provided by the sender for the transfer MUST be passed with its contents unaltered to the onERC1155Received hook function via its _data argument.
+MUST revert if _to is the zero address.
+MUST revert if length of _ids is not the same as length of _values.
+MUST revert if any of the balance(s) of the holder(s) for token(s) in _ids is lower than the respective amount(s) in _values sent to the recipient.
+MUST revert on any other error.
+MUST emit TransferSingle or TransferBatch event(s) such that all the balance changes are reflected (see “TransferSingle and TransferBatch event rules” section).
+The balance changes and events MUST occur in the array order they were submitted (_ids[0]/_values[0] before _ids[1]/_values[1], etc).
+After the above conditions are met, this function MUST check if _to is a smart contract (e.g. code size &gt; 0). If so, it MUST call onERC1155Received or onERC1155BatchReceived on _to and act appropriately (see “onERC1155Received and onERC1155BatchReceived rules” section).
+The _data argument provided by the sender for the transfer MUST be passed with its contents unaltered to the ERC1155TokenReceiver hook function(s) via their _data argument.
+The _operator argument MUST be the address of an account/contract that is approved to make the transfer (SHOULD be msg.sender).
+The _from argument MUST be the address of the holder whose balance is decreased.
+The _to argument MUST be the address of the recipient whose balance is increased.
+The _id argument MUST be the token type being transferred.
+The _value argument MUST be the number of tokens the holder balance is decreased by and match what the recipient balance is increased by.
+When minting/creating tokens, the _from argument MUST be set to 0x0 (i.e. zero address). See “Minting/creating and burning/destroying rules”.
+When burning/destroying tokens, the _to argument MUST be set to 0x0 (i.e. zero address). See “Minting/creating and burning/destroying rules”.
+The _operator argument MUST be the address of an account/contract that is approved to make the transfer (SHOULD be msg.sender).
+The _from argument MUST be the address of the holder whose balance is decreased for each entry pair in _ids and _values.
+The _to argument MUST be the address of the recipient whose balance is increased for each entry pair in _ids and _values.
+The _ids array argument MUST contain the ids of the tokens being transferred.
+The _values array argument MUST contain the number of token to be transferred for each corresponding entry in _ids.
+_ids and _values MUST have the same length.
+When minting/creating tokens, the _from argument MUST be set to 0x0 (i.e. zero address). See “Minting/creating and burning/destroying rules”.
+When burning/destroying tokens, the _to argument MUST be set to 0x0 (i.e. zero address). See “Minting/creating and burning/destroying rules”.
+All TransferSingle and TransferBatch events MUST be emitted to reflect all the balance changes that have occurred before any call(s) to onERC1155Received or onERC1155BatchReceived.
+To make sure event order is correct in the case of valid re-entry (e.g. if a receiver contract forwards tokens on receipt) state balance and events balance MUST match before calling an external contract.
+The _operator argument MUST be the address of an account/contract that is approved to make the transfer (SHOULD be msg.sender).
+The _from argument MUST be the address of the holder whose balance is decreased.
+_from MUST be 0x0 for a mint.
+The _id argument MUST be the token type being transferred.
+The _value argument MUST be the number of tokens the holder balance is decreased by and match what the recipient balance is increased by.
+The _data argument MUST contain the information provided by the sender for the transfer with its contents unaltered.
+i.e. it MUST pass on the unaltered _data argument sent via the safeTransferFrom or safeBatchTransferFrom call for this transfer.
+If the return value is bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)")) the transfer MUST be completed or MUST revert if any other conditions are not met for success.
+If the recipient contract throws/reverts the transaction MUST be reverted.
+If the return value is anything other than bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)")) the transaction MUST be reverted.
+The _operator argument MUST be the address of an account/contract that is approved to make the transfer (SHOULD be msg.sender).
+The _from argument MUST be the address of the holder whose balance is decreased.
+_from MUST be 0x0 for a mint.
+The _ids argument MUST be the list of tokens being transferred.
+The _values argument MUST be the list of number of tokens (matching the list and order of tokens specified in _ids) the holder balance is decreased by and match what the recipient balance is increased by.
+The _data argument MUST contain the information provided by the sender for the transfer with its contents unaltered.
+i.e. it MUST pass on the unaltered _data argument sent via the safeBatchTransferFrom call for this transfer.
+If the return value is bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)")) the transfer MUST be completed or MUST revert if any other conditions are not met for success.
+If the recipient contract throws/reverts the transaction MUST be reverted.
+If the return value is anything other than bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)")) the transaction MUST be reverted.
+It MUST return the constant value true if 0x01ffc9a7 is passed through the interfaceID argument. This signifies ERC-165 support.
+It MUST return the constant value true if 0x4e2312e0 is passed through the interfaceID argument. This signifies ERC-1155 ERC1155TokenReceiver support.
+It MUST NOT consume more than 10,000 gas.
+If an implementation specific API function is used to transfer ERC-1155 token(s) to a contract, the safeTransferFrom or safeBatchTransferFrom (as appropriate) rules MUST still be followed if the receiver implements the ERC1155TokenReceiver interface. If it does not the non-standard implementation SHOULD revert but MAY proceed.
+If however myTransferFrom wishes to continue it MUST call supportsInterface(0x4e2312e0) on _to and if it returns the constant value true the transaction MUST be reverted, as it is now known to be a valid receiver and the previous acceptance step failed.
+Balances that are updated MUST have equivalent transfer events emitted.
+Balances (and events associated) that are referenced in a call to an ERC1155TokenReceiver hook MUST be updated (and emitted) before the ERC1155TokenReceiver hook is called.
+The return values of the ERC1155TokenReceiver hook functions that are called MUST be respected if they are implemented.
+Only non-standard transfer functions MAY allow tokens to be sent to a recipient contract that does NOT implement the necessary ERC1155TokenReceiver hook functions. safeTransferFrom and safeBatchTransferFrom MUST revert in that case (unless it is a hybrid standards implementation see “Backwards Compatibility”).
+A mint/create operation is essentially a specialized transfer and MUST follow these rules:
+The “TransferSingle and TransferBatch event rules” MUST be followed as appropriate for the mint(s) (i.e. singles or batches) however the _from argument MUST be set to 0x0 (i.e. zero address) to flag the transfer as a mint to contract observers.
+NOTE: This includes tokens that are given an initial balance in the contract. The balance of the contract MUST also be able to be determined by events alone meaning initial contract balances (for eg. in construction) MUST emit events to reflect those balances too.
+A burn/destroy operation is essentially a specialized transfer and MUST follow these rules:
+The “TransferSingle and TransferBatch event rules” MUST be followed as appropriate for the burn(s) (i.e. singles or batches) however the _to argument MUST be set to 0x0 (i.e. zero address) to flag the transfer as a burn to contract observers.
+When burning/destroying you do not have to actually transfer to 0x0 (that is impl specific), only the _to argument in the event MUST be set to 0x0 as above.
+Even in a non-safe API and/or hybrid standards case the above event rules MUST still be adhered to when minting/creating or burning/destroying.
+A contract MAY skip calling the ERC1155TokenReceiver hook function(s) if the mint operation is transferring the token(s) to itself. In all other cases the ERC1155TokenReceiver rules MUST be followed as appropriate for the implementation (i.e. safe, custom and/or hybrid).
+The URI value allows for ID substitution by clients. If the string {id} exists in any URI, clients MUST replace this with the actual token ID in hexadecimal form. This allows for a large number of tokens to use the same on-chain string by defining a URI once, for that large number of tokens.
+The string format of the substituted hexadecimal ID MUST be lowercase alphanumeric: [0-9a-f] with no 0x prefix.
+The string format of the substituted hexadecimal ID MUST be leading zero padded to 64 hex characters length if necessary.
+The ERC-165 supportsInterface function MUST return the constant value true if 0x0e89341c is passed through the interfaceID argument.
+Changes to the URI MUST emit the URI event if the change can be expressed with an event (i.e. it isn’t dynamic/programmatic).
+The uri function MUST return the same value as the latest event for an _id if it was emitted.
+The uri function MUST NOT be used to check for the existence of a token as it is possible for an implementation to return a valid string even if the token does not exist.
+        The URI MUST point to a JSON file that conforms to the "ERC-1155 Metadata URI JSON Schema".
+This JSON schema is loosely based on the “ERC721 Metadata JSON Schema”, but includes optional formatting to allow for ID substitution by clients. If the string {id} exists in any JSON value, it MUST be replaced with the actual token ID, by all client software that follows this standard.
+The string format of the substituted hexadecimal ID MUST be lowercase alphanumeric: [0-9a-f] with no 0x prefix.
+The string format of the substituted hexadecimal ID MUST be leading zero padded to 64 hex characters length if necessary.
+Metadata localization should be standardized to increase presentation uniformity across all languages. As such, a simple overlay method is proposed to enable localization. If the metadata JSON file contains a localization attribute, its content MAY be used to provide localized values for fields that need it. The localization attribute should be a sub-object with three attributes: uri, default and locales. If the string {locale} exists in any URI, it MUST be replaced with the chosen locale by all client software.
+../Dataset/ERC/1271.txt
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+   * MUST return the bytes4 magic value 0x1626ba7e when function passes.
+   * MUST NOT modify state (using STATICCALL for solc &lt; 0.5, view modifier for solc &gt; 0.5)
+   * MUST allow external calls
+../Dataset/ERC/1363.txt
+Implementing contracts MUST implement the ERC-1363 interface as well as the ERC-20 and ERC-165 interfaces.
+A contract that wants to accept token payments via transferAndCall or transferFromAndCall MUST implement the following interface:
+   * transfer. Return of other than the magic value MUST result in the
+A contract that wants to accept token payments via approveAndCall MUST implement the following interface:
+   * approval. Return of other than the magic value MUST result in the
+../Dataset/ERC/1820.txt
+/// @dev The interface a contract MUST implement if it is the implementer of
+    //  If the result is not cached or the cached value is out-of-date, the cache MUST be updated manually by calling
+Below is the raw transaction which MUST be used to deploy the smart contract on any chain.
+This transaction MUST NOT use EIP-155 in order to work on any chain.
+This transaction MUST have a relatively high gas price to be deployed on any chain. In this case, it is going to be 100 Gwei.
+To deploy the registry, 0.08 ether MUST be sent to this account first.
+            "content": "/* ERC1820 Pseudo-introspection Registry Contract\n * This standard defines a universal registry smart contract where any address (contract or regular account) can\n * register which interface it supports and which smart contract is responsible for its implementation.\n *\n * Written in 2019 by Jordi Baylina and Jacques Dafflon\n *\n * To the extent possible under law, the author(s) have dedicated all copyright and related and neighboring rights to\n * this software to the public domain worldwide. This software is distributed without any warranty.\n *\n * You should have received a copy of the CC0 Public Domain Dedication along with this software. If not, see\n * &lt;http://creativecommons.org/publicdomain/zero/1.0/&gt;.\n *\n *    ███████╗██████╗  ██████╗ ██╗ █████╗ ██████╗  ██████╗\n *    ██╔════╝██╔══██╗██╔════╝███║██╔══██╗╚════██╗██╔═████╗\n *    █████╗  ██████╔╝██║     ╚██║╚█████╔╝ █████╔╝██║██╔██║\n *    ██╔══╝  ██╔══██╗██║      ██║██╔══██╗██╔═══╝ ████╔╝██║\n *    ███████╗██║  ██║╚██████╗ ██║╚█████╔╝███████╗╚██████╔╝\n *    ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝ ╚════╝ ╚══════╝ ╚═════╝\n *\n *    ██████╗ ███████╗ ██████╗ ██╗███████╗████████╗██████╗ ██╗   ██╗\n *    ██╔══██╗██╔════╝██╔════╝ ██║██╔════╝╚══██╔══╝██╔══██╗╚██╗ ██╔╝\n *    ██████╔╝█████╗  ██║  ███╗██║███████╗   ██║   ██████╔╝ ╚████╔╝\n *    ██╔══██╗██╔══╝  ██║   ██║██║╚════██║   ██║   ██╔══██╗  ╚██╔╝\n *    ██║  ██║███████╗╚██████╔╝██║███████║   ██║   ██║  ██║   ██║\n *    ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═╝╚══════╝   ╚═╝   ╚═╝  ╚═╝   ╚═╝\n *\n */\npragma solidity 0.5.3;\n// IV is value needed to have a vanity address starting with '0x1820'.\n// IV: 53759\n\n/// @dev The interface a contract MUST implement if it is the implementer of\n/// some (other) interface for any address other than itself.\ninterface ERC1820ImplementerInterface {\n    /// @notice Indicates whether the contract implements the interface 'interfaceHash' for the address 'addr' or not.\n    /// @param interfaceHash keccak256 hash of the name of the interface\n    /// @param addr Address for which the contract will implement the interface\n    /// @return ERC1820_ACCEPT_MAGIC only if the contract implements 'interfaceHash' for the address 'addr'.\n    function canImplementInterfaceForAddress(bytes32 interfaceHash, address addr) external view returns(bytes32);\n}\n\n\n/// @title ERC1820 Pseudo-introspection Registry Contract\n/// @author Jordi Baylina and Jacques Dafflon\n/// @notice This contract is the official implementation of the ERC1820 Registry.\n/// @notice For more details, see https://eips.ethereum.org/EIPS/eip-1820\ncontract ERC1820Registry {\n    /// @notice ERC165 Invalid ID.\n    bytes4 constant internal INVALID_ID = 0xffffffff;\n    /// @notice Method ID for the ERC165 supportsInterface method (= `bytes4(keccak256('supportsInterface(bytes4)'))`).\n    bytes4 constant internal ERC165ID = 0x01ffc9a7;\n    /// @notice Magic value which is returned if a contract implements an interface on behalf of some other address.\n    bytes32 constant internal ERC1820_ACCEPT_MAGIC = keccak256(abi.encodePacked(\"ERC1820_ACCEPT_MAGIC\"));\n\n    /// @notice mapping from addresses and interface hashes to their implementers.\n    mapping(address =&gt; mapping(bytes32 =&gt; address)) internal interfaces;\n    /// @notice mapping from addresses to their manager.\n    mapping(address =&gt; address) internal managers;\n    /// @notice flag for each address and erc165 interface to indicate if it is cached.\n    mapping(address =&gt; mapping(bytes4 =&gt; bool)) internal erc165Cached;\n\n    /// @notice Indicates a contract is the 'implementer' of 'interfaceHash' for 'addr'.\n    event InterfaceImplementerSet(address indexed addr, bytes32 indexed interfaceHash, address indexed implementer);\n    /// @notice Indicates 'newManager' is the address of the new manager for 'addr'.\n    event ManagerChanged(address indexed addr, address indexed newManager);\n\n    /// @notice Query if an address implements an interface and through which contract.\n    /// @param _addr Address being queried for the implementer of an interface.\n    /// (If '_addr' is the zero address then 'msg.sender' is assumed.)\n    /// @param _interfaceHash Keccak256 hash of the name of the interface as a string.\n    /// E.g., 'web3.utils.keccak256(\"ERC777TokensRecipient\")' for the 'ERC777TokensRecipient' interface.\n    /// @return The address of the contract which implements the interface '_interfaceHash' for '_addr'\n    /// or '0' if '_addr' did not register an implementer for this interface.\n    function getInterfaceImplementer(address _addr, bytes32 _interfaceHash) external view returns (address) {\n        address addr = _addr == address(0) ? msg.sender : _addr;\n        if (isERC165Interface(_interfaceHash)) {\n            bytes4 erc165InterfaceHash = bytes4(_interfaceHash);\n            return implementsERC165Interface(addr, erc165InterfaceHash) ? addr : address(0);\n        }\n        return interfaces[addr][_interfaceHash];\n    }\n\n    /// @notice Sets the contract which implements a specific interface for an address.\n    /// Only the manager defined for that address can set it.\n    /// (Each address is the manager for itself until it sets a new manager.)\n    /// @param _addr Address for which to set the interface.\n    /// (If '_addr' is the zero address then 'msg.sender' is assumed.)\n    /// @param _interfaceHash Keccak256 hash of the name of the interface as a string.\n    /// E.g., 'web3.utils.keccak256(\"ERC777TokensRecipient\")' for the 'ERC777TokensRecipient' interface.\n    /// @param _implementer Contract address implementing '_interfaceHash' for '_addr'.\n    function setInterfaceImplementer(address _addr, bytes32 _interfaceHash, address _implementer) external {\n        address addr = _addr == address(0) ? msg.sender : _addr;\n        require(getManager(addr) == msg.sender, \"Not the manager\");\n\n        require(!isERC165Interface(_interfaceHash), \"Must not be an ERC165 hash\");\n        if (_implementer != address(0) &amp;&amp; _implementer != msg.sender) {\n            require(\n                ERC1820ImplementerInterface(_implementer)\n                    .canImplementInterfaceForAddress(_interfaceHash, addr) == ERC1820_ACCEPT_MAGIC,\n                \"Does not implement the interface\"\n            );\n        }\n        interfaces[addr][_interfaceHash] = _implementer;\n        emit InterfaceImplementerSet(addr, _interfaceHash, _implementer);\n    }\n\n    /// @notice Sets '_newManager' as manager for '_addr'.\n    /// The new manager will be able to call 'setInterfaceImplementer' for '_addr'.\n    /// @param _addr Address for which to set the new manager.\n    /// @param _newManager Address of the new manager for 'addr'. (Pass '0x0' to reset the manager to '_addr'.)\n    function setManager(address _addr, address _newManager) external {\n        require(getManager(_addr) == msg.sender, \"Not the manager\");\n        managers[_addr] = _newManager == _addr ? address(0) : _newManager;\n        emit ManagerChanged(_addr, _newManager);\n    }\n\n    /// @notice Get the manager of an address.\n    /// @param _addr Address for which to return the manager.\n    /// @return Address of the manager for a given address.\n    function getManager(address _addr) public view returns(address) {\n        // By default the manager of an address is the same address\n        if (managers[_addr] == address(0)) {\n            return _addr;\n        } else {\n            return managers[_addr];\n        }\n    }\n\n    /// @notice Compute the keccak256 hash of an interface given its name.\n    /// @param _interfaceName Name of the interface.\n    /// @return The keccak256 hash of an interface name.\n    function interfaceHash(string calldata _interfaceName) external pure returns(bytes32) {\n        return keccak256(abi.encodePacked(_interfaceName));\n    }\n\n    /* --- ERC165 Related Functions --- */\n    /* --- Developed in collaboration with William Entriken. --- */\n\n    /// @notice Updates the cache with whether the contract implements an ERC165 interface or not.\n    /// @param _contract Address of the contract for which to update the cache.\n    /// @param _interfaceId ERC165 interface for which to update the cache.\n    function updateERC165Cache(address _contract, bytes4 _interfaceId) external {\n        interfaces[_contract][_interfaceId] = implementsERC165InterfaceNoCache(\n            _contract, _interfaceId) ? _contract : address(0);\n        erc165Cached[_contract][_interfaceId] = true;\n    }\n\n    /// @notice Checks whether a contract implements an ERC165 interface or not.\n    //  If the result is not cached a direct lookup on the contract address is performed.\n    //  If the result is not cached or the cached value is out-of-date, the cache MUST be updated manually by calling\n    //  'updateERC165Cache' with the contract address.\n    /// @param _contract Address of the contract to check.\n    /// @param _interfaceId ERC165 interface to check.\n    /// @return True if '_contract' implements '_interfaceId', false otherwise.\n    function implementsERC165Interface(address _contract, bytes4 _interfaceId) public view returns (bool) {\n        if (!erc165Cached[_contract][_interfaceId]) {\n            return implementsERC165InterfaceNoCache(_contract, _interfaceId);\n        }\n        return interfaces[_contract][_interfaceId] == _contract;\n    }\n\n    /// @notice Checks whether a contract implements an ERC165 interface or not without using nor updating the cache.\n    /// @param _contract Address of the contract to check.\n    /// @param _interfaceId ERC165 interface to check.\n    /// @return True if '_contract' implements '_interfaceId', false otherwise.\n    function implementsERC165InterfaceNoCache(address _contract, bytes4 _interfaceId) public view returns (bool) {\n        uint256 success;\n        uint256 result;\n\n        (success, result) = noThrowCall(_contract, ERC165ID);\n        if (success == 0 || result == 0) {\n            return false;\n        }\n\n        (success, result) = noThrowCall(_contract, INVALID_ID);\n        if (success == 0 || result != 0) {\n            return false;\n        }\n\n        (success, result) = noThrowCall(_contract, _interfaceId);\n        if (success == 1 &amp;&amp; result == 1) {\n            return true;\n        }\n        return false;\n    }\n\n    /// @notice Checks whether the hash is a ERC165 interface (ending with 28 zeroes) or not.\n    /// @param _interfaceHash The hash to check.\n    /// @return True if '_interfaceHash' is an ERC165 interface (ending with 28 zeroes), false otherwise.\n    function isERC165Interface(bytes32 _interfaceHash) internal pure returns (bool) {\n        return _interfaceHash &amp; 0x00000000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF == 0;\n    }\n\n    /// @dev Make a call on a contract without throwing if the function does not exist.\n    function noThrowCall(address _contract, bytes4 _interfaceId)\n        internal view returns (uint256 success, uint256 result)\n    {\n        bytes4 erc165ID = ERC165ID;\n\n        assembly {\n            let x := mload(0x40)               // Find empty storage location using \"free memory pointer\"\n            mstore(x, erc165ID)                // Place signature at beginning of empty storage\n            mstore(add(x, 0x04), _interfaceId) // Place first argument directly next to signature\n\n            success := staticcall(\n                30000,                         // 30k gas\n                _contract,                     // To addr\n                x,                             // Inputs are stored at location x\n                0x24,                          // Inputs are 36 (4 + 32) bytes long\n                x,                             // Store output over input (saves space)\n                0x20                           // Outputs are 32 bytes long\n            )\n\n            result := mload(x)                 // Load the result\n        }\n    }\n}\n",
+If the interface is part of an approved ERC, it MUST be named ERC###XXXXX where ### is the number of the ERC and XXXXX should be the name of the interface in CamelCase.
+NOTE: If the result is not cached or the cached value is out-of-date, the cache MUST be updated manually by calling updateERC165Cache with the contract address.
+If a contract dynamically changes its interface and relies on the ERC-165 cache of the ERC-1820 registry, the cache MUST be updated manually—there is no automatic cache invalidation or cache update.
+The cache update MUST be done using the updateERC165Cache function:
+Have fun but please, you MUST not conflict with the reserved designations above.
+The _implementer MUST implement the ERC1820ImplementerInterface (detailed below).
+Calling canImplementInterfaceForAddress on _implementer with the given _addr and _interfaceHash MUST return the ERC1820_ACCEPT_MAGIC value.
+NOTE: The _interfaceHash MUST NOT be an ERC-165 interface—it MUST NOT end with 28 zeroes (0).
+Any contract being registered as the implementation of an interface for a given address MUST implement said interface.
+In addition if it implements an interface on behalf of a different address, the contract MUST implement the ERC1820ImplementerInterface shown above.
+If a contract implements the interface (interfaceHash) for a given address (addr), it MUST return ERC1820_ACCEPT_MAGIC when called with the addr and the interfaceHash.
+If it does not implement the interfaceHash for a given address (addr), it MUST NOT return ERC1820_ACCEPT_MAGIC.
+../Dataset/ERC/1967.txt
+Beacons are used for keeping the logic address for multiple proxies in a single location, allowing the upgrade of multiple proxies by modifying a single storage slot. A beacon contract MUST implement the function:
+../Dataset/ERC/2309.txt
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL
+The address executing the transaction MUST own all the tokens within the range of fromTokenId and toTokenId, or MUST be an approved operator to act on the owners behalf.
+The fromTokenId and toTokenId MUST be a consecutive range of tokens IDs.
+The fromTokenId, fromAddress, and toAddress MUST be indexed parameters
+The toTokenId MUST NOT be an indexed parameter
+When minting/creating tokens, the fromAddress argument MUST be set to 0x0 (i.e. zero address).
+When burning/destroying tokens, the toAddress argument MUST be set to 0x0 (i.e. zero address).
+When emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted
+Contracts that implement the ConsecutiveTransfer event MAY still use the original Transfer event, however when emitting the ConsecutiveTransfer event the Transfer event MUST NOT be emitted.
+../Dataset/ERC/2678.txt
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”,
+../Dataset/ERC/2981.txt
+The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL
+Marketplaces MUST pay the royalty in the same unit of exchange as that of the _salePrice passed to royaltyInfo(). This is equivalent to saying that the _salePrice parameter and the royaltyAmount return value MUST be denominated in the same monetary unit. For example, if the sale price is in ETH, then the royalty payment must also be paid in ETH, and if the sale price is in USDC, then the royalty payment must also be paid in USDC.
+Implementers of this standard MUST calculate a percentage of the _salePrice when calculating the royalty amount. Subsequent invocations of royaltyInfo() MAY return a different royaltyAmount. Though there are some important considerations for implementers if they choose to perform different percentage calculations between royaltyInfo() invocations.
+The royaltyInfo() function is not aware of the unit of exchange for the sale and royalty payment. With that in mind, implementers MUST NOT return a fixed/constant royaltyAmount, wherein they’re ignoring the _salePrice. For the same reason, implementers MUST NOT determine the royaltyAmount based on comparing the _salePrice with constant numbers. In both cases, the royaltyInfo() function makes assumptions on the unit of exchange, which MUST be avoided.
+The percentage value used must be independent of the sale price for reasons previously mentioned (i.e. if the percentage value 10%, then 10% MUST apply whether _salePrice is 10, 10000 or 1234567890). If the royalty fee calculation results in a remainder, implementers MAY round up or round down to the nearest integer. For example, if the royalty fee is 10% and _salePrice is 999, the implementer can return either 99 or 100 for royaltyAmount, both are valid.
+Marketplaces that support this standard MUST pay royalties no matter where the sale occurred or in what currency, including on-chain sales, over-the-counter (OTC) sales and off-chain sales such as at auction houses. As royalty payments are voluntary, entities that respect this EIP must pay no matter where the sale occurred - a sale conducted outside of the blockchain is still a sale. The exact mechanism for paying and notifying the recipient will be defined in future EIPs.
+Implementers of this standard MUST have all of the following functions:
+../Dataset/ERC/3156.txt
+A lender MUST implement the IERC3156FlashLender interface.
+The maxFlashLoan function MUST return the maximum loan possible for token. If a token is not currently supported maxFlashLoan MUST return 0, instead of reverting.
+The flashFee function MUST return the fee charged for a loan of amount token. If the token is not supported flashFee MUST revert.
+The flashLoan function MUST include a callback to the onFlashLoan function in a IERC3156FlashBorrower contract.
+The flashLoan function MUST transfer amount of token to receiver before the callback to the receiver.
+The flashLoan function MUST include msg.sender as the initiator to onFlashLoan.
+The flashLoan function MUST NOT modify the token, amount and data parameter received, and MUST pass them on to onFlashLoan.
+The flashLoan function MUST include a fee argument to onFlashLoan with the fee to pay for the loan on top of the principal, ensuring that fee == flashFee(token, amount).
+The lender MUST verify that the onFlashLoan callback returns the keccak256 hash of “ERC3156FlashBorrower.onFlashLoan”.
+After the callback, the flashLoan function MUST take the amount + fee token from the receiver, or revert if this is not successful.
+If successful, flashLoan MUST return true.
+A receiver of flash loans MUST implement the IERC3156FlashBorrower interface:
+For the transaction to not revert, receiver MUST approve amount + fee of token to be taken by msg.sender before the end of onFlashLoan.
+If successful, onFlashLoan MUST return the keccak256 hash of “ERC3156FlashBorrower.onFlashLoan”.
+../Dataset/ERC/3475.txt
+* @dev transferFrom MUST have the `isApprovedFor(_from, _to, _transactions[i].classId)` approval to transfer `_from` address to `_to` address for given classId (i.e for Transaction tuple corresponding to all nonces).
+* @dev transferAllowanceFrom MUST have the `allowance(_from, msg.sender, _transactions[i].classId, _transactions[i].nonceId)` (where `i` looping for  [ 0 ...Transaction.length - 1] )
+* @dev it MUST be issued by a single entity (for instance, a role-based ownable contract that has integration with the liquidity pool of the deposited collateral by `_to` address).
+* @dev transferAllowanceFrom MUST have the `allowance(_from, msg.sender, _transactions[i].classId, _transactions[i].nonceId)` (where `i` looping for  [ 0 ...Transaction.length - 1] )
+* @dev redeem function for a given class, and nonce category MUST BE done after certain conditions for maturity (can be end time, total active liquidity, etc.) are met.
+* @dev burn function for given class and nonce MUST BE called by only the controller contract.
+* @dev burn function for a given class, and nonce category MUST BE done only after certain conditions for maturity (can be end time, total active liquidity, etc).
+* @dev contract MUST define internal function regarding the conditions for setting approval and should be callable only by bank or owner.
+* @notice Issue MUST trigger when Bonds are issued. This SHOULD not include zero value Issuing.
+* @dev Issue MUST be triggered when the operator (i.e Bank address) contract issues bonds to the given entity.
+* @notice Redeem MUST trigger when Bonds are redeemed. This SHOULD not include zero value redemption.
+* @dev `Burn` MUST trigger when the bonds are being redeemed via staking (or being invalidated) by the bank contract.
+* @dev `Burn` MUST trigger when Bonds are burned. This SHOULD not include zero value burning.
+* @dev Transfer MUST trigger when Bonds are transferred. This SHOULD not include zero value transfers.
+* @dev Transfer event with the _from `0x0` MUST not create this event(use `event Issued` instead).
+* @notice Approval MUST trigger when bond holders are approving an _operator. This SHOULD not include zero value approval.
+../Dataset/ERC/3525.txt
+     * @dev MUST emit when value of a token is transferred to another token with the same slot,
+     * @dev MUST emit when the approval value of a token is set or changed.
+     * @dev MUST emit when the slot of a token is set or changed.
+     * @dev MUST revert unless caller is the current owner, an authorized operator, or the approved
+     *  MUST emit the ApprovalValue event.
+     * @dev Caller MUST be the current owner, an authorized operator or an operator who has been
+     *  MUST revert if `_fromTokenId` or `_toTokenId` is zero token id or does not exist.
+     *  MUST revert if slots of `_fromTokenId` and `_toTokenId` do not match.
+     *  MUST revert if `_value` exceeds the balance of `_fromTokenId` or its allowance to the
+     *  MUST emit `TransferValue` event.
+     * @dev This function MUST create a new EIP-3525 token with the same slot for `_to`,
+     *  MUST revert if `_fromTokenId` is zero token id or does not exist.
+     *  MUST revert if `_to` is zero address.
+     *  MUST revert if `_value` exceeds the balance of `_fromTokenId` or its allowance to the
+     *  MUST emit `Transfer` and `TransferValue` events.
+     * @dev MUST emit when an operator is approved or disapproved to manage all of `_owner`'s
+     *  MUST emit ApprovalSlot event.
+     * @dev An EIP-3525 smart contract MUST check whether this function is implemented by the recipient contract, if the
+     *  recipient contract implements this function, the EIP-3525 contract MUST call this function after a
+     *  MUST return 0x009ce20b (i.e. `bytes4(keccak256('onERC3525Received(address,uint256,uint256,
+     *  MUST revert or return any value other than 0x009ce20b if the transfer is rejected.
+For any approving function, the caller MUST be the owner or has been approved with a higher level of authority.
+MUST revert unless msg.sender is the owner of _fromTokenId, an authorized operator or an operator who has been approved the whole token or at least _value of it.
+MUST revert if _fromTokenId or _toTokenId is zero token id or does not exist.
+MUST revert if slots of _fromTokenId and _toTokenId do not match.
+MUST revert if _value exceeds the value of _fromTokenId or its allowance to the operator.
+MUST check for the onERC3525Received function if the owner of _toTokenId is a smart contract, if the function exists, MUST call this function after the value transfer, MUST revert if the result is not equal to 0x009ce20b;
+MUST emit TransferValue event.
+MUST either find a EIP-3525 token owned by the address _to or create a new EIP-3525 token, with the same slot of _fromTokenId, to receive the transferred value.
+MUST revert unless msg.sender is the owner of _fromTokenId, an authorized operator or an operator who has been approved the whole token or at least _value of it.
+MUST revert if _fromTokenId is zero token id or does not exist.
+MUST revert if _to is zero address.
+MUST revert if _value exceeds the value of _fromTokenId or its allowance to the operator.
+MUST check for the onERC3525Received function if the _to address is a smart contract, if the function exists, MUST call this function after the value transfer, MUST revert if the result is not equal to 0x009ce20b;
+MUST emit Transfer and TransferValue events.
+../Dataset/ERC/3668.txt
+A CCIP read enabled contract MUST revert with the following error whenever a function that requires offchain data is called:
+urls specifies a list of URL templates to services (known as gateways) that implement the CCIP read protocol and can formulate an answer to the query. urls can be the empty list [], in which case the client MUST specify the URL template. The order in which URLs are tried is up to the client, but contracts SHOULD return them in order of priority, with the most important entry first.
+extraData is additional data that is required by the callback, and MUST be retained by the client and provided unmodified to the callback function. This value is opaque to the client.
+The contract MUST also implement a callback method for decoding and validating the data returned by the gateway. The name of this method is implementation-specific, but it MUST have the signature (bytes response, bytes extraData), and MUST have the same return type as the function that reverted with OffchainLookup.
+When a CCIP-aware contract wishes to make a call to another contract, and the possibility exists that the callee may implement CCIP read, the calling contract MUST catch all OffchainLookup errors thrown by the callee, and revert with a different error if the sender field of the error does not match the callee address.
+Where the possibility exists that a callee implements CCIP read, a CCIP-aware contract MUST NOT allow the default solidity behaviour of bubbling up reverts from nested calls. This is to prevent the following situation:
+If the URL template contains the {data} substitution parameter, the client MUST send a GET request after replacing the substitution parameters as described above.
+If the URL template does not contain the {data} substitution parameter, the client MUST send a POST request after replacing the substitution parameters as described above. The POST request MUST be sent with a Content-Type of application/json, and a payload matching the following schema:
+Compliant gateways MUST respond with a Content-Type of application/json, with the body adhering to the following JSON schema:
+Unsuccessful requests MUST return the appropriate HTTP status code - for example, 404 if the sender address is not supported by this gateway, 400 if the callData is in an invalid format, 500 if the server encountered an internal error, and so forth. If the Content-Type of a 4xx or 5xx response is application/json, it MUST adhere to the following JSON schema:
+Clients MUST support both GET and POST requests. Gateways may implement either or both as needed.
+A client that supports CCIP read MUST make contract calls using the following process:
+Clients MUST handle HTTP status codes appropriately, employing best practices for error reporting and retries.
+Clients MUST handle HTTP 4xx and 5xx error responses that have a content type other than application/json appropriately; they MUST NOT attempt to parse the response body as JSON.
+This protocol can result in multiple lookups being requested by the same contract. Clients MUST implement a limit on the number of lookups they permit for a single contract call, and this limit SHOULD be at least 4.
+../Dataset/ERC/4400.txt
+Every contract compliant to the EIP721Consumable extension MUST implement the IEIP721Consumable interface. The consumer extension is OPTIONAL for EIP-721 contracts.
+Every contract implementing the EIP721Consumable extension is free to define the permissions of a consumer (e.g. what are consumers allowed to do within their system) with only one exception - consumers MUST NOT be considered owners, authorised operators or approved addresses as per the EIP-721 specification. Thus, they MUST NOT be able to execute transfers &amp; approvals.
+The ConsumerChanged event MUST be emitted when a consumer is changed.
+On every transfer, the consumer MUST be changed to a default address. It is RECOMMENDED for implementors to use address(0) as that default address.
+The supportsInterface method MUST return true when called with 0x953c8dfa.
+../Dataset/ERC/4626.txt
+All EIP-4626 tokenized Vaults MUST implement EIP-20 to represent shares.
+All EIP-4626 tokenized Vaults MUST implement EIP-20’s optional metadata extensions.
+MUST be an EIP-20 token contract.
+MUST NOT revert.
+MUST be inclusive of any fees that are charged against assets in the Vault.
+MUST NOT revert.
+MUST NOT be inclusive of any fees that are charged against assets in the Vault.
+MUST NOT show any variations depending on the caller.
+MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.
+MUST NOT revert unless due to integer overflow caused by an unreasonably large input.
+MUST round down towards 0.
+MUST NOT be inclusive of any fees that are charged against assets in the Vault.
+MUST NOT show any variations depending on the caller.
+MUST NOT reflect slippage or other on-chain conditions, when performing the actual exchange.
+MUST NOT revert unless due to integer overflow caused by an unreasonably large input.
+MUST round down towards 0.
+MUST return the maximum amount of assets deposit would allow to be deposited for receiver and not cause a revert, which MUST NOT be higher than the actual maximum that would be accepted (it should underestimate if necessary). This assumes that the user has infinite assets, i.e. MUST NOT rely on balanceOf of asset.
+MUST factor in both global and user-specific limits, like if deposits are entirely disabled (even temporarily) it MUST return 0.
+MUST return 2 ** 256 - 1 if there is no limit on the maximum amount of assets that may be deposited.
+MUST NOT revert.
+MUST return as close to and no more than the exact amount of Vault shares that would be minted in a deposit call in the same transaction. I.e. deposit should return the same or more shares as previewDeposit if called in the same transaction.
+MUST NOT account for deposit limits like those returned from maxDeposit and should always act as though the deposit would be accepted, regardless if the user has enough tokens approved, etc.
+MUST be inclusive of deposit fees. Integrators should be aware of the existence of deposit fees.
+MUST NOT revert due to vault specific user/global limits. MAY revert due to other conditions that would also cause deposit to revert.
+MUST emit the Deposit event.
+MUST support EIP-20 approve / transferFrom on asset as a deposit flow.
+MUST revert if all of assets cannot be deposited (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
+MUST return the maximum amount of shares mint would allow to be deposited to receiver and not cause a revert, which MUST NOT be higher than the actual maximum that would be accepted (it should underestimate if necessary). This assumes that the user has infinite assets, i.e. MUST NOT rely on balanceOf of asset.
+MUST factor in both global and user-specific limits, like if mints are entirely disabled (even temporarily) it MUST return 0.
+MUST return 2 ** 256 - 1 if there is no limit on the maximum amount of shares that may be minted.
+MUST NOT revert.
+MUST return as close to and no fewer than the exact amount of assets that would be deposited in a mint call in the same transaction. I.e. mint should return the same or fewer assets as previewMint if called in the same transaction.
+MUST NOT account for mint limits like those returned from maxMint and should always act as though the mint would be accepted, regardless if the user has enough tokens approved, etc.
+MUST be inclusive of deposit fees. Integrators should be aware of the existence of deposit fees.
+MUST NOT revert due to vault specific user/global limits. MAY revert due to other conditions that would also cause mint to revert.
+MUST emit the Deposit event.
+MUST support EIP-20 approve / transferFrom on asset as a mint flow.
+MUST revert if all of shares cannot be minted (due to deposit limit being reached, slippage, the user not approving enough underlying tokens to the Vault contract, etc).
+MUST return the maximum amount of assets that could be transferred from owner through withdraw and not cause a revert, which MUST NOT be higher than the actual maximum that would be accepted (it should underestimate if necessary).
+MUST factor in both global and user-specific limits, like if withdrawals are entirely disabled (even temporarily) it MUST return 0.
+MUST NOT revert.
+MUST return as close to and no fewer than the exact amount of Vault shares that would be burned in a withdraw call in the same transaction. I.e. withdraw should return the same or fewer shares as previewWithdraw if called in the same transaction.
+MUST NOT account for withdrawal limits like those returned from maxWithdraw and should always act as though the withdrawal would be accepted, regardless if the user has enough shares, etc.
+MUST be inclusive of withdrawal fees. Integrators should be aware of the existence of withdrawal fees.
+MUST NOT revert due to vault specific user/global limits. MAY revert due to other conditions that would also cause withdraw to revert.
+MUST emit the Withdraw event.
+MUST support a withdraw flow where the shares are burned from owner directly where owner is msg.sender.
+MUST support a withdraw flow where the shares are burned from owner directly where msg.sender has EIP-20 approval over the shares of owner.
+MUST revert if all of assets cannot be withdrawn (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
+MUST return the maximum amount of shares that could be transferred from owner through redeem and not cause a revert, which MUST NOT be higher than the actual maximum that would be accepted (it should underestimate if necessary).
+MUST factor in both global and user-specific limits, like if redemption is entirely disabled (even temporarily) it MUST return 0.
+MUST NOT revert.
+MUST return as close to and no more than the exact amount of assets that would be withdrawn in a redeem call in the same transaction. I.e. redeem should return the same or more assets as previewRedeem if called in the same transaction.
+MUST NOT account for redemption limits like those returned from maxRedeem and should always act as though the redemption would be accepted, regardless if the user has enough shares, etc.
+MUST be inclusive of withdrawal fees. Integrators should be aware of the existence of withdrawal fees.
+MUST NOT revert due to vault specific user/global limits. MAY revert due to other conditions that would also cause redeem to revert.
+MUST emit the Withdraw event.
+MUST support a redeem flow where the shares are burned from owner directly where owner is msg.sender.
+MUST support a redeem flow where the shares are burned from owner directly where msg.sender has EIP-20 approval over the shares of owner.
+MUST revert if all of shares cannot be redeemed (due to withdrawal limit being reached, slippage, the owner not having enough shares, etc).
+MUST be emitted when tokens are deposited into the Vault via the mint and deposit methods.
+MUST be emitted when shares are withdrawn from the Vault in EIP-4626.redeem or EIP-4626.withdraw methods.
+../Dataset/ERC/4906.txt
+The MetadataUpdate or BatchMetadataUpdate event MUST be emitted when the JSON metadata of a token, or a consecutive range of tokens, is changed.
+The supportsInterface method MUST return true when called with 0x49064906.
+../Dataset/ERC/4907.txt
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+The UpdateUser event MUST be emitted when a user address is changed or the user expires is changed.
+The supportsInterface method MUST return true when called with 0xad092b5c.
+../Dataset/ERC/5192.txt
+The keywords “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY” and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
+../Dataset/ERC/5313.txt
+The key word “MUST” in this document is to be interpreted as described in RFC 2119.
+Every contract compliant with this EIP MUST implement the EIP5313 interface.
